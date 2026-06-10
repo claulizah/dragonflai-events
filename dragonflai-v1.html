@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DragonflAI Events — Planificador Inteligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0D1B2A;
+  --night-2:#142030;
+  --night-3:#1C2D40;
+  --night-4:#243650;
+  --teal:#2EC4B6;
+  --teal-dark:#1A9E92;
+  --teal-glow:rgba(46,196,182,.18);
+  --violet:#7B2FBE;
+  --violet-light:rgba(123,47,190,.2);
+  --gold:#F4C430;
+  --gold-light:rgba(244,196,48,.15);
+  --rose:#E8637A;
+  --text:#F0F4F8;
+  --text-2:#A8BCCF;
+  --text-3:#5A7A94;
+  --border:rgba(46,196,182,.15);
+  --border-strong:rgba(46,196,182,.35);
+  --glass:rgba(255,255,255,.04);
+  --glass-hover:rgba(255,255,255,.07);
+  --radius:14px;
+  --radius-lg:22px;
+  --radius-xl:32px;
+  --shadow-teal:0 0 40px rgba(46,196,182,.12);
+  --shadow-card:0 4px 24px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--night);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;overflow-x:hidden}
+
+/* ── ORBS DE FONDO ── */
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:.35}
+.bg-orb-1{width:500px;height:500px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-100px;right:-100px}
+.bg-orb-2{width:400px;height:400px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-100px;left:-100px}
+.bg-orb-3{width:300px;height:300px;background:radial-gradient(circle,rgba(244,196,48,.4),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+
+/* ── LANG BAR ── */
+.lang-bar{position:relative;z-index:10;background:rgba(13,27,42,.8);backdrop-filter:blur(10px);padding:7px 2rem;display:flex;justify-content:flex-end;gap:8px;border-bottom:1px solid var(--border)}
+.lang-btn{padding:4px 14px;border-radius:100px;border:1px solid rgba(46,196,182,.25);background:transparent;color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:.03em}
+.lang-btn.active,.lang-btn:hover{background:rgba(46,196,182,.15);color:var(--teal);border-color:var(--teal)}
+
+/* ── HEADER ── */
+header{position:relative;z-index:10;background:rgba(13,27,42,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+.logo-svg{width:36px;height:36px;flex-shrink:0}
+.logo-text{display:flex;flex-direction:column;line-height:1}
+.logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);letter-spacing:.5px}
+.logo-name .ai{color:var(--teal)}
+.logo-sub{font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
+.mode-pill{font-size:11px;font-weight:600;padding:4px 14px;border-radius:100px;letter-spacing:.03em;transition:all .2s}
+.mode-pill.diy{background:rgba(46,196,182,.15);color:var(--teal);border:1px solid rgba(46,196,182,.3)}
+.mode-pill.pro{background:var(--violet-light);color:#B47FE8;border:1px solid rgba(123,47,190,.3)}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;max-width:700px;margin:0 auto;text-align:center;padding:4.5rem 1.5rem 2.5rem}
+.hero-dragonfly{font-size:52px;margin-bottom:1.25rem;display:block;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);background:rgba(46,196,182,.1);border:1px solid rgba(46,196,182,.25);padding:5px 16px;border-radius:100px;margin-bottom:1.5rem}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,6vw,3.8rem);line-height:1.1;letter-spacing:-.5px;color:var(--text);margin-bottom:1rem;font-weight:600}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero-sub{font-size:16px;color:var(--text-2);max-width:480px;margin:0 auto}
+
+/* ── MODE SELECTOR ── */
+.mode-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:0 1.5rem}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode-card{background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;cursor:pointer;transition:all .25s;text-align:left;position:relative;overflow:hidden}
+.mode-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius-lg);opacity:0;transition:opacity .25s}
+.mode-card:hover{border-color:var(--border-strong);background:var(--glass-hover);transform:translateY(-2px)}
+.mode-card.sel-diy{border-color:rgba(46,196,182,.5);background:rgba(46,196,182,.07)}
+.mode-card.sel-diy::before{background:linear-gradient(135deg,rgba(46,196,182,.08),transparent);opacity:1}
+.mode-card.sel-pro{border-color:rgba(123,47,190,.5);background:rgba(123,47,190,.07)}
+.mode-card.sel-pro::before{background:linear-gradient(135deg,rgba(123,47,190,.08),transparent);opacity:1}
+.mc-icon{font-size:26px;margin-bottom:10px}
+.mc-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.mc-sub{font-size:13px;color:var(--text-2);line-height:1.4}
+.mode-card.sel-diy .mc-title{color:var(--teal)}
+.mode-card.sel-pro .mc-title{color:#B47FE8}
+
+/* ── EVENT PILLS ── */
+.event-types{position:relative;z-index:1;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:1.75rem 1.5rem 0;max-width:760px;margin:0 auto}
+.epill{display:flex;align-items:center;gap:5px;padding:7px 16px;border-radius:100px;border:1px solid var(--border);background:var(--glass);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:all .2s;white-space:nowrap;font-family:'Inter',sans-serif;backdrop-filter:blur(8px)}
+.epill:hover{border-color:var(--border-strong);color:var(--teal)}
+.epill.active{background:linear-gradient(135deg,rgba(46,196,182,.2),rgba(46,196,182,.08));border-color:var(--teal);color:var(--teal)}
+
+/* ── FORM CARD ── */
+.form-wrap{position:relative;z-index:1;max-width:740px;margin:1.75rem auto 0;padding:0 1.5rem}
+.form-card{background:rgba(20,32,48,.7);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-card),var(--shadow-teal);overflow:hidden}
+.prog-track{height:2px;background:rgba(255,255,255,.06)}
+.prog-fill{height:2px;background:linear-gradient(90deg,var(--teal),var(--violet));transition:width .4s ease;width:0}
+.fcard-head{padding:1.5rem 2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fcard-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)}
+.fcard-sub{font-size:12px;color:var(--text-3);margin-top:3px}
+.gens-badge{font-size:11px;font-weight:600;padding:4px 14px;border-radius:100px;white-space:nowrap;background:var(--gold-light);color:var(--gold);border:1px solid rgba(244,196,48,.3)}
+.fbody{padding:1.75rem 2rem}
+
+/* ── SECTION DIVIDERS ── */
+.sdiv{display:flex;align-items:center;gap:10px;margin:1.75rem 0 1.1rem;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+.sdiv::before{content:'◆';font-size:8px;color:var(--teal);flex-shrink:0}
+.sdiv::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* ── FIELDS ── */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fcol{grid-column:1/-1}
+.field label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1px solid rgba(46,196,182,.2);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:rgba(255,255,255,.04);transition:all .2s;outline:none;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,196,182,.1);background:rgba(46,196,182,.04)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-3)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.55}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 4.5L11 1' stroke='%235A7A94' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer}
+.field select option{background:var(--night-2);color:var(--text)}
+
+/* ── BUDGET ── */
+.budget-num{display:flex;align-items:baseline;gap:4px;margin-bottom:10px}
+.budget-cur{font-size:16px;color:var(--text-2);font-weight:500}
+.budget-val{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--text);line-height:1;font-weight:600}
+.budget-cur2{font-size:13px;color:var(--text-3);margin-left:4px}
+.budget-ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-top:6px}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:3px;background:rgba(255,255,255,.1);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--violet));border:2px solid var(--night-2);box-shadow:0 0 8px rgba(46,196,182,.5);cursor:pointer}
+
+/* ── COUNTER ── */
+.counter{display:flex;align-items:center;gap:12px}
+.cbtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--glass);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;flex-shrink:0}
+.cbtn:hover{border-color:var(--teal);color:var(--teal);background:rgba(46,196,182,.1)}
+.cval{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;min-width:48px;text-align:center;color:var(--text)}
+
+/* ── RADIO / TAGS ── */
+.rgroup{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.ropt{padding:6px 14px;border-radius:100px;border:1px solid var(--border);font-size:13px;color:var(--text-2);cursor:pointer;transition:all .2s;background:var(--glass);user-select:none;font-weight:500;font-family:'Inter',sans-serif}
+.ropt:hover{border-color:var(--border-strong)}
+.ropt.sel{background:linear-gradient(135deg,rgba(46,196,182,.2),rgba(123,47,190,.15));border-color:var(--teal);color:var(--teal)}
+.tag-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{padding:5px 13px;border-radius:100px;border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--text-2);cursor:pointer;transition:all .2s;background:var(--glass);user-select:none;font-family:'Inter',sans-serif}
+.tag:hover{border-color:var(--border-strong)}
+.tag.sel{background:rgba(46,196,182,.12);border-color:rgba(46,196,182,.5);color:var(--teal)}
+
+/* ── PRO FIELDS ── */
+.pro-block{display:none}
+.pro-block.show{display:block}
+
+/* ── GENERATE BUTTON ── */
+.btn-gen{width:100%;padding:16px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:1.75rem;letter-spacing:.02em;position:relative;overflow:hidden}
+.btn-gen::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);opacity:0;transition:opacity .2s}
+.btn-gen:hover::after{opacity:1}
+.btn-gen:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(46,196,182,.3)}
+.btn-gen:active{transform:translateY(0)}
+.btn-gen:disabled{background:var(--night-4);color:var(--text-3);cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ── RESULTS ── */
+#res-section{display:none;position:relative;z-index:1}
+.res-wrap{max-width:740px;margin:2rem auto 4rem;padding:0 1.5rem}
+.res-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px}
+.res-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--text)}
+.res-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-out{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--glass);color:var(--text-2);transition:all .2s;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;backdrop-filter:blur(8px)}
+.btn-out:hover{border-color:var(--border-strong);color:var(--teal)}
+.btn-wa{padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-wa:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,211,102,.3)}
+.btn-wa svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
+.res-card{background:rgba(20,32,48,.75);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-card);overflow:hidden}
+
+/* ── TABS ── */
+.res-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;padding:0 .5rem}
+.rtab{padding:12px 18px;font-size:13px;font-weight:500;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif}
+.rtab:hover{color:var(--text-2)}
+.rtab.active{color:var(--teal);border-bottom-color:var(--teal)}
+.tpanel{display:none;padding:2rem}
+.tpanel.active{display:block}
+
+/* ── AI CONTENT ── */
+.aic{line-height:1.8;color:var(--text)}
+.aic h2{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--text);margin:1.5rem 0 .75rem;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.aic h2:first-child{margin-top:0}
+.aic h2::before{content:'◆';font-size:8px;color:var(--teal)}
+.aic h3{font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;margin:1.25rem 0 .5rem}
+.aic p{margin-bottom:.75rem;color:var(--text-2);font-size:14px}
+.aic ul{padding-left:0;list-style:none;margin-bottom:1rem}
+.aic ul li{padding:8px 12px 8px 36px;font-size:14px;color:var(--text-2);position:relative;border-radius:var(--radius);transition:background .15s}
+.aic ul li:hover{background:rgba(255,255,255,.03)}
+.aic ul li::before{content:'◆';position:absolute;left:12px;color:var(--teal);font-size:8px;top:12px}
+.aic strong{color:var(--text);font-weight:600}
+
+/* ── BUDGET CARDS ── */
+.bcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:1rem 0}
+.bcard{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius);padding:14px;transition:all .2s}
+.bcard:hover{border-color:var(--border-strong);background:rgba(46,196,182,.04)}
+.bcard-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:6px}
+.bcard-amt{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text)}
+.bcard-pct{font-size:11px;color:var(--teal);margin-top:2px}
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:28px}
+.timeline::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:linear-gradient(to bottom,var(--teal),var(--violet),transparent)}
+.tl-item{position:relative;margin-bottom:1.25rem}
+.tl-dot{position:absolute;left:-28px;top:4px;width:13px;height:13px;border-radius:50%;background:var(--night-2);border:2px solid var(--teal);box-shadow:0 0 8px rgba(46,196,182,.4)}
+.tl-when{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:2px}
+.tl-what{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.tl-detail{font-size:13px;color:var(--text-2)}
+
+/* ── CHECKLIST ── */
+.cl-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;border-radius:var(--radius)}
+.cl-item:last-child{border-bottom:none}
+.cl-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--text-3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cl-item.chk .cl-box{background:linear-gradient(135deg,var(--teal),var(--violet));border-color:transparent;box-shadow:0 0 8px rgba(46,196,182,.3)}
+.cl-item.chk .cl-box::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
+.cl-item.chk .cl-text{text-decoration:line-through;color:var(--text-3)}
+.cl-text{font-size:14px;color:var(--text-2);line-height:1.5}
+.cl-cat{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-top:1px}
+
+/* ── VENDOR CARDS ── */
+.vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin:1rem 0}
+.vcard{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--radius);padding:14px;transition:all .2s}
+.vcard:hover{border-color:var(--border-strong);transform:translateY(-2px)}
+.vcard-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:4px}
+.vcard-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.vcard-tip{font-size:12px;color:var(--text-2)}
+
+/* ── SAVE THE DATE ── */
+.std-card{position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:1.25rem;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 2rem}
+.std-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,196,182,.12),rgba(123,47,190,.12),rgba(244,196,48,.08));z-index:0}
+.std-card::after{content:'';position:absolute;inset:0;border:1px solid rgba(46,196,182,.3);border-radius:var(--radius-lg);z-index:0}
+.std-bg-dragonfly{position:absolute;font-size:180px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-55%);z-index:0;pointer-events:none;line-height:1}
+.std-content{position:relative;z-index:1;width:100%}
+.std-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;font-weight:600}
+.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.75rem}
+.std-names em{font-style:italic;color:var(--teal)}
+.std-divider{display:flex;align-items:center;gap:12px;margin:1rem auto;width:200px}
+.std-divider::before,.std-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(46,196,182,.4),transparent)}
+.std-divider-icon{color:var(--teal);font-size:12px}
+.std-details{font-size:14px;color:var(--text-2);line-height:2}
+.std-detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
+.std-footer{font-size:12px;color:var(--text-3);margin-top:1.25rem;font-style:italic}
+.std-actions{display:flex;justify-content:center;gap:10px;margin-top:1.5rem;flex-wrap:wrap}
+.btn-std-copy{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--glass);color:var(--teal);transition:all .2s;font-family:'Inter',sans-serif}
+.btn-std-copy:hover{background:rgba(46,196,182,.1)}
+.btn-std-wa{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-std-wa:hover{box-shadow:0 4px 12px rgba(37,211,102,.3);transform:translateY(-1px)}
+.btn-std-wa svg{width:14px;height:14px;fill:#fff}
+
+/* ── COUNTDOWN ── */
+.countdown-bar{display:none;background:linear-gradient(135deg,rgba(46,196,182,.15),rgba(123,47,190,.15));border:1px solid rgba(46,196,182,.25);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1rem;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;backdrop-filter:blur(10px)}
+.countdown-bar.visible{display:flex}
+.cd-left{color:var(--text-2);font-size:12px}
+.cd-name{color:var(--text);font-size:14px;font-weight:600;margin-bottom:2px}
+.cd-units{display:flex;gap:16px}
+.cd-unit{text-align:center}
+.cd-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--teal);line-height:1}
+.cd-label{font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.cd-date{font-size:12px;color:var(--text-3);text-align:right}
+.cd-event-type{font-size:10px;color:var(--text-3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── PRO PROPOSAL ── */
+.pro-summary{background:rgba(123,47,190,.1);border:1px solid rgba(123,47,190,.25);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.25rem}
+.ps-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#B47FE8;margin-bottom:8px}
+.ps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.ps-label{font-size:11px;color:rgba(180,127,232,.7)}
+.ps-val{font-size:14px;font-weight:600;color:#B47FE8}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:3.5rem 2rem;display:none}
+.ldots{display:flex;justify-content:center;gap:8px;margin-bottom:1.25rem}
+.ldot{width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--violet));animation:pulse 1.2s ease-in-out infinite}
+.ldot:nth-child(2){animation-delay:.2s}
+.ldot:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:1}}
+.lmsg{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-bottom:6px}
+.lsub{font-size:13px;color:var(--text-3)}
+.l-dragonfly{font-size:36px;margin-bottom:1rem;display:block;animation:float 2s ease-in-out infinite}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:100px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:opacity .3s;white-space:nowrap;pointer-events:none;color:#fff;backdrop-filter:blur(10px)}
+
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;text-align:center;padding:2rem;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)}
+footer .teal{color:var(--teal)}
+
+@media(max-width:580px){
+  .fgrid{grid-template-columns:1fr}
+  .mode-grid{grid-template-columns:1fr}
+  .hero h1{font-size:2.2rem}
+  header{padding:0 1rem}
+  .fbody{padding:1.25rem}
+  .hero{padding:3rem 1rem 1.5rem}
+  .lang-bar{padding:7px 1rem}
+}
+@media print{
+  .bg-orb,.lang-bar,header,.form-wrap,.event-types,.hero,.mode-wrap,.res-actions,.res-tabs,footer{display:none!important}
+  #res-section{display:block!important}
+  body{background:#fff;color:#000}
+  .tpanel{display:block!important;page-break-inside:avoid}
+  .res-card{box-shadow:none;border:none}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND ORBS -->
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+
+<!-- LANG BAR -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('es')" id="btn-es">🇲🇽 Español</button>
+  <button class="lang-btn" onclick="setLang('en')" id="btn-en">🇺🇸 English</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo" href="#">
+    <svg class="logo-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Libélula SVG -->
+      <!-- Cuerpo -->
+      <ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6" opacity=".9"/>
+      <ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/>
+      <!-- Ojos -->
+      <circle cx="16.8" cy="12.2" r=".9" fill="#0D1B2A"/>
+      <circle cx="19.2" cy="12.2" r=".9" fill="#0D1B2A"/>
+      <!-- Ala superior izquierda -->
+      <ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".35" transform="rotate(-20 10 14)"/>
+      <ellipse cx="10" cy="14" rx="8" ry="4" fill="none" stroke="#2EC4B6" stroke-width=".8" opacity=".6" transform="rotate(-20 10 14)"/>
+      <!-- Ala superior derecha -->
+      <ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".35" transform="rotate(20 26 14)"/>
+      <ellipse cx="26" cy="14" rx="8" ry="4" fill="none" stroke="#7B2FBE" stroke-width=".8" opacity=".6" transform="rotate(20 26 14)"/>
+      <!-- Ala inferior izquierda -->
+      <ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".25" transform="rotate(-10 9 18)"/>
+      <!-- Ala inferior derecha -->
+      <ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".25" transform="rotate(10 27 18)"/>
+      <!-- Segmentos del cuerpo -->
+      <line x1="18" y1="22" x2="18" y2="24" stroke="#1A9E92" stroke-width="1" opacity=".7"/>
+      <line x1="18" y1="25" x2="18" y2="27" stroke="#1A9E92" stroke-width="1" opacity=".5"/>
+    </svg>
+    <div class="logo-text">
+      <span class="logo-name">Dragonfl<span class="ai">AI</span> Events</span>
+      <span class="logo-sub">Planificador con IA</span>
+    </div>
+  </a>
+  <span class="mode-pill diy" id="mode-pill">Planeación personal</span>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <span class="hero-tag">✦ <span data-es="Planificador de eventos con inteligencia artificial" data-en="AI-powered event planning">Planificador de eventos con inteligencia artificial</span></span>
+  <h1 id="hero-h1" data-es="Tu evento <em>perfecto,</em><br>planeado por IA" data-en="Your <em>perfect event,</em><br>planned by AI">Tu evento <em>perfecto,</em><br>planeado por IA</h1>
+  <p class="hero-sub" id="hero-sub" data-es="Responde unas preguntas y obtén cronograma, presupuesto, checklist, proveedores, ideas creativas y tu Save the Date." data-en="Answer a few questions and get timeline, budget, checklist, vendors, creative ideas and your Save the Date.">Responde unas preguntas y obtén cronograma, presupuesto, checklist, proveedores, ideas creativas y tu Save the Date.</p>
+</section>
+
+<!-- MODE SELECTOR -->
+<div class="mode-wrap">
+  <div class="mode-grid">
+    <div class="mode-card sel-diy" id="card-diy" onclick="setMode('diy')">
+      <div class="mc-icon">🎉</div>
+      <div class="mc-title" data-es="Planeando mi propio evento" data-en="Planning my own event">Planeando mi propio evento</div>
+      <div class="mc-sub" data-es="Novia, cumpleañera, anfitrión — plan personalizado para ti" data-en="Bride, birthday person, host — a personal plan made for you">Novia, cumpleañera, anfitrión — plan personalizado para ti</div>
+    </div>
+    <div class="mode-card" id="card-pro" onclick="setMode('pro')">
+      <div class="mc-icon">📋</div>
+      <div class="mc-title" data-es="Soy planner profesional" data-en="I'm a professional planner">Soy planner profesional</div>
+      <div class="mc-sub" data-es="Genera una propuesta lista para presentar a tu cliente" data-en="Generate a presentation-ready proposal for your client">Genera una propuesta lista para presentar a tu cliente</div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT TYPES -->
+<div class="event-types" id="event-types"></div>
+
+<!-- FORM -->
+<div class="form-wrap">
+  <div class="form-card">
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="fcard-head">
+      <div>
+        <div class="fcard-title" id="fcard-title">Planea tu Boda</div>
+        <div class="fcard-sub" id="fcard-sub" data-es="Más detalles = plan más personalizado" data-en="More detail = more personalized plan">Más detalles = plan más personalizado</div>
+      </div>
+      <div class="gens-badge" id="gen-badge">✦ <span id="gens-left">10</span> <span data-es="planes disponibles" data-en="plans remaining">planes disponibles</span></div>
+    </div>
+    <div class="fbody">
+
+      <div class="sdiv"><span data-es="Lo básico" data-en="The basics">Lo básico</span></div>
+      <div class="fgrid">
+        <div class="field">
+          <label id="lbl-name" data-es="Tu nombre" data-en="Your name">Tu nombre</label>
+          <input type="text" id="f-name" placeholder="ej. Sofía Martínez">
+        </div>
+        <div class="field">
+          <label data-es="Fecha del evento" data-en="Event date">Fecha del evento</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field">
+          <label data-es="Ciudad / lugar" data-en="City / location">Ciudad / lugar</label>
+          <input type="text" id="f-location" placeholder="ej. Querétaro, México">
+        </div>
+        <div class="field">
+          <label data-es="Horario" data-en="Time of day">Horario</label>
+          <select id="f-time">
+            <option value="afternoon" data-es="Tarde (2–6 PM)" data-en="Afternoon (2–6 PM)">Tarde (2–6 PM)</option>
+            <option value="evening" selected data-es="Noche (6–10 PM)" data-en="Evening (6–10 PM)">Noche (6–10 PM)</option>
+            <option value="morning" data-es="Mañana (10 AM–1 PM)" data-en="Morning (10 AM–1 PM)">Mañana (10 AM–1 PM)</option>
+            <option value="all-day" data-es="Todo el día" data-en="All day">Todo el día</option>
+          </select>
+        </div>
+        <div class="field fcol">
+          <label data-es="Presupuesto total" data-en="Total budget">Presupuesto total</label>
+          <div class="budget-num">
+            <span class="budget-cur">$</span>
+            <span class="budget-val" id="bval">15,000</span>
+            <span class="budget-cur2">MXN</span>
+          </div>
+          <input type="range" id="f-budget" min="5000" max="500000" step="5000" value="15000" oninput="updateBudget(this.value)">
+          <div class="budget-ticks"><span>$5K</span><span>$100K</span><span>$250K</span><span>$500K</span></div>
+        </div>
+        <div class="field">
+          <label data-es="Número de invitados" data-en="Number of guests">Número de invitados</label>
+          <div class="counter">
+            <button class="cbtn" onclick="adjGuests(-10)">−</button>
+            <span class="cval" id="gval">50</span>
+            <button class="cbtn" onclick="adjGuests(10)">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label data-es="Ambiente / estilo" data-en="Vibe / style">Ambiente / estilo</label>
+          <select id="f-vibe">
+            <option value="elegante y clásico" data-es="Elegante y clásico" data-en="Elegant and classic">Elegante y clásico</option>
+            <option value="rústico y bohemio" data-es="Rústico y bohemio" data-en="Rustic and bohemian">Rústico y bohemio</option>
+            <option value="moderno y minimalista" data-es="Moderno y minimalista" data-en="Modern and minimalist">Moderno y minimalista</option>
+            <option value="colorido y festivo" data-es="Colorido y festivo" data-en="Colorful and festive">Colorido y festivo</option>
+            <option value="romántico e íntimo" data-es="Romántico e íntimo" data-en="Romantic and intimate">Romántico e íntimo</option>
+            <option value="divertido y casual" data-es="Divertido y casual" data-en="Fun and casual">Divertido y casual</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sdiv"><span data-es="Personaliza tu plan" data-en="Personalize your plan">Personaliza tu plan</span></div>
+      <div class="fgrid">
+        <div class="field fcol" id="stress-row">
+          <label data-es="¿Qué tan estresado/a te sientes? 😅" data-en="How stressed are you about planning? 😅">¿Qué tan estresado/a te sientes? 😅</label>
+          <div class="rgroup" id="stress-opts"></div>
+        </div>
+        <div class="field fcol">
+          <label id="lbl-exp" data-es="Tu experiencia planeando eventos" data-en="Your planning experience">Tu experiencia planeando eventos</label>
+          <div class="rgroup" id="exp-opts"></div>
+        </div>
+        <div class="field fcol">
+          <label data-es="¿Qué es lo más importante para ti?" data-en="What matters most to you?">¿Qué es lo más importante para ti?</label>
+          <div class="rgroup" id="priority-opts"></div>
+        </div>
+        <div class="field">
+          <label data-es="Estado del venue" data-en="Venue status">Estado del venue</label>
+          <select id="f-venue">
+            <option value="not booked" data-es="Aún no reservado" data-en="Not booked yet">Aún no reservado</option>
+            <option value="shortlisting" data-es="Evaluando opciones" data-en="Shortlisting">Evaluando opciones</option>
+            <option value="booked" data-es="Ya reservado ✓" data-en="Already booked ✓">Ya reservado ✓</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-es="Proveedores contratados" data-en="Vendors booked">Proveedores contratados</label>
+          <select id="f-vendors">
+            <option value="none" data-es="Ninguno todavía" data-en="None yet">Ninguno todavía</option>
+            <option value="some" data-es="Algunos" data-en="A few">Algunos</option>
+            <option value="most" data-es="La mayoría" data-en="Most">La mayoría</option>
+            <option value="all" data-es="Todos" data-en="All">Todos</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PRO FIELDS -->
+      <div class="pro-block" id="pro-block">
+        <div class="sdiv"><span data-es="Datos del cliente" data-en="Client details">Datos del cliente</span></div>
+        <div class="fgrid">
+          <div class="field"><label data-es="Nombre del cliente" data-en="Client name">Nombre del cliente</label><input type="text" id="f-client" placeholder="ej. Familia García"></div>
+          <div class="field"><label data-es="Tu empresa / marca" data-en="Your company">Tu empresa / marca</label><input type="text" id="f-company" placeholder="ej. DragonflAI Events"></div>
+          <div class="field">
+            <label data-es="Sensibilidad al presupuesto" data-en="Budget sensitivity">Sensibilidad al presupuesto</label>
+            <select id="f-bsense">
+              <option value="budget-conscious" data-es="Muy ajustado" data-en="Tight">Muy ajustado</option>
+              <option value="flexible" data-es="Flexible" data-en="Flexible">Flexible</option>
+              <option value="unlimited" data-es="Sin límite" data-en="Unlimited">Sin límite</option>
+            </select>
+          </div>
+          <div class="field">
+            <label data-es="Tono de propuesta" data-en="Proposal tone">Tono de propuesta</label>
+            <select id="f-tone">
+              <option value="warm and personal" data-es="Cálido y personal" data-en="Warm and personal">Cálido y personal</option>
+              <option value="professional and formal" data-es="Profesional y formal" data-en="Professional and formal">Profesional y formal</option>
+              <option value="luxury and exclusive" data-es="Lujoso y exclusivo" data-en="Luxury and exclusive">Lujoso y exclusivo</option>
+            </select>
+          </div>
+          <div class="field fcol">
+            <label data-es="Oportunidades de upsell" data-en="Upsell opportunities">Oportunidades de upsell</label>
+            <div class="tag-grid" id="upsell-tags"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sdiv"><span data-es="Lo que necesitas" data-en="Must-haves">Lo que necesitas</span></div>
+      <div class="fgrid">
+        <div class="field fcol">
+          <label data-es="Selecciona lo esencial" data-en="Select what's essential">Selecciona lo esencial</label>
+          <div class="tag-grid" id="must-haves"></div>
+        </div>
+        <div class="field fcol">
+          <label><span data-es="Cuéntanos más" data-en="Tell us more">Cuéntanos más</span> <span style="font-weight:400;color:var(--text-3)" data-es="(opcional pero muy útil)" data-en="(optional but powerful)">(opcional pero muy útil)</span></label>
+          <textarea id="f-notes" data-placeholder-es="ej. La pareja se conoció en Oaxaca, aman el jazz, necesitan opciones veganas…" data-placeholder-en="e.g. The couple met in Oaxaca, loves jazz, needs vegan options…" placeholder="ej. La pareja se conoció en Oaxaca…"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-gen" id="gen-btn" onclick="generate()">
+        <svg width="18" height="18" viewBox="0 0 36 36" fill="none" style="flex-shrink:0"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="white" opacity=".7"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="white"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="white" opacity=".4" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="white" opacity=".4" transform="rotate(20 26 14)"/></svg>
+        <span id="gen-btn-label" data-es="Generar mi plan personalizado" data-en="Generate my personalized plan">Generar mi plan personalizado</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<section id="res-section">
+  <div class="res-wrap">
+    <div class="res-header">
+      <div class="res-title" id="res-title">Tu Plan de Boda</div>
+      <div class="res-actions">
+        <button class="btn-wa" id="btn-wa" onclick="shareWhatsApp()">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.108.549 4.09 1.51 5.814L.057 23.997l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.889 9.889 0 01-5.042-1.379l-.361-.214-3.741.981.999-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/></svg>
+          <span data-es="Compartir" data-en="Share">Compartir</span>
+        </button>
+        <button class="btn-out" onclick="window.print()">⬇ PDF</button>
+        <button class="btn-out" onclick="regen()">↺ <span data-es="Nuevo" data-en="Retry">Nuevo</span></button>
+      </div>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div class="countdown-bar" id="countdown-bar">
+      <div>
+        <div class="cd-event-type" id="cd-event-type"></div>
+        <div class="cd-name" id="cd-name"></div>
+      </div>
+      <div class="cd-units">
+        <div class="cd-unit"><div class="cd-num" id="cd-days">--</div><div class="cd-label" data-es="días" data-en="days">días</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-hours">--</div><div class="cd-label" data-es="horas" data-en="hours">horas</div></div>
+        <div class="cd-unit"><div class="cd-num" id="cd-mins">--</div><div class="cd-label" data-es="min" data-en="min">min</div></div>
+      </div>
+      <div class="cd-date" id="cd-date-display"></div>
+    </div>
+
+    <div class="res-card">
+      <div class="res-tabs" id="res-tabs"></div>
+      <div class="loading" id="loading">
+        <span class="l-dragonfly">🦋</span>
+        <div class="lmsg" id="lmsg" data-es="Creando tu plan…" data-en="Creating your plan…">Creando tu plan…</div>
+        <div class="lsub" id="lsub" data-es="Personalizando cada detalle" data-en="Personalizing every detail">Personalizando cada detalle</div>
+      </div>
+      <div id="panels"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span style="font-size:18px">🦋</span><br>
+  <strong class="teal">DragonflAI Events</strong> &nbsp;·&nbsp;
+  <span data-es="Desarrollado con Claude AI" data-en="Built with Claude AI">Desarrollado con Claude AI</span>
+  &nbsp;·&nbsp; <span data-es="Tu API key nunca sale de tu navegador" data-en="Your API key never leaves your browser">Tu API key nunca sale de tu navegador</span>
+</footer>
+
+<script>
+// ══════════════════════════════
+//  CONFIG
+// ══════════════════════════════
+const WORKER_URL = 'YOUR_WORKER_URL_HERE';
+const MAX_GENERATIONS = 10;
+
+// ══════════════════════════════
+//  STATE
+// ══════════════════════════════
+let lang='es', mode='diy', eventType='Boda/Wedding', guests=50, plan={};
+let radios={stress:'',exp:'',priority:''};
+let gensUsed=parseInt(localStorage.getItem('dflai_gens')||'0');
+let loadTmr=null, loadIdx=0;
+
+const T={
+  eventTypes:{
+    es:['💍 Boda','🎂 Cumpleaños','🍼 Baby Shower','🏢 Corporativo','👑 Quinceañera','🎓 Graduación','🥂 Aniversario','🎈 Fiesta Infantil'],
+    en:['💍 Wedding','🎂 Birthday','🍼 Baby Shower','🏢 Corporate','👑 Quinceañera','🎓 Graduation','🥂 Anniversary','🎈 Kids Party'],
+    vals:['Boda/Wedding','Cumpleaños/Birthday','Baby Shower','Corporativo/Corporate','Quinceañera','Graduación/Graduation','Aniversario/Anniversary','Fiesta Infantil/Kids Party']
+  },
+  stress:{es:['Muy tranquilo/a','Un poco abrumado/a','Muy abrumado/a','¡Que lo haga la IA! 😭'],en:['Totally calm','A little overwhelmed','Very overwhelmed','Just do it for me 😭']},
+  exp:{es:['Primera vez','He planeado 1-2 eventos','Tengo experiencia'],en:['First time','Planned 1–2 events','Experienced planner']},
+  priority:{es:['Respetar el presupuesto','Experiencia de invitados','Fotos y video perfectos','Algo único','Sin estrés'],en:['Staying on budget','Guest experience','Stunning photos','Unique & memorable','Stress-free']},
+  mustHaves:{
+    'Boda/Wedding':{es:['Música en vivo','Photo booth','Barra libre','DJ','Fuegos artificiales','Video','Arco floral','Mesa de postres','Ceremonia exterior','Valet','Brindis champán','Recuerdos'],en:['Live music','Photo booth','Open bar','DJ','Fireworks','Video','Floral arch','Dessert table','Outdoor ceremony','Valet','Champagne toast','Favors']},
+    'Cumpleaños/Birthday':{es:['DJ','Pastel','Photo booth','Música en vivo','Barra libre','Globos','Juegos','Catering','Video','Confeti','Decoración temática','Entrada sorpresa'],en:['DJ','Custom cake','Photo booth','Live music','Open bar','Balloons','Games','Catering','Video','Confetti','Theme decor','Surprise entrance']},
+    'Baby Shower':{es:['Decoración','Juegos','Photo booth','Catering','Mesa regalos','Mesa dulces','Flores','Playlist','Recuerdos','Área infantil','Revelación género','Pastel'],en:['Decoration','Games','Photo booth','Catering','Gift table','Dessert table','Florals','Music playlist','Favors','Kids area','Gender reveal','Custom cake']},
+    'Corporativo/Corporate':{es:['AV y proyector','Catering','Decoración marca','MC','Networking','Streaming','Gafetes','Estacionamiento','Fotografía','After office','Kit bienvenida','Speakers'],en:['Projector & AV','Catering','Branded decor','MC','Networking','Streaming','Name badges','Parking','Photography','After party','Gift bags','Speakers']},
+    'Quinceañera':{es:['Banda en vivo','DJ','Photo booth','Barra libre','Vals','Chambelanes','Corona','Video','Arco floral','Postres','Limosina','Vestido'],en:['Live band','DJ','Photo booth','Open bar','Waltz','Court of honor','Crown','Video','Floral arch','Dessert table','Limo','Custom dress']},
+    'Graduación/Graduation':{es:['DJ','Catering','Photo booth','Decoración','Barra libre','Presentación fotos','Música','Juegos','Video','Confeti','Backdrop','Diploma'],en:['DJ','Catering','Photo booth','Decorations','Open bar','Slideshow','Music','Games','Video','Confetti','Backdrop','Diploma']},
+    'Aniversario/Anniversary':{es:['Música en vivo','Decoración romántica','Libro de fotos','Barra libre','Postres','Video','Jardín','Velas','Pista de baile','Sorpresa','Renovación votos','Mesa recuerdos'],en:['Live music','Romantic decor','Photo book','Open bar','Dessert','Video','Garden','Candles','Dance floor','Surprise','Vow renewal','Memory table']},
+    'Fiesta Infantil/Kids Party':{es:['Animador','Inflable','Pintacaritas','Pastel','Globos','Juegos','Catering','Photo booth','Recuerdos','Área infantil','Personaje','Dulces'],en:['Entertainer','Bounce house','Face painting','Cake','Balloons','Games','Catering','Photo booth','Favors','Kids area','Character','Candy bar']}
+  },
+  upsells:{es:['Transporte de lujo','After party','Streaming','Fotografía premium','Dron','Flores premium','Recuerdos personalizados','Álbum fotos'],en:['Luxury transport','After party','Live streaming','Premium photography','Drone footage','Floral upgrade','Custom favors','Photo album']},
+  tabs:{
+    diy:{es:['Vista general','Cronograma','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date'],en:['Overview','Timeline','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date']},
+    pro:{es:['Vista general','Cronograma','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date','Propuesta cliente'],en:['Overview','Timeline','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date','Client proposal']}
+  },
+  loading:{
+    es:[['Leyendo tu visión…','Personalizando cada detalle'],['Construyendo tu cronograma…','Mes a mes'],['Calculando tu presupuesto…','Distribuyendo inteligentemente'],['Buscando los mejores proveedores…','Para tu estilo y presupuesto'],['Escribiendo tu checklist…','Nada se queda sin planear'],['Añadiendo magia creativa…','Haciéndolo único para ti'],['Diseñando tu Save the Date…','Listo para compartir']],
+    en:[['Reading your vision…','Personalizing every detail'],['Building your timeline…','Month by month'],['Calculating your budget…','Smart allocation'],['Finding vendors…','For your style and budget'],['Writing your checklist…','Nothing left to chance'],['Adding creative magic…','Making it uniquely yours'],['Designing your Save the Date…','Ready to share']]
+  }
+};
+
+const tabKeys=['overview','timeline','budget','checklist','vendors','ideas','savethedate','proposal'];
+
+function init(){
+  updateBudget(15000);
+  renderEventTypes();
+  renderRadios();
+  renderMustHaves();
+  renderUpsells();
+  renderTabs();
+  updateGenBadge();
+  const d=new Date(); d.setMonth(d.getMonth()+6);
+  document.getElementById('f-date').value=d.toISOString().split('T')[0];
+  ['f-name','f-location','f-notes'].forEach(id=>document.getElementById(id).addEventListener('input',updateProgress));
+}
+
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
+  document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+  document.documentElement.lang=l;
+  document.querySelectorAll('[data-es]').forEach(el=>{
+    if(el.tagName==='INPUT'||el.tagName==='OPTION') return;
+    const txt=el.getAttribute('data-'+l);
+    if(txt) el.innerHTML=txt;
+  });
+  document.querySelectorAll('option[data-'+l+']').forEach(el=>{ el.textContent=el.getAttribute('data-'+l); });
+  const ta=document.getElementById('f-notes');
+  ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
+  renderEventTypes(); renderRadios(); renderMustHaves(); renderUpsells(); renderTabs();
+  updateFormTitle(); updateModePill(); updateGenBadge();
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('card-diy').className='mode-card'+(m==='diy'?' sel-diy':'');
+  document.getElementById('card-pro').className='mode-card'+(m==='pro'?' sel-pro':'');
+  document.getElementById('pro-block').className='pro-block'+(m==='pro'?' show':'');
+  document.getElementById('stress-row').style.display=m==='diy'?'block':'none';
+  updateModePill(); renderTabs(); updateFormTitle();
+  document.getElementById('gen-btn-label').setAttribute('data-es',m==='diy'?'Generar mi plan personalizado':'Generar propuesta para cliente');
+  document.getElementById('gen-btn-label').setAttribute('data-en',m==='diy'?'Generate my personalized plan':'Generate client proposal');
+  document.getElementById('gen-btn-label').textContent=document.getElementById('gen-btn-label').getAttribute('data-'+lang);
+}
+
+function updateModePill(){
+  const pill=document.getElementById('mode-pill');
+  pill.className='mode-pill '+mode;
+  pill.textContent=mode==='diy'?(lang==='es'?'Planeación personal':'Personal planner'):(lang==='es'?'Planner profesional':'Pro planner');
+}
+
+function renderEventTypes(){
+  const types=T.eventTypes[lang];
+  const activeIdx=T.eventTypes.vals.indexOf(eventType);
+  document.getElementById('event-types').innerHTML=types.map((t,i)=>
+    `<button class="epill${i===(activeIdx>=0?activeIdx:0)?' active':''}" onclick="selectType(this,${i})">${t}</button>`
+  ).join('');
+}
+
+function selectType(btn,idx){
+  document.querySelectorAll('.epill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  eventType=T.eventTypes.vals[idx];
+  updateFormTitle(); renderMustHaves();
+}
+
+function updateFormTitle(){
+  const idx=T.eventTypes.vals.indexOf(eventType);
+  const name=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
+  const prefix=mode==='diy'?(lang==='es'?'Planea tu ':'Plan your '):(lang==='es'?'Evento de cliente: ':'Client event: ');
+  document.getElementById('fcard-title').textContent=prefix+name;
+}
+
+function renderRadios(){
+  [['stress','stress-opts'],['exp','exp-opts'],['priority','priority-opts']].forEach(([key,id])=>{
+    const opts=T[key][lang];
+    const cur=radios[key]||'';
+    document.getElementById(id).innerHTML=opts.map((o,i)=>
+      `<span class="ropt${o===cur||(!radios[key]&&i===(key==='priority'?0:1))?' sel':''}" onclick="selRadio(this,'${key}')">${o}</span>`
+    ).join('');
+  });
+}
+
+function selRadio(el,group){
+  el.closest('.rgroup').querySelectorAll('.ropt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel'); radios[group]=el.textContent; updateProgress();
+}
+
+function renderMustHaves(){
+  const mh=T.mustHaves[eventType]||T.mustHaves['Boda/Wedding'];
+  const items=mh[lang]||mh.es;
+  const c=document.getElementById('must-haves');
+  const sel=[...c.querySelectorAll('.tag.sel')].map(t=>t.dataset.idx);
+  c.innerHTML=items.map((item,i)=>`<span class="tag${i<2||sel.includes(String(i))?' sel':''}" data-idx="${i}" onclick="toggleTag(this)">${item}</span>`).join('');
+}
+
+function renderUpsells(){
+  const items=T.upsells[lang];
+  const c=document.getElementById('upsell-tags');
+  const sel=[...c.querySelectorAll('.tag.sel')].map(t=>t.dataset.idx);
+  c.innerHTML=items.map((item,i)=>`<span class="tag${i===3||i===5||sel.includes(String(i))?' sel':''}" data-idx="${i}" onclick="toggleTag(this)">${item}</span>`).join('');
+}
+
+function toggleTag(el){el.classList.toggle('sel');updateProgress();}
+
+function renderTabs(){
+  const labels=T.tabs[mode][lang];
+  const keys=mode==='pro'?tabKeys:[...tabKeys.slice(0,6),'savethedate'];
+  document.getElementById('res-tabs').innerHTML=labels.map((l,i)=>
+    `<button class="rtab${i===0?' active':''}" onclick="switchTab('${keys[i]}',this)">${l}</button>`
+  ).join('');
+  const panelsEl=document.getElementById('panels');
+  if(!panelsEl.children.length){
+    panelsEl.innerHTML=tabKeys.map(k=>
+      `<div class="tpanel${k==='overview'?' active':''}" id="panel-${k}"><div class="aic" id="content-${k}"></div></div>`
+    ).join('');
+  }
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function updateBudget(val){
+  const n=parseInt(val);
+  document.getElementById('bval').textContent=n.toLocaleString('en-US');
+  const pct=((n-5000)/(500000-5000))*100;
+  document.getElementById('f-budget').style.background=`linear-gradient(to right,#2EC4B6 ${pct}%,rgba(255,255,255,.1) ${pct}%)`;
+  updateProgress();
+}
+
+function adjGuests(d){guests=Math.max(5,Math.min(1000,guests+d));document.getElementById('gval').textContent=guests;updateProgress();}
+
+function updateProgress(){
+  let s=30;
+  if(document.getElementById('f-name').value) s+=15;
+  if(document.getElementById('f-location').value) s+=15;
+  const n=document.getElementById('f-notes').value;
+  if(n.length>20) s+=20; if(n.length>80) s+=20;
+  document.getElementById('prog-fill').style.width=Math.min(100,s)+'%';
+}
+
+function updateGenBadge(){
+  const left=Math.max(0,MAX_GENERATIONS-gensUsed);
+  document.getElementById('gens-left').textContent=left;
+  const b=document.getElementById('gen-badge');
+  b.style.background=left<=2?'rgba(232,99,122,.15)':'rgba(244,196,48,.12)';
+  b.style.color=left<=2?'#E8637A':'#F4C430';
+  b.style.borderColor=left<=2?'rgba(232,99,122,.3)':'rgba(244,196,48,.3)';
+}
+
+async function generate(){
+  if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
+  if(gensUsed>=MAX_GENERATIONS){showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;}
+
+  const name=document.getElementById('f-name').value||(lang==='es'?'el anfitrión':'the host');
+  const date=document.getElementById('f-date').value;
+  const location=document.getElementById('f-location').value||(lang==='es'?'un hermoso lugar':'a beautiful venue');
+  const time=document.getElementById('f-time').options[document.getElementById('f-time').selectedIndex].text;
+  const budget=document.getElementById('f-budget').value;
+  const vibe=document.getElementById('f-vibe').value;
+  const notes=document.getElementById('f-notes').value;
+  const venueStatus=document.getElementById('f-venue').options[document.getElementById('f-venue').selectedIndex].text;
+  const vendorStatus=document.getElementById('f-vendors').options[document.getElementById('f-vendors').selectedIndex].text;
+  const mustHaves=[...document.querySelectorAll('#must-haves .tag.sel')].map(t=>t.textContent).join(', ');
+  const stress=radios.stress||T.stress[lang][1];
+  const exp=radios.exp||T.exp[lang][1];
+  const priority=radios.priority||T.priority[lang][0];
+
+  let proCtx='';
+  if(mode==='pro'){
+    const client=document.getElementById('f-client').value;
+    const company=document.getElementById('f-company').value;
+    const bsense=document.getElementById('f-bsense').options[document.getElementById('f-bsense').selectedIndex].text;
+    const tone=document.getElementById('f-tone').options[document.getElementById('f-tone').selectedIndex].text;
+    const upsells=[...document.querySelectorAll('#upsell-tags .tag.sel')].map(t=>t.textContent).join(', ');
+    proCtx=` | Client: ${client||'the client'} | Company: ${company||'DragonflAI Events'} | Budget: ${bsense} | Tone: ${tone} | Upsells: ${upsells}`;
+  }
+
+  const dateStr=date?new Date(date+' ').toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'long',day:'numeric',year:'numeric'}):'TBD';
+  const idx=T.eventTypes.vals.indexOf(eventType);
+  const typeName=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
+
+  plan={name,date:dateStr,rawDate:date,location,time,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,guests,typeName,mode,stress,exp,priority,proCtx,lang};
+
+  document.getElementById('res-title').textContent=(mode==='diy'?(lang==='es'?'Tu Plan de ':'Your '):(lang==='es'?'Propuesta — ':'Proposal — '))+typeName;
+  document.getElementById('res-section').style.display='block';
+  document.getElementById('res-section').scrollIntoView({behavior:'smooth',block:'start'});
+
+  tabKeys.forEach(k=>{const el=document.getElementById('content-'+k);if(el)el.innerHTML='';});
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.rtab')?.classList.add('active');
+
+  startLoading();
+  document.getElementById('gen-btn').disabled=true;
+
+  const activeTabs=mode==='pro'?tabKeys:[...tabKeys.slice(0,6),'savethedate'];
+  const results=await Promise.allSettled(activeTabs.map(t=>callClaude(buildPrompt(t)).then(h=>({id:t,h}))));
+
+  stopLoading();
+  document.getElementById('gen-btn').disabled=false;
+  document.getElementById('panel-overview').classList.add('active');
+
+  results.forEach(r=>{
+    if(r.status==='fulfilled'){
+      const el=document.getElementById('content-'+r.value.id);
+      if(el) el.innerHTML=r.value.h;
+    }
+  });
+
+  gensUsed++; localStorage.setItem('dflai_gens',gensUsed); updateGenBadge();
+  startCountdown();
+}
+
+function buildPrompt(section){
+  const p=plan;
+  const outLang=p.lang==='es'?'Spanish (warm, natural Mexican Spanish)':'English';
+  const htmlOnly='Return ONLY clean HTML. No markdown, no code fences. Write ALL text in '+outLang+'.';
+  const persona=p.mode==='diy'
+    ?`Planning for: ${p.name} (planning their OWN ${p.typeName}). Stress: "${p.stress}". Exp: "${p.exp}". Priority: "${p.priority}". Venue: ${p.venueStatus}. Vendors: ${p.vendorStatus}.`
+    :`PROFESSIONAL PLANNER. Planner: ${p.name}.${p.proCtx}. Exp: "${p.exp}".`;
+  const ctx=`${persona}\nEvent: ${p.typeName} | Date: ${p.date} | Location: ${p.location} | Guests: ${p.guests} | Budget: $${parseInt(p.budget).toLocaleString()} MXN | Vibe: ${p.vibe} | Time: ${p.time} | Must-haves: ${p.mustHaves}${p.notes?' | Details: '+p.notes:''}`;
+
+  const prompts={
+    overview:`${htmlOnly}\nYou are an expert event planner. Write a ${p.mode==='diy'?'warm, personal':'professional'} overview.\n${ctx}\n${p.mode==='diy'?`Start with a warm personalized 2-sentence intro for "${p.name}" acknowledging their stress "${p.stress}" and priority "${p.priority}".`:'Start with a professional executive summary.'}\nUse <h2>, <p>, <ul><li>, <strong>. Include: intro, event snapshot as bullet list, 3-4 key highlights tied to must-haves, smart tips for their situation.`,
+    timeline:`${htmlOnly}\nExpert event planner. Create a detailed planning timeline.\n${ctx}\nVenue: "${p.venueStatus}", vendors: "${p.vendorStatus}". Adjust for what's done.\nUse:\n<div class="timeline"><div class="tl-item"><div class="tl-dot"></div><div class="tl-when">6 months before</div><div class="tl-what">Task</div><div class="tl-detail">Detail</div></div></div>\n12-14 milestones. Specific to must-haves: ${p.mustHaves}.`,
+    budget:`${htmlOnly}\nExpert event planner. Personalized budget breakdown.\n${ctx}\nPriority is "${p.priority}" — reflect in allocation.\nUse:\n<div class="bcards"><div class="bcard"><div class="bcard-label">Category</div><div class="bcard-amt">$X,XXX</div><div class="bcard-pct">XX%</div></div></div>\n7-8 categories summing to ~$${parseInt(p.budget).toLocaleString()} MXN. Then <h2>Consejos de presupuesto</h2> with 3 tips specific to vibe "${p.vibe}".`,
+    checklist:`${htmlOnly}\nExpert event planner. Personalized checklist.\n${ctx}\nUse:\n<div class="cl-item" onclick="toggleCheck(this)"><div class="cl-box"></div><div><div class="cl-text">Task</div><div class="cl-cat">Category</div></div></div>\nGroup under <h2>. 5-7 items per group. Specific to must-haves: ${p.mustHaves}.`,
+    vendors:`${htmlOnly}\nExpert event planner. Vendor guide tailored to vibe and budget.\n${ctx}\nUse:\n<div class="vcards"><div class="vcard"><div class="vcard-type">Type</div><div class="vcard-name">What to look for</div><div class="vcard-tip">Specific tip</div></div></div>\n6-8 vendor types. Then <h2> for top 5 questions to ask vendors. Then <h2> for 3 negotiation tips.`,
+    ideas:`${htmlOnly}\nCreative event designer. Unique ideas SPECIFIC to this event — reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".\nUse <h2>, <p>, <ul><li>:\n1. Signature moment\n2. Theme & decor (4-5 ideas)\n3. Surprise elements (3)\n4. Personal touches (4, use details: "${p.notes||'none'}")\n5. Photo & video moments (3)`,
+    savethedate:`${htmlOnly}\nYou are an elegant wedding stationer and copywriter. Create a beautiful Save the Date card.\n${ctx}\nCreate an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure:\n<div class="std-card">\n<div class="std-bg-dragonfly">🦋</div>\n<div class="std-content">\n<div class="std-eyebrow">— Save the Date —</div>\n<div class="std-names">[Host name or couple's names elegantly, with <em> on key words]</div>\n<div class="std-divider"><span class="std-divider-icon">◆</span></div>\n<div class="std-details"><div class="std-detail-item">📅 [Full date]</div><div class="std-detail-item">📍 [Location]</div><div class="std-detail-item">🕕 [Time]</div></div>\n<div class="std-footer">[Elegant short phrase: "Formal invitation to follow" or a personalized poetic line based on their vibe and details]</div>\n</div>\n</div>\n<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>\n<div class="std-actions">\n<button class="btn-std-copy" onclick="copySTD()">${p.lang==='es'?'📋 Copiar texto':'📋 Copy text'}</button>\n<button class="btn-std-wa" onclick="shareSTDWA()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.108.549 4.09 1.51 5.814L.057 23.997l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.889 9.889 0 01-5.042-1.379l-.361-.214-3.741.981.999-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/></svg>${p.lang==='es'?'Enviar por WhatsApp':'Send via WhatsApp'}</button>\n</div>`,
+    proposal:`${htmlOnly}\nFormal client proposal for professional event planner.\n${ctx}\nShow:\n<div class="pro-summary"><div class="ps-title">Resumen de propuesta</div><div class="ps-grid"><div><div class="ps-label">Cliente</div><div class="ps-val">${plan.name}</div></div></div></div>\nThen <h2> sections: Visión del evento | Qué incluye | Inversión | Por qué elegirnos | Mejoras opcionales (upsells: ${plan.proCtx}) | Próximos pasos (3-step CTA).`
+  };
+  return prompts[section]||prompts.overview;
+}
+
+async function callClaude(prompt){
+  const res=await fetch(WORKER_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1500,system:'You are an expert event planner AI for DragonflAI Events. Return ONLY clean HTML. No markdown, no code fences, no preamble.',messages:[{role:'user',content:prompt}]})
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Error ${res.status}`);}
+  const data=await res.json();
+  let h=data.content?.[0]?.text||'';
+  return h.replace(/```html?\n?/gi,'').replace(/```\n?/g,'').trim();
+}
+
+function toggleCheck(el){
+  el.classList.toggle('chk');
+  const items=[...document.querySelectorAll('.cl-item')];
+  const done=items.filter(i=>i.classList.contains('chk')).length;
+  showToast(`${done}/${items.length} ${lang==='es'?'tareas listas':'tasks done'}`);
+}
+
+function startCountdown(){
+  const raw=document.getElementById('f-date').value;
+  if(!raw) return;
+  const eventDate=new Date(raw+'T23:59:59');
+  if(eventDate<=new Date()) return;
+  const bar=document.getElementById('countdown-bar');
+  bar.classList.add('visible');
+  const idx=T.eventTypes.vals.indexOf(eventType);
+  const tName=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
+  document.getElementById('cd-event-type').textContent=lang==='es'?`Tu ${tName}`:`Your ${tName}`;
+  document.getElementById('cd-date-display').textContent=plan.date;
+  function tick(){
+    const diff=eventDate-new Date();
+    if(diff<=0){bar.classList.remove('visible');return;}
+    document.getElementById('cd-days').textContent=Math.floor(diff/(1000*60*60*24));
+    document.getElementById('cd-hours').textContent=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+    document.getElementById('cd-mins').textContent=Math.floor((diff%(1000*60*60))/(1000*60));
+    const n=plan.name&&plan.name!=='el anfitrión'&&plan.name!=='the host'?plan.name+', ':'';
+    document.getElementById('cd-name').textContent=lang==='es'?`${n}¡faltan ${Math.floor(diff/(1000*60*60*24))} días! 🦋`:`${n}only ${Math.floor(diff/(1000*60*60*24))} days! 🦋`;
+  }
+  tick(); setInterval(tick,60000);
+}
+
+function shareWhatsApp(){
+  const p=plan;
+  if(!p.typeName){showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true);return;}
+  const msg=lang==='es'
+    ?`🦋 *DragonflAI Events — Mi ${p.typeName}*\n\n📅 ${p.date}\n📍 ${p.location}\n👥 ${p.guests} invitados\n💰 $${parseInt(p.budget).toLocaleString()} MXN\n✨ ${p.vibe}\n\nGeneré mi plan completo con IA — cronograma, presupuesto, checklist y Save the Date\n\n¿Quieres el tuyo? → dragonflai.events`
+    :`🦋 *DragonflAI Events — My ${p.typeName}*\n\n📅 ${p.date}\n📍 ${p.location}\n👥 ${p.guests} guests\n💰 $${parseInt(p.budget).toLocaleString()} MXN\n✨ ${p.vibe}\n\nI created my complete event plan with AI — timeline, budget, checklist and Save the Date\n\nGet yours → dragonflai.events`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+function copySTD(){
+  const card=document.querySelector('.std-card');
+  if(!card) return;
+  navigator.clipboard.writeText(card.innerText).then(()=>showToast(lang==='es'?'📋 Save the Date copiado':'📋 Copied!'));
+}
+
+function shareSTDWA(){
+  const card=document.querySelector('.std-card');
+  if(!card) return;
+  const txt='🦋 '+card.innerText+'\n\n— DragonflAI Events';
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+
+function startLoading(){
+  loadIdx=0;
+  document.getElementById('loading').style.display='block';
+  loadTmr=setInterval(()=>{
+    const [msg,sub]=T.loading[lang][loadIdx%T.loading[lang].length];
+    document.getElementById('lmsg').textContent=msg;
+    document.getElementById('lsub').textContent=sub;
+    loadIdx++;
+  },1800);
+}
+
+function stopLoading(){
+  clearInterval(loadTmr);
+  document.getElementById('loading').style.display='none';
+}
+
+function regen(){
+  tabKeys.forEach(k=>{const el=document.getElementById('content-'+k);if(el)el.innerHTML='';});
+  generate();
+}
+
+function showToast(msg,isErr=false){
+  const t=document.createElement('div');
+  t.className='toast';
+  t.textContent=msg;
+  t.style.background=isErr?'linear-gradient(135deg,#E8637A,#C14A5E)':'linear-gradient(135deg,#2EC4B6,#7B2FBE)';
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},2500);
+}
+
+init();
+</script>
+</body>
+</html>
