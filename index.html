@@ -209,7 +209,7 @@ footer a:hover{color:var(--teal)}
   <div class="nav-right">
     <a href="#como-funciona" class="nav-link">Cómo funciona</a>
     <a href="#precios" class="nav-link">Precios</a>
-    <a href="app.html" class="btn-nav">Probar gratis →</a>
+    <a href="dragonflai-v1.html" class="btn-nav">Probar gratis →</a>
   </div>
 </nav>
 
@@ -220,7 +220,7 @@ footer a:hover{color:var(--teal)}
   <h1>Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
   <p class="hero-sub">Ingresa los detalles de tu boda, quinceañera o fiesta y la IA genera un plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date.</p>
   <div class="hero-cta">
-    <a href="app.html" class="btn-primary">
+    <a href="dragonflai-v1.html" class="btn-primary">
       <span>✦</span> Generar mi plan gratis
     </a>
     <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
@@ -360,7 +360,7 @@ footer a:hover{color:var(--teal)}
         <li class="muted" style="text-decoration:line-through;opacity:.5">Planes ilimitados</li>
         <li class="muted" style="text-decoration:line-through;opacity:.5">Modo planner profesional</li>
       </ul>
-      <button class="btn-price free" onclick="window.location.href='app.html'">Empezar gratis →</button>
+      <button class="btn-price free" onclick="window.location.href='dragonflai-v1.html'">Empezar gratis →</button>
     </div>
 
     <!-- PAID -->
@@ -416,7 +416,7 @@ footer a:hover{color:var(--teal)}
     <span style="font-size:48px;display:block;margin-bottom:1rem">🦋</span>
     <h2>Tu evento perfecto<br>empieza aquí</h2>
     <p>Prueba gratis ahora mismo — sin registro, sin tarjeta, sin complicaciones. Tu primer plan completo en menos de un minuto.</p>
-    <a href="app.html" class="btn-primary" style="display:inline-flex">
+    <a href="dragonflai-v1.html" class="btn-primary" style="display:inline-flex">
       <span>✦</span> Generar mi plan gratis
     </a>
   </div>
@@ -484,7 +484,7 @@ const isPaid = localStorage.getItem('dflai_paid') === 'true';
 // Si viene de Stripe con ?paid=true, guardar acceso
 if (new URLSearchParams(location.search).get('paid') === 'true') {
   localStorage.setItem('dflai_paid', 'true');
-  window.location.href = 'app.html';
+  window.location.href = 'dragonflai-v1.html';
 }
 
 // Mostrar banner si ya usó 2+ planes gratis y no pagó
