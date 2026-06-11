@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════
-//  EventMind AI — Cloudflare Worker Proxy
+//  DragonflAI — Cloudflare Worker Proxy
 //  Pega este código en: workers.cloudflare.com
 //  Luego añade tu API key como variable de entorno:
 //  Settings → Variables → ANTHROPIC_API_KEY
