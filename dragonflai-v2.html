@@ -119,6 +119,10 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 
 /* ── SECTION DIVIDERS ── */
 .sdiv{display:flex;align-items:center;gap:10px;margin:1.75rem 0 1.1rem;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3)}
+.extra-toggle{display:flex;align-items:center;gap:8px;margin:1.75rem 0 1rem;padding-top:1.25rem;border-top:1px solid var(--border-gray);cursor:pointer;font-size:13px;font-weight:600;color:var(--teal-dark);user-select:none}
+.extra-toggle:hover{color:var(--teal)}
+#extra-toggle-icon{transition:transform .2s;display:inline-block;font-size:11px}
+#extra-toggle-icon.open{transform:rotate(90deg)}
 .sdiv::before{content:'◆';font-size:8px;color:var(--teal);flex-shrink:0}
 .sdiv::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border-gray),transparent)}
 
@@ -184,8 +188,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .res-card{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-xl);box-shadow:var(--shadow-card);overflow:hidden}
 
 /* ── TABS ── */
-.res-tabs{display:flex;border-bottom:2px solid var(--border-gray);overflow-x:auto;padding:0 .5rem;background:var(--cream-2)}
+.res-tabs{display:flex;flex-wrap:wrap;border-bottom:2px solid var(--border-gray);padding:0 .5rem;background:var(--cream-2)}
 .rtab{padding:12px 18px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Inter',sans-serif;margin-bottom:-2px}
+@media(max-width:640px){.rtab{padding:10px 12px;font-size:12px}}
 .rtab:hover{color:var(--text-2)}
 .rtab.active{color:var(--teal-dark);border-bottom-color:var(--teal);font-weight:600}
 .tpanel{display:none;padding:2rem}
@@ -227,15 +232,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .cl-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-gray);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--white)}
 .cl-item.chk .cl-box{background:var(--teal);border-color:transparent;box-shadow:0 2px 8px rgba(46,196,182,.3)}
 .cl-item.chk .cl-box::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
-.cl-item.chk .cl-text{text-decoration:line-through;color:var(--text-3)}
+.cl-item:not(.chk){opacity:.45}
+.cl-item:not(.chk) .cl-text{text-decoration:line-through;color:var(--text-3)}
 .cl-text{font-size:14px;color:var(--text);line-height:1.5}
 .cl-cat{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--teal-dark);margin-top:1px}
+.vcard{cursor:pointer;position:relative}
+.vcard-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-gray);background:var(--white);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.vcard.chk .vcard-check{background:var(--teal);border-color:transparent}
+.vcard.chk .vcard-check::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
+.vcard:not(.chk){opacity:.45}
 
 /* ── VENDOR CARDS ── */
 .vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin:1rem 0}
 .vcard{background:var(--cream);border:1.5px solid var(--border-gray);border-radius:var(--radius);padding:14px;transition:all .2s}
 .vcard:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:var(--shadow-teal)}
-.vcard-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-dark);margin-bottom:4px}
+.vcard-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-dark);margin-bottom:4px;padding-right:24px}
 .vcard-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
 .vcard-tip{font-size:12px;color:var(--text-2)}
 
@@ -605,8 +616,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       </div>
 
       <!-- PAQUETE TODO INCLUIDO -->
-      <div class="field fcol" id="todo-incluido-row">
-        <label data-es="¿Tu venue ofrece paquete todo incluido?" data-en="Does your venue offer an all-inclusive package?">¿Tu venue ofrece paquete todo incluido?</label>
+      <div class="field fcol" id="todo-incluido-row" style="margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
+        <label data-es="¿Tu lugar ofrece paquete todo incluido?" data-en="Does your venue offer an all-inclusive package?">¿Tu lugar ofrece paquete todo incluido?</label>
         <div class="rgroup" id="todo-opts">
           <span class="ropt sel" onclick="selRadio(this,'todoIncluido')" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</span>
           <span class="ropt" onclick="selRadio(this,'todoIncluido')" data-es="Sí, por persona 💰" data-en="Yes, per person 💰">Sí, por persona 💰</span>
@@ -629,6 +640,130 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <div class="field fcol">
           <label><span data-es="Cuéntanos más" data-en="Tell us more">Cuéntanos más</span> <span style="font-weight:400;color:var(--text-3)" data-es="(opcional pero muy útil)" data-en="(optional but powerful)">(opcional pero muy útil)</span></label>
           <textarea id="f-notes" data-placeholder-es="ej. La pareja se conoció en Oaxaca, aman el jazz, necesitan opciones veganas…" data-placeholder-en="e.g. The couple met in Oaxaca, loves jazz, needs vegan options…" placeholder="ej. La pareja se conoció en Oaxaca…"></textarea>
+        </div>
+      </div>
+
+      <!-- DETALLES ADICIONALES (OPCIONAL) -->
+      <div class="extra-toggle" onclick="toggleExtraDetails()">
+        <span id="extra-toggle-icon">▸</span>
+        <span data-es="Detalles adicionales (opcional, pero personaliza aún más tu plan)" data-en="Additional details (optional, but personalizes your plan even more)">Detalles adicionales (opcional, pero personaliza aún más tu plan)</span>
+      </div>
+      <div class="fgrid" id="extra-details" style="display:none">
+        <div class="field" id="motivo-row" style="display:none">
+          <label data-es="Motivo del evento" data-en="Event purpose">Motivo del evento</label>
+          <input type="text" id="f-motivo" placeholder="ej. Lanzamiento de producto, integración de equipo…">
+        </div>
+        <div class="field" id="edad-row" style="display:none">
+          <label data-es="Edad del festejado/a" data-en="Guest of honor's age">Edad del festejado/a</label>
+          <input type="number" id="f-edad" placeholder="ej. 7" min="0" max="120">
+        </div>
+        <div class="field" id="graduados-row" style="display:none">
+          <label data-es="Número de graduados" data-en="Number of graduates">Número de graduados</label>
+          <input type="number" id="f-graduados" placeholder="ej. 120" min="0">
+        </div>
+        <div class="field" id="costoboleto-row" style="display:none">
+          <label data-es="Costo esperado por boleto (MXN)" data-en="Expected ticket price (MXN)">Costo esperado por boleto (MXN)</label>
+          <input type="number" id="f-costoboleto" placeholder="ej. 350" min="0">
+        </div>
+        <div class="field">
+          <label data-es="Número de niños entre los invitados" data-en="Number of children among guests">Número de niños entre los invitados</label>
+          <input type="number" id="f-kids" placeholder="ej. 0" min="0" value="0">
+        </div>
+        <div class="field" id="ceremony-row" style="display:none">
+          <label id="lbl-ceremony" data-es="Formato / tipo de ceremonia" data-en="Ceremony format / type">Formato / tipo de ceremonia</label>
+          <select id="f-ceremony"></select>
+        </div>
+        <div class="field">
+          <label data-es="Paleta de colores" data-en="Color palette">Paleta de colores</label>
+          <input type="text" id="f-colors" placeholder="ej. Verde sage, dorado y crema">
+        </div>
+        <div class="field">
+          <label data-es="Tipo de lugar" data-en="Venue type">Tipo de lugar</label>
+          <select id="f-venue-type">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="salon" data-es="Salón de eventos" data-en="Event hall">Salón de eventos</option>
+            <option value="jardin" data-es="Jardín / exterior" data-en="Garden / outdoor">Jardín / exterior</option>
+            <option value="playa" data-es="Playa" data-en="Beach">Playa</option>
+            <option value="hacienda" data-es="Hacienda" data-en="Estate / hacienda">Hacienda</option>
+            <option value="casa" data-es="Casa u hogar" data-en="Home">Casa u hogar</option>
+            <option value="oficina" data-es="Oficina / espacio corporativo" data-en="Office / corporate space">Oficina / espacio corporativo</option>
+            <option value="restaurante" data-es="Restaurante" data-en="Restaurant">Restaurante</option>
+            <option value="otro" data-es="Otro" data-en="Other">Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-es="Duración del evento" data-en="Event duration">Duración del evento</label>
+          <select id="f-duration">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="2-3h" data-es="2-3 horas" data-en="2-3 hours">2-3 horas</option>
+            <option value="4-6h" data-es="4-6 horas" data-en="4-6 hours">4-6 horas</option>
+            <option value="todo-dia" data-es="Todo el día" data-en="All day">Todo el día</option>
+            <option value="varios-dias" data-es="Varios días" data-en="Multiple days">Varios días</option>
+          </select>
+        </div>
+        <div class="field" id="dresscode-row">
+          <label data-es="Código de vestimenta" data-en="Dress code">Código de vestimenta</label>
+          <input type="text" id="f-dresscode" placeholder="ej. Formal, casual elegante…">
+        </div>
+        <div class="field">
+          <label data-es="Tipo de menú" data-en="Menu type">Tipo de menú</label>
+          <select id="f-menu">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="formal" data-es="Formal / servido" data-en="Formal / plated">Formal / servido</option>
+            <option value="buffet" data-es="Buffet" data-en="Buffet">Buffet</option>
+            <option value="coctel" data-es="Cóctel / bocadillos" data-en="Cocktail / appetizers">Cóctel / bocadillos</option>
+            <option value="vegano" data-es="Vegano / vegetariano" data-en="Vegan / vegetarian">Vegano / vegetariano</option>
+            <option value="infantil" data-es="Enfocado en niños" data-en="Kid-focused">Enfocado en niños</option>
+            <option value="no-aplica" data-es="No aplica" data-en="Not applicable">No aplica</option>
+          </select>
+        </div>
+        <div class="field" id="tasting-row">
+          <label data-es="¿Degustación previa?" data-en="Menu tasting beforehand?">¿Degustación previa?</label>
+          <select id="f-tasting">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="si" data-es="Sí" data-en="Yes">Sí</option>
+            <option value="no" data-es="No" data-en="No">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-es="Bebidas" data-en="Drinks">Bebidas</label>
+          <select id="f-drinks">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="vino" data-es="Solo vino" data-en="Wine only">Solo vino</option>
+            <option value="cerveza" data-es="Solo cerveza" data-en="Beer only">Solo cerveza</option>
+            <option value="barra-libre" data-es="Barra libre" data-en="Open bar">Barra libre</option>
+            <option value="sin-alcohol" data-es="Sin alcohol" data-en="No alcohol">Sin alcohol</option>
+            <option value="alcohol-aparte" data-es="El lugar solo pone hielo/vasos, alcohol por separado" data-en="Venue provides ice/glasses only, we bring alcohol separately">Alcohol por separado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-es="¿Pastel o postres personalizados?" data-en="Custom cake or desserts?">¿Pastel o postres personalizados?</label>
+          <select id="f-cake">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="si" data-es="Sí" data-en="Yes">Sí</option>
+            <option value="no" data-es="No" data-en="No">No</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-es="Alergias o restricciones alimentarias" data-en="Allergies or dietary restrictions">Alergias o restricciones alimentarias</label>
+          <input type="text" id="f-allergies" placeholder="ej. Un invitado es celíaco, dos veganos…">
+        </div>
+        <div class="field" id="lodging-row">
+          <label data-es="¿Hospedaje para invitados de fuera?" data-en="Lodging for out-of-town guests?">¿Hospedaje para invitados de fuera?</label>
+          <select id="f-lodging">
+            <option value="" data-es="No aplica" data-en="Not applicable">No aplica</option>
+            <option value="si" data-es="Sí, necesito coordinarlo" data-en="Yes, need to arrange it">Sí, necesito coordinarlo</option>
+            <option value="resuelto" data-es="Sí, ya está resuelto" data-en="Yes, already handled">Sí, ya está resuelto</option>
+          </select>
+        </div>
+        <div class="field" id="coordinator-row">
+          <label data-es="Coordinador/a de evento" data-en="Event coordinator">Coordinador/a de evento</label>
+          <select id="f-coordinator">
+            <option value="" data-es="No sé todavía" data-en="Not sure yet">No sé todavía</option>
+            <option value="tengo" data-es="Ya tengo uno" data-en="Already have one">Ya tengo uno</option>
+            <option value="necesito" data-es="Necesito contratar uno" data-en="Need to hire one">Necesito contratar uno</option>
+            <option value="no-aplica" data-es="No necesito, lo hago yo" data-en="Don't need one, doing it myself">No necesito, lo hago yo</option>
+          </select>
         </div>
       </div>
 
@@ -705,7 +840,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 //  CONFIG
 // ══════════════════════════════
 const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
-const MAX_GENERATIONS = 1000;
+const MAX_GENERATIONS = 3;
 
 // ══════════════════════════════
 //  STATE
@@ -723,6 +858,19 @@ if(!deviceId){
   localStorage.setItem('dflai_device_id',deviceId);
 }
 
+// Código de QA para pruebas internas (opcional). Se manda UNA vez por URL:
+//   tu-sitio.com/dragonflai-v2.html?qaKey=EL_SECRETO_QUE_PUSISTE_EN_EL_WORKER
+// y de ahí se queda guardado en este navegador — no hace falta repetirlo.
+// Sin el secreto correcto configurado en el Worker (QA_BYPASS_KEY), esto no hace nada.
+const urlQaKey=new URLSearchParams(location.search).get('qaKey');
+if(urlQaKey){
+  localStorage.setItem('dflai_qa_key',urlQaKey);
+  const cleanUrl=new URL(location.href);
+  cleanUrl.searchParams.delete('qaKey');
+  history.replaceState(null,'',cleanUrl.pathname+cleanUrl.search);
+}
+const qaKey=localStorage.getItem('dflai_qa_key')||'';
+
 // isPaid empieza con el último valor conocido (solo para no mostrar el candado
 // parpadeando mientras carga) — SIEMPRE se re-verifica contra el servidor
 // antes de dejar pasar una acción sensible (ver exportSpreadsheet).
@@ -730,7 +878,9 @@ let isPaid=localStorage.getItem('dflai_paid_cache')==='true';
 
 async function refreshPaidStatus(){
   try{
-    const res=await fetch(`${WORKER_URL}/check-paid?id=${encodeURIComponent(deviceId)}`);
+    const qs=new URLSearchParams({id:deviceId});
+    if(qaKey) qs.set('qa',qaKey);
+    const res=await fetch(`${WORKER_URL}/check-paid?${qs.toString()}`);
     const data=await res.json();
     isPaid=!!data.paid;
     localStorage.setItem('dflai_paid_cache',isPaid?'true':'false');
@@ -792,6 +942,76 @@ const T={
 
 const tabKeys=['overview','timeline','budget','checklist','vendors','ideas','savethedate','proposal'];
 
+// Formato/tipo de ceremonia y otros campos condicionales — solo aplican a
+// los tipos de evento que indica la matriz (Boda, Baby Shower, Corporativo, Aniversario).
+// Si un tipo de evento no aparece aquí, el campo se oculta solo.
+const CEREMONY_FORMATS={
+  'Boda/Wedding':{label:{es:'Formato / tipo de ceremonia',en:'Ceremony format / type'},es:['Civil','Religiosa','Simbólica','Ya estamos casados (solo fiesta)'],en:['Civil','Religious','Symbolic','Already married (party only)']},
+  'Baby Shower':{label:{es:'Formato del evento',en:'Event format'},es:['Tradicional','Con revelación de género'],en:['Traditional','With gender reveal']},
+  'Corporativo/Corporate':{label:{es:'Formato del evento',en:'Event format'},es:['Formal / protocolo','Informal / networking casual','Híbrido (presencial + streaming)'],en:['Formal / structured','Informal / casual networking','Hybrid (in-person + streaming)']},
+  'Aniversario/Anniversary':{label:{es:'Formato del evento',en:'Event format'},es:['Renovación de votos + fiesta','Solo fiesta'],en:['Vow renewal + party','Party only']},
+  'Quinceañera':{label:{es:'Formato / tipo de ceremonia',en:'Ceremony format / type'},es:['Con misa religiosa','Solo fiesta (sin misa)'],en:['With religious mass','Party only (no mass)']},
+  'Graduación/Graduation':{label:{es:'Formato de la ceremonia',en:'Ceremony format'},es:['Ceremonia formal + fiesta','Solo fiesta / festejo'],en:['Formal ceremony + party','Party only']}
+};
+// Degustación/hospedaje/coordinador ahora aplican a todos los tipos de evento.
+const TYPES_DRESSCODE=['Boda/Wedding','Corporativo/Corporate','Aniversario/Anniversary'];
+
+// Relabelea el campo "Nombre" según a quién se refiere realmente en cada tipo de evento.
+const NAME_LABELS={
+  'Boda/Wedding':{es:['Nombre de los novios','ej. Ana & Juan'],en:['Names of the couple','e.g. Ana & Juan']},
+  'Aniversario/Anniversary':{es:['Nombre de los novios','ej. Ana & Juan'],en:['Names of the couple','e.g. Ana & Juan']},
+  'Cumpleaños/Birthday':{es:['Nombre del festejado/a','ej. Sofía Martínez'],en:['Guest of honor\'s name','e.g. Sofía Martínez']},
+  'Baby Shower':{es:['Nombre del festejado/a','ej. Sofía Martínez'],en:['Guest of honor\'s name','e.g. Sofía Martínez']},
+  'Quinceañera':{es:['Nombre de la quinceañera','ej. Sofía Martínez'],en:['Quinceañera\'s name','e.g. Sofía Martínez']},
+  'Fiesta Infantil/Kids Party':{es:['Nombre del festejado/a','ej. Sofía Martínez'],en:['Guest of honor\'s name','e.g. Sofía Martínez']},
+  'Corporativo/Corporate':{es:['Nombre de la empresa','ej. Acme Corp'],en:['Company name','e.g. Acme Corp']},
+  'Graduación/Graduation':{es:['Nombre de la institución','ej. Universidad Autónoma'],en:['Institution name','e.g. State University']}
+};
+
+function toggleExtraDetails(){
+  const box=document.getElementById('extra-details');
+  const icon=document.getElementById('extra-toggle-icon');
+  const open=box.style.display==='none';
+  box.style.display=open?'grid':'none';
+  icon.classList.toggle('open',open);
+}
+
+function renderCeremonyOptions(){
+  const row=document.getElementById('ceremony-row');
+  const sel=document.getElementById('f-ceremony');
+  const lblEl=document.getElementById('lbl-ceremony');
+  const cfg=CEREMONY_FORMATS[eventType];
+  if(!cfg){ row.style.display='none'; sel.innerHTML=''; return; }
+  row.style.display='block';
+  lblEl.setAttribute('data-es',cfg.label.es); lblEl.setAttribute('data-en',cfg.label.en);
+  lblEl.textContent=cfg.label[lang];
+  sel.innerHTML='<option value="">'+(lang==='es'?'No sé todavía':'Not sure yet')+'</option>'
+    +cfg[lang].map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('');
+}
+
+// Muestra/oculta los campos que solo aplican a ciertos tipos de evento, según la matriz.
+function updateExtraFieldVisibility(){
+  document.getElementById('tasting-row').style.display='block';
+  document.getElementById('lodging-row').style.display='block';
+  document.getElementById('coordinator-row').style.display='block';
+  document.getElementById('dresscode-row').style.display=TYPES_DRESSCODE.includes(eventType)?'block':'none';
+  document.getElementById('motivo-row').style.display=eventType==='Corporativo/Corporate'?'block':'none';
+  document.getElementById('edad-row').style.display=eventType==='Fiesta Infantil/Kids Party'?'block':'none';
+  document.getElementById('graduados-row').style.display=eventType==='Graduación/Graduation'?'block':'none';
+  document.getElementById('costoboleto-row').style.display=eventType==='Graduación/Graduation'?'block':'none';
+  renderCeremonyOptions();
+}
+
+function updateNameLabel(){
+  const cfg=NAME_LABELS[eventType];
+  const lbl=document.getElementById('lbl-name');
+  const input=document.getElementById('f-name');
+  if(!cfg) return;
+  lbl.setAttribute('data-es',cfg.es[0]); lbl.setAttribute('data-en',cfg.en[0]);
+  lbl.textContent=cfg[lang][0];
+  input.placeholder=cfg[lang][1];
+}
+
 function init(){
   updateBudget(15000);
   renderEventTypes();
@@ -799,12 +1019,15 @@ function init(){
   renderMustHaves();
   renderUpsells();
   renderTabs();
+  updateExtraFieldVisibility();
+  updateNameLabel();
   updateGenBadge();
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   refreshPaidStatus(); // confirma contra el servidor (KV), no solo el caché local
   const d=new Date(); d.setMonth(d.getMonth()+6);
   document.getElementById('f-date').value=d.toISOString().split('T')[0];
+  document.getElementById('f-date').min=new Date().toISOString().split('T')[0];
   ['f-name','f-location','f-notes'].forEach(id=>document.getElementById(id).addEventListener('input',updateProgress));
 }
 
@@ -821,7 +1044,7 @@ function setLang(l){
   document.querySelectorAll('option[data-'+l+']').forEach(el=>{ el.textContent=el.getAttribute('data-'+l); });
   const ta=document.getElementById('f-notes');
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
-  renderEventTypes(); renderRadios(); renderMustHaves(); renderUpsells(); renderTabs();
+  renderEventTypes(); renderRadios(); renderMustHaves(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
 }
 
@@ -855,7 +1078,7 @@ function selectType(btn,idx){
   document.querySelectorAll('.epill').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   eventType=T.eventTypes.vals[idx];
-  updateFormTitle(); renderMustHaves();
+  updateFormTitle(); renderMustHaves(); updateExtraFieldVisibility(); updateNameLabel();
   // Mostrar campo tipo de pareja solo para bodas y aniversarios
   const coupleEvents=['Boda/Wedding','Aniversario/Anniversary'];
   const coupleRow=document.getElementById('couple-type-row');
@@ -980,7 +1203,8 @@ async function generate(){
   const notes=document.getElementById('f-notes').value;
   const venueStatus=document.getElementById('f-venue').options[document.getElementById('f-venue').selectedIndex].text;
   const vendorStatus=document.getElementById('f-vendors').options[document.getElementById('f-vendors').selectedIndex].text;
-  const mustHaves=[...document.querySelectorAll('#must-haves .tag.sel')].map(t=>t.textContent).join(', ');
+  const mustHaveTags=[...document.querySelectorAll('#must-haves .tag.sel')].map(t=>t.textContent);
+  const mustHaves=mustHaveTags.join(', ');
   const todoIncluido=radios.todoIncluido||'No sé todavía';
   const precioPersona=document.getElementById('f-precio-persona')?.value||'';
   const paqueteInfo=todoIncluido.includes('persona')||todoIncluido.includes('person')
@@ -990,6 +1214,29 @@ async function generate(){
   const stress=radios.stress||T.stress[lang][1];
   const exp=radios.exp||T.exp[lang][1];
   const priority=radios.priority||T.priority[lang][0];
+
+  // ── Detalles adicionales (todos opcionales) ──
+  const kids=parseInt(document.getElementById('f-kids').value)||0;
+  const ceremony=document.getElementById('f-ceremony').value||'';
+  const colors=document.getElementById('f-colors').value||'';
+  const venueType=document.getElementById('f-venue-type').options[document.getElementById('f-venue-type').selectedIndex].text;
+  const duration=document.getElementById('f-duration').options[document.getElementById('f-duration').selectedIndex].text;
+  const dresscode=document.getElementById('f-dresscode').value||'';
+  const menuType=document.getElementById('f-menu').options[document.getElementById('f-menu').selectedIndex].text;
+  const tasting=document.getElementById('f-tasting').value;
+  const drinks=document.getElementById('f-drinks').value;
+  const drinksLabel=document.getElementById('f-drinks').options[document.getElementById('f-drinks').selectedIndex].text;
+  const cake=document.getElementById('f-cake').value;
+  const allergies=document.getElementById('f-allergies').value||'';
+  const lodging=document.getElementById('f-lodging').value;
+  const lodgingLabel=document.getElementById('f-lodging').options[document.getElementById('f-lodging').selectedIndex].text;
+  const coordinator=document.getElementById('f-coordinator').value;
+  const coordinatorLabel=document.getElementById('f-coordinator').options[document.getElementById('f-coordinator').selectedIndex].text;
+  const motivo=document.getElementById('f-motivo').value||'';
+  const edadFestejado=document.getElementById('f-edad').value||'';
+  const numGraduados=document.getElementById('f-graduados').value||'';
+  const costoBoleto=document.getElementById('f-costoboleto').value||'';
+  const extra={kids,ceremony,colors,venueType,duration,dresscode,menuType,tasting,drinks,drinksLabel,cake,allergies,lodging,lodgingLabel,coordinator,coordinatorLabel,motivo,edadFestejado,numGraduados,costoBoleto};
 
   let proCtx='';
   if(mode==='pro'){
@@ -1005,7 +1252,7 @@ async function generate(){
   const idx=T.eventTypes.vals.indexOf(eventType);
   const typeName=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
 
-  plan={name,date:dateStr,rawDate:date,location,time,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,guests,typeName,mode,stress,exp,priority,proCtx,lang,paqueteInfo};
+  plan={name,date:dateStr,rawDate:date,location,time,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,proCtx,lang,paqueteInfo,extra};
 
   document.getElementById('res-title').textContent=(mode==='diy'?(lang==='es'?'Tu Plan de ':'Your '):(lang==='es'?'Propuesta — ':'Proposal — '))+typeName;
   document.getElementById('res-section').style.display='block';
@@ -1020,18 +1267,30 @@ async function generate(){
   document.getElementById('gen-btn').disabled=true;
 
   // ══════════════════════════════
-  //  LLAMADAS A IA — CONSOLIDADAS
-  //  Antes: 7-8 llamadas paralelas a Sonnet (una por tab).
-  //  Ahora: 2 llamadas creativas a Sonnet (overview+ideas juntas, savethedate)
-  //         + 1 llamada de DATOS a Haiku en JSON (presupuesto+cronograma+checklist+proveedores)
-  //         + 1 llamada extra a Sonnet solo en modo pro (propuesta cliente)
-  //  Menos llamadas = menos contexto/system-prompt repetido. JSON en vez de HTML
-  //  con clases repetidas = mucho menos texto de salida. Haiku para lo tabular = ~10x más barato.
+  //  PRESUPUESTO, CRONOGRAMA, CHECKLIST Y PROVEEDORES — YA NO SE LE PIDEN A LA IA.
+  //  Se arman al instante con plantillas + los datos que el usuario ya dio
+  //  (fecha, presupuesto, prioridad, must-haves). Cero espera, cero costo,
+  //  cero riesgo de que la IA devuelva algo incompleto o cortado.
+  // ══════════════════════════════
+  const budgetResult=buildBudget();
+  plan.budgetData=budgetResult.budget;
+  plan.timelineData=buildTimeline();
+  plan.checklistData=buildChecklist();
+  const vendorsResult=buildVendors();
+  plan.vendorsData=vendorsResult.vendors;
+
+  setTabHTML('budget',renderBudget(budgetResult.budget,budgetResult.budgetTips,budgetResult.paqueteInfo));
+  setTabHTML('timeline',renderTimeline(plan.timelineData));
+  setTabHTML('checklist',renderChecklist(plan.checklistData));
+  setTabHTML('vendors',renderVendors(vendorsResult.vendors,vendorsResult.vendorQuestions,vendorsResult.negotiationTips));
+
+  // ══════════════════════════════
+  //  LLAMADAS A IA — SOLO LO QUE REALMENTE NECESITA REDACCIÓN
+  //  (vista general + ideas juntas, save the date, y propuesta en modo pro)
   // ══════════════════════════════
   const calls=[
     callClaude(buildCreativePrompt(),'claude-sonnet-4-5',2200).then(h=>({id:'creative',h})),
-    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',600).then(h=>({id:'savethedate',h})),
-    callClaudeJSON(buildDataPrompt(),'claude-haiku-4-5-20251001',2400).then(j=>({id:'data',j}))
+    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',600).then(h=>({id:'savethedate',h}))
   ];
   if(mode==='pro') calls.push(callClaude(buildProposalPrompt(),'claude-sonnet-4-5',1400).then(h=>({id:'proposal',h})));
 
@@ -1052,16 +1311,6 @@ async function generate(){
       setTabHTML('savethedate',v.h);
     } else if(v.id==='proposal'){
       setTabHTML('proposal',v.h);
-    } else if(v.id==='data'){
-      const j=v.j||{};
-      plan.budgetData=Array.isArray(j.budget)?j.budget:[];
-      plan.timelineData=Array.isArray(j.timeline)?j.timeline:[];
-      plan.checklistData=Array.isArray(j.checklist)?j.checklist:[];
-      plan.vendorsData=Array.isArray(j.vendors)?j.vendors:[];
-      setTabHTML('budget',renderBudget(j.budget,j.budgetTips,j.paqueteInfo));
-      setTabHTML('timeline',renderTimeline(j.timeline));
-      setTabHTML('checklist',renderChecklist(j.checklist));
-      setTabHTML('vendors',renderVendors(j.vendors,j.vendorQuestions,j.negotiationTips));
     }
   });
 
@@ -1082,12 +1331,31 @@ function esc(s){
 //  CONTEXTO COMPARTIDO PARA PROMPTS
 // ══════════════════════════════
 function buildCtx(){
-  const p=plan;
+  const p=plan,e=p.extra||{};
   const outLang=p.lang==='es'?'Spanish (warm, natural Mexican Spanish)':'English';
   const persona=p.mode==='diy'
     ?`Planning for: ${p.name} (planning their OWN ${p.typeName}). Stress: "${p.stress}". Exp: "${p.exp}". Priority: "${p.priority}". Venue: ${p.venueStatus}. Vendors: ${p.vendorStatus}.`
     :`PROFESSIONAL PLANNER. Planner: ${p.name}.${p.proCtx}. Exp: "${p.exp}".`;
-  const ctx=`${persona}\nEvent: ${p.typeName} | Date: ${p.date} | Location: ${p.location} | Guests: ${p.guests} | Budget: $${parseInt(p.budget).toLocaleString()} MXN | Vibe: ${p.vibe} | Time: ${p.time} | Must-haves: ${p.mustHaves}${p.paqueteInfo||''}${p.notes?' | Details: '+p.notes:''}`;
+  let ctx=`${persona}\nEvent: ${p.typeName} | Date: ${p.date} | Location: ${p.location} | Guests: ${p.guests} | Budget: $${parseInt(p.budget).toLocaleString()} MXN | Vibe: ${p.vibe} | Time: ${p.time} | Must-haves: ${p.mustHaves}${p.paqueteInfo||''}${p.notes?' | Details: '+p.notes:''}`;
+  // Detalles adicionales opcionales — solo se agregan si el usuario los llenó
+  const extras=[];
+  if(e.kids>0) extras.push(`${e.kids} children among guests`);
+  if(e.ceremony) extras.push(`Ceremony format: ${e.ceremony}`);
+  if(e.colors) extras.push(`Color palette: ${e.colors}`);
+  if(e.venueType&&e.venueType!=='No sé todavía'&&e.venueType!=='Not sure yet') extras.push(`Venue type: ${e.venueType}`);
+  if(e.duration&&e.duration!=='No sé todavía'&&e.duration!=='Not sure yet') extras.push(`Duration: ${e.duration}`);
+  if(e.dresscode) extras.push(`Dress code: ${e.dresscode}`);
+  if(e.menuType&&e.menuType!=='No sé todavía'&&e.menuType!=='Not sure yet') extras.push(`Menu type: ${e.menuType}`);
+  if(e.drinks) extras.push(`Drinks: ${e.drinksLabel}`);
+  if(e.cake==='si') extras.push(`Wants a custom cake/desserts`);
+  if(e.allergies) extras.push(`Allergies/dietary restrictions: ${e.allergies}`);
+  if(e.lodging&&e.lodging!=='') extras.push(`Lodging for guests: ${e.lodgingLabel}`);
+  if(e.coordinator&&e.coordinator!=='') extras.push(`Event coordinator: ${e.coordinatorLabel}`);
+  if(e.motivo) extras.push(`Event purpose: ${e.motivo}`);
+  if(e.edadFestejado) extras.push(`Guest of honor's age: ${e.edadFestejado}`);
+  if(e.numGraduados) extras.push(`Number of graduates: ${e.numGraduados}`);
+  if(e.costoBoleto) extras.push(`Expected ticket price: $${e.costoBoleto} MXN`);
+  if(extras.length) ctx+=`\nAdditional details: ${extras.join(' | ')}`;
   return {outLang,ctx};
 }
 
@@ -1144,38 +1412,300 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 }
 
 // ══════════════════════════════
-//  PROMPT 3 (Haiku, JSON): presupuesto + cronograma + checklist + proveedores EN UNA SOLA LLAMADA
-//  Salida en JSON compacto: menos tokens que HTML con clases repetidas, y sirve directo para el Excel.
+//  PRESUPUESTO, CRONOGRAMA, CHECKLIST Y PROVEEDORES — PLANTILLAS SIN IA
+//  Antes se le pedían a Haiku como JSON. Ahora se arman al instante en el
+//  navegador: más rápido, gratis, y sin riesgo de que venga incompleto.
+//  La personalización viene de los datos reales del usuario (fecha, presupuesto,
+//  prioridad, must-haves seleccionados) en vez de pedirle a la IA que "adivine".
 // ══════════════════════════════
-function buildDataPrompt(){
-  const p=plan;
-  const {outLang,ctx}=buildCtx();
-  return `You are an expert event planner. Return ONLY a single valid JSON object, no markdown, no code fences, no preamble, no trailing text. All text values must be in ${outLang}. Do not truncate the JSON — every array must be fully closed.
 
-${ctx}
-Be very specific to must-haves: ${p.mustHaves}.
-
-Return exactly this shape:
-{
- "budget": [{"label": string, "amount": number, "pct": number}],
- "budgetTips": [string],
- "paqueteInfo": string,
- "timeline": [{"when": string, "what": string, "detail": string}],
- "checklist": [{"section": string, "items": [{"text": string, "cat": string}]}],
- "vendors": [{"type": string, "name": string, "tip": string}],
- "vendorQuestions": [string],
- "negotiationTips": [string]
+function fillTemplate(str,data){
+  return str.replace(/\$\{(\w+)\}/g,(_,k)=>data[k]!==undefined?data[k]:'');
 }
 
-Field rules:
-- "budget": EXACTLY 8 items. Categories in this order (translate label if outLang is English): Lugar y Decoración, Catering y Bebidas, Fotografía y Video, Música y Entretenimiento, Vestimenta y Accesorios, Invitaciones y Papelería, Transporte y Extras, Fondo de Emergencia. Priority "${p.priority}" gets extra allocation. Amounts (numbers, no currency symbols) must sum to exactly ${parseInt(p.budget)}. "pct" is the whole-number percentage of total.
-- "budgetTips": exactly 4 specific, actionable money tips for this event.
-- "paqueteInfo": 2-4 sentences (plain text, no HTML) explaining how all-inclusive venue packages work in Mexico (price per person including food, non-alcoholic drinks, venue and music), plus common extras like photography, alcohol, ceremony.
-- "timeline": 14-16 milestones. CRITICAL: calculate every date working BACKWARDS from the event date ${p.date}. Never use past dates, never go beyond ${p.date}. Venue status: "${p.venueStatus}", vendor status: "${p.vendorStatus}" — mark already-booked items as done in "detail". "when" should read like "12 meses antes (Enero 2026)". "detail" should include practical notes and estimated budget where relevant.
-- "checklist": exactly these 8 sections in this order (translate section name if outLang is English): Lugar y Logística, Catering y Menu, Entretenimiento, Decoración, Invitados e Invitaciones, Dia del Evento, Fotografía y Video, Detalles Finales. Each section needs 8-10 specific, non-empty items. "cat" is a short 1-3 word category tag.
-- "vendors": 6-8 vendor types tailored to vibe "${p.vibe}" and budget. "name" = what to look for, "tip" = one specific practical tip.
-- "vendorQuestions": exactly 5 top questions to ask vendors.
-- "negotiationTips": exactly 3 negotiation tips.`;
+// ── PRESUPUESTO ──
+const BUDGET_CATS=[
+  {es:'Lugar y Decoración',en:'Venue & Decor',pct:25},
+  {es:'Catering y Bebidas',en:'Catering & Drinks',pct:28},
+  {es:'Fotografía y Video',en:'Photography & Video',pct:12},
+  {es:'Música y Entretenimiento',en:'Music & Entertainment',pct:10},
+  {es:'Vestimenta y Accesorios',en:'Attire & Accessories',pct:8},
+  {es:'Invitaciones y Papelería',en:'Invitations & Stationery',pct:3},
+  {es:'Transporte y Extras',en:'Transport & Extras',pct:7},
+  {es:'Fondo de Emergencia',en:'Emergency Fund',pct:7}
+];
+const PRIORITY_BOOST_IDX={
+  'Experiencia de invitados':1,'Guest experience':1,
+  'Fotos y video perfectos':2,'Stunning photos':2,
+  'Algo único':3,'Unique & memorable':3,
+  'Sin estrés':7,'Stress-free':7
+};
+
+function buildBudget(){
+  const p=plan,L=p.lang==='es';
+  const total=parseInt(p.budget)||0;
+  let pcts=BUDGET_CATS.map(c=>c.pct);
+  const boostIdx=PRIORITY_BOOST_IDX[p.priority];
+  if(boostIdx!==undefined){
+    const boost=8;
+    const othersSum=pcts.reduce((s,v,i)=>i===boostIdx?s:s+v,0);
+    pcts=pcts.map((v,i)=>i===boostIdx?v+boost:Math.max(1,Math.round(v-(v/othersSum)*boost)));
+  }
+  let sum=pcts.reduce((a,b)=>a+b,0);
+  pcts[pcts.length-1]+=(100-sum);
+
+  let amounts=pcts.map(pc=>Math.round(total*pc/100));
+  let amtSum=amounts.reduce((a,b)=>a+b,0);
+  amounts[amounts.length-1]+=(total-amtSum);
+
+  const budget=BUDGET_CATS.map((c,i)=>({label:L?c.es:c.en,amount:amounts[i],pct:pcts[i]}));
+
+  const budgetTips=L?[
+    'Aparta siempre un 5-10% extra para imprevistos — casi nunca falla.',
+    `Como tu prioridad es "${p.priority}", vale la pena invertir más tiempo y presupuesto ahí que en el resto.`,
+    'Pide cotizaciones por escrito antes de comprometerte — compara mínimo 3 opciones.',
+    'Revisa si algún proveedor ofrece paquetes todo incluido: a veces salen más baratos que contratar por separado.'
+  ]:[
+    'Always set aside 5-10% extra for surprises — you will almost always use it.',
+    `Since your priority is "${p.priority}", it's worth spending more time and budget there than everywhere else.`,
+    'Get quotes in writing before committing — compare at least 3 options.',
+    'Check whether any vendor offers an all-inclusive package — sometimes cheaper than booking separately.'
+  ];
+
+  const paqueteInfo=L
+    ?'En México, muchos lugares para eventos ofrecen paquetes "todo incluido" con precio por persona, que suele cubrir alimentos, bebidas no alcohólicas, el uso del salón o jardín y música. Extras comunes como fotografía, barra libre de alcohol o la ceremonia normalmente se cotizan aparte. Vale la pena comparar el precio por persona del paquete contra contratar todo por separado — según tu número de invitados, una opción puede salir bastante más barata que la otra.'
+    :'In Mexico, many event venues offer "all-inclusive" packages priced per person, usually covering food, non-alcoholic drinks, the venue itself, and music. Common extras like photography, an open bar, or the ceremony are typically quoted separately. It is worth comparing the per-person package price against booking everything separately — depending on your guest count, one option can end up noticeably cheaper.';
+
+  return {budget,budgetTips,paqueteInfo};
+}
+
+// ── CRONOGRAMA ──
+function statusNote(statusText,lang){
+  const L=lang==='es';
+  const t=(statusText||'').toLowerCase();
+  const negated=/\bno\b|not yet|todavía no|aún no|pendiente|pending|falta|por definir|por hacer|to do|not booked|not confirmed/.test(t);
+  const already=!negated&&/\bya\b|reserv|confirm|listo|tengo|booked|\bhave\b|ready|\byes\b|\bsí\b/.test(t);
+  if(already) return L?`Ya tienes esto resuelto (${statusText}) — perfecto, un pendiente menos.`:`This is already locked in (${statusText}) — one less thing to worry about.`;
+  return L?`Aún no lo tienes resuelto (${statusText}) — es momento de cerrarlo.`:`Not locked in yet (${statusText}) — time to get this handled.`;
+}
+
+const TIMELINE_TEMPLATE={
+  es:[
+    {frac:1.00,what:'Define presupuesto y prioridades',detail:'Con $${budget} MXN definidos y tu prioridad en "${priority}", ya tienes la base para decidir todo lo demás.'},
+    {frac:0.92,what:'Reserva el lugar',type:'venue'},
+    {frac:0.83,what:'Arma tu lista de invitados',detail:'Define el número aproximado de invitados (${guests}) — esto afecta presupuesto, lugar y catering.'},
+    {frac:0.75,what:'Reserva proveedores clave',type:'vendor'},
+    {frac:0.58,what:'Elige el estilo y la decoración',detail:'Con un estilo "${vibe}" en mente, busca referencias visuales y cotiza decoración.'},
+    {frac:0.50,what:'Envía invitaciones o Save the Date',detail:'Da tiempo suficiente a tus invitados para organizarse, sobre todo si vienen de fuera.'},
+    {frac:0.42,what:'Confirma menú y degustación',detail:'Agenda la prueba de menú con tu proveedor de catering y confirma opciones especiales.'},
+    {frac:0.33,what:'Define detalles de vestimenta',detail:'Aparta o manda a hacer lo que necesites, dejando margen para ajustes.'},
+    {frac:0.25,what:'Confirma detalles con todos los proveedores',detail:'Revisa horarios, pagos y qué incluye cada contrato.'},
+    {frac:0.17,what:'Da seguimiento a confirmaciones (RSVP)',detail:'Contacta a quien no haya confirmado y cierra el número final de invitados.'},
+    {frac:0.08,what:'Últimos ajustes y pagos finales',detail:'Confirma pagos pendientes y revisa que todo relacionado con: ${mustHaves} esté resuelto.'},
+    {frac:0.02,what:'Confirmación final con proveedores',detail:'Llama a cada proveedor para confirmar horarios exactos de llegada.'},
+    {frac:0,what:'Día del evento',detail:'Disfruta — llegó el momento, ya está todo listo.'}
+  ],
+  en:[
+    {frac:1.00,what:'Set your budget and priorities',detail:'With $${budget} MXN defined and your priority on "${priority}", you have the base to decide everything else.'},
+    {frac:0.92,what:'Book your venue',type:'venue'},
+    {frac:0.83,what:'Build your guest list',detail:'Define your approximate guest count (${guests}) — this affects budget, venue and catering.'},
+    {frac:0.75,what:'Book key vendors',type:'vendor'},
+    {frac:0.58,what:'Choose your style and decor',detail:'With a "${vibe}" style in mind, start gathering visual references and quoting decor.'},
+    {frac:0.50,what:'Send invitations or Save the Dates',detail:'Give guests enough time to plan, especially if they are traveling.'},
+    {frac:0.42,what:'Confirm menu and tasting',detail:'Schedule your menu tasting with catering and confirm special options.'},
+    {frac:0.33,what:'Finalize attire details',detail:'Order or set aside what you need, leaving room for alterations.'},
+    {frac:0.25,what:'Confirm details with every vendor',detail:'Review schedules, payments and what each contract includes.'},
+    {frac:0.17,what:'Follow up on RSVPs',detail:'Reach out to anyone who has not confirmed and lock in your final guest count.'},
+    {frac:0.08,what:'Final adjustments and payments',detail:'Confirm outstanding payments and make sure everything related to: ${mustHaves} is handled.'},
+    {frac:0.02,what:'Final vendor confirmations',detail:'Call every vendor to confirm exact arrival times.'},
+    {frac:0,what:'Event day',detail:'Enjoy — the moment is here, everything is ready.'}
+  ]
+};
+
+// Formatea "cuándo" adaptando la unidad (meses/semanas/días) según qué tan
+// cerca esté ese hito de la fecha del evento — así funciona igual de bien
+// si el evento es en 12 meses o en 3 semanas.
+function formatWhen(daysBefore,date,L){
+  if(daysBefore<=0) return L?'Día del evento':'Event day';
+  const monthYear=date.toLocaleDateString(L?'es-MX':'en-US',{month:'long',year:'numeric'});
+  const dayMonth=date.toLocaleDateString(L?'es-MX':'en-US',{day:'numeric',month:'long'});
+  if(daysBefore>=45){
+    const months=Math.max(1,Math.round(daysBefore/30));
+    return `${L?`${months} ${months===1?'mes':'meses'} antes`:`${months} ${months===1?'month':'months'} before`} (${monthYear})`;
+  }
+  if(daysBefore>=10){
+    const weeks=Math.max(1,Math.round(daysBefore/7));
+    return `${L?`${weeks} ${weeks===1?'semana':'semanas'} antes`:`${weeks} ${weeks===1?'week':'weeks'} before`} (${dayMonth})`;
+  }
+  return `${L?`${daysBefore} ${daysBefore===1?'día':'días'} antes`:`${daysBefore} ${daysBefore===1?'day':'days'} before`} (${dayMonth})`;
+}
+
+function buildTimeline(){
+  const p=plan,L=p.lang==='es';
+  const today=new Date(); today.setHours(0,0,0,0);
+  const eventDate=p.rawDate?new Date(p.rawDate+'T12:00:00'):new Date(today.getTime()+1000*60*60*24*180);
+  let totalDays=Math.round((eventDate-today)/(1000*60*60*24));
+  if(totalDays<1) totalDays=1; // por si la fecha elegida es hoy o quedó en el pasado
+  const data={budget:(parseInt(p.budget)||0).toLocaleString(),priority:p.priority,guests:p.guests,vibe:p.vibe,mustHaves:p.mustHaves};
+  return TIMELINE_TEMPLATE[p.lang].map(item=>{
+    const daysBefore=Math.round(item.frac*totalDays);
+    const d=new Date(eventDate); d.setDate(d.getDate()-daysBefore);
+    const when=formatWhen(daysBefore,d,L);
+    let detail;
+    if(item.type==='venue') detail=statusNote(p.venueStatus,p.lang);
+    else if(item.type==='vendor') detail=statusNote(p.vendorStatus,p.lang)+' '+(L?'Empieza por lo más solicitado en tu fecha: fotografía, catering y música.':'Start with what books up fastest for your date: photography, catering and music.');
+    else detail=fillTemplate(item.detail,data);
+    return {when,what:item.what,detail};
+  });
+}
+
+// ── CHECKLIST ──
+const CHECKLIST_BASE={
+  es:[
+    {section:'Lugar y Logística',items:['Definir número final de invitados','Reservar el lugar y firmar contrato','Confirmar capacidad y permisos necesarios','Revisar estacionamiento y accesibilidad','Definir plan B en caso de mal clima','Coordinar horarios de montaje y desmontaje']},
+    {section:'Catering y Menu',items:['Elegir proveedor de catering','Definir menú y opciones para restricciones alimentarias','Agendar degustación','Confirmar servicio de bebidas','Definir pastel o postre principal','Coordinar horarios de servicio']},
+    {section:'Entretenimiento',items:['Contratar música o entretenimiento principal','Armar playlist con canciones especiales','Definir actividades o dinámicas','Coordinar equipo de sonido','Planear el momento principal del evento']},
+    {section:'Decoración',items:['Definir paleta de colores y estilo','Contratar decorador o floristería','Elegir centros de mesa','Definir señalización y letreros','Coordinar iluminación']},
+    {section:'Invitados e Invitaciones',items:['Armar lista de invitados','Diseñar y enviar invitaciones','Dar seguimiento a confirmaciones (RSVP)','Organizar asignación de mesas','Preparar detalles de bienvenida']},
+    {section:'Dia del Evento',items:['Confirmar horario final con todos los proveedores','Preparar kit de emergencia','Asignar responsable de coordinar el día','Revisar checklist de última hora','Confirmar transporte del día']},
+    {section:'Fotografía y Video',items:['Contratar fotógrafo y/o videógrafo','Definir lista de tomas imprescindibles','Coordinar horarios de sesión','Definir cómo se compartirán las fotos después']},
+    {section:'Detalles Finales',items:['Confirmar pagos pendientes a proveedores','Preparar agradecimientos para invitados','Revisar el presupuesto final vs. lo gastado','Hacer un último recorrido del lugar']}
+  ],
+  en:[
+    {section:'Venue & Logistics',items:['Set your final guest count','Book the venue and sign the contract','Confirm capacity and required permits','Check parking and accessibility','Define a backup plan for bad weather','Coordinate setup and breakdown times']},
+    {section:'Catering & Menu',items:['Choose a catering vendor','Define the menu and dietary options','Schedule a tasting','Confirm the drinks service','Decide on the cake or main dessert','Coordinate service timing']},
+    {section:'Entertainment',items:['Book your main music/entertainment','Put together a playlist of special songs','Plan any activities or games','Coordinate the sound setup','Plan the event\'s key moment']},
+    {section:'Decor',items:['Define your color palette and style','Book a decorator or florist','Choose your centerpieces','Plan signage','Coordinate lighting']},
+    {section:'Guests & Invitations',items:['Build your guest list','Design and send invitations','Follow up on RSVPs','Organize table assignments','Prepare welcome details']},
+    {section:'Event Day',items:['Confirm the final schedule with every vendor','Prepare an emergency kit','Assign someone to coordinate the day','Do a last-minute checklist review','Confirm transportation for the day']},
+    {section:'Photography & Video',items:['Book a photographer and/or videographer','Define your must-have shot list','Coordinate session timing','Decide how photos will be shared afterward']},
+    {section:'Final Details',items:['Confirm any pending vendor payments','Prepare thank-you notes for guests','Review final budget vs. actual spend','Do one last venue walkthrough']}
+  ]
+};
+
+function guessSection(tag,lang){
+  const L=lang==='es';
+  const t=tag.toLowerCase();
+  if(/dj|música|music|banda|band|baile|dance|karaoke|animador|entertainer|\bmc\b|vals|waltz|fuego|firework|pirotecnia/.test(t)) return L?'Entretenimiento':'Entertainment';
+  if(/catering|pastel|cake|dulce|candy|bebida|drink|barra|\bbar\b|comida|food|brindis|toast|postre|dessert/.test(t)) return L?'Catering y Menu':'Catering & Menu';
+  if(/decor|flor|flower|globo|balloon|arco|arch|backdrop|vela|candle|jardín|garden|tema|theme|confeti|confetti/.test(t)) return L?'Decoración':'Decor';
+  if(/foto|photo|video|streaming|dron|drone/.test(t)) return L?'Fotografía y Video':'Photography & Video';
+  if(/valet|estacionamiento|parking|\bav\b|proyector|projector|gafete|badge|limo|transporte|transport/.test(t)) return L?'Lugar y Logística':'Venue & Logistics';
+  if(/juego|game|infantil|kids|inflable|inflatable|pintacar|face paint|personaje|character/.test(t)) return L?'Entretenimiento':'Entertainment';
+  return L?'Detalles Finales':'Final Details';
+}
+
+function buildChecklist(){
+  const p=plan,L=p.lang==='es',e=p.extra||{};
+  const base=CHECKLIST_BASE[p.lang].map(s=>({section:s.section,items:s.items.map(t=>({text:t,cat:s.section}))}));
+  (p.mustHaveTags||[]).forEach(tag=>{
+    const sectionName=guessSection(tag,p.lang);
+    const target=base.find(s=>s.section===sectionName)||base[base.length-1];
+    target.items.push({text:L?`Coordinar: ${tag}`:`Coordinate: ${tag}`,cat:tag});
+  });
+  const find=name=>base.find(s=>s.section===(L?name.es:name.en));
+  const catering=find({es:'Catering y Menu',en:'Catering & Menu'});
+  const guests=find({es:'Invitados e Invitaciones',en:'Guests & Invitations'});
+  const logistics=find({es:'Lugar y Logística',en:'Venue & Logistics'});
+  const finalD=find({es:'Detalles Finales',en:'Final Details'});
+  if(e.kids>0&&catering) catering.items.push({text:L?`Definir menú infantil para ${e.kids} niños`:`Plan a kids menu for ${e.kids} children`,cat:L?'Niños':'Kids'});
+  if(e.allergies&&catering) catering.items.push({text:L?`Confirmar con el catering: ${e.allergies}`:`Confirm with catering: ${e.allergies}`,cat:L?'Alergias':'Allergies'});
+  if(e.tasting==='si'&&catering) catering.items.push({text:L?'Agendar fecha de degustación':'Schedule the tasting date',cat:L?'Menú':'Menu'});
+  if(e.cake==='si'&&catering) catering.items.push({text:L?'Encargar pastel/postres personalizados':'Order custom cake/desserts',cat:L?'Pastel':'Cake'});
+  if(e.drinks&&catering) catering.items.push({text:L?`Confirmar servicio de bebidas: ${e.drinksLabel}`:`Confirm drinks service: ${e.drinksLabel}`,cat:L?'Bebidas':'Drinks'});
+  if(e.ceremony&&logistics) logistics.items.push({text:L?`Confirmar detalles de la ceremonia: ${e.ceremony}`:`Confirm ceremony details: ${e.ceremony}`,cat:L?'Ceremonia':'Ceremony'});
+  if(e.dresscode&&guests) guests.items.push({text:L?`Comunicar código de vestimenta a invitados: ${e.dresscode}`:`Share dress code with guests: ${e.dresscode}`,cat:L?'Vestimenta':'Dress code'});
+  if((e.lodging==='si'||e.lodging==='resuelto')&&guests) guests.items.push({text:e.lodging==='si'?(L?'Coordinar hospedaje para invitados de fuera':'Arrange lodging for out-of-town guests'):(L?'Compartir opciones de hospedaje ya resueltas con invitados':'Share confirmed lodging options with guests'),cat:L?'Hospedaje':'Lodging'});
+  if(e.coordinator==='necesito'&&finalD) finalD.items.push({text:L?'Contratar coordinador/a de evento':'Hire an event coordinator',cat:L?'Coordinación':'Coordination'});
+  if(e.motivo&&logistics) logistics.items.push({text:L?`Alinear agenda y actividades con el motivo: ${e.motivo}`:`Align agenda and activities with the purpose: ${e.motivo}`,cat:L?'Agenda':'Agenda'});
+  if(e.numGraduados&&guests) guests.items.push({text:L?`Confirmar lista final de ${e.numGraduados} graduados`:`Confirm final list of ${e.numGraduados} graduates`,cat:L?'Graduados':'Graduates'});
+  return base;
+}
+
+// ── PROVEEDORES ──
+const VENDOR_TEMPLATE={
+  es:{
+    vendors:[
+      {type:'Fotografía y Video',name:'Portafolio consistente en el estilo que buscas',tip:'Pide ver un evento completo, no solo los mejores momentos.'},
+      {type:'Música / DJ',name:'Buena reputación y equipo propio de sonido',tip:'Pregunta por su playlist de respaldo y si tiene plan B de equipo.'},
+      {type:'Catering',name:'Experiencia con el tamaño de tu evento',tip:'Siempre pide degustación antes de firmar.'},
+      {type:'Decoración y Flores',name:'Portafolio que combine con tu estilo',tip:'Pregunta si el precio incluye montaje y desmontaje.'},
+      {type:'Lugar del Evento',name:'Capacidad y permisos correctos para tus invitados',tip:'Visita en persona antes de firmar, no solo por fotos.'},
+      {type:'Transporte',name:'Flota en buen estado y seguro vigente',tip:'Confirma tiempos de traslado en horario real, no ideal.'},
+      {type:'Coordinador de Evento',name:'Referencias de eventos similares al tuyo',tip:'Pregunta cuántos eventos coordina el mismo día.'},
+      {type:'Mobiliario y Renta',name:'Variedad de estilos y buen estado del inventario',tip:'Confirma la póliza en caso de daños o faltantes.'}
+    ],
+    vendorQuestions:[
+      '¿Cuál es tu disponibilidad para mi fecha?',
+      '¿Qué incluye exactamente el precio cotizado?',
+      '¿Cuál es tu política de cancelación o cambios?',
+      '¿Tienes seguro de responsabilidad civil?',
+      '¿Puedo ver referencias o reseñas de clientes anteriores?',
+      '¿Cuánto tiempo antes necesitas la confirmación final?',
+      '¿Tienes plan B en caso de lluvia o imprevistos?',
+      '¿Quién será mi contacto directo el día del evento?',
+      '¿Ofreces pruebas o muestras (de comida, decoración, música)?',
+      '¿Cómo manejas los pagos y depósitos?',
+      '¿Qué sucede si hay retrasos en el montaje o entrega?',
+      '¿Incluyes limpieza o desmontaje al final del evento?',
+      '¿Tienes restricciones de horario o ruido en el lugar?'
+    ],
+    negotiationTips:[
+      'Pide todo por escrito, incluyendo lo que NO está incluido.',
+      'Compara al menos 3 cotizaciones antes de decidir.',
+      'Pregunta por descuentos en fechas de temporada baja.',
+      'Pide cláusulas claras sobre reembolsos y penalizaciones.',
+      'Negocia paquetes integrales (foto + video + dron, por ejemplo).',
+      'Pregunta si ofrecen descuentos por pago anticipado.',
+      'Revisa reseñas en redes y pide ver trabajos recientes.',
+      'Mantén una hoja de control con fechas de pago y entregables.',
+      'Usa un correo exclusivo para tu evento (facilita el seguimiento).',
+      'Si el proveedor es local, pregunta por alianzas con otros servicios (floristas, banqueteros, etc.).'
+    ]
+  },
+  en:{
+    vendors:[
+      {type:'Photography & Video',name:'A portfolio consistent with the style you want',tip:'Ask to see a full event, not just the highlight reel.'},
+      {type:'Music / DJ',name:'Good reputation and their own sound equipment',tip:'Ask about their backup playlist and equipment plan B.'},
+      {type:'Catering',name:'Experience with your event size',tip:'Always request a tasting before signing.'},
+      {type:'Decor & Florals',name:'A portfolio that matches your style',tip:'Ask if the price includes setup and breakdown.'},
+      {type:'Venue',name:'Correct capacity and permits for your guest count',tip:'Visit in person before signing, not just from photos.'},
+      {type:'Transportation',name:'Well-maintained fleet and current insurance',tip:'Confirm travel times at the actual time of day, not ideal traffic.'},
+      {type:'Event Coordinator',name:'References from similar events to yours',tip:'Ask how many events they coordinate on the same day.'},
+      {type:'Rentals & Furniture',name:'Variety of styles and inventory in good condition',tip:'Confirm the policy for damaged or missing items.'}
+    ],
+    vendorQuestions:[
+      'What is your availability for my date?',
+      'What exactly does the quoted price include?',
+      'What is your cancellation or change policy?',
+      'Do you carry liability insurance?',
+      'Can I see references or reviews from past clients?',
+      'How far in advance do you need the final confirmation?',
+      'Do you have a backup plan for rain or unexpected issues?',
+      'Who will be my direct contact on the day of the event?',
+      'Do you offer tastings or samples (food, decor, music)?',
+      'How do you handle payments and deposits?',
+      'What happens if setup or delivery is delayed?',
+      'Is cleanup or breakdown included at the end of the event?',
+      'Are there time or noise restrictions at the venue?'
+    ],
+    negotiationTips:[
+      'Get everything in writing, including what is NOT included.',
+      'Compare at least 3 quotes before deciding.',
+      'Ask about discounts for off-season dates.',
+      'Ask for clear clauses on refunds and penalties.',
+      'Negotiate bundled packages (photo + video + drone, for example).',
+      'Ask if they offer discounts for early payment.',
+      'Check reviews online and ask to see recent work.',
+      'Keep a tracking sheet with payment dates and deliverables.',
+      'Use a dedicated email for your event (makes follow-up easier).',
+      'If the vendor is local, ask about partnerships with other services (florists, caterers, etc.).'
+    ]
+  }
+};
+
+function buildVendors(){
+  return VENDOR_TEMPLATE[plan.lang];
 }
 
 // ══════════════════════════════
@@ -1231,26 +1761,54 @@ function renderTimeline(items){
 
 function renderChecklist(sections){
   if(!Array.isArray(sections)||!sections.length) return '';
-  return sections.map(s=>{
-    const items=(s.items||[]).map(i=>`<div class="cl-item" onclick="toggleCheck(this)"><div class="cl-box"></div><div><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div></div>`).join('');
+  const L=plan.lang==='es';
+  const hint=L?'Deselecciona lo que no necesites — solo lo que dejes marcado se incluye en tu Excel.':'Deselect what you don\'t need — only what stays checked is included in your Excel.';
+  const body=sections.map((s,si)=>{
+    const items=(s.items||[]).map((i,ii)=>{
+      if(i.selected===undefined) i.selected=true; // por defecto viene incluido; el usuario quita lo que no aplique
+      return `<div class="cl-item${i.selected?' chk':''}" data-s="${si}" data-i="${ii}" onclick="toggleChecklistItem(this)"><div class="cl-box"></div><div><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div></div>`;
+    }).join('');
     return `<h2>${esc(s.section)}</h2>${items}`;
   }).join('');
+  return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}`;
+}
+
+function toggleChecklistItem(el){
+  const si=+el.dataset.s,ii=+el.dataset.i;
+  const item=plan.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.selected=!item.selected;
+  el.classList.toggle('chk',item.selected);
+  const total=plan.checklistData.reduce((s,sec)=>s+sec.items.length,0);
+  const selected=plan.checklistData.reduce((s,sec)=>s+sec.items.filter(i=>i.selected).length,0);
+  showToast(`${selected}/${total} ${lang==='es'?'tareas en tu plan':'tasks in your plan'}`);
 }
 
 function renderVendors(items,questions,negotiation){
   if(!Array.isArray(items)||!items.length) return '';
   const L=plan.lang==='es';
-  const cards=items.map(v=>`<div class="vcard"><div class="vcard-type">${esc(v.type)}</div><div class="vcard-name">${esc(v.name)}</div><div class="vcard-tip">${esc(v.tip)}</div></div>`).join('');
+  const cards=items.map((v,vi)=>{
+    if(v.selected===undefined) v.selected=true; // por defecto vienen incluidos; el usuario quita los que no necesite
+    return `<div class="vcard${v.selected?' chk':''}" data-i="${vi}" onclick="toggleVendorItem(this)"><div class="vcard-check"></div><div class="vcard-type">${esc(v.type)}</div><div class="vcard-name">${esc(v.name)}</div><div class="vcard-tip">${esc(v.tip)}</div></div>`;
+  }).join('');
   const qs=(questions||[]).map(q=>`<li>${esc(q)}</li>`).join('');
   const neg=(negotiation||[]).map(n=>`<li>${esc(n)}</li>`).join('');
-  return `<div class="vcards">${cards}</div><h2>${L?'Top 5 preguntas para proveedores':'Top 5 vendor questions'}</h2><ul>${qs}</ul><h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
+  const hint=L?'Deselecciona los que no necesites — solo se incluyen en tu Excel los que dejes marcados.':'Deselect the ones you don\'t need — only the ones left checked are included in your Excel.';
+  return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p><div class="vcards">${cards}</div><h2>${L?'Top 5 preguntas para proveedores':'Top 5 vendor questions'}</h2><ul>${qs}</ul><h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
+}
+
+function toggleVendorItem(el){
+  const vi=+el.dataset.i;
+  const item=plan.vendorsData?.[vi];
+  if(!item) return;
+  item.selected=!item.selected;
+  el.classList.toggle('chk',item.selected);
 }
 
 // ══════════════════════════════
 //  LLAMADAS A LA API
 // ══════════════════════════════
 const SYSTEM_HTML='You are an expert event planner AI for DragonflAI Events. Write ALL content in the language specified in the prompt. Return ONLY clean HTML. No markdown, no code fences, no preamble. Never leave content incomplete.';
-const SYSTEM_JSON='You are an expert event planner AI for DragonflAI Events. Write ALL text content in the language specified in the prompt. Return ONLY a single valid JSON object — no markdown, no code fences, no preamble, no explanation, no trailing commentary. Never leave the JSON truncated or incomplete.';
 
 async function callAI(prompt,model,maxTokens,system){
   const res=await fetch(WORKER_URL,{
@@ -1266,17 +1824,6 @@ async function callAI(prompt,model,maxTokens,system){
 async function callClaude(prompt,model='claude-sonnet-4-5',maxTokens=2000){
   const h=await callAI(prompt,model,maxTokens,SYSTEM_HTML);
   return h.replace(/```html?\n?/gi,'').replace(/```\n?/g,'').trim();
-}
-
-async function callClaudeJSON(prompt,model='claude-haiku-4-5-20251001',maxTokens=2400){
-  const raw=await callAI(prompt,model,maxTokens,SYSTEM_JSON);
-  const clean=raw.replace(/```json\n?/gi,'').replace(/```\n?/g,'').trim();
-  try{ return JSON.parse(clean); }
-  catch(e){
-    const m=clean.match(/\{[\s\S]*\}/);
-    if(m){ try{ return JSON.parse(m[0]); }catch(e2){} }
-    throw new Error('JSON inválido de IA');
-  }
 }
 
 // ══════════════════════════════
@@ -1303,6 +1850,7 @@ async function exportSpreadsheet(){
   const wb=XLSX.utils.book_new();
 
   // Resumen
+  const e=plan.extra||{};
   const resumen=[
     [L?'Evento':'Event',plan.typeName],
     [L?'Anfitrión':'Host',plan.name],
@@ -1314,6 +1862,23 @@ async function exportSpreadsheet(){
     [L?'Moneda':'Currency','MXN'],
     [L?'Presupuesto total':'Total budget',parseInt(plan.budget)||0]
   ];
+  if(e.kids>0) resumen.push([L?'Niños entre invitados':'Children among guests',e.kids]);
+  if(e.ceremony) resumen.push([L?'Formato de ceremonia':'Ceremony format',e.ceremony]);
+  if(e.colors) resumen.push([L?'Paleta de colores':'Color palette',e.colors]);
+  if(e.venueType&&!/no s[eé]|not sure/i.test(e.venueType)) resumen.push([L?'Tipo de lugar':'Venue type',e.venueType]);
+  if(e.duration&&!/no s[eé]|not sure/i.test(e.duration)) resumen.push([L?'Duración':'Duration',e.duration]);
+  if(e.dresscode) resumen.push([L?'Código de vestimenta':'Dress code',e.dresscode]);
+  if(e.menuType&&!/no s[eé]|not sure/i.test(e.menuType)) resumen.push([L?'Tipo de menú':'Menu type',e.menuType]);
+  if(e.tasting==='si') resumen.push([L?'Degustación previa':'Tasting beforehand',L?'Sí':'Yes']);
+  if(e.drinks) resumen.push([L?'Bebidas':'Drinks',e.drinksLabel]);
+  if(e.cake==='si') resumen.push([L?'Pastel/postres personalizados':'Custom cake/desserts',L?'Sí':'Yes']);
+  if(e.allergies) resumen.push([L?'Alergias / restricciones':'Allergies / restrictions',e.allergies]);
+  if(e.lodging) resumen.push([L?'Hospedaje para invitados':'Guest lodging',e.lodgingLabel]);
+  if(e.coordinator) resumen.push([L?'Coordinador de evento':'Event coordinator',e.coordinatorLabel]);
+  if(e.motivo) resumen.push([L?'Motivo del evento':'Event purpose',e.motivo]);
+  if(e.edadFestejado) resumen.push([L?'Edad del festejado/a':'Guest of honor\'s age',e.edadFestejado]);
+  if(e.numGraduados) resumen.push([L?'Número de graduados':'Number of graduates',e.numGraduados]);
+  if(e.costoBoleto) resumen.push([L?'Costo esperado por boleto':'Expected ticket price',`$${e.costoBoleto} MXN`]);
   const wsResumen=XLSX.utils.aoa_to_sheet(resumen);
   wsResumen['!cols']=[{wch:24},{wch:36}];
   XLSX.utils.book_append_sheet(wb,wsResumen,L?'Overview':'Overview');
@@ -1354,21 +1919,29 @@ async function exportSpreadsheet(){
   wsItin['!cols']=[{wch:10},{wch:28},{wch:36},{wch:16}];
   XLSX.utils.book_append_sheet(wb,wsItin,L?'Itinerario del día':'Day-of Itinerary');
 
-  // Checklist
+  // Checklist — solo lo que el usuario dejó marcado en la app
   if(plan.checklistData&&plan.checklistData.length){
     const rows=[[L?'Sección':'Section',L?'Tarea':'Task',L?'Categoría':'Category',L?'Hecho':'Done']];
-    plan.checklistData.forEach(s=>(s.items||[]).forEach(i=>rows.push([s.section,i.text,i.cat,''])));
+    plan.checklistData.forEach(s=>(s.items||[]).forEach(i=>{ if(i.selected!==false) rows.push([s.section,i.text,i.cat,'']); }));
     const ws=XLSX.utils.aoa_to_sheet(rows);
     ws['!cols']=[{wch:22},{wch:38},{wch:18},{wch:8}];
     XLSX.utils.book_append_sheet(wb,ws,'Checklist');
   }
 
-  // Proveedores
+  // Proveedores — solo lo que el usuario dejó marcado, con seguimiento financiero real
   if(plan.vendorsData&&plan.vendorsData.length){
-    const rows=[[L?'Tipo':'Type',L?'Qué buscar':'What to look for',L?'Tip':'Tip',L?'Contacto':'Contact',L?'Precio cotizado':'Quoted price',L?'Estado':'Status']];
-    plan.vendorsData.forEach(v=>rows.push([v.type,v.name,v.tip,'','','']));
+    const header=[L?'Categoría':'Category',L?'Qué buscar':'What to look for',L?'Tip':'Tip',L?'Empresa':'Company',L?'Contacto':'Contact',L?'Teléfono / Email':'Phone / Email',L?'Sitio web':'Website',L?'Estatus':'Status',L?'Presupuestado':'Budgeted',L?'Precio contratado':'Contract price',L?'Pagado':'Paid',L?'Pagado por':'Paid by',L?'Restante':'Remaining',L?'Fecha límite de pago':'Payment due date'];
+    const rows=[header];
+    let vendorRowCount=0;
+    plan.vendorsData.forEach(v=>{
+      if(v.selected===false) return;
+      vendorRowCount++;
+      rows.push([v.type,v.name,v.tip,'','','','','',0,0,0,'','','']);
+    });
     const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:20},{wch:32},{wch:38},{wch:18},{wch:14},{wch:14}];
+    // Fórmula: Restante = Precio contratado - Pagado, por cada fila con datos
+    for(let r=2;r<=vendorRowCount+1;r++){ ws['M'+r]={t:'n',f:`J${r}-K${r}`}; }
+    ws['!cols']=[{wch:18},{wch:28},{wch:32},{wch:20},{wch:16},{wch:18},{wch:18},{wch:14},{wch:13},{wch:14},{wch:11},{wch:16},{wch:11},{wch:16}];
     XLSX.utils.book_append_sheet(wb,ws,L?'Proveedores':'Vendors');
   }
 
@@ -1394,17 +1967,36 @@ async function exportSpreadsheet(){
   wsFood['!cols']=[{wch:26},{wch:14},{wch:8},{wch:20},{wch:12}];
   XLSX.utils.book_append_sheet(wb,wsFood,L?'Comida y Bebidas':'Food & Drinks');
 
+  // Regalos — plantilla editable en blanco (aplica a cualquier tipo de evento)
+  const giftRows=[[L?'Invitado':'Guest',L?'¿Trajo regalo?':'Brought a gift?',L?'Tipo de regalo':'Gift type',L?'Valor estimado':'Estimated value',L?'Descripción':'Description',L?'Agradecimiento enviado':'Thank you sent']];
+  for(let i=0;i<20;i++) giftRows.push(['','','','','','']);
+  const wsGifts=XLSX.utils.aoa_to_sheet(giftRows);
+  wsGifts['!cols']=[{wch:24},{wch:16},{wch:18},{wch:16},{wch:30},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,wsGifts,L?'Regalos':'Gifts');
+
+  // Comparador de lugares — plantilla editable en blanco (aplica a cualquier tipo de evento)
+  const venueHeader=[L?'Opción':'Option',L?'Nombre del lugar':'Venue name',L?'Capacidad':'Capacity',L?'Precio total':'Total price',L?'Precio por persona':'Price per person',L?'¿Incluye qué?':'What\'s included',L?'¿Disponible en tu fecha?':'Available on your date?',L?'Pros':'Pros',L?'Contras':'Cons',L?'Calificación (1-5)':'Rating (1-5)'];
+  const venueRows=[venueHeader];
+  for(let i=1;i<=4;i++) venueRows.push([L?`Opción ${i}`:`Option ${i}`,'','','','','','','','','']);
+  const wsVenueCmp=XLSX.utils.aoa_to_sheet(venueRows);
+  wsVenueCmp['!cols']=[{wch:12},{wch:22},{wch:12},{wch:14},{wch:16},{wch:26},{wch:20},{wch:26},{wch:26},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,wsVenueCmp,L?'Comparador de Lugares':'Venue Comparison');
+
+  // Luna de miel — solo para bodas, plantilla editable en blanco
+  if(plan.eventTypeRaw==='Boda/Wedding'){
+    const hmHeader=[L?'Destino':'Destination',L?'Duración':'Duration',L?'Vuelos':'Flights',L?'Hospedaje':'Lodging',L?'Actividades':'Activities',L?'Comida':'Food',L?'Total estimado':'Estimated total'];
+    const hmRows=[hmHeader];
+    for(let i=1;i<=3;i++) hmRows.push([L?`Opción ${i}`:`Option ${i}`,'','','','','','']);
+    const wsHoneymoon=XLSX.utils.aoa_to_sheet(hmRows);
+    wsHoneymoon['!cols']=[{wch:18},{wch:14},{wch:14},{wch:14},{wch:26},{wch:14},{wch:16}];
+    XLSX.utils.book_append_sheet(wb,wsHoneymoon,L?'Luna de Miel':'Honeymoon');
+  }
+
   const filename=`DragonflAI_${(plan.typeName||'evento').replace(/[^\w]+/g,'_')}.xlsx`;
   XLSX.writeFile(wb,filename);
   showToast(L?'📊 Excel descargado':'📊 Excel downloaded');
 }
 
-function toggleCheck(el){
-  el.classList.toggle('chk');
-  const items=[...document.querySelectorAll('.cl-item')];
-  const done=items.filter(i=>i.classList.contains('chk')).length;
-  showToast(`${done}/${items.length} ${lang==='es'?'tareas listas':'tasks done'}`);
-}
 
 function startCountdown(){
   const raw=document.getElementById('f-date').value;
@@ -1424,7 +2016,7 @@ function startCountdown(){
     document.getElementById('cd-hours').textContent=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
     document.getElementById('cd-mins').textContent=Math.floor((diff%(1000*60*60))/(1000*60));
     const n=plan.name&&plan.name!=='el anfitrión'&&plan.name!=='the host'?plan.name+', ':'';
-    document.getElementById('cd-name').textContent=lang==='es'?`${n}¡faltan ${Math.floor(diff/(1000*60*60*24))} días! <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg>`:`${n}only ${Math.floor(diff/(1000*60*60*24))} days! <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg>`;
+    document.getElementById('cd-name').innerHTML=lang==='es'?`${n}¡faltan ${Math.floor(diff/(1000*60*60*24))} días! <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg>`:`${n}only ${Math.floor(diff/(1000*60*60*24))} days! <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg>`;
   }
   tick(); setInterval(tick,60000);
 }
