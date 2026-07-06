@@ -518,9 +518,9 @@ const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
 const MAX_FREE = 3;
 
 // Supabase dashboard → Settings → API (mismas llaves que en dragonflai-v2.html)
-const SUPABASE_URL = 'TU_SUPABASE_URL_AQUI';
-const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY_AQUI';
-const supabase = (window.supabase && SUPABASE_URL.startsWith('http'))
+const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
+const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
@@ -533,11 +533,11 @@ let currentUser = null;
 let isPaid = false;
 
 async function refreshPaidStatus() {
-  if (!supabase) return;
-  const { data: { session } } = await supabase.auth.getSession();
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
   currentUser = session ? session.user : null;
   if (!currentUser) { isPaid = false; return; }
-  const { data } = await supabase.from('profiles').select('paid').eq('id', currentUser.id).single();
+  const { data } = await sb.from('profiles').select('paid').eq('id', currentUser.id).single();
   isPaid = !!(data && data.paid);
 }
 
@@ -554,8 +554,8 @@ refreshPaidStatus().then(() => {
   }
 });
 
-if (supabase) {
-  supabase.auth.onAuthStateChange((_event, session) => {
+if (sb) {
+  sb.auth.onAuthStateChange((_event, session) => {
     currentUser = session ? session.user : null;
     refreshPaidStatus();
   });
@@ -589,10 +589,10 @@ function closeAuthModal() {
 }
 
 async function sendMagicLink() {
-  if (!supabase) { alert('Supabase no está configurado todavía.'); return; }
+  if (!sb) { alert('Supabase no está configurado todavía.'); return; }
   const email = document.getElementById('auth-email').value.trim();
   if (!email) { alert('Escribe tu correo.'); return; }
-  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
   if (error) { alert(error.message); return; }
   alert('✉️ Revisa tu correo — te mandamos un link para entrar. Al volver, da clic en "Ir a pago seguro" de nuevo.');
   closeAuthModal();
