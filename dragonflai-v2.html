@@ -938,10 +938,10 @@ const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
 const MAX_GENERATIONS = 3;
 
 // Supabase dashboard → Settings → API
-const SUPABASE_URL = 'TU_SUPABASE_URL_AQUI';        // Project URL
-const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY_AQUI'; // anon public key — esta SÍ es segura de exponer aquí
+const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';        // Project URL
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U'; // anon public key — esta SÍ es segura de exponer aquí
 
-const supabase = (window.supabase && SUPABASE_URL.startsWith('http'))
+const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
@@ -959,12 +959,12 @@ let currentUser=null;
 let isPaid=false;
 
 async function refreshPaidStatus(){
-  if(!supabase) return isPaid;
-  const {data:{session}}=await supabase.auth.getSession();
+  if(!sb) return isPaid;
+  const {data:{session}}=await sb.auth.getSession();
   currentUser=session?session.user:null;
   updateAccountUI();
   if(!currentUser){ isPaid=false; return isPaid; }
-  const {data}=await supabase.from('profiles').select('paid').eq('id',currentUser.id).single();
+  const {data}=await sb.from('profiles').select('paid').eq('id',currentUser.id).single();
   isPaid=!!(data&&data.paid);
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
@@ -990,10 +990,10 @@ function openAuthModal(){ document.getElementById('auth-modal').classList.add('o
 function closeAuthModal(){ document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow=''; }
 
 async function sendMagicLink(){
-  if(!supabase){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   const email=document.getElementById('auth-email').value.trim();
   if(!email){ showToast(lang==='es'?'Escribe tu correo':'Enter your email',true); return; }
-  const {error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
   if(error){ showToast(error.message,true); return; }
   showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link':'✉️ Check your email — we sent you a link');
   closeAuthModal();
@@ -1010,14 +1010,14 @@ document.addEventListener('click',e=>{
 });
 
 async function logout(){
-  if(supabase) await supabase.auth.signOut();
+  if(sb) await sb.auth.signOut();
   currentUser=null; isPaid=false;
   updateAccountUI();
   showToast(lang==='es'?'Sesión cerrada':'Logged out');
 }
 
-if(supabase){
-  supabase.auth.onAuthStateChange((_event,session)=>{
+if(sb){
+  sb.auth.onAuthStateChange((_event,session)=>{
     currentUser=session?session.user:null;
     updateAccountUI();
     refreshPaidStatus();
@@ -2012,14 +2012,14 @@ async function callClaude(prompt,model='claude-sonnet-4-5',maxTokens=2000){
 // ══════════════════════════════
 async function savePlanToAccount(){
   if(!plan.typeName){ showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true); return; }
-  if(!supabase){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para guardar tu plan':'Log in to save your plan',true); return; }
 
   const tabsHtml={};
   tabKeys.forEach(k=>{ const el=document.getElementById('content-'+k); if(el) tabsHtml[k]=el.innerHTML; });
 
   const title=`${plan.typeName}${plan.name?' — '+plan.name:''}`;
-  const {error}=await supabase.from('plans').insert({
+  const {error}=await sb.from('plans').insert({
     user_id:currentUser.id,
     title,
     event_type:plan.typeName,
@@ -2044,13 +2044,13 @@ function closeMyPlans(){
 async function loadMyPlans(){
   const L=lang==='es';
   const listEl=document.getElementById('myplans-list');
-  if(!supabase){ listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">Supabase no configurado.</p>`; return; }
+  if(!sb){ listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">Supabase no configurado.</p>`; return; }
   if(!currentUser){
     listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Inicia sesión para ver tus planes guardados.':'Log in to see your saved plans.'}</p>`;
     return;
   }
   listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
-  const {data,error}=await supabase.from('plans').select('id,title,event_type,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  const {data,error}=await sb.from('plans').select('id,title,event_type,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!data||!data.length){
     listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Todavía no tienes planes guardados.':'No saved plans yet.'}</p>`;
     return;
@@ -2070,7 +2070,7 @@ async function loadMyPlans(){
 }
 
 async function loadSavedPlan(id){
-  const {data,error}=await supabase.from('plans').select('plan_data').eq('id',id).single();
+  const {data,error}=await sb.from('plans').select('plan_data').eq('id',id).single();
   if(error||!data){ showToast(lang==='es'?'No se pudo abrir el plan':'Could not open the plan',true); return; }
   const saved=data.plan_data||{};
   plan=saved.plan||{};
@@ -2083,7 +2083,7 @@ async function loadSavedPlan(id){
 }
 
 async function deleteSavedPlan(id){
-  const {error}=await supabase.from('plans').delete().eq('id',id);
+  const {error}=await sb.from('plans').delete().eq('id',id);
   if(error){ showToast(lang==='es'?'No se pudo borrar':'Could not delete',true); return; }
   showToast(lang==='es'?'🗑️ Plan borrado':'🗑️ Plan deleted');
   loadMyPlans();
@@ -2421,3 +2421,4 @@ init();
 </script>
 </body>
 </html>
+
