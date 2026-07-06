@@ -1,24 +1,26 @@
 // ══════════════════════════════════════════════════════════════
-//  DragonflAI Events — Cloudflare Worker
-//  Si ya tienes un worker.js con lógica adicional, fusiona esto
-//  con lo que ya tengas — no lo pegues encima sin revisar.
+//  DragonflAI Events — Cloudflare Worker (Milestone 1: Supabase)
+//  Reemplaza tu worker.js anterior con este.
 // ══════════════════════════════════════════════════════════════
 //
-// BINDINGS REQUERIDOS (Cloudflare dashboard → tu Worker → Settings):
+// BINDINGS REQUERIDOS (Cloudflare dashboard → tu Worker → Settings → Variables):
 //
-//  1. KV Namespace:
-//     - Crea un namespace nuevo (ej. "dragonflai-paid-users")
-//     - Bindea con el nombre: PAID_KV
+//  - ANTHROPIC_API_KEY          (la que ya usas hoy)
+//  - STRIPE_WEBHOOK_SECRET      (la obtienes al crear el webhook en Stripe)
+//  - SUPABASE_URL               (Supabase dashboard → Settings → API → Project URL)
+//  - SUPABASE_SERVICE_ROLE_KEY  (Supabase dashboard → Settings → API → service_role secret
+//                                 — NUNCA la pongas en el frontend, solo aquí en el Worker)
 //
-//  2. Variables de entorno (Settings → Variables → agregar como "Secret"):
-//     - ANTHROPIC_API_KEY        (la que ya usas hoy)
-//     - STRIPE_WEBHOOK_SECRET    (la obtienes al crear el webhook en Stripe, ver abajo)
+// YA NO SE USA: la KV Namespace "PAID_KV" del Milestone anterior. El estatus de
+// pago ahora vive en la tabla `profiles` de Supabase, y el frontend la consulta
+// directamente con el JS client de Supabase (protegido por Row Level Security),
+// así que este Worker ya no necesita exponer un endpoint /check-paid.
 //
 // ENDPOINTS QUE EXPONE ESTE WORKER:
 //
-//  POST /                 → proxy a la API de Claude (igual que hoy)
-//  GET  /check-paid?id=X  → { paid: true|false } — lee de KV, verdad del servidor
-//  POST /stripe-webhook   → Stripe llama aquí cuando se confirma un pago
+//  POST /                 → proxy a la API de Claude (igual que siempre)
+//  POST /stripe-webhook   → Stripe llama aquí cuando se confirma un pago;
+//                            este Worker marca profiles.paid = true en Supabase
 //
 // ══════════════════════════════════════════════════════════════
 
@@ -27,7 +29,7 @@ export default {
     const url = new URL(request.url);
 
     const CORS = {
-      'Access-Control-Allow-Origin': '*', // recomendado: cambiar '*' por tu dominio real, ej 'https://dragonflai.events'
+      'Access-Control-Allow-Origin': '*', // recomendado: cambiar '*' por tu dominio real
       'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type,Stripe-Signature'
     };
@@ -36,15 +38,7 @@ export default {
       return new Response(null, { headers: CORS });
     }
 
-    // ── 1) VERIFICAR STATUS DE PAGO (lo llama el frontend) ──
-    if (url.pathname === '/check-paid' && request.method === 'GET') {
-      const id = url.searchParams.get('id');
-      if (!id) return jsonResponse({ paid: false }, CORS);
-      const value = await env.PAID_KV.get(id);
-      return jsonResponse({ paid: value === 'true' }, CORS);
-    }
-
-    // ── 2) WEBHOOK DE STRIPE (lo llama Stripe, no el navegador) ──
+    // ── WEBHOOK DE STRIPE (lo llama Stripe, no el navegador) ──
     if (url.pathname === '/stripe-webhook' && request.method === 'POST') {
       const signature = request.headers.get('Stripe-Signature');
       const rawBody = await request.text();
@@ -58,16 +52,37 @@ export default {
 
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        const deviceId = session.client_reference_id;
-        if (deviceId) {
-          await env.PAID_KV.put(deviceId, 'true');
+        // client_reference_id ahora es el UUID del usuario de Supabase
+        // (se manda al crear el link de pago — ver goToPay() en el frontend).
+        const userId = session.client_reference_id;
+
+        if (userId) {
+          const res = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+              'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+              paid: true,
+              paid_at: new Date().toISOString(),
+              stripe_session_id: session.id
+            })
+          });
+
+          if (!res.ok) {
+            console.error('Error actualizando Supabase:', await res.text());
+            return new Response('Supabase update failed', { status: 500, headers: CORS });
+          }
         }
       }
 
       return new Response('ok', { status: 200, headers: CORS });
     }
 
-    // ── 3) PROXY A CLAUDE (tu funcionalidad actual) ──
+    // ── PROXY A CLAUDE (tu funcionalidad actual) ──
     if (request.method === 'POST') {
       const body = await request.text();
       const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -90,14 +105,8 @@ export default {
   }
 };
 
-function jsonResponse(obj, extraHeaders = {}) {
-  return new Response(JSON.stringify(obj), {
-    headers: { ...extraHeaders, 'Content-Type': 'application/json' }
-  });
-}
-
-// Verificación manual de la firma de Stripe (formato: "t=timestamp,v1=hash")
-// usando Web Crypto API, disponible nativamente en Cloudflare Workers.
+// Verificación manual de la firma de Stripe usando Web Crypto API
+// (disponible nativamente en Cloudflare Workers, sin necesitar el SDK de Stripe).
 async function verifyStripeSignature(payload, sigHeader, secret) {
   if (!sigHeader || !secret) return false;
   const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')));
