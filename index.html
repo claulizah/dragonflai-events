@@ -205,6 +205,7 @@ footer a:hover{color:var(--teal-dark)}
   .hero-cta{flex-direction:column;align-items:center}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -488,6 +489,17 @@ footer a:hover{color:var(--teal-dark)}
   </div>
 </div>
 
+<!-- LOGIN: MAGIC LINK -->
+<div class="modal-overlay" id="auth-modal" onclick="if(event.target===this) closeAuthModal()">
+  <div class="modal">
+    <h3>🪄 Inicia sesión</h3>
+    <p>Sin contraseñas — te mandamos un link mágico a tu correo para entrar y completar tu compra.</p>
+    <input type="email" id="auth-email" placeholder="tu@correo.com" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin:.75rem 0;box-sizing:border-box">
+    <button class="btn-modal-pay" onclick="sendMagicLink()">Enviarme el link mágico →</button>
+    <button class="btn-modal-close" onclick="closeAuthModal()">Ahora no</button>
+  </div>
+</div>
+
 <!-- UNLOCK BANNER (aparece después de 2 planes) -->
 <div class="unlock-banner" id="unlock-banner">
   <span class="ub-text">Te queda <strong id="ub-count">1</strong> plan gratis</span>
@@ -505,44 +517,48 @@ const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/TU_LINK_AQUI';
 const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
 const MAX_FREE = 3;
 
-// ══════════════════════════════
-//  IDENTIDAD DE DISPOSITIVO (compartida con dragonflai-v2.html vía localStorage)
-// ══════════════════════════════
-let deviceId = localStorage.getItem('dflai_device_id');
-if (!deviceId) {
-  deviceId = (crypto.randomUUID ? crypto.randomUUID() : 'd-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-  localStorage.setItem('dflai_device_id', deviceId);
-}
+// Supabase dashboard → Settings → API (mismas llaves que en dragonflai-v2.html)
+const SUPABASE_URL = 'TU_SUPABASE_URL_AQUI';
+const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY_AQUI';
+const supabase = (window.supabase && SUPABASE_URL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 // ══════════════════════════════
 //  LÓGICA DE PLANES Y ACCESO
-//  isPaid aquí es solo para decidir si mostramos el banner de "desbloquea" —
-//  la verdad real (que sí importa para el Excel) se verifica en dragonflai-v2.html
-//  contra el servidor cada vez, no se confía en localStorage.
+//  isPaid se confirma contra Supabase (nunca se confía en localStorage).
 // ══════════════════════════════
 const gensUsed = parseInt(localStorage.getItem('dflai_gens') || '0');
-let isPaid = localStorage.getItem('dflai_paid_cache') === 'true';
+let currentUser = null;
+let isPaid = false;
 
-fetch(`${WORKER_URL}/check-paid?id=${encodeURIComponent(deviceId)}`)
-  .then(r => r.json())
-  .then(d => { isPaid = !!d.paid; localStorage.setItem('dflai_paid_cache', isPaid ? 'true' : 'false'); })
-  .catch(() => {});
-
-// Si viene de Stripe, mandamos a la app a confirmar el pago contra el servidor
-// (ya NO marcamos "pagó" solo por traer ?paid=true en la URL — eso era falsificable)
-if (new URLSearchParams(location.search).get('paid') === 'true') {
-  window.location.href = 'dragonflai-v2.html?justPaid=true';
+async function refreshPaidStatus() {
+  if (!supabase) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  currentUser = session ? session.user : null;
+  if (!currentUser) { isPaid = false; return; }
+  const { data } = await supabase.from('profiles').select('paid').eq('id', currentUser.id).single();
+  isPaid = !!(data && data.paid);
 }
 
-// Mostrar banner si ya usó 2+ planes gratis y no pagó
-if (!isPaid && gensUsed >= MAX_FREE - 1) {
-  const banner = document.getElementById('unlock-banner');
-  const left = Math.max(0, MAX_FREE - gensUsed);
-  document.getElementById('ub-count').textContent = left;
-  if (left <= 0) {
-    document.querySelector('.ub-text').innerHTML = '<strong>Agotaste tus planes gratis</strong>';
+refreshPaidStatus().then(() => {
+  // Mostrar banner si ya usó 2+ planes gratis y no pagó
+  if (!isPaid && gensUsed >= MAX_FREE - 1) {
+    const banner = document.getElementById('unlock-banner');
+    const left = Math.max(0, MAX_FREE - gensUsed);
+    document.getElementById('ub-count').textContent = left;
+    if (left <= 0) {
+      document.querySelector('.ub-text').innerHTML = '<strong>Agotaste tus planes gratis</strong>';
+    }
+    setTimeout(() => banner.classList.add('visible'), 1500);
   }
-  setTimeout(() => banner.classList.add('visible'), 1500);
+});
+
+if (supabase) {
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentUser = session ? session.user : null;
+    refreshPaidStatus();
+  });
 }
 
 // ══════════════════════════════
@@ -562,11 +578,36 @@ function closeModalOutside(e) {
   if (e.target === document.getElementById('modal')) closeModal();
 }
 
+function openAuthModal() {
+  document.getElementById('auth-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function sendMagicLink() {
+  if (!supabase) { alert('Supabase no está configurado todavía.'); return; }
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { alert('Escribe tu correo.'); return; }
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  if (error) { alert(error.message); return; }
+  alert('✉️ Revisa tu correo — te mandamos un link para entrar. Al volver, da clic en "Ir a pago seguro" de nuevo.');
+  closeAuthModal();
+}
+
 function goToPay() {
-  // Mandamos nuestro deviceId como client_reference_id — así el webhook de
-  // Stripe sabe a quién marcar como pagado en KV cuando se confirme el pago.
+  if (!currentUser) {
+    closeModal();
+    openAuthModal();
+    return;
+  }
+  // Mandamos el UUID real del usuario como client_reference_id — así el
+  // webhook de Stripe sabe a qué cuenta marcar como pagada en Supabase.
   const sep = STRIPE_PAYMENT_LINK.includes('?') ? '&' : '?';
-  window.location.href = STRIPE_PAYMENT_LINK + sep + 'client_reference_id=' + encodeURIComponent(deviceId);
+  window.location.href = STRIPE_PAYMENT_LINK + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
 }
 
 // ══════════════════════════════
