@@ -4,10 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DragonflAI Events — Planificador Inteligente</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -272,6 +276,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-card.theme-sage .std-eyebrow,.std-card.theme-sage .std-divider-icon{color:#5A7C52}
 .std-card.theme-night{background:linear-gradient(135deg,#1A2332,#2B3A52)}
 .std-card.theme-night .std-eyebrow,.std-card.theme-night .std-divider-icon,.std-card.theme-night .std-names,.std-card.theme-night .std-detail-item,.std-card.theme-night .std-footer,.std-card.theme-night .std-hashtag{color:#F0E8D8!important}
+.std-card.theme-blanco{background:#FFFFFF;border:1px solid var(--border-gray)}
+.std-card.theme-blanco .std-eyebrow,.std-card.theme-blanco .std-divider-icon{color:var(--text-3)}
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem}
 .theme-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
@@ -280,16 +286,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .theme-swatch.sw-gold{background:linear-gradient(135deg,#FDF6E3,#F5E6C8)}
 .theme-swatch.sw-sage{background:linear-gradient(135deg,#E8F0E5,#D4E4CE)}
 .theme-swatch.sw-night{background:linear-gradient(135deg,#1A2332,#2B3A52)}
+.theme-swatch.sw-blanco{background:#FFFFFF;border-color:var(--border-gray)}
+.std-logo-mark{position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:4px;opacity:.55}
+.std-logo-mark span{font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--text-3)}
 .std-editable{outline:1.5px dashed transparent;border-radius:6px;cursor:text;transition:outline-color .15s;padding:2px 4px}
 .std-editable:hover{outline-color:rgba(46,196,182,.4)}
 .std-editable:focus{outline:1.5px dashed var(--teal);background:rgba(46,196,182,.06)}
-.std-edit-hint{font-size:11.5px;color:var(--text-3);text-align:center;margin-bottom:.75rem}
+.std-edit-hint{display:block;width:fit-content;font-size:11.5px;font-weight:600;color:var(--teal-dark);background:var(--teal-light);border:1px solid rgba(46,196,182,.3);padding:5px 12px;border-radius:100px;margin:0 auto .9rem;text-align:center}
 .std-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,196,182,.12),rgba(123,47,190,.12),rgba(244,196,48,.08));z-index:0}
 .std-card::after{content:'';position:absolute;inset:0;border:2px solid rgba(46,196,182,.3);border-radius:var(--radius-lg);z-index:0}
 .std-bg-dragonfly{position:absolute;font-size:180px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-55%);z-index:0;pointer-events:none;line-height:1}
 .std-content{position:relative;z-index:1;width:100%}
 .std-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
-.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.75rem}
+.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.75rem;text-transform:uppercase}
 .std-names em{font-style:italic;color:var(--teal)}
 .std-divider{display:flex;align-items:center;gap:12px;margin:1rem auto;width:200px}
 .std-divider::before,.std-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(46,196,182,.4),transparent)}
@@ -499,6 +508,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <button class="btn-account" id="btn-account-email" onclick="toggleAccountDropdown()"></button>
       <div class="account-dropdown" id="account-dropdown" style="display:none">
         <button onclick="openMyPlans()">📁 <span data-es="Mis planes" data-en="My plans">Mis planes</span></button>
+        <button onclick="openMyInvitations()">📬 <span data-es="Mis invitaciones" data-en="My invitations">Mis invitaciones</span></button>
+        <button onclick="openProfileModal()">⚙️ <span data-es="Mi perfil" data-en="My profile">Mi perfil</span></button>
         <button onclick="logout()">🚪 <span data-es="Cerrar sesión" data-en="Log out">Cerrar sesión</span></button>
       </div>
     </div>
@@ -863,6 +874,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </button>
         <button class="btn-out" id="btn-excel" onclick="exportSpreadsheet()">📊 <span data-es="Descargar Excel" data-en="Download Excel">Descargar Excel</span><span id="excel-lock" style="display:none">🔒</span></button>
         <button class="btn-out" onclick="savePlanToAccount()">💾 <span data-es="Guardar plan" data-en="Save plan">Guardar plan</span></button>
+        <button class="btn-out" onclick="openPublishModal()">🌐 <span data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</span></button>
         <button class="btn-out" onclick="printPlan()">⬇ <span data-es="Exportar PDF" data-en="Export PDF">Exportar PDF</span></button>
         <button class="btn-out" onclick="regen()">↺ <span data-es="Nuevo" data-en="Retry">Nuevo</span></button>
       </div>
@@ -974,6 +986,58 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
     <a class="btn-excel-unlock" href="#" onclick="saveProfile();return false" data-es="Guardar cambios" data-en="Save changes" style="display:block;text-align:center;text-decoration:none">Guardar cambios</a>
     <button class="btn-excel-close" onclick="closeProfileModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
+  </div>
+</div>
+
+<!-- PUBLICAR INVITACIÓN -->
+<div class="excel-modal-overlay" id="publish-modal" onclick="if(event.target===this) closePublishModal()">
+  <div class="excel-modal" style="max-width:480px;text-align:left;max-height:85vh;overflow-y:auto">
+    <h3 style="text-align:center" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
+    <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
+
+    <div id="publish-form">
+      <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
+      <div style="display:flex;align-items:center;gap:4px;margin-bottom:.4rem">
+        <span style="font-size:13px;color:var(--text-3);white-space:nowrap">tudominio.com/i/</span>
+        <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
+      </div>
+
+      <div class="profile-section-divider" data-es="¿Qué pedirle al invitado en el RSVP?" data-en="What to ask guests in the RSVP?">¿Qué pedirle al invitado en el RSVP?</div>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;font-size:13px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="pub-ask-guests" checked style="width:16px;height:16px;cursor:pointer">
+        <span data-es="Número de acompañantes" data-en="Number of guests">Número de acompañantes</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;font-size:13px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="pub-ask-dietary" checked style="width:16px;height:16px;cursor:pointer">
+        <span data-es="Restricción alimentaria" data-en="Dietary restrictions">Restricción alimentaria</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem;font-size:13px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="pub-ask-message" checked style="width:16px;height:16px;cursor:pointer">
+        <span data-es="Mensaje para los anfitriones" data-en="Message for the hosts">Mensaje para los anfitriones</span>
+      </label>
+      <label class="profile-label" data-es="Pregunta personalizada (opcional)" data-en="Custom question (optional)">Pregunta personalizada (opcional)</label>
+      <input type="text" id="pub-custom-question" class="profile-input" placeholder="ej. ¿Necesitas transporte desde el hotel?">
+
+      <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none">Publicar →</a>
+    </div>
+
+    <div id="publish-success" style="display:none;text-align:center">
+      <span style="font-size:36px;display:block;margin-bottom:.5rem">🎉</span>
+      <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
+      <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
+      <a class="btn-excel-unlock" href="#" onclick="copyPublishUrl();return false" data-es="📋 Copiar link" data-en="📋 Copy link" style="display:block;text-align:center;text-decoration:none">📋 Copiar link</a>
+    </div>
+
+    <button class="btn-excel-close" onclick="closePublishModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
+  </div>
+</div>
+
+<!-- MIS INVITACIONES -->
+<div class="excel-modal-overlay" id="invitations-modal" onclick="if(event.target===this) closeMyInvitations()">
+  <div class="excel-modal" style="max-width:520px;text-align:left">
+    <h3 style="text-align:center" data-es="Mis invitaciones" data-en="My invitations">Mis invitaciones</h3>
+    <div id="invitations-list" style="max-height:400px;overflow-y:auto;margin:1rem 0"></div>
+    <button class="btn-excel-close" onclick="closeMyInvitations()" data-es="Cerrar" data-en="Close">Cerrar</button>
   </div>
 </div>
 
@@ -1171,6 +1235,156 @@ async function saveProfile(){
   showToast(lang==='es'?'✅ Perfil guardado':'✅ Profile saved');
 }
 
+// ══════════════════════════════
+//  PUBLICAR INVITACIÓN (Milestone 2)
+// ══════════════════════════════
+function slugify(str){
+  return (str||'').toString().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s-]/g,'')
+    .trim().replace(/\s+/g,'-').replace(/-+/g,'-');
+}
+
+function openPublishModal(){
+  document.getElementById('account-dropdown').style.display='none';
+  if(!plan.typeName){ showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true); return; }
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para publicar tu invitación':'Log in to publish your invitation',true); return; }
+  document.getElementById('publish-form').style.display='block';
+  document.getElementById('publish-success').style.display='none';
+  document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
+  document.getElementById('publish-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closePublishModal(){
+  document.getElementById('publish-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+let lastPublishedUrl='';
+
+async function publishInvitation(){
+  if(!sb||!currentUser) return;
+  const slug=slugify(document.getElementById('pub-slug').value);
+  if(!slug){ showToast(lang==='es'?'Escribe un link válido':'Enter a valid link',true); return; }
+
+  const p=plan, e=p.extra||{};
+  let theme='theme-teal';
+  const stdCard=document.querySelector('.std-card');
+  if(stdCard){
+    const themeClass=[...stdCard.classList].find(c=>c.startsWith('theme-'));
+    if(themeClass) theme=themeClass;
+  }
+
+  const payload={
+    user_id: currentUser.id,
+    slug,
+    is_published: true,
+    host_names: p.name||'',
+    event_type: p.typeName||'',
+    event_date: p.date||'',
+    event_date_raw: p.rawDate||null,
+    event_time: p.time||'',
+    location: p.location||'',
+    dress_code: e.dresscode||'',
+    hashtag: e.hashtag||'',
+    vibe: p.vibe||'',
+    theme,
+    ask_guest_count: document.getElementById('pub-ask-guests').checked,
+    ask_dietary: document.getElementById('pub-ask-dietary').checked,
+    ask_message: document.getElementById('pub-ask-message').checked,
+    custom_question: document.getElementById('pub-custom-question').value.trim()||null
+  };
+
+  const {error}=await sb.from('invitations').insert(payload);
+  if(error){
+    if(error.code==='23505') showToast(lang==='es'?'Ese link ya está en uso, prueba otro':'That link is taken, try another',true);
+    else showToast(lang==='es'?'No se pudo publicar':'Could not publish',true);
+    return;
+  }
+
+  lastPublishedUrl=`${location.origin}/i/${slug}`;
+  document.getElementById('publish-url').textContent=lastPublishedUrl;
+  document.getElementById('publish-form').style.display='none';
+  document.getElementById('publish-success').style.display='block';
+  showToast(lang==='es'?'🎉 ¡Invitación publicada!':'🎉 Invitation published!');
+}
+
+function copyPublishUrl(){
+  navigator.clipboard.writeText(lastPublishedUrl);
+  showToast(lang==='es'?'📋 Link copiado':'📋 Link copied');
+}
+
+// ══════════════════════════════
+//  MIS INVITACIONES + VER RSVPs
+// ══════════════════════════════
+function openMyInvitations(){
+  document.getElementById('account-dropdown').style.display='none';
+  if(!currentUser){ openAuthModal(); return; }
+  document.getElementById('invitations-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+  loadMyInvitations();
+}
+
+function closeMyInvitations(){
+  document.getElementById('invitations-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+async function loadMyInvitations(){
+  const L=lang==='es';
+  const listEl=document.getElementById('invitations-list');
+  if(!sb||!currentUser){
+    listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Inicia sesión para ver tus invitaciones.':'Log in to see your invitations.'}</p>`;
+    return;
+  }
+  listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
+  const {data:invs,error}=await sb.from('invitations').select('id,slug,host_names,event_date,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(error||!invs||!invs.length){
+    listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Todavía no has publicado ninguna invitación.':'You have not published any invitations yet.'}</p>`;
+    return;
+  }
+  listEl.innerHTML='';
+  for(const inv of invs){
+    const {count}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id);
+    const {count:yesCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',true);
+    const div=document.createElement('div');
+    div.style.cssText='padding:12px 0;border-bottom:1px solid var(--border-gray)';
+    div.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="min-width:0">
+          <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(inv.host_names)}</div>
+          <div style="font-size:11.5px;color:var(--text-3)">/i/${esc(inv.slug)} · ${count||0} RSVPs (${yesCount||0} ${L?'confirmados':'attending'})</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn-account" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
+          <button class="btn-account" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
+        </div>
+      </div>
+      <div class="rsvp-sublist" id="rsvp-sub-${inv.id}" style="display:none;font-size:12.5px;color:var(--text-2)"></div>
+    `;
+    listEl.appendChild(div);
+  }
+}
+
+async function toggleRsvpList(invId){
+  const el=document.getElementById('rsvp-sub-'+invId);
+  if(el.style.display==='block'){ el.style.display='none'; return; }
+  el.style.display='block';
+  el.innerHTML=lang==='es'?'Cargando…':'Loading…';
+  const {data,error}=await sb.from('rsvps').select('guest_name,attending,guest_count,dietary,message,custom_answer').eq('invitation_id',invId).order('created_at',{ascending:false});
+  if(error||!data||!data.length){ el.innerHTML=lang==='es'?'Sin respuestas todavía.':'No responses yet.'; return; }
+  el.innerHTML=data.map(r=>`
+    <div style="padding:6px 0;border-top:1px solid var(--border-gray)">
+      <strong>${esc(r.guest_name)}</strong> — ${r.attending?(lang==='es'?'✅ Asiste':'✅ Attending'):(lang==='es'?'❌ No asiste':'❌ Not attending')}
+      ${r.guest_count?` · +${r.guest_count}`:''}
+      ${r.dietary?`<br>🍽️ ${esc(r.dietary)}`:''}
+      ${r.message?`<br>💬 ${esc(r.message)}`:''}
+    </div>
+  `).join('');
+}
+
 async function logout(){
   if(sb) await sb.auth.signOut();
   currentUser=null; isPaid=false; currentUserName=''; userProfile={};
@@ -1212,8 +1426,8 @@ const T={
   },
   upsells:{es:['Transporte de lujo','After party','Streaming','Fotografía premium','Dron','Flores premium','Recuerdos personalizados','Álbum fotos'],en:['Luxury transport','After party','Live streaming','Premium photography','Drone footage','Floral upgrade','Custom favors','Photo album']},
   tabs:{
-    diy:{es:['Vista general','Cronograma','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date'],en:['Overview','Timeline','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date']},
-    pro:{es:['Vista general','Cronograma','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date','Propuesta cliente'],en:['Overview','Timeline','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date','Client proposal']}
+    diy:{es:['Vista general','Cronograma','Itinerario del día','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date'],en:['Overview','Timeline','Day itinerary','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date']},
+    pro:{es:['Vista general','Cronograma','Itinerario del día','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date','Propuesta cliente'],en:['Overview','Timeline','Day itinerary','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date','Client proposal']}
   },
   loading:{
     es:[['Leyendo tu visión…','Personalizando cada detalle'],['Construyendo tu cronograma…','Mes a mes'],['Calculando tu presupuesto…','Distribuyendo inteligentemente'],['Buscando los mejores proveedores…','Para tu estilo y presupuesto'],['Escribiendo tu checklist…','Nada se queda sin planear'],['Añadiendo magia creativa…','Haciéndolo único para ti'],['Diseñando tu Save the Date…','Listo para compartir']],
@@ -1221,7 +1435,7 @@ const T={
   }
 };
 
-const tabKeys=['overview','timeline','budget','checklist','vendors','ideas','savethedate','proposal'];
+const tabKeys=['overview','timeline','dayitinerary','budget','checklist','vendors','ideas','savethedate','proposal'];
 
 // Formato/tipo de ceremonia y otros campos condicionales — solo aplican a
 // los tipos de evento que indica la matriz (Boda, Baby Shower, Corporativo, Aniversario).
@@ -1432,7 +1646,7 @@ function toggleTag(el){el.classList.toggle('sel');updateProgress();}
 
 function renderTabs(){
   const labels=T.tabs[mode][lang];
-  const keys=mode==='pro'?tabKeys:[...tabKeys.slice(0,6),'savethedate'];
+  const keys=mode==='pro'?tabKeys:tabKeys.filter(k=>k!=='proposal');
   document.getElementById('res-tabs').innerHTML=labels.map((l,i)=>
     `<button class="rtab${i===0?' active':''}" onclick="switchTab('${keys[i]}',this)">${l}</button>`
   ).join('');
@@ -1510,6 +1724,10 @@ async function generate(){
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
   if(!isPaid&&gensUsed>=MAX_GENERATIONS){showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;}
 
+  // Limpiar el plan anterior de todas las pestañas ANTES de generar el nuevo —
+  // así nunca se ve contenido viejo mientras la IA está respondiendo.
+  tabKeys.forEach(k=>setTabHTML(k,''));
+
   const showingCoupleNames=mode==='diy'&&TYPES_COUPLE_NAMES.includes(eventType);
   let name;
   if(showingCoupleNames){
@@ -1521,7 +1739,9 @@ async function generate(){
   }
   const date=document.getElementById('f-date').value;
   const location=document.getElementById('f-location').value||(lang==='es'?'un hermoso lugar':'a beautiful venue');
-  const time=formatTimeRange(document.getElementById('f-time-start').value,document.getElementById('f-time-end').value,lang);
+  const timeStartRaw=document.getElementById('f-time-start').value;
+  const timeEndRaw=document.getElementById('f-time-end').value;
+  const time=formatTimeRange(timeStartRaw,timeEndRaw,lang);
   const budget=document.getElementById('f-budget').value;
   const vibe=document.getElementById('f-vibe').value;
   const notes=document.getElementById('f-notes').value;
@@ -1577,7 +1797,7 @@ async function generate(){
   const idx=T.eventTypes.vals.indexOf(eventType);
   const typeName=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
 
-  plan={name,date:dateStr,rawDate:date,location,time,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
+  plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
 
   document.getElementById('res-title').textContent=(mode==='diy'?(lang==='es'?'Tu Plan de ':'Your '):(lang==='es'?'Propuesta — ':'Proposal — '))+typeName;
   document.getElementById('res-section').style.display='block';
@@ -1600,12 +1820,14 @@ async function generate(){
   const budgetResult=buildBudget();
   plan.budgetData=budgetResult.budget;
   plan.timelineData=buildTimeline();
+  plan.dayItineraryData=buildDayItinerary();
   plan.checklistData=buildChecklist();
   const vendorsResult=buildVendors();
   plan.vendorsData=vendorsResult.vendors;
 
   setTabHTML('budget',renderBudget(budgetResult.budget,budgetResult.budgetTips,budgetResult.paqueteInfo));
   setTabHTML('timeline',renderTimeline(plan.timelineData));
+  setTabHTML('dayitinerary',renderDayItinerary(plan.dayItineraryData));
   setTabHTML('checklist',renderChecklist(plan.checklistData));
   setTabHTML('vendors',renderVendors(vendorsResult.vendors,vendorsResult.vendorQuestions,vendorsResult.negotiationTips));
 
@@ -1728,6 +1950,7 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 <span class="theme-swatch sw-gold" onclick="setSTDTheme('theme-gold',this)" title="Gold"></span>
 <span class="theme-swatch sw-sage" onclick="setSTDTheme('theme-sage',this)" title="Sage"></span>
 <span class="theme-swatch sw-night" onclick="setSTDTheme('theme-night',this)" title="Night"></span>
+<span class="theme-swatch sw-blanco" onclick="setSTDTheme('theme-blanco',this)" title="Blanco"></span>
 </div>
 <div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>
 <div class="std-card theme-teal">
@@ -1740,6 +1963,7 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 <div class="std-footer">[Elegant short phrase: "Formal invitation to follow" or a personalized poetic line based on their vibe and details]</div>
 ${hashtagLine}
 </div>
+<div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
 </div>
 <p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
 <div class="std-actions">
@@ -1908,6 +2132,65 @@ function buildTimeline(){
     else detail=fillTemplate(item.detail,data);
     return {when,what:item.what,detail};
   });
+}
+
+// ── ITINERARIO DEL DÍA (hora a hora) ──
+// Se calcula como fracciones de la duración total del evento (hora de inicio → hora de fin
+// que el usuario ya dio en el formulario), igual que el cronograma se calcula como fracciones
+// del tiempo restante — así funciona bien sin importar si el evento dura 3 horas o todo el día.
+const DAY_ITINERARY_TEMPLATE={
+  es:[
+    {offsetBeforeMin:60,what:'Llegada del equipo y montaje final'},
+    {frac:0,what:'Llegada de invitados'},
+    {frac:0.12,what:'Bienvenida e inicio del programa'},
+    {frac:0.28,what:'Momento principal (ceremonia / apertura / presentación)'},
+    {frac:0.45,what:'Coctel y networking'},
+    {frac:0.60,what:'Comida / cena'},
+    {frac:0.75,what:'Momento especial (brindis, baile, premiaciones)'},
+    {frac:0.90,what:'Entretenimiento / pista abierta'},
+    {frac:1,what:'Cierre del evento'},
+    {offsetAfterMin:30,what:'Desmontaje'}
+  ],
+  en:[
+    {offsetBeforeMin:60,what:'Team arrival and final setup'},
+    {frac:0,what:'Guest arrival'},
+    {frac:0.12,what:'Welcome and program starts'},
+    {frac:0.28,what:'Main moment (ceremony / opening / presentation)'},
+    {frac:0.45,what:'Cocktail hour and networking'},
+    {frac:0.60,what:'Meal / dinner'},
+    {frac:0.75,what:'Special moment (toast, dance, awards)'},
+    {frac:0.90,what:'Entertainment / open floor'},
+    {frac:1,what:'Event ends'},
+    {offsetAfterMin:30,what:'Breakdown / teardown'}
+  ]
+};
+
+function buildDayItinerary(){
+  const p=plan,L=p.lang==='es';
+  const toMin=t=>{ const m=/^(\d{1,2}):(\d{2})$/.exec(t||''); return m?(+m[1]*60+ +m[2]):null; };
+  const startMin=toMin(p.timeStartRaw)??16*60; // default 4:00 PM si no se especificó
+  let endMin=toMin(p.timeEndRaw)??23*60;
+  if(endMin<=startMin) endMin+=24*60; // el evento cruza la medianoche
+  const totalMin=Math.max(60,endMin-startMin);
+  const toTimeStr=m=>{
+    m=((m%1440)+1440)%1440;
+    const h=Math.floor(m/60),mi=m%60;
+    const period=h<12?'AM':'PM'; const h12=h%12===0?12:h%12;
+    return `${h12}:${String(mi).padStart(2,'0')} ${period}`;
+  };
+  return DAY_ITINERARY_TEMPLATE[p.lang].map(item=>{
+    let m;
+    if(item.offsetBeforeMin!==undefined) m=startMin-item.offsetBeforeMin;
+    else if(item.offsetAfterMin!==undefined) m=endMin+item.offsetAfterMin;
+    else m=startMin+Math.round(item.frac*totalMin);
+    return {time:toTimeStr(m),what:item.what};
+  });
+}
+
+function renderDayItinerary(items){
+  if(!Array.isArray(items)||!items.length) return '';
+  const rows=items.map(t=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-when">${esc(t.time)}</div><div class="tl-what">${esc(t.what)}</div></div>`).join('');
+  return `<div class="timeline">${rows}</div>`;
 }
 
 // ── CHECKLIST ──
@@ -2250,7 +2533,18 @@ async function loadSavedPlan(id){
   const saved=data.plan_data||{};
   plan=saved.plan||{};
   if(saved.mode) setMode(saved.mode);
+
+  // Limpiar TODAS las pestañas primero — si no, el contenido de un plan
+  // anterior se queda "pegado" en las pestañas que este plan no trae.
+  tabKeys.forEach(k=>setTabHTML(k,''));
   Object.keys(saved.tabsHtml||{}).forEach(k=>setTabHTML(k,saved.tabsHtml[k]));
+
+  // Siempre regresar a la primera pestaña, para no quedar en una vista
+  // que ya no corresponde al nuevo plan.
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-overview').classList.add('active');
+  document.querySelectorAll('.rtab').forEach((t,i)=>t.classList.toggle('active',i===0));
+
   closeMyPlans();
   document.getElementById('res-section').style.display='block';
   document.getElementById('res-section').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2274,21 +2568,65 @@ function closeExcelPaywall(){
   document.body.style.overflow='';
 }
 
+// ══════════════════════════════
+//  ESTILOS DE MARCA PARA EL EXCEL
+// ══════════════════════════════
+const XL_TEAL='FF2EC4B6', XL_TEAL_DARK='FF0D6E65', XL_VIOLET='FF7B2FBE', XL_NAVY='FF0D1B2A', XL_CREAM='FFF6F1FA', XL_WHITE='FFFFFFFF', XL_BORDER='FFE0D5EE';
+
+function xlStyleHeader(row){
+  row.eachCell(cell=>{
+    cell.font={bold:true,color:{argb:XL_WHITE},size:11,name:'Calibri'};
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_TEAL_DARK}};
+    cell.alignment={vertical:'middle',wrapText:true};
+    cell.border={bottom:{style:'medium',color:{argb:XL_TEAL_DARK}}};
+  });
+  row.height=22;
+}
+
+function xlStyleDataRow(row,isAlt){
+  row.eachCell(cell=>{
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:isAlt?XL_CREAM:XL_WHITE}};
+    cell.font={color:{argb:XL_NAVY},size:10.5,name:'Calibri'};
+    cell.border={bottom:{style:'thin',color:{argb:XL_BORDER}}};
+    cell.alignment={vertical:'middle'};
+  });
+}
+
+function xlStyleTotalRow(row){
+  row.eachCell(cell=>{
+    cell.font={bold:true,color:{argb:XL_WHITE},size:10.5,name:'Calibri'};
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_VIOLET}};
+    cell.alignment={vertical:'middle'};
+  });
+}
+
+// Crea una hoja simple (header + filas), ya estilizada y con la primera fila congelada.
+function xlAddSheet(wb,name,header,rows,widths){
+  const ws=wb.addWorksheet(name,{properties:{tabColor:{argb:XL_TEAL}}});
+  ws.columns=widths.map(w=>({width:w}));
+  xlStyleHeader(ws.addRow(header));
+  rows.forEach((r,i)=>xlStyleDataRow(ws.addRow(r),i%2===1));
+  ws.views=[{state:'frozen',ySplit:1}];
+  return ws;
+}
+
 async function exportSpreadsheet(){
   if(!plan.typeName){showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true);return;}
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
   const paid=await refreshPaidStatus(); // verdad del servidor, no la variable en memoria
   if(!paid){openExcelPaywall();return;}
-  if(typeof XLSX==='undefined'){showToast(lang==='es'?'No se pudo cargar el generador de Excel':'Could not load Excel generator',true);return;}
+  if(typeof ExcelJS==='undefined'){showToast(lang==='es'?'No se pudo cargar el generador de Excel':'Could not load Excel generator',true);return;}
 
   const L=lang==='es';
-  const wb=XLSX.utils.book_new();
+  const wb=new ExcelJS.Workbook();
+  wb.creator='DragonflAI Events';
+  wb.created=new Date();
 
-  // Resumen
+  // Overview — formato de tarjeta: etiqueta en teal oscuro + negritas, valor normal
   const e=plan.extra||{};
   const resumen=[
     [L?'Evento':'Event',plan.typeName],
-    [L?'Anfitrión':'Host',plan.name],
+    [L?'Anfitrión':'Host',(plan.name||'').toUpperCase()],
     [L?'Fecha':'Date',plan.date],
     [L?'Hora':'Time',plan.time||''],
     [L?'Lugar':'Venue',plan.location],
@@ -2314,121 +2652,120 @@ async function exportSpreadsheet(){
   if(e.edadFestejado) resumen.push([L?'Edad del festejado/a':'Guest of honor\'s age',e.edadFestejado]);
   if(e.numGraduados) resumen.push([L?'Número de graduados':'Number of graduates',e.numGraduados]);
   if(e.costoBoleto) resumen.push([L?'Costo esperado por boleto':'Expected ticket price',`$${e.costoBoleto} MXN`]);
-  const wsResumen=XLSX.utils.aoa_to_sheet(resumen);
-  wsResumen['!cols']=[{wch:24},{wch:36}];
-  XLSX.utils.book_append_sheet(wb,wsResumen,L?'Overview':'Overview');
 
-  // Presupuesto — con fórmulas reales de Excel (Actual y Restante los llena el usuario / se calculan solos)
+  const wsResumen=wb.addWorksheet(L?'Overview':'Overview',{properties:{tabColor:{argb:XL_VIOLET}}});
+  wsResumen.columns=[{width:26},{width:40}];
+  resumen.forEach((r,i)=>{
+    const row=wsResumen.addRow(r);
+    row.getCell(1).font={bold:true,color:{argb:XL_TEAL_DARK},size:10.5,name:'Calibri'};
+    row.getCell(2).font={color:{argb:XL_NAVY},size:11,name:'Calibri'};
+    row.eachCell(cell=>{ cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2===1?XL_CREAM:XL_WHITE}}; cell.border={bottom:{style:'thin',color:{argb:XL_BORDER}}}; cell.alignment={vertical:'middle'}; });
+    row.height=19;
+  });
+
+  // Presupuesto — con fórmulas reales de Excel
   if(plan.budgetData&&plan.budgetData.length){
     const header=[L?'Categoría':'Category',L?'Presupuestado':'Budget',L?'Gastado':'Actual',L?'Restante':'Left','%'];
-    const rows=[header];
-    plan.budgetData.forEach(b=>rows.push([b.label,Number(b.amount)||0,0,'',Number(b.pct)||0]));
-    const totalRow=rows.length+1; // fila del TOTAL (1-indexed, +1 por header)
-    rows.push([L?'TOTAL':'TOTAL',plan.budgetData.reduce((s,b)=>s+(Number(b.amount)||0),0),0,'',100]);
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    // Fórmulas: Restante = Presupuestado - Gastado, por cada fila de categoría y en el total
-    for(let r=2;r<=totalRow;r++){
-      ws['D'+r]={t:'n',f:`B${r}-C${r}`};
-    }
-    ws[`B${totalRow}`]={t:'n',f:`SUM(B2:B${totalRow-1})`};
-    ws[`C${totalRow}`]={t:'n',f:`SUM(C2:C${totalRow-1})`};
-    ws['!cols']=[{wch:26},{wch:14},{wch:14},{wch:14},{wch:8}];
-    XLSX.utils.book_append_sheet(wb,ws,L?'Presupuesto':'Budget');
+    const ws=wb.addWorksheet(L?'Presupuesto':'Budget',{properties:{tabColor:{argb:XL_TEAL}}});
+    ws.columns=[{width:26},{width:14},{width:14},{width:14},{width:8}];
+    xlStyleHeader(ws.addRow(header));
+    plan.budgetData.forEach((b,i)=>{
+      const r=i+2;
+      const row=ws.addRow([b.label,Number(b.amount)||0,0,{formula:`B${r}-C${r}`},Number(b.pct)||0]);
+      xlStyleDataRow(row,i%2===1);
+    });
+    const totalRow=plan.budgetData.length+2;
+    const tRow=ws.addRow([L?'TOTAL':'TOTAL',{formula:`SUM(B2:B${totalRow-1})`},{formula:`SUM(C2:C${totalRow-1})`},{formula:`B${totalRow}-C${totalRow}`},100]);
+    xlStyleTotalRow(tRow);
+    ws.views=[{state:'frozen',ySplit:1}];
   }
 
-  // Cronograma de planeación (meses antes del evento)
+  // Cronograma de planeación
   if(plan.timelineData&&plan.timelineData.length){
-    const rows=[[L?'Cuándo':'When',L?'Tarea':'Task',L?'Detalle':'Detail',L?'Hecho':'Done']];
-    plan.timelineData.forEach(t=>rows.push([t.when,t.what,t.detail,'']));
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:22},{wch:30},{wch:45},{wch:8}];
-    XLSX.utils.book_append_sheet(wb,ws,L?'Cronograma':'Timeline');
+    xlAddSheet(wb,L?'Cronograma':'Timeline',
+      [L?'Cuándo':'When',L?'Tarea':'Task',L?'Detalle':'Detail',L?'Hecho':'Done'],
+      plan.timelineData.map(t=>[t.when,t.what,t.detail,'']),
+      [22,30,45,8]);
   }
 
-  // Itinerario del día — plantilla editable en blanco (hora a hora, el día del evento)
-  const itinRows=[[L?'Hora':'Time',L?'Actividad':'Activity',L?'Detalles':'Details',L?'Responsable':'Owner']];
-  const itinSlots=L?['Llegada del equipo','Inicio de montaje','Llegada de invitados','Inicio de ceremonia/programa','Coctel / recepción','Comida / cena','Momento especial','Baile / entretenimiento','Cierre del evento','Desmontaje']
-                    :['Team arrival','Setup begins','Guest arrival','Ceremony/program starts','Cocktail hour','Dinner','Special moment','Dancing / entertainment','Event ends','Breakdown'];
-  itinSlots.forEach(s=>itinRows.push(['',s,'','']));
-  const wsItin=XLSX.utils.aoa_to_sheet(itinRows);
-  wsItin['!cols']=[{wch:10},{wch:28},{wch:36},{wch:16}];
-  XLSX.utils.book_append_sheet(wb,wsItin,L?'Itinerario del día':'Day-of Itinerary');
+  // Itinerario del día — con horas calculadas a partir del horario que diste
+  xlAddSheet(wb,L?'Itinerario del día':'Day-of Itinerary',
+    [L?'Hora':'Time',L?'Actividad':'Activity',L?'Detalles':'Details',L?'Responsable':'Owner'],
+    (plan.dayItineraryData||[]).map(t=>[t.time,t.what,'','']),
+    [10,32,36,16]);
 
-  // Checklist — solo lo que el usuario dejó marcado en la app
+  // Checklist — solo lo que el usuario dejó marcado
   if(plan.checklistData&&plan.checklistData.length){
-    const rows=[[L?'Sección':'Section',L?'Tarea':'Task',L?'Categoría':'Category',L?'Hecho':'Done']];
+    const rows=[];
     plan.checklistData.forEach(s=>(s.items||[]).forEach(i=>{ if(i.selected!==false) rows.push([s.section,i.text,i.cat,'']); }));
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols']=[{wch:22},{wch:38},{wch:18},{wch:8}];
-    XLSX.utils.book_append_sheet(wb,ws,'Checklist');
+    xlAddSheet(wb,'Checklist',[L?'Sección':'Section',L?'Tarea':'Task',L?'Categoría':'Category',L?'Hecho':'Done'],rows,[22,38,18,8]);
   }
 
-  // Proveedores — solo lo que el usuario dejó marcado, con seguimiento financiero real
+  // Proveedores — con fórmula real de Restante
   if(plan.vendorsData&&plan.vendorsData.length){
     const header=[L?'Categoría':'Category',L?'Qué buscar':'What to look for',L?'Tip':'Tip',L?'Empresa':'Company',L?'Contacto':'Contact',L?'Teléfono / Email':'Phone / Email',L?'Sitio web':'Website',L?'Estatus':'Status',L?'Presupuestado':'Budgeted',L?'Precio contratado':'Contract price',L?'Pagado':'Paid',L?'Pagado por':'Paid by',L?'Restante':'Remaining',L?'Fecha límite de pago':'Payment due date'];
-    const rows=[header];
-    let vendorRowCount=0;
+    const ws=wb.addWorksheet(L?'Proveedores':'Vendors',{properties:{tabColor:{argb:XL_TEAL}}});
+    ws.columns=[{width:18},{width:28},{width:32},{width:20},{width:16},{width:18},{width:18},{width:14},{width:13},{width:14},{width:11},{width:16},{width:11},{width:16}];
+    xlStyleHeader(ws.addRow(header));
+    let i=0;
     plan.vendorsData.forEach(v=>{
       if(v.selected===false) return;
-      vendorRowCount++;
-      rows.push([v.type,v.name,v.tip,'','','','','',0,0,0,'','','']);
+      i++;
+      const r=i+1;
+      const row=ws.addRow([v.type,v.name,v.tip,'','','','','',0,0,0,'',{formula:`J${r}-K${r}`},'']);
+      xlStyleDataRow(row,i%2===0);
     });
-    const ws=XLSX.utils.aoa_to_sheet(rows);
-    // Fórmula: Restante = Precio contratado - Pagado, por cada fila con datos
-    for(let r=2;r<=vendorRowCount+1;r++){ ws['M'+r]={t:'n',f:`J${r}-K${r}`}; }
-    ws['!cols']=[{wch:18},{wch:28},{wch:32},{wch:20},{wch:16},{wch:18},{wch:18},{wch:14},{wch:13},{wch:14},{wch:11},{wch:16},{wch:11},{wch:16}];
-    XLSX.utils.book_append_sheet(wb,ws,L?'Proveedores':'Vendors');
+    ws.views=[{state:'frozen',ySplit:1}];
   }
 
   // Lista de invitados — plantilla editable en blanco
-  const guestRows=[[L?'Nombre':'Name','RSVP',L?'Regalo recibido':'Gift received',L?'Agradecimiento enviado':'Thank you sent',L?'Restricción alimentaria':'Dietary',L?'Mesa':'Table']];
-  const guestCount=Math.min(Math.max(parseInt(guests)||30,10),80);
-  for(let i=0;i<guestCount;i++) guestRows.push(['','','','','','']);
-  const wsGuest=XLSX.utils.aoa_to_sheet(guestRows);
-  wsGuest['!cols']=[{wch:24},{wch:12},{wch:16},{wch:20},{wch:20},{wch:8}];
-  XLSX.utils.book_append_sheet(wb,wsGuest,L?'Invitados':'Guest List');
+  {
+    const guestCount=Math.min(Math.max(parseInt(guests)||30,10),80);
+    xlAddSheet(wb,L?'Invitados':'Guest List',
+      [L?'Nombre':'Name','RSVP',L?'Número de mesa':'Table number',L?'Agradecimiento enviado':'Thank you sent',L?'Restricción alimentaria':'Dietary'],
+      Array.from({length:guestCount},()=>['','','','','']),
+      [24,12,14,20,20]);
+  }
 
   // Decoración — plantilla editable en blanco
-  const decorRows=[[L?'Artículo':'Item',L?'Cantidad':'Qty',L?'¿Renta?':'Rental?',L?'Proveedor':'Vendor',L?'Costo':'Cost']];
-  for(let i=0;i<15;i++) decorRows.push(['','','','','']);
-  const wsDecor=XLSX.utils.aoa_to_sheet(decorRows);
-  wsDecor['!cols']=[{wch:26},{wch:8},{wch:10},{wch:20},{wch:12}];
-  XLSX.utils.book_append_sheet(wb,wsDecor,L?'Decoración':'Decor');
+  xlAddSheet(wb,L?'Decoración':'Decor',
+    [L?'Artículo':'Item',L?'Cantidad':'Qty',L?'¿Renta?':'Rental?',L?'Proveedor':'Vendor',L?'Costo':'Cost'],
+    Array.from({length:15},()=>['','','','','']),
+    [26,8,10,20,12]);
 
   // Comida y bebidas — plantilla editable en blanco
-  const foodRows=[[L?'Artículo':'Item',L?'Tipo':'Type',L?'Cantidad':'Qty',L?'Proveedor':'Vendor',L?'Costo':'Cost']];
-  for(let i=0;i<15;i++) foodRows.push(['','','','','']);
-  const wsFood=XLSX.utils.aoa_to_sheet(foodRows);
-  wsFood['!cols']=[{wch:26},{wch:14},{wch:8},{wch:20},{wch:12}];
-  XLSX.utils.book_append_sheet(wb,wsFood,L?'Comida y Bebidas':'Food & Drinks');
+  xlAddSheet(wb,L?'Comida y Bebidas':'Food & Drinks',
+    [L?'Artículo':'Item',L?'Tipo':'Type',L?'Cantidad':'Qty',L?'Proveedor':'Vendor',L?'Costo':'Cost'],
+    Array.from({length:15},()=>['','','','','']),
+    [26,14,8,20,12]);
 
-  // Regalos — plantilla editable en blanco (aplica a cualquier tipo de evento)
-  const giftRows=[[L?'Invitado':'Guest',L?'¿Trajo regalo?':'Brought a gift?',L?'Tipo de regalo':'Gift type',L?'Valor estimado':'Estimated value',L?'Descripción':'Description',L?'Agradecimiento enviado':'Thank you sent']];
-  for(let i=0;i<20;i++) giftRows.push(['','','','','','']);
-  const wsGifts=XLSX.utils.aoa_to_sheet(giftRows);
-  wsGifts['!cols']=[{wch:24},{wch:16},{wch:18},{wch:16},{wch:30},{wch:18}];
-  XLSX.utils.book_append_sheet(wb,wsGifts,L?'Regalos':'Gifts');
+  // Regalos — plantilla editable en blanco
+  xlAddSheet(wb,L?'Regalos':'Gifts',
+    [L?'Invitado':'Guest',L?'¿Trajo regalo?':'Brought a gift?',L?'Tipo de regalo':'Gift type',L?'Valor estimado':'Estimated value',L?'Descripción':'Description',L?'Agradecimiento enviado':'Thank you sent'],
+    Array.from({length:20},()=>['','','','','','']),
+    [24,16,18,16,30,18]);
 
-  // Comparador de lugares — plantilla editable en blanco (aplica a cualquier tipo de evento)
-  const venueHeader=[L?'Opción':'Option',L?'Nombre del lugar':'Venue name',L?'Capacidad':'Capacity',L?'Precio total':'Total price',L?'Precio por persona':'Price per person',L?'¿Incluye qué?':'What\'s included',L?'¿Disponible en tu fecha?':'Available on your date?',L?'Pros':'Pros',L?'Contras':'Cons',L?'Calificación (1-5)':'Rating (1-5)'];
-  const venueRows=[venueHeader];
-  for(let i=1;i<=4;i++) venueRows.push([L?`Opción ${i}`:`Option ${i}`,'','','','','','','','','']);
-  const wsVenueCmp=XLSX.utils.aoa_to_sheet(venueRows);
-  wsVenueCmp['!cols']=[{wch:12},{wch:22},{wch:12},{wch:14},{wch:16},{wch:26},{wch:20},{wch:26},{wch:26},{wch:14}];
-  XLSX.utils.book_append_sheet(wb,wsVenueCmp,L?'Comparador de Lugares':'Venue Comparison');
+  // Comparador de lugares — plantilla editable en blanco
+  xlAddSheet(wb,L?'Comparador de Lugares':'Venue Comparison',
+    [L?'Opción':'Option',L?'Nombre del lugar':'Venue name',L?'Capacidad':'Capacity',L?'Precio total':'Total price',L?'Precio por persona':'Price per person',L?'¿Incluye qué?':'What\'s included',L?'¿Disponible en tu fecha?':'Available on your date?',L?'Pros':'Pros',L?'Contras':'Cons',L?'Calificación (1-5)':'Rating (1-5)'],
+    [1,2,3,4].map(i=>[L?`Opción ${i}`:`Option ${i}`,'','','','','','','','','']),
+    [12,22,12,14,16,26,20,26,26,14]);
 
-  // Luna de miel — solo para bodas, plantilla editable en blanco
+  // Luna de miel — solo para bodas
   if(plan.eventTypeRaw==='Boda/Wedding'){
-    const hmHeader=[L?'Destino':'Destination',L?'Duración':'Duration',L?'Vuelos':'Flights',L?'Hospedaje':'Lodging',L?'Actividades':'Activities',L?'Comida':'Food',L?'Total estimado':'Estimated total'];
-    const hmRows=[hmHeader];
-    for(let i=1;i<=3;i++) hmRows.push([L?`Opción ${i}`:`Option ${i}`,'','','','','','']);
-    const wsHoneymoon=XLSX.utils.aoa_to_sheet(hmRows);
-    wsHoneymoon['!cols']=[{wch:18},{wch:14},{wch:14},{wch:14},{wch:26},{wch:14},{wch:16}];
-    XLSX.utils.book_append_sheet(wb,wsHoneymoon,L?'Luna de Miel':'Honeymoon');
+    xlAddSheet(wb,L?'Luna de Miel':'Honeymoon',
+      [L?'Destino':'Destination',L?'Duración':'Duration',L?'Vuelos':'Flights',L?'Hospedaje':'Lodging',L?'Actividades':'Activities',L?'Comida':'Food',L?'Total estimado':'Estimated total'],
+      [1,2,3].map(i=>[L?`Opción ${i}`:`Option ${i}`,'','','','','','']),
+      [18,14,14,14,26,14,16]);
   }
 
   const filename=`DragonflAI_${(plan.typeName||'evento').replace(/[^\w]+/g,'_')}.xlsx`;
-  XLSX.writeFile(wb,filename);
+  const buffer=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url; link.download=filename; link.click();
+  URL.revokeObjectURL(url);
   showToast(L?'📊 Excel descargado':'📊 Excel downloaded');
 }
 
@@ -2501,7 +2838,7 @@ function shareSTDWA(){
 function setSTDTheme(theme,el){
   const card=document.querySelector('.std-card');
   if(!card) return;
-  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night');
+  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco');
   card.classList.add(theme);
   document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
@@ -2556,7 +2893,7 @@ function regen(){
 
 function printPlan(){
   const labels=T.tabs[mode][lang];
-  const keys=mode==='pro'?tabKeys:[...tabKeys.slice(0,6),'savethedate'];
+  const keys=mode==='pro'?tabKeys:tabKeys.filter(k=>k!=='proposal');
   const labelMap={}; keys.forEach((k,i)=>labelMap[k]=labels[i]);
 
   const visible=[];

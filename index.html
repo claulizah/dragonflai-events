@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DragonflAI Events — Planea tu evento perfecto con IA</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <meta name="description" content="Genera en segundos un plan completo para tu boda, quinceañera o evento. Cronograma, presupuesto, checklist, proveedores, Save the Date — y descarga en Excel editable con el acceso completo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -228,6 +232,7 @@ footer a:hover{color:var(--teal-dark)}
   <div class="nav-right">
     <a href="#como-funciona" class="nav-link">Cómo funciona</a>
     <a href="#precios" class="nav-link">Precios</a>
+    <a href="#" id="nav-login" class="nav-link" onclick="handleNavLogin();return false">Iniciar sesión</a>
     <a href="dragonflai-v2.html" class="btn-nav">Probar gratis →</a>
   </div>
 </nav>
@@ -536,9 +541,27 @@ async function refreshPaidStatus() {
   if (!sb) return;
   const { data: { session } } = await sb.auth.getSession();
   currentUser = session ? session.user : null;
+  updateNavLogin();
   if (!currentUser) { isPaid = false; return; }
   const { data } = await sb.from('profiles').select('paid').eq('id', currentUser.id).single();
   isPaid = !!(data && data.paid);
+}
+
+function updateNavLogin() {
+  const navLogin = document.getElementById('nav-login');
+  if (!navLogin) return;
+  if (currentUser) {
+    navLogin.textContent = 'Mi cuenta →';
+    navLogin.onclick = () => { window.location.href = 'dragonflai-v2.html'; return false; };
+  } else {
+    navLogin.textContent = 'Iniciar sesión';
+    navLogin.onclick = () => { openAuthModal(); return false; };
+  }
+}
+
+function handleNavLogin() {
+  if (currentUser) { window.location.href = 'dragonflai-v2.html'; }
+  else { openAuthModal(); }
 }
 
 refreshPaidStatus().then(() => {
