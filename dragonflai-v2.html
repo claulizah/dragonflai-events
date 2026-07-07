@@ -443,6 +443,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .btn-excel-unlock{display:block;width:100%;padding:14px;border-radius:var(--radius);background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;margin-bottom:.6rem;text-decoration:none;box-sizing:border-box}
 .btn-excel-unlock:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,196,182,.3)}
 .btn-excel-close{width:100%;padding:10px;border-radius:var(--radius);background:var(--cream-2);color:var(--text-2);font-size:12.5px;border:1.5px solid var(--border-gray);cursor:pointer;font-family:'Inter',sans-serif}
+.profile-label{display:block;font-size:11px;font-weight:600;color:var(--text-3);margin:.6rem 0 .3rem}
+.profile-input{width:100%;padding:10px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:13.5px;box-sizing:border-box;margin-bottom:.4rem;background:var(--white)}
+.profile-section-divider{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-dark);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
 .btn-excel-close:hover{color:var(--text);border-color:var(--teal)}
 </style>
 </head>
@@ -908,6 +911,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem">🪄</span>
     <h3 data-es="Inicia sesión" data-en="Log in">Inicia sesión</h3>
     <p data-es="Sin contraseñas — te mandamos un link mágico a tu correo para entrar." data-en="No passwords — we'll email you a magic link to log in.">Sin contraseñas — te mandamos un link mágico a tu correo para entrar.</p>
+    <input type="text" id="auth-name" placeholder="Tu nombre (opcional)" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.6rem;box-sizing:border-box">
     <input type="email" id="auth-email" placeholder="tu@correo.com" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.75rem;box-sizing:border-box">
     <button class="btn-excel-unlock" onclick="sendMagicLink()" data-es="Enviarme el link mágico →" data-en="Send me the magic link →" style="width:100%">Enviarme el link mágico →</button>
     <button class="btn-excel-close" onclick="closeAuthModal()" data-es="Ahora no" data-en="Not now">Ahora no</button>
@@ -920,6 +924,56 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <h3 style="text-align:center" data-es="Mis planes guardados" data-en="My saved plans">Mis planes guardados</h3>
     <div id="myplans-list" style="max-height:340px;overflow-y:auto;margin:1rem 0"></div>
     <button class="btn-excel-close" onclick="closeMyPlans()" data-es="Cerrar" data-en="Close">Cerrar</button>
+  </div>
+</div>
+
+<!-- MI PERFIL -->
+<div class="excel-modal-overlay" id="profile-modal" onclick="if(event.target===this) closeProfileModal()">
+  <div class="excel-modal" style="max-width:480px;text-align:left;max-height:85vh;overflow-y:auto">
+    <h3 style="text-align:center" data-es="Mi perfil" data-en="My profile">Mi perfil</h3>
+
+    <label class="profile-label" data-es="Nombre" data-en="Name">Nombre</label>
+    <input type="text" id="pf-name" class="profile-input" placeholder="ej. Ana Martínez">
+
+    <label class="profile-label" data-es="Teléfono" data-en="Phone">Teléfono</label>
+    <input type="text" id="pf-phone" class="profile-input" placeholder="ej. 442 123 4567">
+
+    <div style="display:flex;gap:10px">
+      <div style="flex:1">
+        <label class="profile-label" data-es="Idioma preferido" data-en="Preferred language">Idioma preferido</label>
+        <select id="pf-lang" class="profile-input">
+          <option value="es">Español</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <label class="profile-label" data-es="Modo preferido" data-en="Preferred mode">Modo preferido</label>
+        <select id="pf-mode" class="profile-input">
+          <option value="diy" data-es="Planeación personal" data-en="Personal planning">Planeación personal</option>
+          <option value="pro" data-es="Planner profesional" data-en="Professional planner">Planner profesional</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="profile-section-divider" data-es="Datos de tu empresa (modo Planner)" data-en="Your company (Planner mode)">Datos de tu empresa (modo Planner)</div>
+    <input type="text" id="pf-company-name" class="profile-input" placeholder="Nombre de tu empresa / marca">
+    <div style="display:flex;gap:10px">
+      <input type="text" id="pf-company-phone" class="profile-input" placeholder="Teléfono de la empresa" style="flex:1">
+      <input type="text" id="pf-company-website" class="profile-input" placeholder="Sitio web" style="flex:1">
+    </div>
+
+    <div class="profile-section-divider" data-es="Evento principal" data-en="Main event">Evento principal</div>
+    <select id="pf-main-plan" class="profile-input">
+      <option value="" data-es="Ninguno seleccionado" data-en="None selected">Ninguno seleccionado</option>
+    </select>
+
+    <label style="display:flex;align-items:center;gap:8px;margin:1rem 0;font-size:13px;color:var(--text-2);cursor:pointer">
+      <input type="checkbox" id="pf-reminders" style="width:16px;height:16px;cursor:pointer">
+      <span data-es="Quiero recibir recordatorios de mi evento por correo" data-en="I want to receive event reminders by email">Quiero recibir recordatorios de mi evento por correo</span>
+    </label>
+
+    <a class="btn-excel-unlock" href="#" onclick="saveProfile();return false" data-es="Guardar cambios" data-en="Save changes" style="display:block;text-align:center;text-decoration:none">Guardar cambios</a>
+    <button class="btn-excel-close" onclick="closeProfileModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
   </div>
 </div>
 
@@ -956,16 +1010,45 @@ let lang='es', mode='diy', eventType='Boda/Wedding', guests=50, plan={};
 //  en nada guardado solo en el navegador.
 // ══════════════════════════════
 let currentUser=null;
+let currentUserName='';
+let userProfile={};
 let isPaid=false;
+let suppressPrefSave=false;
+let prefsApplied=false;
 
 async function refreshPaidStatus(){
   if(!sb) return isPaid;
   const {data:{session}}=await sb.auth.getSession();
   currentUser=session?session.user:null;
+  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; updateAccountUI(); return isPaid; }
+
+  // Si veníamos de mandar el link mágico con un nombre escrito, lo guardamos
+  // ahora que ya hay sesión.
+  const pendingName=localStorage.getItem('dflai_pending_name');
+  if(pendingName){
+    await sb.rpc('update_my_profile',{new_name:pendingName});
+    localStorage.removeItem('dflai_pending_name');
+  }
+
+  const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in').eq('id',currentUser.id).single();
+  userProfile=data||{};
+  isPaid=!!userProfile.paid;
+  currentUserName=userProfile.full_name||'';
+
+  // Aplicar idioma/modo guardados — solo una vez por carga de página, para no
+  // pelearse con cambios que el usuario haga manualmente después.
+  if(!prefsApplied){
+    prefsApplied=true;
+    suppressPrefSave=true;
+    if(userProfile.preferred_lang && userProfile.preferred_lang!==lang) setLang(userProfile.preferred_lang);
+    if(userProfile.preferred_mode && userProfile.preferred_mode!==mode) setMode(userProfile.preferred_mode);
+    suppressPrefSave=false;
+  }
+  // Autocompletar "Tu empresa" en modo Planner si no lo ha escrito ya
+  const companyInput=document.getElementById('f-company');
+  if(companyInput && !companyInput.value && userProfile.company_name) companyInput.value=userProfile.company_name;
+
   updateAccountUI();
-  if(!currentUser){ isPaid=false; return isPaid; }
-  const {data}=await sb.from('profiles').select('paid').eq('id',currentUser.id).single();
-  isPaid=!!(data&&data.paid);
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   return isPaid;
@@ -978,7 +1061,7 @@ function updateAccountUI(){
   if(currentUser){
     loginBtn.style.display='none';
     menu.style.display='block';
-    emailBtn.textContent='👤 '+currentUser.email;
+    emailBtn.textContent='👤 '+(currentUserName||currentUser.email);
   }else{
     loginBtn.style.display='inline-block';
     menu.style.display='none';
@@ -992,7 +1075,9 @@ function closeAuthModal(){ document.getElementById('auth-modal').classList.remov
 async function sendMagicLink(){
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   const email=document.getElementById('auth-email').value.trim();
+  const name=document.getElementById('auth-name').value.trim();
   if(!email){ showToast(lang==='es'?'Escribe tu correo':'Enter your email',true); return; }
+  if(name) localStorage.setItem('dflai_pending_name',name);
   const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
   if(error){ showToast(error.message,true); return; }
   showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link':'✉️ Check your email — we sent you a link');
@@ -1008,6 +1093,82 @@ document.addEventListener('click',e=>{
     document.getElementById('account-dropdown').style.display='none';
   }
 });
+
+// ══════════════════════════════
+//  MI PERFIL
+// ══════════════════════════════
+async function openProfileModal(){
+  document.getElementById('account-dropdown').style.display='none';
+  if(!currentUser){ openAuthModal(); return; }
+
+  document.getElementById('pf-name').value=userProfile.full_name||'';
+  document.getElementById('pf-phone').value=userProfile.phone||'';
+  document.getElementById('pf-lang').value=userProfile.preferred_lang||lang;
+  document.getElementById('pf-mode').value=userProfile.preferred_mode||mode;
+  document.getElementById('pf-company-name').value=userProfile.company_name||'';
+  document.getElementById('pf-company-phone').value=userProfile.company_phone||'';
+  document.getElementById('pf-company-website').value=userProfile.company_website||'';
+  document.getElementById('pf-reminders').checked=!!userProfile.email_reminders_opt_in;
+
+  // Llenar el selector de "evento principal" con los planes guardados
+  const sel=document.getElementById('pf-main-plan');
+  sel.innerHTML=`<option value="">${lang==='es'?'Ninguno seleccionado':'None selected'}</option>`;
+  if(sb){
+    const {data}=await sb.from('plans').select('id,title').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    (data||[]).forEach(p=>{
+      const opt=document.createElement('option');
+      opt.value=p.id; opt.textContent=p.title;
+      if(userProfile.main_plan_id===p.id) opt.selected=true;
+      sel.appendChild(opt);
+    });
+  }
+
+  document.getElementById('profile-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeProfileModal(){
+  document.getElementById('profile-modal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+async function saveProfile(){
+  if(!sb||!currentUser) return;
+  const payload={
+    new_name:document.getElementById('pf-name').value.trim(),
+    new_lang:document.getElementById('pf-lang').value,
+    new_mode:document.getElementById('pf-mode').value,
+    new_phone:document.getElementById('pf-phone').value.trim(),
+    new_company_name:document.getElementById('pf-company-name').value.trim(),
+    new_company_phone:document.getElementById('pf-company-phone').value.trim(),
+    new_company_website:document.getElementById('pf-company-website').value.trim(),
+    new_email_reminders:document.getElementById('pf-reminders').checked
+  };
+  const mainPlanVal=document.getElementById('pf-main-plan').value;
+  if(mainPlanVal) payload.new_main_plan_id=mainPlanVal;
+
+  const {error}=await sb.rpc('update_my_profile',payload);
+  if(error){ showToast(lang==='es'?'No se pudo guardar tu perfil':'Could not save your profile',true); return; }
+
+  // Reflejar los cambios de inmediato sin esperar otra consulta
+  Object.assign(userProfile,{
+    full_name:payload.new_name, preferred_lang:payload.new_lang, preferred_mode:payload.new_mode,
+    phone:payload.new_phone, company_name:payload.new_company_name, company_phone:payload.new_company_phone,
+    company_website:payload.new_company_website, email_reminders_opt_in:payload.new_email_reminders
+  });
+  if(mainPlanVal) userProfile.main_plan_id=mainPlanVal;
+  currentUserName=userProfile.full_name;
+  updateAccountUI();
+
+  // Aplicar idioma/modo si cambiaron desde el modal
+  suppressPrefSave=true;
+  if(payload.new_lang!==lang) setLang(payload.new_lang);
+  if(payload.new_mode!==mode) setMode(payload.new_mode);
+  suppressPrefSave=false;
+
+  closeProfileModal();
+  showToast(lang==='es'?'✅ Perfil guardado':'✅ Profile saved');
+}
 
 async function logout(){
   if(sb) await sb.auth.signOut();
@@ -1181,6 +1342,7 @@ function setLang(l){
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
   renderEventTypes(); renderRadios(); renderMustHaves(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
+  if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_lang:l});
 }
 
 function setMode(m){
@@ -1193,6 +1355,7 @@ function setMode(m){
   document.getElementById('gen-btn-label').setAttribute('data-es',m==='diy'?'Generar mi plan personalizado':'Generar propuesta para cliente');
   document.getElementById('gen-btn-label').setAttribute('data-en',m==='diy'?'Generate my personalized plan':'Generate client proposal');
   document.getElementById('gen-btn-label').textContent=document.getElementById('gen-btn-label').getAttribute('data-'+lang);
+  if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_mode:m});
 }
 
 function updateModePill(){
@@ -2421,4 +2584,3 @@ init();
 </script>
 </body>
 </html>
-
