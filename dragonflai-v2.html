@@ -1020,7 +1020,7 @@ async function refreshPaidStatus(){
   if(!sb) return isPaid;
   const {data:{session}}=await sb.auth.getSession();
   currentUser=session?session.user:null;
-  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; updateAccountUI(); return isPaid; }
+  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; updateAccountUI(); updateGenBadge(); return isPaid; }
 
   // Si veníamos de mandar el link mágico con un nombre escrito, lo guardamos
   // ahora que ya hay sesión.
@@ -1049,6 +1049,7 @@ async function refreshPaidStatus(){
   if(companyInput && !companyInput.value && userProfile.company_name) companyInput.value=userProfile.company_name;
 
   updateAccountUI();
+  updateGenBadge();
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   return isPaid;
@@ -1172,8 +1173,9 @@ async function saveProfile(){
 
 async function logout(){
   if(sb) await sb.auth.signOut();
-  currentUser=null; isPaid=false;
+  currentUser=null; isPaid=false; currentUserName=''; userProfile={};
   updateAccountUI();
+  updateGenBadge();
   showToast(lang==='es'?'Sesión cerrada':'Logged out');
 }
 
@@ -1475,10 +1477,20 @@ function updateProgress(){
 }
 
 function updateGenBadge(){
+  const b=document.getElementById('gen-badge');
+  const labelEl=document.getElementById('gens-left').nextElementSibling;
+  b.style.border='none';
+  if(isPaid){
+    document.getElementById('gens-left').textContent='∞';
+    if(labelEl){ labelEl.setAttribute('data-es','planes ilimitados'); labelEl.setAttribute('data-en','unlimited plans'); labelEl.textContent=lang==='es'?'planes ilimitados':'unlimited plans'; }
+    b.style.background='linear-gradient(135deg,var(--teal),var(--violet))';
+    b.style.color='#fff';
+    b.style.boxShadow='0 2px 8px rgba(123,47,190,.3)';
+    return;
+  }
+  if(labelEl){ labelEl.setAttribute('data-es','planes disponibles'); labelEl.setAttribute('data-en','plans remaining'); labelEl.textContent=lang==='es'?'planes disponibles':'plans remaining'; }
   const left=Math.max(0,MAX_GENERATIONS-gensUsed);
   document.getElementById('gens-left').textContent=left;
-  const b=document.getElementById('gen-badge');
-  b.style.border='none';
   if(left<=1){
     b.style.background='#E8637A';
     b.style.color='#fff';
@@ -1496,7 +1508,7 @@ function updateGenBadge(){
 
 async function generate(){
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
-  if(gensUsed>=MAX_GENERATIONS){showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;}
+  if(!isPaid&&gensUsed>=MAX_GENERATIONS){showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;}
 
   const showingCoupleNames=mode==='diy'&&TYPES_COUPLE_NAMES.includes(eventType);
   let name;
