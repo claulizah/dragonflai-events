@@ -115,8 +115,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 
 /* ── FEATURES ── */
 .features-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:900px;margin:0 auto}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.feature-card{background:var(--white);border:1.5px solid var(--border-gray);border-radius:var(--radius-lg);padding:1.5rem;transition:all .25s;box-shadow:var(--shadow-sm)}
+.features-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
+.feature-card{background:var(--white);border:1.5px solid var(--border-gray);border-radius:var(--radius-lg);padding:1.5rem;transition:all .25s;box-shadow:var(--shadow-sm);flex:1 1 260px;max-width:280px}
 .feature-card:hover{border-color:var(--teal);background:var(--teal-light);transform:translateY(-3px);box-shadow:var(--shadow-teal)}
 .feature-icon{font-size:28px;margin-bottom:.875rem;display:block}
 .feature-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:.5rem}

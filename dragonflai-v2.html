@@ -267,34 +267,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .vcard-tip{font-size:12px;color:var(--text-2)}
 
 /* ── SAVE THE DATE ── */
-.std-card{position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:1.25rem;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 2rem;background:linear-gradient(135deg,var(--teal-light),var(--violet-light))}
-.std-card.theme-blush{background:linear-gradient(135deg,#FCE8EC,#F8D7DE)}
-.std-card.theme-blush .std-eyebrow,.std-card.theme-blush .std-divider-icon{color:#C14A5E}
-.std-card.theme-gold{background:linear-gradient(135deg,#FDF6E3,#F5E6C8)}
-.std-card.theme-gold .std-eyebrow,.std-card.theme-gold .std-divider-icon{color:#B8860B}
-.std-card.theme-sage{background:linear-gradient(135deg,#E8F0E5,#D4E4CE)}
-.std-card.theme-sage .std-eyebrow,.std-card.theme-sage .std-divider-icon{color:#5A7C52}
-.std-card.theme-night{background:linear-gradient(135deg,#1A2332,#2B3A52)}
-.std-card.theme-night .std-eyebrow,.std-card.theme-night .std-divider-icon,.std-card.theme-night .std-names,.std-card.theme-night .std-detail-item,.std-card.theme-night .std-footer,.std-card.theme-night .std-hashtag{color:#F0E8D8!important}
-.std-card.theme-blanco{background:#FFFFFF;border:1px solid var(--border-gray)}
-.std-card.theme-blanco .std-eyebrow,.std-card.theme-blanco .std-divider-icon{color:var(--text-3)}
+.std-card{position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:1.25rem;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 2rem;background:#FFFFFF;border:1px solid var(--border-gray)}
+/* Los temas SOLO cambian el color de los detalles (encabezado, ícono del divisor, hashtag) — la tarjeta siempre es blanca */
+.std-card.theme-teal .std-eyebrow,.std-card.theme-teal .std-divider-icon,.std-card.theme-teal .std-hashtag{color:var(--teal-dark)}
+.std-card.theme-blush .std-eyebrow,.std-card.theme-blush .std-divider-icon,.std-card.theme-blush .std-hashtag{color:#C14A5E}
+.std-card.theme-gold .std-eyebrow,.std-card.theme-gold .std-divider-icon,.std-card.theme-gold .std-hashtag{color:#B8860B}
+.std-card.theme-sage .std-eyebrow,.std-card.theme-sage .std-divider-icon,.std-card.theme-sage .std-hashtag{color:#5A7C52}
+.std-card.theme-night .std-eyebrow,.std-card.theme-night .std-divider-icon,.std-card.theme-night .std-hashtag{color:#1A2332}
+.std-card.theme-blanco .std-eyebrow,.std-card.theme-blanco .std-divider-icon,.std-card.theme-blanco .std-hashtag{color:var(--text-3)}
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem}
 .theme-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
-.theme-swatch.sw-teal{background:linear-gradient(135deg,var(--teal-light),var(--violet-light))}
-.theme-swatch.sw-blush{background:linear-gradient(135deg,#FCE8EC,#F8D7DE)}
-.theme-swatch.sw-gold{background:linear-gradient(135deg,#FDF6E3,#F5E6C8)}
-.theme-swatch.sw-sage{background:linear-gradient(135deg,#E8F0E5,#D4E4CE)}
-.theme-swatch.sw-night{background:linear-gradient(135deg,#1A2332,#2B3A52)}
+.theme-swatch.sw-teal{background:var(--teal-dark)}
+.theme-swatch.sw-blush{background:#C14A5E}
+.theme-swatch.sw-gold{background:#B8860B}
+.theme-swatch.sw-sage{background:#5A7C52}
+.theme-swatch.sw-night{background:#1A2332}
 .theme-swatch.sw-blanco{background:#FFFFFF;border-color:var(--border-gray)}
 .std-logo-mark{position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:4px;opacity:.55}
 .std-logo-mark span{font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--text-3)}
-.std-editable{outline:1.5px dashed transparent;border-radius:6px;cursor:text;transition:outline-color .15s;padding:2px 4px}
+.std-editable{outline:1.5px dashed transparent;border-radius:6px;cursor:text;transition:outline-color .15s;padding:2px 4px;display:inline-block}
 .std-editable:hover{outline-color:rgba(46,196,182,.4)}
 .std-editable:focus{outline:1.5px dashed var(--teal);background:rgba(46,196,182,.06)}
 .std-edit-hint{display:block;width:fit-content;font-size:11.5px;font-weight:600;color:var(--teal-dark);background:var(--teal-light);border:1px solid rgba(46,196,182,.3);padding:5px 12px;border-radius:100px;margin:0 auto .9rem;text-align:center}
-.std-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,196,182,.12),rgba(123,47,190,.12),rgba(244,196,48,.08));z-index:0}
-.std-card::after{content:'';position:absolute;inset:0;border:2px solid rgba(46,196,182,.3);border-radius:var(--radius-lg);z-index:0}
+.std-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,196,182,.06),rgba(123,47,190,.06),rgba(244,196,48,.04));z-index:0}
+.std-card::after{content:'';position:absolute;inset:0;border:2px solid rgba(46,196,182,.2);border-radius:var(--radius-lg);z-index:0}
 .std-bg-dragonfly{position:absolute;font-size:180px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-55%);z-index:0;pointer-events:none;line-height:1}
 .std-content{position:relative;z-index:1;width:100%}
 .std-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
@@ -305,6 +302,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-divider-icon{color:var(--teal);font-size:12px}
 .std-details{font-size:14px;color:var(--text-2);line-height:2}
 .std-detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
+.std-icon{flex-shrink:0}
 .std-footer{font-size:12px;color:var(--text-3);margin-top:1.25rem;font-style:italic}
 .std-hashtag{font-size:13px;color:var(--teal);font-weight:600;margin-top:.5rem;letter-spacing:.02em}
 .std-actions{display:flex;justify-content:center;gap:10px;margin-top:1.5rem;flex-wrap:wrap}
@@ -998,7 +996,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <div id="publish-form">
       <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:.4rem">
-        <span style="font-size:13px;color:var(--text-3);white-space:nowrap">tudominio.com/i/</span>
+        <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/i/</span>
         <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
       </div>
 
@@ -1090,8 +1088,12 @@ async function refreshPaidStatus(){
   // ahora que ya hay sesión.
   const pendingName=localStorage.getItem('dflai_pending_name');
   if(pendingName){
-    await sb.rpc('update_my_profile',{new_name:pendingName});
-    localStorage.removeItem('dflai_pending_name');
+    const {error:nameErr}=await sb.rpc('update_my_profile',{new_name:pendingName});
+    if(nameErr){
+      console.error('No se pudo guardar el nombre pendiente:',nameErr);
+    } else {
+      localStorage.removeItem('dflai_pending_name');
+    }
   }
 
   const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in').eq('id',currentUser.id).single();
@@ -1252,6 +1254,7 @@ function openPublishModal(){
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para publicar tu invitación':'Log in to publish your invitation',true); return; }
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
+  document.getElementById('pub-domain-label').textContent=location.host+'/i/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
   document.getElementById('publish-modal').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1300,7 +1303,8 @@ async function publishInvitation(){
   const {error}=await sb.from('invitations').insert(payload);
   if(error){
     if(error.code==='23505') showToast(lang==='es'?'Ese link ya está en uso, prueba otro':'That link is taken, try another',true);
-    else showToast(lang==='es'?'No se pudo publicar':'Could not publish',true);
+    else showToast((lang==='es'?'No se pudo publicar: ':'Could not publish: ')+(error.message||error.code||''),true);
+    console.error('publishInvitation error:',error);
     return;
   }
 
@@ -1938,8 +1942,8 @@ Output format EXACTLY: [HTML of section 1]<!--SPLIT-->[HTML of section 2]. The l
 function buildSTDPrompt(){
   const p=plan,e=p.extra||{};
   const {outLang,ctx}=buildCtx();
-  const dresscodeLine=e.dresscode?`<div class="std-detail-item">👔 ${esc(e.dresscode)}</div>`:'';
-  const hashtagLine=e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:'';
+  const dresscodeText=e.dresscode?esc(e.dresscode):(p.lang==='es'?'Código de vestimenta':'Dress code');
+  const hashtagText=e.hashtag?esc(e.hashtag):(p.lang==='es'?'#TuHashtag':'#YourHashtag');
   return `Return ONLY clean HTML. No markdown, no code fences. Write ALL text in ${outLang}.
 You are an elegant wedding stationer and copywriter. Create a beautiful Save the Date card.
 ${ctx}
@@ -1957,11 +1961,16 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 <div class="std-bg-dragonfly" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);opacity:.06;pointer-events:none"><svg width="180" height="180" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg></div>
 <div class="std-content">
 <div class="std-eyebrow">${p.lang==='es'?'— Aparta la Fecha —':'— Save the Date —'}</div>
-<div class="std-names">[Host name or couple's names elegantly, with <em> on key words]</div>
+<div class="std-names" data-field="names">[Host name or couple's names elegantly — do NOT include any HTML tags like <em>, just plain text]</div>
 <div class="std-divider"><span class="std-divider-icon">◆</span></div>
-<div class="std-details"><div class="std-detail-item">📅 [Full date]</div><div class="std-detail-item">📍 [Location]</div><div class="std-detail-item">🕕 [Time]</div>${dresscodeLine}</div>
-<div class="std-footer">[Elegant short phrase: "Formal invitation to follow" or a personalized poetic line based on their vibe and details]</div>
-${hashtagLine}
+<div class="std-details">
+<div class="std-detail-item"><span class="std-icon">📅</span><span class="std-field" data-field="date">[Full date]</span></div>
+<div class="std-detail-item"><span class="std-icon">📍</span><span class="std-field" data-field="location">[Location]</span></div>
+<div class="std-detail-item"><span class="std-icon">🕕</span><span class="std-field" data-field="time">[Time]</span></div>
+<div class="std-detail-item"><span class="std-icon">👔</span><span class="std-field" data-field="dresscode">${dresscodeText}</span></div>
+</div>
+<div class="std-footer" data-field="message">[Elegant short phrase: "Formal invitation to follow" or a personalized poetic line based on their vibe and details]</div>
+<div class="std-hashtag" data-field="hashtag">${hashtagText}</div>
 </div>
 <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
 </div>
@@ -2622,8 +2631,15 @@ async function exportSpreadsheet(){
   wb.creator='DragonflAI Events';
   wb.created=new Date();
 
-  // Overview — formato de tarjeta: etiqueta en teal oscuro + negritas, valor normal
+  // Overview — ahora con un bloque de "dashboard" arriba (fórmulas que jalan de otras hojas)
   const e=plan.extra||{};
+  const L2=L; // alias para claridad dentro de este bloque
+  const budgetSheetName=L?'Presupuesto':'Budget';
+  const budgetTotalRow=(plan.budgetData&&plan.budgetData.length)?plan.budgetData.length+2:null;
+  const eventDateObj=plan.rawDate?new Date(plan.rawDate+'T12:00:00'):null;
+  const totalChecklist=(plan.checklistData||[]).reduce((s,sec)=>s+(sec.items||[]).length,0);
+  const doneChecklist=(plan.checklistData||[]).reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+
   const resumen=[
     [L?'Evento':'Event',plan.typeName],
     [L?'Anfitrión':'Host',(plan.name||'').toUpperCase()],
@@ -2654,9 +2670,42 @@ async function exportSpreadsheet(){
   if(e.costoBoleto) resumen.push([L?'Costo esperado por boleto':'Expected ticket price',`$${e.costoBoleto} MXN`]);
 
   const wsResumen=wb.addWorksheet(L?'Overview':'Overview',{properties:{tabColor:{argb:XL_VIOLET}}});
-  wsResumen.columns=[{width:26},{width:40}];
+  wsResumen.columns=[{width:22},{width:16},{width:16},{width:16},{width:16},{width:16}];
+
+  // ── Encabezado del dashboard ──
+  wsResumen.mergeCells('A1:F1');
+  const dashTitle=wsResumen.getCell('A1');
+  dashTitle.value='📊 '+(L?'RESUMEN DEL EVENTO':'EVENT SUMMARY');
+  dashTitle.font={bold:true,size:14,color:{argb:XL_WHITE},name:'Calibri'};
+  dashTitle.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_VIOLET}};
+  dashTitle.alignment={vertical:'middle',horizontal:'center'};
+  wsResumen.getRow(1).height=28;
+
+  // ── Fila de etiquetas de las estadísticas ──
+  const statLabels=[L?'Días para el evento':'Days to go',L?'Presupuesto':'Budget',L?'Gastado':'Spent',L?'Restante':'Left',L?'Invitados':'Guests',L?'Checklist':'Checklist'];
+  const labelRow=wsResumen.addRow(statLabels);
+  labelRow.eachCell(c=>{ c.font={bold:true,size:9,color:{argb:XL_TEAL_DARK},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_CREAM}}; });
+
+  // ── Fila de valores (con fórmulas reales cuando aplica) ──
+  const statValues=[
+    eventDateObj?{formula:`DATE(${eventDateObj.getFullYear()},${eventDateObj.getMonth()+1},${eventDateObj.getDate()})-TODAY()`}:(L?'N/D':'N/A'),
+    budgetTotalRow?{formula:`'${budgetSheetName}'!B${budgetTotalRow}`}:(parseInt(plan.budget)||0),
+    budgetTotalRow?{formula:`'${budgetSheetName}'!C${budgetTotalRow}`}:0,
+    budgetTotalRow?{formula:`'${budgetSheetName}'!D${budgetTotalRow}`}:0,
+    plan.guests||0,
+    totalChecklist?`${doneChecklist}/${totalChecklist}`:(L?'N/D':'N/A')
+  ];
+  const valueRow=wsResumen.addRow(statValues);
+  valueRow.eachCell(c=>{ c.font={bold:true,size:15,color:{argb:XL_NAVY},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_WHITE}}; c.border={bottom:{style:'medium',color:{argb:XL_TEAL}}}; });
+  valueRow.height=26;
+
+  wsResumen.addRow([]); // separador visual
+
+  // ── Detalle del evento (igual que antes, con la celda de valor fusionada B:F) ──
   resumen.forEach((r,i)=>{
     const row=wsResumen.addRow(r);
+    const rowNum=row.number;
+    wsResumen.mergeCells(`B${rowNum}:F${rowNum}`);
     row.getCell(1).font={bold:true,color:{argb:XL_TEAL_DARK},size:10.5,name:'Calibri'};
     row.getCell(2).font={color:{argb:XL_NAVY},size:11,name:'Calibri'};
     row.eachCell(cell=>{ cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2===1?XL_CREAM:XL_WHITE}}; cell.border={bottom:{style:'thin',color:{argb:XL_BORDER}}}; cell.alignment={vertical:'middle'}; });
@@ -2847,7 +2896,7 @@ function setSTDTheme(theme,el){
 function makeSTDEditable(){
   const card=document.querySelector('.std-card');
   if(!card) return;
-  card.querySelectorAll('.std-names,.std-detail-item,.std-footer,.std-hashtag').forEach(el=>{
+  card.querySelectorAll('.std-names,.std-field,.std-footer,.std-hashtag').forEach(el=>{
     el.setAttribute('contenteditable','true');
     el.classList.add('std-editable');
   });
