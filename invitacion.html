@@ -27,17 +27,17 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
 
 /* ── TARJETA (mismos temas que el Save the Date de la app) ── */
-.card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:linear-gradient(135deg,var(--teal-light),var(--violet-light));box-shadow:var(--shadow-md);margin-bottom:1.5rem}
-.card.theme-blush{background:linear-gradient(135deg,#FCE8EC,#F8D7DE)}
-.card.theme-gold{background:linear-gradient(135deg,#FDF6E3,#F5E6C8)}
-.card.theme-sage{background:linear-gradient(135deg,#E8F0E5,#D4E4CE)}
-.card.theme-night{background:linear-gradient(135deg,#1A2332,#2B3A52)}
-.card.theme-night .eyebrow,.card.theme-night .names,.card.theme-night .detail-item,.card.theme-night .msg{color:#F0E8D8!important}
-.card.theme-blanco{background:#FFFFFF;border:1px solid var(--border-gray)}
+.card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:#FFFFFF;border:1px solid var(--border-gray);box-shadow:var(--shadow-md);margin-bottom:1.5rem}
+.card.theme-teal .eyebrow,.card.theme-teal .hashtag{color:var(--teal-dark)}
+.card.theme-blush .eyebrow,.card.theme-blush .hashtag{color:#C14A5E}
+.card.theme-gold .eyebrow,.card.theme-gold .hashtag{color:#B8860B}
+.card.theme-sage .eyebrow,.card.theme-sage .hashtag{color:#5A7C52}
+.card.theme-night .eyebrow,.card.theme-night .hashtag{color:#1A2332}
+.card.theme-blanco .eyebrow,.card.theme-blanco .hashtag{color:var(--text-3)}
 .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
-.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;text-transform:uppercase;line-height:1.15;margin-bottom:1rem}
-.divider{width:60px;height:1px;background:currentColor;opacity:.3;margin:0 auto 1.2rem}
-.details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px}
+.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;text-transform:uppercase;line-height:1.15;margin-bottom:1rem;color:var(--text)}
+.divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
+.details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px;color:var(--text-2)}
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
 .msg{font-size:13px;color:var(--text-2);font-style:italic;margin-top:.5rem}
 .hashtag{font-size:13px;color:var(--teal-dark);font-weight:600;margin-top:.6rem}
@@ -60,6 +60,11 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .btn-submit:disabled{opacity:.5;cursor:not-allowed}
 .state-msg{text-align:center;padding:3rem 1rem;color:var(--text-2)}
 .state-msg h2{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);margin-bottom:.5rem}
+.thanks-card{text-align:center;padding:3rem 2rem;background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border-radius:var(--radius-lg);box-shadow:var(--shadow-md)}
+.thanks-emoji{font-size:52px;margin-bottom:.5rem}
+.thanks-card h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--text);margin-bottom:.6rem}
+.thanks-card p{font-size:15px;color:var(--text-2)}
+.thanks-brand{margin-top:1.5rem;font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--teal-dark);letter-spacing:.03em}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--night);color:#fff;padding:12px 20px;border-radius:100px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s;z-index:100}
 .toast.show{opacity:1}
 </style>
@@ -75,6 +80,11 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
   <div id="content">
     <div class="state-msg"><h2>Cargando…</h2></div>
   </div>
+
+  <p style="text-align:center;margin-top:2rem;font-size:11px;color:var(--text-3)">
+    <a href="/terminos.html" style="color:var(--text-3)">Términos</a> &nbsp;·&nbsp;
+    <a href="/aviso-de-privacidad.html" style="color:var(--text-3)">Aviso de privacidad</a>
+  </p>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -134,6 +144,7 @@ function renderInvitation(inv){
         ${inv.location?`<div class="detail-item">📍 ${esc(inv.location)}</div>`:''}
         ${inv.event_time?`<div class="detail-item">🕕 ${esc(inv.event_time)}</div>`:''}
         ${inv.dress_code?`<div class="detail-item">👔 ${esc(inv.dress_code)}</div>`:''}
+        ${inv.directions_info?`<div class="detail-item">🗺️ ${esc(inv.directions_info)}</div>`:''}
       </div>
       ${inv.message?`<div class="msg">${esc(inv.message)}</div>`:''}
       ${inv.hashtag?`<div class="hashtag">${esc(inv.hashtag)}</div>`:''}
@@ -146,6 +157,10 @@ function renderInvitation(inv){
         <div class="field">
           <label>Tu nombre</label>
           <input type="text" id="r-name" required>
+        </div>
+        <div class="field">
+          <label>Tu correo (opcional, para recordatorios)</label>
+          <input type="text" id="r-email" placeholder="tu@correo.com">
         </div>
         <div class="field">
           <label>¿Asistes?</label>
@@ -161,6 +176,17 @@ function renderInvitation(inv){
         ${inv.ask_dietary?`<div class="field" id="field-dietary" style="display:none">
           <label>Restricción alimentaria (opcional)</label>
           <input type="text" id="r-dietary" placeholder="ej. Vegetariano, sin gluten…">
+        </div>`:''}
+        ${inv.ask_song_request?`<div class="field" id="field-song" style="display:none">
+          <label>Canción que no puede faltar (opcional)</label>
+          <input type="text" id="r-song" placeholder="ej. Vivir mi vida — Marc Anthony">
+        </div>`:''}
+        ${inv.ask_lodging_need?`<div class="field" id="field-lodging" style="display:none">
+          <label>¿Necesitas ayuda con hospedaje?</label>
+          <div class="attend-toggle">
+            <div class="attend-opt" id="opt-lodging-yes" onclick="setLodging(true)">Sí</div>
+            <div class="attend-opt" id="opt-lodging-no" onclick="setLodging(false)">No</div>
+          </div>
         </div>`:''}
         ${inv.custom_question?`<div class="field" id="field-custom" style="display:none">
           <label>${esc(inv.custom_question)}</label>
@@ -178,11 +204,17 @@ function renderInvitation(inv){
 }
 
 let attending=null;
+let lodgingNeeded=null;
+function setLodging(val){
+  lodgingNeeded=val;
+  document.getElementById('opt-lodging-yes').classList.toggle('sel-yes',val===true);
+  document.getElementById('opt-lodging-no').classList.toggle('sel-no',val===false);
+}
 function setAttending(val){
   attending=val;
   document.getElementById('opt-yes').classList.toggle('sel-yes',val===true);
   document.getElementById('opt-no').classList.toggle('sel-no',val===false);
-  ['field-guests','field-dietary','field-custom','field-message'].forEach(id=>{
+  ['field-guests','field-dietary','field-song','field-lodging','field-custom','field-message'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display=(val===true)?'block':'none';
   });
@@ -201,9 +233,12 @@ async function submitRSVP(e){
   const payload={
     invitation_id: invitation.id,
     guest_name: name,
+    guest_email: document.getElementById('r-email').value.trim()||null,
     attending,
     guest_count: document.getElementById('r-guests')?parseInt(document.getElementById('r-guests').value)||0:null,
     dietary: document.getElementById('r-dietary')?document.getElementById('r-dietary').value.trim():null,
+    song_request: document.getElementById('r-song')?document.getElementById('r-song').value.trim():null,
+    lodging_needed: document.getElementById('field-lodging')?lodgingNeeded:null,
     message: document.getElementById('r-message')?document.getElementById('r-message').value.trim():null,
     custom_answer: document.getElementById('r-custom')?document.getElementById('r-custom').value.trim():null
   };
@@ -216,9 +251,12 @@ async function submitRSVP(e){
   }
 
   document.getElementById('content').innerHTML=`
-    <div class="state-msg">
-      <h2>${attending?'🎉 ¡Gracias por confirmar!':'💌 Gracias por avisarnos'}</h2>
-      <p>${attending?'Nos vemos pronto.':'Te vamos a extrañar, pero gracias por decirnos.'}</p>
+    <div class="thanks-card">
+      <svg width="56" height="56" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.75rem"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#0D6E65"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#0D6E65"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".55" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".55" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".35" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".35" transform="rotate(10 27 18)"/></svg>
+      <div class="thanks-emoji">${attending?'🎉':'💌'}</div>
+      <h2>${attending?'¡Gracias por confirmar!':'Gracias por avisarnos'}</h2>
+      <p>${attending?'Nos vemos pronto — va a estar increíble.':'Te vamos a extrañar, pero gracias por decirnos.'}</p>
+      <div class="thanks-brand">DragonflAI Events</div>
     </div>`;
 }
 

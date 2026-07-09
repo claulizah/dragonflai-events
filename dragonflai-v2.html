@@ -907,9 +907,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <!-- PAYWALL: DESCARGA DE EXCEL -->
 <div class="excel-modal-overlay" id="excel-modal" onclick="if(event.target===this) closeExcelPaywall()">
   <div class="excel-modal">
-    <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem">📊🔒</span>
-    <h3 data-es="Descarga tu Excel editable" data-en="Download your editable Excel">Descarga tu Excel editable</h3>
-    <p data-es="La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre." data-en="Excel export (budget with formulas, guest list, timeline, checklist and more) is part of full access — one payment, yours forever.">La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre.</p>
+    <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem" id="paywall-icon">📊🔒</span>
+    <h3 id="paywall-title" data-es="Descarga tu Excel editable" data-en="Download your editable Excel">Descarga tu Excel editable</h3>
+    <p id="paywall-text" data-es="La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre." data-en="Excel export (budget with formulas, guest list, timeline, checklist and more) is part of full access — one payment, yours forever.">La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre.</p>
     <a class="btn-excel-unlock" href="index.html#precios" data-es="Ver acceso completo — $497 MXN →" data-en="See full access — $497 MXN →">Ver acceso completo — $497 MXN →</a>
     <button class="btn-excel-close" onclick="closeExcelPaywall()" data-es="Ahora no" data-en="Not now">Ahora no</button>
   </div>
@@ -1000,6 +1000,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
       </div>
 
+      <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
+      <div class="std-theme-picker" id="pub-theme-picker" style="margin-bottom:.75rem">
+        <span class="theme-swatch sw-teal" onclick="setPublishTheme('theme-teal',this)" title="Teal"></span>
+        <span class="theme-swatch sw-blush" onclick="setPublishTheme('theme-blush',this)" title="Blush"></span>
+        <span class="theme-swatch sw-gold" onclick="setPublishTheme('theme-gold',this)" title="Gold"></span>
+        <span class="theme-swatch sw-sage" onclick="setPublishTheme('theme-sage',this)" title="Sage"></span>
+        <span class="theme-swatch sw-night" onclick="setPublishTheme('theme-night',this)" title="Night"></span>
+        <span class="theme-swatch sw-blanco" onclick="setPublishTheme('theme-blanco',this)" title="Blanco"></span>
+      </div>
+
       <div class="profile-section-divider" data-es="¿Qué pedirle al invitado en el RSVP?" data-en="What to ask guests in the RSVP?">¿Qué pedirle al invitado en el RSVP?</div>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;font-size:13px;color:var(--text-2);cursor:pointer">
         <input type="checkbox" id="pub-ask-guests" checked style="width:16px;height:16px;cursor:pointer">
@@ -1013,8 +1023,20 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <input type="checkbox" id="pub-ask-message" checked style="width:16px;height:16px;cursor:pointer">
         <span data-es="Mensaje para los anfitriones" data-en="Message for the hosts">Mensaje para los anfitriones</span>
       </label>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;font-size:13px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="pub-ask-song" style="width:16px;height:16px;cursor:pointer">
+        <span data-es="Canción que no puede faltar" data-en="Must-play song">Canción que no puede faltar</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem;font-size:13px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="pub-ask-lodging" style="width:16px;height:16px;cursor:pointer">
+        <span data-es="¿Necesita ayuda con hospedaje?" data-en="Needs lodging help?">¿Necesita ayuda con hospedaje?</span>
+      </label>
       <label class="profile-label" data-es="Pregunta personalizada (opcional)" data-en="Custom question (optional)">Pregunta personalizada (opcional)</label>
       <input type="text" id="pub-custom-question" class="profile-input" placeholder="ej. ¿Necesitas transporte desde el hotel?">
+
+      <div class="profile-section-divider" data-es="Información para tus invitados" data-en="Info for your guests">Información para tus invitados</div>
+      <label class="profile-label" data-es="Cómo llegar (opcional)" data-en="Directions (optional)">Cómo llegar (opcional)</label>
+      <input type="text" id="pub-directions" class="profile-input" placeholder="ej. Entrada por Av. Reforma, estacionamiento gratis">
 
       <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none">Publicar →</a>
     </div>
@@ -1043,7 +1065,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg><br>
   <strong class="teal">DragonflAI Events</strong> &nbsp;·&nbsp;
   <span data-es="Desarrollado con Claude AI" data-en="Built with Claude AI">Desarrollado con Claude AI</span>
-  &nbsp;·&nbsp; <span data-es="Tu API key nunca sale de tu navegador" data-en="Your API key never leaves your browser">Tu API key nunca sale de tu navegador</span>
+  &nbsp;·&nbsp; <a href="/terminos.html" style="color:inherit" data-es="Términos" data-en="Terms">Términos</a>
+  &nbsp;·&nbsp; <a href="/aviso-de-privacidad.html" style="color:inherit" data-es="Aviso de privacidad" data-en="Privacy notice">Aviso de privacidad</a>
 </footer>
 
 <script>
@@ -1247,17 +1270,40 @@ function slugify(str){
     .trim().replace(/\s+/g,'-').replace(/-+/g,'-');
 }
 
-function openPublishModal(){
+let pubSelectedTheme='theme-teal';
+
+async function openPublishModal(){
   document.getElementById('account-dropdown').style.display='none';
   if(!plan.typeName){ showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true); return; }
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para publicar tu invitación':'Log in to publish your invitation',true); return; }
+  showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
+  const paid=await refreshPaidStatus();
+  if(!paid){ openExcelPaywall('publish'); return; }
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
   document.getElementById('pub-domain-label').textContent=location.host+'/i/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
+
+  // Precargar con el mismo tema que ya tiene el Save the Date, si existe
+  pubSelectedTheme='theme-teal';
+  const stdCard=document.querySelector('.std-card');
+  if(stdCard){
+    const themeClass=[...stdCard.classList].find(c=>c.startsWith('theme-'));
+    if(themeClass) pubSelectedTheme=themeClass;
+  }
+  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
+    s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
+  });
+
   document.getElementById('publish-modal').classList.add('open');
   document.body.style.overflow='hidden';
+}
+
+function setPublishTheme(theme,el){
+  pubSelectedTheme=theme;
+  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
 }
 
 function closePublishModal(){
@@ -1269,16 +1315,13 @@ let lastPublishedUrl='';
 
 async function publishInvitation(){
   if(!sb||!currentUser) return;
+  const paid=await refreshPaidStatus();
+  if(!paid){ closePublishModal(); openExcelPaywall('publish'); return; }
   const slug=slugify(document.getElementById('pub-slug').value);
   if(!slug){ showToast(lang==='es'?'Escribe un link válido':'Enter a valid link',true); return; }
 
   const p=plan, e=p.extra||{};
-  let theme='theme-teal';
-  const stdCard=document.querySelector('.std-card');
-  if(stdCard){
-    const themeClass=[...stdCard.classList].find(c=>c.startsWith('theme-'));
-    if(themeClass) theme=themeClass;
-  }
+  const theme=pubSelectedTheme||'theme-teal';
 
   const payload={
     user_id: currentUser.id,
@@ -1297,6 +1340,9 @@ async function publishInvitation(){
     ask_guest_count: document.getElementById('pub-ask-guests').checked,
     ask_dietary: document.getElementById('pub-ask-dietary').checked,
     ask_message: document.getElementById('pub-ask-message').checked,
+    ask_song_request: document.getElementById('pub-ask-song').checked,
+    ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
+    directions_info: document.getElementById('pub-directions').value.trim()||null,
     custom_question: document.getElementById('pub-custom-question').value.trim()||null
   };
 
@@ -1364,6 +1410,7 @@ async function loadMyInvitations(){
         <div style="display:flex;gap:6px;flex-shrink:0">
           <button class="btn-account" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
           <button class="btn-account" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
+          <button class="btn-account" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
         </div>
       </div>
       <div class="rsvp-sublist" id="rsvp-sub-${inv.id}" style="display:none;font-size:12.5px;color:var(--text-2)"></div>
@@ -1377,16 +1424,59 @@ async function toggleRsvpList(invId){
   if(el.style.display==='block'){ el.style.display='none'; return; }
   el.style.display='block';
   el.innerHTML=lang==='es'?'Cargando…':'Loading…';
-  const {data,error}=await sb.from('rsvps').select('guest_name,attending,guest_count,dietary,message,custom_answer').eq('invitation_id',invId).order('created_at',{ascending:false});
+  const {data,error}=await sb.from('rsvps').select('guest_name,guest_email,attending,guest_count,dietary,song_request,lodging_needed,message,custom_answer').eq('invitation_id',invId).order('created_at',{ascending:false});
   if(error||!data||!data.length){ el.innerHTML=lang==='es'?'Sin respuestas todavía.':'No responses yet.'; return; }
   el.innerHTML=data.map(r=>`
     <div style="padding:6px 0;border-top:1px solid var(--border-gray)">
       <strong>${esc(r.guest_name)}</strong> — ${r.attending?(lang==='es'?'✅ Asiste':'✅ Attending'):(lang==='es'?'❌ No asiste':'❌ Not attending')}
       ${r.guest_count?` · +${r.guest_count}`:''}
+      ${r.guest_email?`<br>✉️ ${esc(r.guest_email)}`:''}
       ${r.dietary?`<br>🍽️ ${esc(r.dietary)}`:''}
+      ${r.song_request?`<br>🎵 ${esc(r.song_request)}`:''}
+      ${r.lodging_needed===true?`<br>🏨 ${lang==='es'?'Necesita hospedaje':'Needs lodging'}`:''}
       ${r.message?`<br>💬 ${esc(r.message)}`:''}
     </div>
   `).join('');
+}
+
+async function exportRsvpsToExcel(invId,hostNames){
+  if(!sb) return;
+  if(typeof ExcelJS==='undefined'){ showToast(lang==='es'?'No se pudo cargar el generador de Excel':'Could not load Excel generator',true); return; }
+  const L=lang==='es';
+  const {data,error}=await sb.from('rsvps').select('guest_name,guest_email,attending,guest_count,dietary,song_request,lodging_needed,message,custom_answer,created_at').eq('invitation_id',invId).order('created_at',{ascending:false});
+  if(error){ showToast(lang==='es'?'No se pudo exportar':'Could not export',true); return; }
+  if(!data||!data.length){ showToast(lang==='es'?'Todavía no hay RSVPs para exportar':'No RSVPs to export yet',true); return; }
+
+  const wb=new ExcelJS.Workbook();
+  const ws=wb.addWorksheet(L?'RSVPs':'RSVPs',{properties:{tabColor:{argb:XL_TEAL}}});
+  ws.columns=[{width:22},{width:26},{width:12},{width:12},{width:24},{width:24},{width:12},{width:30},{width:24},{width:18}];
+  const header=[L?'Invitado':'Guest',L?'Correo':'Email',L?'Asiste':'Attending',L?'Acompañantes':'Guests',L?'Restricción alimentaria':'Dietary',L?'Canción':'Song request',L?'Hospedaje':'Lodging',L?'Mensaje':'Message',L?'Respuesta extra':'Custom answer',L?'Fecha de respuesta':'Response date'];
+  xlStyleHeader(ws.addRow(header));
+  data.forEach((r,i)=>{
+    const row=ws.addRow([
+      r.guest_name,
+      r.guest_email||'',
+      r.attending?(L?'Sí':'Yes'):(L?'No':'No'),
+      r.guest_count||0,
+      r.dietary||'',
+      r.song_request||'',
+      r.lodging_needed===true?(L?'Sí':'Yes'):(r.lodging_needed===false?(L?'No':'No'):''),
+      r.message||'',
+      r.custom_answer||'',
+      r.created_at?new Date(r.created_at).toLocaleDateString(L?'es-MX':'en-US'):''
+    ]);
+    xlStyleDataRow(row,i%2===1);
+  });
+  ws.views=[{state:'frozen',ySplit:1}];
+
+  const filename=`RSVPs_${(hostNames||'invitacion').replace(/[^\w]+/g,'_')}.xlsx`;
+  const buffer=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url; link.download=filename; link.click();
+  URL.revokeObjectURL(url);
+  showToast(L?'📊 RSVPs exportados':'📊 RSVPs exported');
 }
 
 async function logout(){
@@ -1405,7 +1495,7 @@ if(sb){
   });
 }
 
-let radios={stress:'',exp:'',priority:'',couple:'Hombre & Mujer',todoIncluido:'No sé todavía'};
+let radios={stress:'',exp:'',priority:[],couple:'Hombre & Mujer',todoIncluido:'No sé todavía'};
 let gensUsed=parseInt(localStorage.getItem('dflai_gens')||'0');
 let loadTmr=null, loadIdx=0;
 
@@ -1611,13 +1701,30 @@ function updateFormTitle(){
 }
 
 function renderRadios(){
-  [['stress','stress-opts'],['exp','exp-opts'],['priority','priority-opts']].forEach(([key,id])=>{
+  [['stress','stress-opts'],['exp','exp-opts']].forEach(([key,id])=>{
     const opts=T[key][lang];
     const cur=radios[key]||'';
     document.getElementById(id).innerHTML=opts.map((o,i)=>
-      `<span class="ropt${o===cur||(!radios[key]&&i===(key==='priority'?0:1))?' sel':''}" onclick="selRadio(this,'${key}')">${o}</span>`
+      `<span class="ropt${o===cur||(!radios[key]&&i===1)?' sel':''}" onclick="selRadio(this,'${key}')">${o}</span>`
     ).join('');
   });
+  // Prioridad: multi-select (puede elegir varias)
+  const pOpts=T.priority[lang];
+  if(!radios.priority||!radios.priority.length) radios.priority=[pOpts[0]];
+  document.getElementById('priority-opts').innerHTML=pOpts.map(o=>
+    `<span class="ropt${radios.priority.includes(o)?' sel':''}" onclick="selPriority(this)">${o}</span>`
+  ).join('');
+}
+
+function selPriority(el){
+  const group=el.closest('.rgroup');
+  const willBeSelected=!el.classList.contains('sel');
+  // No permitir dejar cero opciones seleccionadas — siempre al menos una
+  const currentlySelected=group.querySelectorAll('.ropt.sel').length;
+  if(!willBeSelected&&currentlySelected<=1) return;
+  el.classList.toggle('sel');
+  radios.priority=[...group.querySelectorAll('.ropt.sel')].map(o=>o.textContent);
+  updateProgress();
 }
 
 function selRadio(el,group){
@@ -1761,7 +1868,8 @@ async function generate(){
     ?' | Contratando proveedores por separado':' | Tipo de venue: por definir';
   const stress=radios.stress||T.stress[lang][1];
   const exp=radios.exp||T.exp[lang][1];
-  const priority=radios.priority||T.priority[lang][0];
+  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[T.priority[lang][0]];
+  const priority=priorityList.join(', ');
 
   // ── Detalles adicionales (todos opcionales) ──
   const kids=parseInt(document.getElementById('f-kids').value)||0;
@@ -1801,7 +1909,7 @@ async function generate(){
   const idx=T.eventTypes.vals.indexOf(eventType);
   const typeName=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
 
-  plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
+  plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,priorityList,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
 
   document.getElementById('res-title').textContent=(mode==='diy'?(lang==='es'?'Tu Plan de ':'Your '):(lang==='es'?'Propuesta — ':'Proposal — '))+typeName;
   document.getElementById('res-section').style.display='block';
@@ -1840,8 +1948,8 @@ async function generate(){
   //  (vista general + ideas juntas, save the date, y propuesta en modo pro)
   // ══════════════════════════════
   const calls=[
-    callClaude(buildCreativePrompt(),'claude-sonnet-4-5',2200).then(h=>({id:'creative',h})),
-    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',600).then(h=>({id:'savethedate',h}))
+    callClaude(buildCreativePrompt(),'claude-sonnet-4-5',3800).then(h=>({id:'creative',h})),
+    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',1400).then(h=>({id:'savethedate',h}))
   ];
   if(mode==='pro') calls.push(callClaude(buildProposalPrompt(),'claude-sonnet-4-5',1400).then(h=>({id:'proposal',h})));
 
@@ -2029,11 +2137,14 @@ function buildBudget(){
   const p=plan,L=p.lang==='es';
   const total=parseInt(p.budget)||0;
   let pcts=BUDGET_CATS.map(c=>c.pct);
-  const boostIdx=PRIORITY_BOOST_IDX[p.priority];
-  if(boostIdx!==undefined){
-    const boost=8;
-    const othersSum=pcts.reduce((s,v,i)=>i===boostIdx?s:s+v,0);
-    pcts=pcts.map((v,i)=>i===boostIdx?v+boost:Math.max(1,Math.round(v-(v/othersSum)*boost)));
+  const priorityList=p.priorityList||[p.priority];
+  const boostIdxs=[...new Set(priorityList.map(pr=>PRIORITY_BOOST_IDX[pr]).filter(i=>i!==undefined))];
+  if(boostIdxs.length){
+    const boostTotal=8;
+    const boostEach=boostTotal/boostIdxs.length;
+    const othersSum=pcts.reduce((s,v,i)=>boostIdxs.includes(i)?s:s+v,0);
+    pcts=pcts.map((v,i)=>boostIdxs.includes(i)?v+boostEach:Math.max(1,Math.round(v-(v/othersSum)*boostTotal)));
+    pcts=pcts.map(v=>Math.round(v));
   }
   let sum=pcts.reduce((a,b)=>a+b,0);
   pcts[pcts.length-1]+=(100-sum);
@@ -2567,7 +2678,24 @@ async function deleteSavedPlan(id){
   loadMyPlans();
 }
 
-function openExcelPaywall(){
+const PAYWALL_CONTENT={
+  excel:{icon:'📊🔒',
+    title:{es:'Descarga tu Excel editable',en:'Download your editable Excel'},
+    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of full access — one payment, yours forever.'}},
+  publish:{icon:'🌐🔒',
+    title:{es:'Publica tu invitación',en:'Publish your invitation'},
+    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) es parte del acceso completo — un solo pago, tuyo para siempre.',en:'Your own invitation site with a custom URL and RSVP is part of full access — one payment, yours forever.'}}
+};
+
+function openExcelPaywall(feature){
+  const c=PAYWALL_CONTENT[feature]||PAYWALL_CONTENT.excel;
+  document.getElementById('paywall-icon').textContent=c.icon;
+  const titleEl=document.getElementById('paywall-title');
+  titleEl.setAttribute('data-es',c.title.es); titleEl.setAttribute('data-en',c.title.en);
+  titleEl.textContent=c.title[lang];
+  const textEl=document.getElementById('paywall-text');
+  textEl.setAttribute('data-es',c.text.es); textEl.setAttribute('data-en',c.text.en);
+  textEl.textContent=c.text[lang];
   document.getElementById('excel-modal').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -2581,6 +2709,8 @@ function closeExcelPaywall(){
 //  ESTILOS DE MARCA PARA EL EXCEL
 // ══════════════════════════════
 const XL_TEAL='FF2EC4B6', XL_TEAL_DARK='FF0D6E65', XL_VIOLET='FF7B2FBE', XL_NAVY='FF0D1B2A', XL_CREAM='FFF6F1FA', XL_WHITE='FFFFFFFF', XL_BORDER='FFE0D5EE';
+const XL_CORAL='FFE8637A', XL_GOLD='FFD4972A', XL_GREEN='FF4CA36F', XL_BLUE='FF4A7FBE';
+const DASH_COLORS=[XL_TEAL, XL_VIOLET, XL_CORAL, XL_GREEN, XL_GOLD, XL_BLUE];
 
 function xlStyleHeader(row){
   row.eachCell(cell=>{
@@ -2681,10 +2811,11 @@ async function exportSpreadsheet(){
   dashTitle.alignment={vertical:'middle',horizontal:'center'};
   wsResumen.getRow(1).height=28;
 
-  // ── Fila de etiquetas de las estadísticas ──
+  // ── Fila de etiquetas de las estadísticas — cada una con su color ──
   const statLabels=[L?'Días para el evento':'Days to go',L?'Presupuesto':'Budget',L?'Gastado':'Spent',L?'Restante':'Left',L?'Invitados':'Guests',L?'Checklist':'Checklist'];
   const labelRow=wsResumen.addRow(statLabels);
-  labelRow.eachCell(c=>{ c.font={bold:true,size:9,color:{argb:XL_TEAL_DARK},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_CREAM}}; });
+  labelRow.eachCell((c,colNum)=>{ c.font={bold:true,size:9,color:{argb:XL_WHITE},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:DASH_COLORS[colNum-1]||XL_TEAL}}; });
+  labelRow.height=18;
 
   // ── Fila de valores (con fórmulas reales cuando aplica) ──
   const statValues=[
@@ -2696,14 +2827,22 @@ async function exportSpreadsheet(){
     totalChecklist?`${doneChecklist}/${totalChecklist}`:(L?'N/D':'N/A')
   ];
   const valueRow=wsResumen.addRow(statValues);
-  valueRow.eachCell(c=>{ c.font={bold:true,size:15,color:{argb:XL_NAVY},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_WHITE}}; c.border={bottom:{style:'medium',color:{argb:XL_TEAL}}}; });
-  valueRow.height=26;
+  valueRow.eachCell((c,colNum)=>{
+    const accent=DASH_COLORS[colNum-1]||XL_TEAL;
+    c.font={bold:true,size:16,color:{argb:accent},name:'Calibri'};
+    c.alignment={horizontal:'center'};
+    c.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_WHITE}};
+    c.border={bottom:{style:'medium',color:{argb:accent}},left:{style:'thin',color:{argb:XL_BORDER}},right:{style:'thin',color:{argb:XL_BORDER}}};
+  });
+  valueRow.height=28;
 
   wsResumen.addRow([]); // separador visual
 
   // ── Detalle del evento (igual que antes, con la celda de valor fusionada B:F) ──
+  const capFirst=s=>typeof s==='string'&&s.length?s.charAt(0).toUpperCase()+s.slice(1):s;
   resumen.forEach((r,i)=>{
-    const row=wsResumen.addRow(r);
+    const rowData=[r[0],capFirst(r[1])];
+    const row=wsResumen.addRow(rowData);
     const rowNum=row.number;
     wsResumen.mergeCells(`B${rowNum}:F${rowNum}`);
     row.getCell(1).font={bold:true,color:{argb:XL_TEAL_DARK},size:10.5,name:'Calibri'};
@@ -2856,7 +2995,7 @@ Estilo: ${p.vibe}
 
 GeneRe mi plan completo con IA: cronograma, presupuesto, checklist y Save the Date.
 
-Quieres el tuyo? -> dragonflai.events`
+Quieres el tuyo? -> dragonflaievents.com`
     :`*DragonflAI Events - My ${p.typeName}*
 
 Date: ${p.date}
@@ -2867,7 +3006,7 @@ Vibe: ${p.vibe}
 
 I created my complete event plan with AI: timeline, budget, checklist and Save the Date.
 
-Get yours -> dragonflai.events`;
+Get yours -> dragonflaievents.com`;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 
