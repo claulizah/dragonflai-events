@@ -252,19 +252,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .cl-item:not(.chk) .cl-text{text-decoration:line-through;color:var(--text-3)}
 .cl-text{font-size:14px;color:var(--text);line-height:1.5}
 .cl-cat{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--teal-dark);margin-top:1px}
-.vcard{cursor:pointer;position:relative}
-.vcard-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-gray);background:var(--white);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.vcard{position:relative}
+.vcard-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-gray);background:var(--white);display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer}
 .vcard.chk .vcard-check{background:var(--teal);border-color:transparent}
 .vcard.chk .vcard-check::after{content:'';width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
 .vcard:not(.chk){opacity:.45}
 
 /* ── VENDOR CARDS ── */
-.vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin:1rem 0}
+.vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:9px;margin:1rem 0}
 .vcard{background:var(--cream);border:1.5px solid var(--border-gray);border-radius:var(--radius);padding:14px;transition:all .2s}
-.vcard:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:var(--shadow-teal)}
+.vcard:hover{border-color:var(--teal);box-shadow:var(--shadow-teal)}
 .vcard-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-dark);margin-bottom:4px;padding-right:24px}
 .vcard-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
-.vcard-tip{font-size:12px;color:var(--text-2)}
+.vcard-tip{font-size:12px;color:var(--text-2);margin-bottom:.6rem}
+.vcard-inputs{display:flex;flex-direction:column;gap:6px}
+.vcard-input{width:100%;padding:7px 9px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:12px;background:var(--white);box-sizing:border-box}
+.btn-adjust-budget{display:block;width:100%;padding:12px;border-radius:var(--radius);border:1.5px dashed var(--teal);background:var(--teal-light);color:var(--teal-dark);font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:1.5rem;transition:all .2s}
+.btn-adjust-budget:hover{background:var(--teal);color:#fff}
+.bcard-real-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;color:#fff;background:var(--teal);padding:2px 7px;border-radius:100px;vertical-align:middle}
+.bcard.bcard-real{border-color:var(--teal)}
 
 /* ── SAVE THE DATE ── */
 .std-card{position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:1.25rem;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 2rem;background:#FFFFFF;border:1px solid var(--border-gray)}
@@ -295,7 +301,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-bg-dragonfly{position:absolute;font-size:180px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-55%);z-index:0;pointer-events:none;line-height:1}
 .std-content{position:relative;z-index:1;width:100%}
 .std-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
-.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.75rem;text-transform:uppercase}
+.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.75rem}
 .std-names em{font-style:italic;color:var(--teal)}
 .std-divider{display:flex;align-items:center;gap:12px;margin:1rem auto;width:200px}
 .std-divider::before,.std-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(46,196,182,.4),transparent)}
@@ -1038,6 +1044,14 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <label class="profile-label" data-es="Cómo llegar (opcional)" data-en="Directions (optional)">Cómo llegar (opcional)</label>
       <input type="text" id="pub-directions" class="profile-input" placeholder="ej. Entrada por Av. Reforma, estacionamiento gratis">
 
+      <div class="profile-section-divider" data-es="Lista de invitados (opcional)" data-en="Guest list (optional)">Lista de invitados (opcional)</div>
+      <p style="font-size:11.5px;color:var(--text-3);margin-bottom:.5rem" data-es="Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. 'Ana Pérez, 2')." data-en="One name per line. Add a comma and a number if they can bring companions (e.g. 'Ana Pérez, 2').">Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. "Ana Pérez, 2").</p>
+      <textarea id="pub-guest-list" class="profile-input" style="min-height:100px;resize:vertical" placeholder="Ana Pérez, 2&#10;Juan Gómez&#10;Familia López, 4"></textarea>
+      <label style="display:flex;align-items:center;gap:8px;margin:.5rem 0 .75rem;font-size:13px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="pub-restrict-list" style="width:16px;height:16px;cursor:pointer">
+        <span data-es="Solo las personas de esta lista pueden confirmar asistencia" data-en="Only people on this list can confirm attendance">Solo las personas de esta lista pueden confirmar asistencia</span>
+      </label>
+
       <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none">Publicar →</a>
     </div>
 
@@ -1074,7 +1088,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 //  CONFIG
 // ══════════════════════════════
 const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
-const MAX_GENERATIONS = 3;
+const MAX_GENERATIONS = 2;
 
 // Supabase dashboard → Settings → API
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';        // Project URL
@@ -1101,11 +1115,13 @@ let isPaid=false;
 let suppressPrefSave=false;
 let prefsApplied=false;
 
+let access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false};
+
 async function refreshPaidStatus(){
   if(!sb) return isPaid;
   const {data:{session}}=await sb.auth.getSession();
   currentUser=session?session.user:null;
-  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; updateAccountUI(); updateGenBadge(); return isPaid; }
+  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false}; updateAccountUI(); updateGenBadge(); return isPaid; }
 
   // Si veníamos de mandar el link mágico con un nombre escrito, lo guardamos
   // ahora que ya hay sesión.
@@ -1121,8 +1137,20 @@ async function refreshPaidStatus(){
 
   const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in').eq('id',currentUser.id).single();
   userProfile=data||{};
-  isPaid=!!userProfile.paid;
   currentUserName=userProfile.full_name||'';
+
+  const {data:accessData,error:accessError}=await sb.rpc('get_my_access_summary');
+  if(!accessError&&accessData){
+    access={
+      diyEventCredits:accessData.diy_event_credits||0,
+      diyUnlimitedActive:!!accessData.diy_unlimited_active,
+      plannerEventCredits:accessData.planner_event_credits||0,
+      plannerUnlimitedActive:!!accessData.planner_unlimited_active
+    };
+  }
+  // isPaid = "¿tiene cualquier acceso pagado activo?" — se usa para el badge de
+  // generaciones ilimitadas y para no seguir contando contra el límite gratis.
+  isPaid=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
 
   // Aplicar idioma/modo guardados — solo una vez por carga de página, para no
   // pelearse con cambios que el usuario haga manualmente después.
@@ -1278,8 +1306,9 @@ async function openPublishModal(){
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para publicar tu invitación':'Log in to publish your invitation',true); return; }
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
-  const paid=await refreshPaidStatus();
-  if(!paid){ openExcelPaywall('publish'); return; }
+  await refreshPaidStatus(); // trae el saldo real de créditos, sin gastar nada todavía
+  const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+  if(!hasAnyAccess){ openExcelPaywall('publish'); return; }
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
   document.getElementById('pub-domain-label').textContent=location.host+'/i/';
@@ -1313,20 +1342,34 @@ function closePublishModal(){
 
 let lastPublishedUrl='';
 
+function parseGuestList(text){
+  return text.split('\n').map(line=>line.trim()).filter(Boolean).map(line=>{
+    const parts=line.split(',');
+    const name=parts[0].trim();
+    const num=parts.length>1?parseInt(parts[1].trim(),10):0;
+    return {guest_name:name, max_companions: isNaN(num)?0:num};
+  }).filter(g=>g.guest_name);
+}
+
 async function publishInvitation(){
   if(!sb||!currentUser) return;
-  const paid=await refreshPaidStatus();
-  if(!paid){ closePublishModal(); openExcelPaywall('publish'); return; }
+  const result=await tryUnlockAccess('diy');
+  if(!result.success){ closePublishModal(); openExcelPaywall('publish'); return; }
   const slug=slugify(document.getElementById('pub-slug').value);
   if(!slug){ showToast(lang==='es'?'Escribe un link válido':'Enter a valid link',true); return; }
 
+  const publishedViaPlanner=result.method==='planner_credit'||result.method==='planner_unlimited';
   const p=plan, e=p.extra||{};
   const theme=pubSelectedTheme||'theme-teal';
+  const guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
+  const restrictToList=document.getElementById('pub-restrict-list').checked && guestListEntries.length>0;
 
   const payload={
     user_id: currentUser.id,
+    plan_id: plan._savedId||null,
     slug,
     is_published: true,
+    published_via_planner: publishedViaPlanner,
     host_names: p.name||'',
     event_type: p.typeName||'',
     event_date: p.date||'',
@@ -1343,15 +1386,23 @@ async function publishInvitation(){
     ask_song_request: document.getElementById('pub-ask-song').checked,
     ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
     directions_info: document.getElementById('pub-directions').value.trim()||null,
-    custom_question: document.getElementById('pub-custom-question').value.trim()||null
+    custom_question: document.getElementById('pub-custom-question').value.trim()||null,
+    restrict_to_guest_list: restrictToList
   };
 
-  const {error}=await sb.from('invitations').insert(payload);
+  const {data:newInv,error}=await sb.from('invitations').insert(payload).select().single();
   if(error){
     if(error.code==='23505') showToast(lang==='es'?'Ese link ya está en uso, prueba otro':'That link is taken, try another',true);
     else showToast((lang==='es'?'No se pudo publicar: ':'Could not publish: ')+(error.message||error.code||''),true);
     console.error('publishInvitation error:',error);
     return;
+  }
+
+  // Si el anfitrión pegó una lista de invitados, la guardamos ligada a esta invitación
+  if(guestListEntries.length>0 && newInv){
+    const rows=guestListEntries.map(g=>({invitation_id:newInv.id,guest_name:g.guest_name,max_companions:g.max_companions}));
+    const {error:glError}=await sb.from('guest_list').insert(rows);
+    if(glError) console.error('Error guardando lista de invitados:',glError);
   }
 
   lastPublishedUrl=`${location.origin}/i/${slug}`;
@@ -1507,7 +1558,16 @@ const T={
   },
   stress:{es:['Muy tranquilo/a','Un poco abrumado/a','Muy abrumado/a','¡Que lo haga la IA! 😭'],en:['Totally calm','A little overwhelmed','Very overwhelmed','Just do it for me 😭']},
   exp:{es:['Primera vez','He planeado 1-2 eventos','Tengo experiencia'],en:['First time','Planned 1–2 events','Experienced planner']},
-  priority:{es:['Respetar el presupuesto','Experiencia de invitados','Fotos y video perfectos','Algo único','Sin estrés'],en:['Staying on budget','Guest experience','Stunning photos','Unique & memorable','Stress-free']},
+  priority:{
+    'Boda/Wedding':{es:['Respetar el presupuesto','Experiencia de invitados','Fotos y video perfectos','Algo único y memorable','Sin estrés'],en:['Staying on budget','Guest experience','Stunning photos','Unique & memorable','Stress-free']},
+    'Cumpleaños/Birthday':{es:['Respetar el presupuesto','Que se diviertan los invitados','Fotos y video perfectos','Sorprender al festejado/a','Sin estrés'],en:['Staying on budget','Guests having fun','Stunning photos','Surprising the guest of honor','Stress-free']},
+    'Baby Shower':{es:['Respetar el presupuesto','Que la mamá se sienta especial','Fotos y video perfectos','Juegos y actividades memorables','Sin estrés'],en:['Staying on budget','Making mom feel special','Stunning photos','Memorable games & activities','Stress-free']},
+    'Corporativo/Corporate':{es:['Respetar el presupuesto','Imagen profesional de marca','Networking efectivo','Que todo salga puntual','Sin estrés'],en:['Staying on budget','Professional brand image','Effective networking','Everything on time','Stress-free']},
+    'Quinceañera':{es:['Respetar el presupuesto','Que se sienta como princesa','Fotos y video perfectos','El vals y el show sorpresa','Sin estrés'],en:['Staying on budget','Feeling like a princess','Stunning photos','The waltz & surprise show','Stress-free']},
+    'Graduación/Graduation':{es:['Respetar el presupuesto','Celebrar el logro en grande','Fotos y video perfectos','Que se diviertan los invitados','Sin estrés'],en:['Staying on budget','Celebrating the achievement big','Stunning photos','Guests having fun','Stress-free']},
+    'Aniversario/Anniversary':{es:['Respetar el presupuesto','Momento romántico e íntimo','Fotos y video perfectos','Sorprender a mi pareja','Sin estrés'],en:['Staying on budget','Romantic & intimate moment','Stunning photos','Surprising my partner','Stress-free']},
+    'Fiesta Infantil/Kids Party':{es:['Respetar el presupuesto','Que los niños se diviertan','Fotos y video perfectos','Tranquilidad de los papás','Sin estrés'],en:['Staying on budget','Kids having fun','Stunning photos','Peace of mind for parents','Stress-free']}
+  },
   mustHaves:{
     'Boda/Wedding':{es:['Música en vivo','Photo booth','Barra libre','DJ','Fuegos artificiales','Video','Arco floral','Mesa de postres','Ceremonia exterior','Valet','Brindis champán','Recuerdos'],en:['Live music','Photo booth','Open bar','DJ','Fireworks','Video','Floral arch','Dessert table','Outdoor ceremony','Valet','Champagne toast','Favors']},
     'Cumpleaños/Birthday':{es:['DJ','Pastel','Photo booth','Música en vivo','Barra libre','Globos','Juegos','Catering','Video','Confeti','Decoración temática','Entrada sorpresa'],en:['DJ','Custom cake','Photo booth','Live music','Open bar','Balloons','Games','Catering','Video','Confetti','Theme decor','Surprise entrance']},
@@ -1708,9 +1768,10 @@ function renderRadios(){
       `<span class="ropt${o===cur||(!radios[key]&&i===1)?' sel':''}" onclick="selRadio(this,'${key}')">${o}</span>`
     ).join('');
   });
-  // Prioridad: multi-select (puede elegir varias)
-  const pOpts=T.priority[lang];
-  if(!radios.priority||!radios.priority.length) radios.priority=[pOpts[0]];
+  // Prioridad: multi-select (puede elegir varias), ahora personalizada por tipo de evento
+  const pOpts=(T.priority[eventType]||T.priority['Boda/Wedding'])[lang];
+  // Si venimos de otro tipo de evento y ninguna selección previa existe en la lista nueva, reiniciar
+  if(!radios.priority||!radios.priority.length||!radios.priority.some(p=>pOpts.includes(p))) radios.priority=[pOpts[0]];
   document.getElementById('priority-opts').innerHTML=pOpts.map(o=>
     `<span class="ropt${radios.priority.includes(o)?' sel':''}" onclick="selPriority(this)">${o}</span>`
   ).join('');
@@ -1831,9 +1892,25 @@ function updateGenBadge(){
   }
 }
 
+let plannerCreditSpentThisSession=false;
+
 async function generate(){
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
-  if(!isPaid&&gensUsed>=MAX_GENERATIONS){showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;}
+
+  if(mode==='pro'){
+    if(!sb){showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true);return;}
+    if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para generar propuestas de cliente':'Log in to generate client proposals',true); return; }
+    if(!plannerCreditSpentThisSession && !access.plannerUnlimitedActive){
+      showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
+      const spend=await sb.rpc('spend_planner_credit');
+      const spendResult=spend.data;
+      if(!spendResult||!spendResult.success){ openExcelPaywall('planner'); return; }
+      plannerCreditSpentThisSession=true;
+      await refreshPaidStatus();
+    }
+  } else if(!isPaid&&gensUsed>=MAX_GENERATIONS){
+    showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;
+  }
 
   // Limpiar el plan anterior de todas las pestañas ANTES de generar el nuevo —
   // así nunca se ve contenido viejo mientras la IA está respondiendo.
@@ -1987,6 +2064,11 @@ function esc(s){
   return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// Convierte a Title Case: "ana & juan" -> "Ana & Juan", "FAFIS" -> "Fafis"
+function toTitleCase(s){
+  return String(s??'').toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase());
+}
+
 // ══════════════════════════════
 //  CONTEXTO COMPARTIDO PARA PROMPTS
 // ══════════════════════════════
@@ -2022,9 +2104,23 @@ function buildCtx(){
 // ══════════════════════════════
 //  PROMPT 1 (Sonnet, HTML): overview + ideas EN UNA SOLA LLAMADA
 // ══════════════════════════════
+function getSeason(dateStr,lang){
+  if(!dateStr) return '';
+  const m=new Date(dateStr+'T12:00:00').getMonth()+1; // 1-12
+  // Convención hemisferio norte (México/Latam/España) — ajustar si algún día se soporta hemisferio sur
+  let key;
+  if([12,1,2].includes(m)) key='winter';
+  else if([3,4,5].includes(m)) key='spring';
+  else if([6,7,8].includes(m)) key='summer';
+  else key='fall';
+  const names={es:{winter:'invierno',spring:'primavera',summer:'verano',fall:'otoño'},en:{winter:'winter',spring:'spring',summer:'summer',fall:'fall/autumn'}};
+  return names[lang==='es'?'es':'en'][key];
+}
+
 function buildCreativePrompt(){
   const p=plan;
   const {outLang,ctx}=buildCtx();
+  const season=getSeason(p.rawDate,p.lang);
   return `Return ONLY clean HTML for TWO sections, no markdown, no code fences, no preamble. Write ALL text in ${outLang}. Do not mix languages.
 ${ctx}
 
@@ -2036,7 +2132,7 @@ Use <h2>, <p>, <ul><li>, <strong>. Include: personalized intro, event snapshot a
 Reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".
 Use <h2>, <p>, <ul><li>:
 1. Signature moment
-2. Theme & decor (4-5 ideas)
+2. Theme & decor (4-5 ideas) — include ONE specific suggestion of flowers/florals that are naturally in season for ${season||"the event's time of year"} and that match the stated vibe/style. Present it as a general seasonal suggestion only — do NOT claim to have searched real florists, catalogs, or current prices; phrase it like "considera flores de temporada como..." / "consider seasonal flowers like...".
 3. Surprise elements (3)
 4. Personal touches (4, use details: "${p.notes||'none'}")
 5. Photo & video moments (3)
@@ -2127,10 +2223,31 @@ const BUDGET_CATS=[
   {es:'Fondo de Emergencia',en:'Emergency Fund',pct:7}
 ];
 const PRIORITY_BOOST_IDX={
+  // Boda
   'Experiencia de invitados':1,'Guest experience':1,
   'Fotos y video perfectos':2,'Stunning photos':2,
-  'Algo único':3,'Unique & memorable':3,
-  'Sin estrés':7,'Stress-free':7
+  'Algo único y memorable':3,'Unique & memorable':3,
+  'Sin estrés':7,'Stress-free':7,
+  // Cumpleaños
+  'Que se diviertan los invitados':3,'Guests having fun':3,
+  'Sorprender al festejado/a':0,'Surprising the guest of honor':0,
+  // Baby Shower
+  'Que la mamá se sienta especial':0,'Making mom feel special':0,
+  'Juegos y actividades memorables':3,'Memorable games & activities':3,
+  // Corporativo
+  'Imagen profesional de marca':0,'Professional brand image':0,
+  'Networking efectivo':1,'Effective networking':1,
+  // Quinceañera
+  'Que se sienta como princesa':4,'Feeling like a princess':4,
+  'El vals y el show sorpresa':3,'The waltz & surprise show':3,
+  // Graduación
+  'Celebrar el logro en grande':0,'Celebrating the achievement big':0,
+  // Aniversario
+  'Momento romántico e íntimo':0,'Romantic & intimate moment':0,
+  'Sorprender a mi pareja':0,'Surprising my partner':0,
+  // Fiesta Infantil
+  'Que los niños se diviertan':3,'Kids having fun':3,
+  'Tranquilidad de los papás':7,'Peace of mind for parents':7
 };
 
 function buildBudget(){
@@ -2309,8 +2426,9 @@ function buildDayItinerary(){
 
 function renderDayItinerary(items){
   if(!Array.isArray(items)||!items.length) return '';
-  const rows=items.map(t=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-when">${esc(t.time)}</div><div class="tl-what">${esc(t.what)}</div></div>`).join('');
-  return `<div class="timeline">${rows}</div>`;
+  const hint=`<div class="std-edit-hint">✏️ ${plan.lang==='es'?'Haz clic en cualquier hora o actividad para editarla':'Click any time or activity to edit it'}</div>`;
+  const rows=items.map(t=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-when std-editable" contenteditable="true">${esc(t.time)}</div><div class="tl-what std-editable" contenteditable="true">${esc(t.what)}</div></div>`).join('');
+  return hint+`<div class="timeline">${rows}</div>`;
 }
 
 // ── CHECKLIST ──
@@ -2504,7 +2622,7 @@ Tone: professional, warm and exclusive. Make the client feel their event is in t
 function renderBudget(items,tips,paquete){
   if(!Array.isArray(items)||!items.length) return '';
   const L=plan.lang==='es';
-  const cards=items.map(b=>`<div class="bcard"><div class="bcard-label">${esc(b.label)}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div></div>`).join('');
+  const cards=items.map(b=>`<div class="bcard${b.isReal?' bcard-real':''}"><div class="bcard-label">${esc(b.label)}${b.isReal?` <span class="bcard-real-tag">✓ ${L?'Real':'Actual'}</span>`:''}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div></div>`).join('');
   const tipsHtml=(tips||[]).map(t=>`<li>${esc(t)}</li>`).join('');
   return `<div class="bcards">${cards}</div><h2>${L?'Consejos de presupuesto':'Budget tips'}</h2><ul>${tipsHtml}</ul><h2>${L?'Opción paquete todo incluido':'All-inclusive package option'}</h2><p>${esc(paquete||'')}</p>`;
 }
@@ -2545,20 +2663,106 @@ function renderVendors(items,questions,negotiation){
   const L=plan.lang==='es';
   const cards=items.map((v,vi)=>{
     if(v.selected===undefined) v.selected=true; // por defecto vienen incluidos; el usuario quita los que no necesite
-    return `<div class="vcard${v.selected?' chk':''}" data-i="${vi}" onclick="toggleVendorItem(this)"><div class="vcard-check"></div><div class="vcard-type">${esc(v.type)}</div><div class="vcard-name">${esc(v.name)}</div><div class="vcard-tip">${esc(v.tip)}</div></div>`;
+    return `<div class="vcard${v.selected?' chk':''}" data-i="${vi}">
+      <div class="vcard-check" onclick="toggleVendorItem(this)"></div>
+      <div class="vcard-type">${esc(v.type)}</div>
+      <div class="vcard-name">${esc(v.name)}</div>
+      <div class="vcard-tip">${esc(v.tip)}</div>
+      <div class="vcard-inputs">
+        <input type="number" min="0" class="vcard-input" placeholder="${L?'Precio cotizado':'Quoted price'}" value="${v.quotedPrice||''}" oninput="plan.vendorsData[${vi}].quotedPrice=this.value">
+        <select class="vcard-input" onchange="plan.vendorsData[${vi}].availability=this.value">
+          <option value="" ${!v.availability?'selected':''}>${L?'¿Disponible?':'Available?'}</option>
+          <option value="yes" ${v.availability==='yes'?'selected':''}>${L?'Sí, disponible':'Yes, available'}</option>
+          <option value="no" ${v.availability==='no'?'selected':''}>${L?'No disponible':'Not available'}</option>
+          <option value="unknown" ${v.availability==='unknown'?'selected':''}>${L?'Aún no sé':'Not sure yet'}</option>
+        </select>
+        <input type="text" class="vcard-input" placeholder="${L?'Notas':'Notes'}" value="${esc(v.notes||'')}" oninput="plan.vendorsData[${vi}].notes=this.value">
+      </div>
+    </div>`;
   }).join('');
   const qs=(questions||[]).map(q=>`<li>${esc(q)}</li>`).join('');
   const neg=(negotiation||[]).map(n=>`<li>${esc(n)}</li>`).join('');
-  const hint=L?'Deselecciona los que no necesites — solo se incluyen en tu Excel los que dejes marcados.':'Deselect the ones you don\'t need — only the ones left checked are included in your Excel.';
-  return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p><div class="vcards">${cards}</div><h2>${L?'Preguntas para proveedores':'Vendor questions'}</h2><ul>${qs}</ul><h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
+  const hint=L?'Deselecciona los que no necesites, y captura el precio real que te coticen — solo se incluyen en tu Excel los que dejes marcados.':'Deselect the ones you don\'t need, and enter the real price you get quoted — only the ones left checked are included in your Excel.';
+  return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>
+    <div class="vcards">${cards}</div>
+    <button class="btn-adjust-budget" onclick="adjustBudgetWithQuotes()">🔄 ${L?'Ajustar presupuesto con estas cotizaciones':'Adjust budget with these quotes'}</button>
+    <h2>${L?'Preguntas para proveedores':'Vendor questions'}</h2><ul>${qs}</ul><h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
 }
 
 function toggleVendorItem(el){
-  const vi=+el.dataset.i;
+  const card=el.closest('.vcard');
+  const vi=+card.dataset.i;
   const item=plan.vendorsData?.[vi];
   if(!item) return;
   item.selected=!item.selected;
-  el.classList.toggle('chk',item.selected);
+  card.classList.toggle('chk',item.selected);
+}
+
+// Mapea cada tipo de proveedor a su categoría correspondiente de BUDGET_CATS (índice)
+const VENDOR_TO_BUDGET_IDX={
+  'Fotografía y Video':2,'Photography & Video':2,
+  'Música / DJ':3,'Music / DJ':3,
+  'Catering':1,
+  'Decoración y Flores':0,'Decor & Flowers':0,
+  'Lugar del Evento':0,'Venue':0,
+  'Transporte':6,'Transportation':6,
+  'Coordinador de Evento':6,'Event Coordinator':6,
+  'Mobiliario y Renta':0,'Furniture & Rentals':0
+};
+
+function adjustBudgetWithQuotes(){
+  const L=lang==='es';
+  const vendors=plan.vendorsData||[];
+  const quoted=vendors.filter(v=>v.selected!==false && v.quotedPrice && parseFloat(v.quotedPrice)>0);
+  if(!quoted.length){ showToast(L?'Captura al menos un precio cotizado primero':'Enter at least one quoted price first',true); return; }
+  if(!Array.isArray(plan.budgetData)||!plan.budgetData.length){ showToast(L?'Genera tu plan primero':'Generate your plan first',true); return; }
+
+  const total=parseInt(plan.budget)||0;
+  const budget=plan.budgetData;
+
+  // Sumar cotizaciones reales por categoría de presupuesto (puede haber varios proveedores en la misma categoría)
+  const realByIdx={};
+  quoted.forEach(v=>{
+    const idx=VENDOR_TO_BUDGET_IDX[v.type];
+    if(idx===undefined) return;
+    realByIdx[idx]=(realByIdx[idx]||0)+parseFloat(v.quotedPrice);
+  });
+
+  const realIdxs=Object.keys(realByIdx).map(Number);
+  if(!realIdxs.length){ showToast(L?'Ninguno de los precios capturados corresponde a una categoría de presupuesto reconocida':'None of the entered prices match a recognized budget category',true); return; }
+
+  const realTotal=realIdxs.reduce((s,i)=>s+realByIdx[i],0);
+  const remaining=total-realTotal;
+
+  if(remaining<0){
+    showToast(L?'⚠️ Tus cotizaciones ya suman más que tu presupuesto total':'⚠️ Your quotes already exceed your total budget',true);
+  }
+
+  // Categorías SIN cotización real: mantener su proporción relativa entre ellas, repartiendo lo que quede del presupuesto
+  const otherIdxs=budget.map((_,i)=>i).filter(i=>!realIdxs.includes(i));
+  const otherOriginalSum=otherIdxs.reduce((s,i)=>s+budget[i].amount,0)||1;
+
+  const newBudget=budget.map((b,i)=>{
+    if(realIdxs.includes(i)){
+      const amt=Math.round(realByIdx[i]);
+      return {...b,amount:amt,pct:total>0?Math.round(amt/total*100):0,isReal:true};
+    }
+    const share=remaining>0?(b.amount/otherOriginalSum)*Math.max(0,remaining):0;
+    const amt=Math.round(share);
+    return {...b,amount:amt,pct:total>0?Math.round(amt/total*100):0,isReal:false};
+  });
+
+  // Ajuste de redondeo en la última categoría SIN cotización real, para que sume exacto al total y al 100%
+  const sumAmt=newBudget.reduce((s,b)=>s+b.amount,0);
+  const lastOtherIdx=otherIdxs.length?otherIdxs[otherIdxs.length-1]:newBudget.length-1;
+  newBudget[lastOtherIdx].amount+=(total-sumAmt);
+  newBudget.forEach(b=>{ b.pct=total>0?Math.round(b.amount/total*100):0; });
+  const sumPct=newBudget.reduce((s,b)=>s+b.pct,0);
+  newBudget[lastOtherIdx].pct+=(100-sumPct);
+
+  plan.budgetData=newBudget;
+  setTabHTML('budget',renderBudget(newBudget,plan.budgetTips,plan.paqueteInfo));
+  showToast(L?'✅ Presupuesto actualizado con tus cotizaciones reales — revisa la pestaña Presupuesto':'✅ Budget updated with your real quotes — check the Budget tab');
 }
 
 // ══════════════════════════════
@@ -2593,18 +2797,41 @@ async function savePlanToAccount(){
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para guardar tu plan':'Log in to save your plan',true); return; }
 
+  const id=await ensurePlanSaved();
+  if(id) showToast(lang==='es'?'💾 Plan guardado':'💾 Plan saved');
+}
+
+// Guarda el plan si aún no existe en la base de datos, y regresa su id.
+// Si ya se había guardado antes en esta sesión, solo regresa el id que ya teníamos.
+async function ensurePlanSaved(){
+  if(plan._savedId) return plan._savedId;
+  if(!sb||!currentUser) return null;
+
   const tabsHtml={};
   tabKeys.forEach(k=>{ const el=document.getElementById('content-'+k); if(el) tabsHtml[k]=el.innerHTML; });
 
   const title=`${plan.typeName}${plan.name?' — '+plan.name:''}`;
-  const {error}=await sb.from('plans').insert({
+  const {data,error}=await sb.from('plans').insert({
     user_id:currentUser.id,
     title,
     event_type:plan.typeName,
     plan_data:{plan,tabsHtml,mode}
-  });
-  if(error){ showToast(lang==='es'?'No se pudo guardar tu plan':'Could not save your plan',true); return; }
-  showToast(lang==='es'?'💾 Plan guardado':'💾 Plan saved');
+  }).select().single();
+  if(error){ showToast(lang==='es'?'No se pudo guardar tu plan':'Could not save your plan',true); return null; }
+  plan._savedId=data.id;
+  return data.id;
+}
+
+// Intenta desbloquear una función paga (Excel, invitación, o propuesta) para el plan actual.
+// Guarda el plan automáticamente si hace falta, y gasta un crédito solo si es necesario.
+async function tryUnlockAccess(accessType){
+  if(!sb||!currentUser) return {success:false,reason:'not_logged_in'};
+  const planId=await ensurePlanSaved();
+  if(!planId) return {success:false,reason:'save_failed'};
+  const {data,error}=await sb.rpc('unlock_plan_access',{p_plan_id:planId,p_access_type:accessType});
+  if(error){ console.error('unlock_plan_access error:',error); return {success:false,reason:'rpc_error'}; }
+  if(data&&data.success) await refreshPaidStatus(); // refrescar el saldo de créditos visible
+  return data||{success:false,reason:'unknown'};
 }
 
 function openMyPlans(){
@@ -2652,6 +2879,7 @@ async function loadSavedPlan(id){
   if(error||!data){ showToast(lang==='es'?'No se pudo abrir el plan':'Could not open the plan',true); return; }
   const saved=data.plan_data||{};
   plan=saved.plan||{};
+  plan._savedId=id; // ya existe en la base de datos — reutilizar este id, no crear uno nuevo
   if(saved.mode) setMode(saved.mode);
 
   // Limpiar TODAS las pestañas primero — si no, el contenido de un plan
@@ -2681,10 +2909,13 @@ async function deleteSavedPlan(id){
 const PAYWALL_CONTENT={
   excel:{icon:'📊🔒',
     title:{es:'Descarga tu Excel editable',en:'Download your editable Excel'},
-    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of full access — one payment, yours forever.'}},
+    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso DIY — desde $179 por evento, o ilimitado por un año.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
   publish:{icon:'🌐🔒',
     title:{es:'Publica tu invitación',en:'Publish your invitation'},
-    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) es parte del acceso completo — un solo pago, tuyo para siempre.',en:'Your own invitation site with a custom URL and RSVP is part of full access — one payment, yours forever.'}}
+    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) es parte del acceso DIY — desde $179 por evento, o ilimitado por un año.',en:'Your own invitation site with a custom URL and RSVP is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
+  planner:{icon:'💼🔒',
+    title:{es:'Genera propuestas para tus clientes',en:'Generate client proposals'},
+    text:{es:'El modo Planner (propuestas de cliente, y todo lo de DIY incluido) es parte del acceso Planner — paquetes desde $249, o ilimitado por un año.',en:'Planner mode (client proposals, plus everything in DIY) is part of Planner access — packages from $249 MXN, or unlimited for a year.'}}
 };
 
 function openExcelPaywall(feature){
@@ -2751,9 +2982,11 @@ function xlAddSheet(wb,name,header,rows,widths){
 
 async function exportSpreadsheet(){
   if(!plan.typeName){showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true);return;}
+  if(!sb){showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true);return;}
+  if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para descargar tu Excel':'Log in to download your Excel',true); return; }
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
-  const paid=await refreshPaidStatus(); // verdad del servidor, no la variable en memoria
-  if(!paid){openExcelPaywall();return;}
+  const result=await tryUnlockAccess('diy');
+  if(!result.success){openExcelPaywall('excel');return;}
   if(typeof ExcelJS==='undefined'){showToast(lang==='es'?'No se pudo cargar el generador de Excel':'Could not load Excel generator',true);return;}
 
   const L=lang==='es';
@@ -2772,7 +3005,7 @@ async function exportSpreadsheet(){
 
   const resumen=[
     [L?'Evento':'Event',plan.typeName],
-    [L?'Anfitrión':'Host',(plan.name||'').toUpperCase()],
+    [L?'Anfitrión':'Host',toTitleCase(plan.name)],
     [L?'Fecha':'Date',plan.date],
     [L?'Hora':'Time',plan.time||''],
     [L?'Lugar':'Venue',plan.location],
@@ -3010,17 +3243,43 @@ Get yours -> dragonflaievents.com`;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 
-function copySTD(){
+function getSTDText(){
   const card=document.querySelector('.std-card');
-  if(!card) return;
-  navigator.clipboard.writeText(card.innerText).then(()=>showToast(lang==='es'?'📋 Save the Date copiado':'📋 Copied!'));
+  if(!card) return '';
+  const get=sel=>{ const el=card.querySelector(sel); return el?el.textContent.trim():''; };
+  const names=get('.std-names');
+  const date=get('[data-field="date"]');
+  const location=get('[data-field="location"]');
+  const time=get('[data-field="time"]');
+  const dresscode=get('[data-field="dresscode"]');
+  const message=get('[data-field="message"]');
+  const hashtag=get('[data-field="hashtag"]');
+  const title=lang==='es'?'Aparta la Fecha':'Save the Date';
+  const lines=[
+    `— ${title} — ${names}`,
+    '',
+    date?`📅 ${date}`:'',
+    location?`📍 ${location}`:'',
+    time?`🕕 ${time}`:'',
+    dresscode?`👔 ${dresscode}`:'',
+    '',
+    message,
+    hashtag
+  ].filter(l=>l!=='');
+  return lines.join('\n');
+}
+
+function copySTD(){
+  const txt=getSTDText();
+  if(!txt) return;
+  navigator.clipboard.writeText(txt).then(()=>showToast(lang==='es'?'📋 Save the Date copiado':'📋 Copied!'));
 }
 
 function shareSTDWA(){
-  const card=document.querySelector('.std-card');
-  if(!card) return;
-  const txt='💌 '+card.innerText.trim()+'\n\n— DragonflAI Events';
-  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+  const txt=getSTDText();
+  if(!txt) return;
+  const full=txt+'\n\n— DragonflAI Events';
+  window.open('https://wa.me/?text='+encodeURIComponent(full),'_blank');
 }
 
 function setSTDTheme(theme,el){

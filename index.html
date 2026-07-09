@@ -1,3 +1,247 @@
+
+/
+Claude finished the response
+Que links de stripe necesito generar?
+
+
+Inventoried cinco productos y delineó proceso para generar enlaces
+Inventoried cinco productos y delineó proceso para generar enlaces
+Necesitas generar 5 Payment Links, uno por cada producto que ya tienes en el catálogo (modo Live, no Test, ya que vas a cobrar de verdad):
+
+Los 5 links a crear
+#	Producto	Precio
+1	DIY — 1 evento	$179 MXN
+2	DIY — Anual	$299 MXN
+3	Planner - 3 eventos	$249 MXN
+4	Planner — 10 eventos	$399 MXN
+5	Planner — Anual	$599 MXN
+Cómo crear cada uno
+Stripe Dashboard (en modo Live) → Catálogo de productos
+Entra al producto (ej. "DIY — 1 evento")
+Busca el botón "Crear enlace de pago" (o el ⋯ de opciones → "Create payment link")
+Confirma que diga "Enlaces de pago para compartir" (el mismo tipo que ya configuramos antes, no Checkout ni Elements)
+Dale Crear — te va a dar una URL tipo https://buy.stripe.com/xxxxxxx
+Repite para los otros 4
+Un detalle importante — no necesitas configurar nada especial para client_reference_id
+El código ya se encarga de esto automáticamente: cuando el usuario le da clic a comprar, la app le pega el ID de su cuenta directo a la URL del link (tu-link.com?client_reference_id=abc123...) — Stripe lo reconoce solo, sin que tengas que activar nada en el dashboard para eso.
+
+Cuando tengas los 5 links
+Mándamelos (o solo dime que ya los tienes) y seguimos con la parte que quedó pendiente: construir la pantalla de precios con los 5 planes y sus botones, conectando cada uno a su link correspondiente.
+
+1DIY — 1 evento$179 MXN - https://buy.stripe.com/cNibJ295kbD49N6bPtdEs00
+2DIY — Anual$299 MXN - https://buy.stripe.com/9B68wQa9o7mO2kEaLpdEs01
+3Planner - 3 eventos$249 MXN - https://buy.stripe.com/aFa5kE81g22ugbudXBdEs02
+4Planner — 10 eventos$399 MXN - https://buy.stripe.com/aFa5kE81g22ugbudXBdEs02
+5Planner — Anual$599 MXN - https://buy.stripe.com/aFa5kE81g22ugbudXBdEs02
+
+Show more
+
+Detected duplicate payment links requiring verification before proceeding
+Detected duplicate payment links requiring verification before proceeding
+Antes de conectar nada — encontré un problema: los links #3, #4 y #5 son exactamente el mismo (.../aFa5kE81g22ugbudXBdEs02). Probablemente fue un error al copiar/pegar la lista.
+
+Esto es importante corregir porque, aunque en tu app se vean 3 botones distintos ("Planner 3 eventos", "10 eventos", "Anual"), si los 3 apuntan al mismo Payment Link, los 3 cobrarían lo mismo y darían el mismo producto (el que sea que tenga configurado ese link específico — probablemente terminaría dándole solo 3 créditos a alguien que creyó comprar el paquete de 10 o el anual).
+
+¿Puedes regresar a Stripe y confirmarme los links correctos de:
+
+Planner — 10 eventos ($399)
+Planner — Anual ($599)
+Revisa en Catálogo de productos → [ese producto] → pestaña de "Payment Links" (o donde te muestre los enlaces ya creados para ese producto específico) para copiar el correcto de cada uno, en vez de la lista general.
+
+Mientras tanto, estos 3 ya están confirmados y listos para conectar:
+
+#	Producto	Link
+1	DIY — 1 evento	✅ cNibJ295kbD49N6bPtdEs00
+2	DIY — Anual	✅ 9B68wQa9o7mO2kEaLpdEs01
+3	Planner - 3 eventos	✅ aFa5kE81g22ugbudXBdEs02
+1DIY — 1 evento$179 MXN - https://buy.stripe.com/cNibJ295kbD49N6bPtdEs00
+2DIY — Anual$299 MXN - https://buy.stripe.com/9B68wQa9o7mO2kEaLpdEs01
+3Planner - 3 eventos$249 MXN - https://buy.stripe.com/aFa5kE81g22ugbudXBdEs02
+4Planner — 10 eventos$399 MXN - https://buy.stripe.com/5kQaEY3L0cH88J206LdEs04
+5Planner — Anual$599 MXN - https://buy.stripe.com/5kQ3cw1CS5eG7EY5r5dEs03
+
+Show more
+
+Architected tiered pricing UI with DIY and Planner categories
+Architected tiered pricing UI with DIY and Planner categories
+Los 5 links ya están correctos y son únicos. Ahora construyo la pantalla de precios completa con los 6 planes (incluyendo el gratis), organizados en dos columnas — DIY y Planner, igual que ya separa la app misma:
+
+
+Verified file structure to prevent content duplication
+Verified file structure to prevent content duplication
+Ahora agrego el CSS del toggle DIY/Planner:
+
+
+Orchestrated JavaScript refactoring and modal removal workflow
+Orchestrated JavaScript refactoring and modal removal workflow
+Ahora actualizo el JS: el mapa de 5 links, goToPay(), y la función del toggle. Primero veo la config actual:
+
+
+Viewed a file, edited a file
+Viewed a file, edited a file
+Ahora reescribo goToPay() y agrego showPricingGroup(), eliminando el modal viejo de un solo producto:
+
+
+Planificó eliminar modal antiguo y redirigir botón a precios
+Planificó eliminar modal antiguo y redirigir botón a precios
+Ahora quito el HTML del modal viejo y actualizo el botón del banner de "planes agotados":
+
+
+Diseñando pruebas funcionales para validar comportamiento DOM
+Diseñando pruebas funcionales para validar comportamiento DOM
+Sí, esos son los mismos 5 links que ya estoy conectando ahora mismo — seguimos con lo mismo. Termino de conectar el banner de "planes agotados" (antes abría el modal viejo que ya quitamos) para que en su lugar lleve directo a la sección de precios:
+
+
+El botón del banner ahora lleva a la sección de precios en vez de abrir el modal que ya no existe
+El botón del banner ahora lleva a la sección de precios en vez de abrir el modal que ya no existe
+Ahora reviso que no quede ninguna referencia colgante a openModal/closeModal/STRIPE_PAYMENT_LINK:
+
+
+Buscar referencias colgantes a las funciones/variables eliminadas
+Buscar referencias colgantes a las funciones/variables eliminadas
+Limpio, sin referencias colgantes. Valido todo el archivo:
+
+
+Verified DOM element references and pricing flow logic
+Verified DOM element references and pricing flow logic
+Confirmo que todos los IDs que usa el JS nuevo existen en el HTML:
+
+
+Verificar que todos los IDs referenciados en JS existen en el HTML
+Verificar que todos los IDs referenciados en JS existen en el HTML
+Todos existen exactamente una vez. Copio el archivo final:
+
+
+Ran a command, read a file
+Ran a command, read a file
+Pantalla de precios lista, con los 5 links conectados
+Lo que cambió:
+
+Sección de precios rediseñada con un toggle "Para mi evento (DIY)" / "Soy planner profesional" — cada uno muestra sus 3 planes correspondientes
+Los 6 botones de compra están conectados a sus links reales de Stripe
+Se quitó el modal viejo de un solo producto (ya no aplicaba, con 5 productos distintos cada botón va directo a su propio Payment Link)
+El banner de "planes agotados" ahora te lleva directo a la sección de precios en vez de abrir un modal que ya no existe
+Validado: sintaxis limpia, tags balanceados, 129 pares de traducción sin ninguno vacío, y confirmé que los 5 IDs que usa el JS nuevo existen exactamente donde deben.
+
+Con esto, el sistema completo ya está armado de principio a fin:
+✅ Base de datos (créditos, RLS, funciones) — probado con Postgres real
+✅ Worker (lee metadata de Stripe, aplica créditos) — probado con 4 escenarios
+✅ Frontend de la app (candados de Excel/Invitación/Planner)
+✅ Pantalla de precios con los 6 planes y sus links reales
+Lo que falta para probarlo en vivo
+Subir index.html, dragonflai-v2.html, invitacion.html a Netlify
+Actualizar el Worker en Cloudflare con el worker.js nuevo + agregar la variable STRIPE_SECRET_KEY
+Confirmar que el webhook de Stripe (modo Live) ya apunta a tu Worker con el evento checkout.session.completed
+Hacer una compra de prueba real (la más barata, "DIY — 1 evento" a $179) y confirmar que el crédito llega a tu cuenta
+¿Quieres que revisemos juntos la configuración del webhook antes de que hagas la primera compra de prueba, o prefieres intentarlo y me dices qué pasa?
+
+
+Index
+Code · HTML 
+podriamos hacerlo juntos?
+
+
+Orchestrated step-by-step Stripe webhook configuration walkthrough
+Orchestrated step-by-step Stripe webhook configuration walkthrough
+Vamos paso a paso. Empecemos por confirmar/crear el webhook en Stripe (modo Live, no Test).
+
+Paso 1 — Crear el webhook en Stripe
+Ve a Stripe Dashboard (asegúrate que el toggle arriba diga "Modo Live", no "Modo de prueba")
+Busca Desarrolladores (o "Developers") en el menú → Webhooks
+Clic en "Agregar endpoint" / "Add endpoint"
+En URL del endpoint, pon:
+   https://dragonflai-worker.clauliz-acosta.workers.dev/stripe-webhook
+En "Escuchar eventos" / "Select events to listen to", busca y marca únicamente:
+   checkout.session.completed
+Guarda / Crea el endpoint
+Paso 2 — Copiar el secreto de firma
+Una vez creado, Stripe te va a mostrar (o lo verás al entrar al webhook recién creado) un "Signing secret" que empieza con whsec_...
+
+Cópialo — lo vamos a necesitar para el Worker en el siguiente paso, pero no lo pegues aquí en el chat (es sensible, aunque menos crítico que la clave secreta general — de todas formas, mejor que solo tú lo veas).
+
+¿Ya tienes el webhook creado y el whsec_... a la mano? Cuando lo tengas, seguimos con configurar las variables en Cloudflare (ahí sí te digo exactamente qué pegar en cada campo, sin que tengas que compartirme los valores).
+
+1783638832955_image.png
+me muestra asi , no encuentro webhooks
+
+
+Identificó interfaz nueva de Stripe y reubicó webhooks correctamente
+Identificó interfaz nueva de Stripe y reubicó webhooks correctamente
+Ahí estás en la página de configuración general de Desarrolladores — Stripe movió los Webhooks a otro lugar en su interfaz nueva (Workbench). Déjame confirmar la ruta exacta actual:
+
+
+Searched the web
+Searched the web
+Claude's response was interrupted.
+1783638929224_image.png
+Perfecto, ya llegaste a "Crea un destino de evento" (así se llama ahora el webhook en la interfaz nueva). Confirmado que Stripe cambió los términos: "destino de evento" = webhook.
+
+Lo que necesitas hacer aquí
+En el buscador de arriba ("Buscar evento por nombre o descripción...") escribe:
+   checkout.session.completed
+Va a aparecer una categoría llamada "Checkout Session" (o similar) — ábrela con la flechita ›
+Dentro, marca únicamente el evento checkout.session.completed (no marques "Selecciona todo" — solo necesitas ese uno)
+Dale Continuar →
+Después de esto, Stripe te va a pedir 2 cosas más:
+Tipo de destino → elige "Webhook endpoint" (no Amazon EventBridge ni Azure)
+URL del endpoint → pega exactamente:
+   https://dragonflai-worker.clauliz-acosta.workers.dev/stripe-webhook
+Al final, Stripe te va a mostrar la página del destino ya creado, con una sección "Signing secret" (o "Secreto de firma") con un botón para revelarlo — ese es el whsec_... que necesitamos para el siguiente paso.
+
+¿Encuentras el evento al buscarlo?
+
+nombre del destino y descripcion?
+
+
+Flagged sensitive credential and planned secure configuration steps
+Flagged sensitive credential and planned secure configuration steps
+Antes de seguir — un aviso importante: este secreto (whsec_...) es lo que usa el Worker para verificar que un pago de verdad viene de Stripe. Si alguien más lo obtiene, técnicamente podría fabricar un pago falso y darse créditos gratis sin pagar. No pasa nada grave por haberlo compartido aquí conmigo, pero de ahora en adelante evita pegar este tipo de valores en chats o lugares que no sean directamente donde se usan (igual que con la clave secreta de Stripe).
+
+Ahora sí, vamos a ponerlo donde debe vivir — Cloudflare, no aquí.
+
+Configurar las variables del Worker en Cloudflare
+Ve a Cloudflare Dashboard → Workers & Pages → tu Worker (dragonflai-worker)
+Settings → Variables and Secrets (o "Variables y Secretos")
+Confirma/agrega estas 5 variables:
+Variable	Valor
+ANTHROPIC_API_KEY	Ya la tienes de antes — no la toques
+SUPABASE_URL	Ya la tienes de antes — no la toques
+SUPABASE_SERVICE_ROLE_KEY	Ya la tienes de antes — no la toques
+STRIPE_WEBHOOK_SECRET	El whsec_... que acabas de generar
+STRIPE_SECRET_KEY	Nueva — la clave secreta de tu cuenta Live (Stripe → Desarrolladores/Claves API → "Clave secreta", empieza con sk_live_...)
+Marca STRIPE_WEBHOOK_SECRET y STRIPE_SECRET_KEY como "Encrypt" / "Secreto" si Cloudflare te da esa opción (para que no queden visibles en texto plano ni siquiera para ti después)
+Guarda/despliega
+Después de eso
+También necesitas actualizar el código del Worker con la versión nueva (worker.js que ya te generé) — ¿ya lo subiste a Cloudflare, o falta ese paso?
+
+en que parte cargo el nuevo worker?
+
+
+Formuló instrucciones paso a paso para desplegar código
+Formuló instrucciones paso a paso para desplegar código
+Dónde actualizar el código del Worker
+Ve a Cloudflare Dashboard → Workers & Pages
+Entra a tu Worker (dragonflai-worker)
+Busca la pestaña "Edit code" (o "Editar código") — a veces está arriba como botón, a veces dentro de una pestaña llamada "Quick edit"
+Se abre un editor con tu código actual (el viejo)
+Selecciona todo el código actual y bórralo (Ctrl+A / Cmd+A, luego Supr)
+Pega el contenido completo del worker.js nuevo que te generé
+Dale "Save and deploy" (o "Guardar y desplegar")
+Un detalle importante — hazlo en este orden
+Guarda primero las variables (el paso anterior: STRIPE_WEBHOOK_SECRET y STRIPE_SECRET_KEY) antes de desplegar el código nuevo, o justo después — pero asegúrate de que ambas cosas (variables + código) queden listas antes de intentar una compra de prueba, porque el código nuevo depende de que STRIPE_SECRET_KEY ya exista para poder leer qué producto se compró.
+
+¿Ya tienes el archivo worker.js a la mano (te lo compartí hace unas cuantas respuestas), o te lo vuelvo a mandar para que lo copies más fácil?
+
+
+
+
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+
+
+Index · HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -19,7 +263,7 @@
   --cream-2:#F3F1EE;
   --cream-3:#EAE7E2;
   --white:#FFFFFF;
-
+ 
   /* Marca */
   --teal:#2EC4B6;
   --teal-dark:#1A9E92;
@@ -30,22 +274,22 @@
   --violet-light:rgba(123,47,190,.1);
   --gold:#D4972A;
   --gold-light:rgba(212,151,42,.12);
-
+ 
   /* Texto */
   --text:#1A1A2E;
   --text-2:#4A4A6A;
   --text-3:#8A8AAA;
-
+ 
   /* Bordes */
   --border:rgba(46,196,182,.2);
   --border-strong:rgba(46,196,182,.5);
   --border-gray:rgba(0,0,0,.08);
-
+ 
   /* Sombras */
   --shadow-sm:0 1px 4px rgba(0,0,0,.06);
   --shadow:0 4px 20px rgba(0,0,0,.08);
   --shadow-teal:0 4px 20px rgba(46,196,182,.2);
-
+ 
   /* Radios */
   --radius:12px;
   --radius-lg:20px;
@@ -53,12 +297,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
-
+ 
 /* ── ORBS ── */
 .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.12}
 .orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-150px;right:-150px}
 .orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-150px;left:-150px}
-
+ 
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border-gray);box-shadow:var(--shadow-sm);height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
@@ -66,10 +310,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .nav-logo-name em{font-style:normal;color:var(--teal)}
 .nav-right{display:flex;align-items:center;gap:12px}
 .nav-link{font-size:13px;color:var(--text-2);text-decoration:none;transition:color .2s}
+.lang-btn{padding:4px 12px;border-radius:100px;border:1px solid var(--border-gray);background:var(--cream-2);color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:.03em}
+.lang-btn.active{background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark);font-weight:600}
 .nav-link:hover{color:var(--teal-dark)}
 .btn-nav{padding:8px 20px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
 .btn-nav:hover{opacity:.9;transform:translateY(-1px)}
-
+ 
 /* ── HERO ── */
 .hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 1.5rem 5rem}
 .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-dark);background:var(--teal-light);border:1px solid var(--border);padding:6px 18px;border-radius:100px;margin-bottom:1.5rem;animation:fadeup .6s ease both}
@@ -87,7 +333,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .proof-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2)}
 .proof-dot{width:4px;height:4px;border-radius:50%;background:var(--text-3)}
 @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-
+ 
 /* ── DEMO PREVIEW ── */
 .demo-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:900px;margin:0 auto}
 .section-eyebrow{text-align:center;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:.75rem}
@@ -112,7 +358,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .demo-std{background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center}
 .demo-std-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:.5rem}
 .demo-std-detail{font-size:13px;color:var(--text-2)}
-
+ 
 /* ── FEATURES ── */
 .features-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:900px;margin:0 auto}
 .features-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
@@ -121,7 +367,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .feature-icon{font-size:28px;margin-bottom:.875rem;display:block}
 .feature-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:.5rem}
 .feature-desc{font-size:13px;color:var(--text-2);line-height:1.6}
-
+ 
 /* ── HOW IT WORKS ── */
 .how-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:760px;margin:0 auto}
 .steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:2rem}
@@ -129,13 +375,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .step-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:var(--teal-light);line-height:1;margin-bottom:.5rem;-webkit-text-stroke:1px var(--teal)}
 .step-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:.375rem}
 .step-desc{font-size:13px;color:var(--text-2)}
-
+ 
 /* ── PRICING ── */
 .pricing-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:820px;margin:0 auto}
-.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:2rem}
+.pricing-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:2rem}
+.pricing-toggle{display:flex;justify-content:center;gap:8px;margin-top:1.5rem}
+.pt-btn{padding:10px 22px;border-radius:100px;border:1.5px solid var(--border-gray);background:var(--white);color:var(--text-2);font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.pt-btn.active{background:linear-gradient(135deg,var(--teal),var(--violet));border-color:transparent;color:#fff}
 .price-card{background:var(--white);border:1.5px solid var(--border-gray);border-radius:var(--radius-lg);padding:2rem;position:relative;overflow:hidden;box-shadow:var(--shadow-sm)}
 .price-card.featured{border:2px solid var(--teal);background:var(--teal-light);box-shadow:var(--shadow-teal)}
-.price-card.featured::before{content:'Más popular';position:absolute;top:16px;right:-24px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:10px;font-weight:600;padding:4px 32px;transform:rotate(35deg);letter-spacing:.05em}
+.price-card.featured .featured-badge{position:absolute;top:16px;right:-24px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:10px;font-weight:600;padding:4px 32px;transform:rotate(35deg);letter-spacing:.05em}
 .price-name{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:.75rem}
 .price-amount{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:var(--text);line-height:1;margin-bottom:.25rem}
 .price-amount span{font-size:18px;color:var(--text-2);font-family:'Inter',sans-serif;font-weight:400}
@@ -151,7 +400,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .btn-price.paid{background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff}
 .btn-price.paid:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,196,182,.3)}
 .pricing-note{text-align:center;font-size:12px;color:var(--text-2);margin-top:1rem}
-
+ 
 /* ── SOCIAL PROOF / FAQ ── */
 .faq-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:680px;margin:0 auto}
 .faq-item{border-bottom:1px solid var(--border-gray);padding:1.25rem 0;cursor:pointer}
@@ -161,18 +410,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .faq-item.open .faq-icon{transform:rotate(45deg)}
 .faq-a{font-size:14px;color:var(--text-2);line-height:1.7;margin-top:.75rem;display:none}
 .faq-item.open .faq-a{display:block}
-
+ 
 /* ── CTA FINAL ── */
 .cta-section{position:relative;z-index:1;padding:5rem 1.5rem;text-align:center;max-width:700px;margin:0 auto}
 .cta-box{background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:3rem 2rem}
 .cta-box h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);font-weight:600;margin-bottom:.875rem;line-height:1.15;color:var(--text)}
 .cta-box p{font-size:15px;color:var(--text-2);margin-bottom:2rem;line-height:1.6}
-
+ 
 /* ── FOOTER ── */
 footer{position:relative;z-index:1;border-top:1px solid var(--border-gray);padding:2rem;text-align:center;font-size:12px;color:var(--text-3);background:var(--white)}
 footer a{color:var(--text-2);text-decoration:none}
 footer a:hover{color:var(--teal-dark)}
-
+ 
 /* ── MODAL DE PAGO ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
@@ -190,7 +439,7 @@ footer a:hover{color:var(--teal-dark)}
 .btn-modal-close{width:100%;padding:11px;border-radius:var(--radius);background:var(--cream-2);color:var(--text-2);font-size:13px;border:1.5px solid var(--border-gray);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
 .btn-modal-close:hover{color:var(--text);border-color:var(--teal)}
 .modal-secure{text-align:center;font-size:11px;color:var(--text-3);margin-top:.75rem}
-
+ 
 /* ── UNLOCK BANNER ── */
 .unlock-banner{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--white);border:1.5px solid var(--border);border-radius:100px;padding:12px 20px;z-index:90;box-shadow:0 8px 32px rgba(0,0,0,.12);align-items:center;gap:14px;white-space:nowrap;max-width:90vw}
 .unlock-banner.visible{display:flex}
@@ -198,24 +447,26 @@ footer a:hover{color:var(--teal-dark)}
 .ub-text strong{color:var(--text)}
 .ub-btn{padding:8px 18px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .2s}
 .ub-btn:hover{opacity:.9}
-
+ 
 @media(max-width:600px){
   nav{padding:0 1rem}
   .hero{padding:7rem 1rem 4rem}
   .pricing-grid{grid-template-columns:1fr}
-  .price-card.featured::before{display:none}
+  .price-card.featured .featured-badge{display:none}
   .steps{grid-template-columns:1fr 1fr}
   .demo-grid{grid-template-columns:1fr 1fr}
   .hero-cta{flex-direction:column;align-items:center}
-}
+}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--night,#0D1B2A);color:#fff;padding:13px 22px;border-radius:100px;font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.toast.error{background:#E8637A}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
-
+ 
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
-
+ 
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="#">
@@ -230,41 +481,43 @@ footer a:hover{color:var(--teal-dark)}
     <span class="nav-logo-name">Dragonfl<em>AI</em> Events</span>
   </a>
   <div class="nav-right">
-    <a href="#como-funciona" class="nav-link">Cómo funciona</a>
-    <a href="#precios" class="nav-link">Precios</a>
-    <a href="#" id="nav-login" class="nav-link" onclick="handleNavLogin();return false">Iniciar sesión</a>
-    <a href="dragonflai-v2.html" class="btn-nav">Probar gratis →</a>
+    <a href="#como-funciona" class="nav-link" data-es="Cómo funciona" data-en="How it works">Cómo funciona</a>
+    <a href="#precios" class="nav-link" data-es="Precios" data-en="Pricing">Precios</a>
+    <a href="#" id="nav-login" class="nav-link" onclick="handleNavLogin();return false" data-es="Iniciar sesión" data-en="Log in">Iniciar sesión</a>
+    <a href="dragonflai-v2.html" class="btn-nav" data-es="Probar gratis →" data-en="Try for free →">Probar gratis →</a>
+    <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
+    <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
   </div>
 </nav>
-
+ 
 <!-- HERO -->
 <section class="hero">
-  <span class="hero-tag">✦ Inteligencia artificial para eventos</span>
+  <span class="hero-tag" data-es="✦ Inteligencia artificial para eventos" data-en="✦ AI for event planning">✦ Inteligencia artificial para eventos</span>
   <span class="hero-dragonfly" style="display:block;text-align:center"><svg width="64" height="64" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><circle cx="16.8" cy="12.2" r=".9" fill="#0D1B2A"/><circle cx="19.2" cy="12.2" r=".9" fill="#0D1B2A"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".4" transform="rotate(-20 10 14)"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="none" stroke="#2EC4B6" stroke-width=".8" opacity=".8" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".4" transform="rotate(20 26 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="none" stroke="#7B2FBE" stroke-width=".8" opacity=".8" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/><line x1="18" y1="22" x2="18" y2="24" stroke="#1A9E92" stroke-width="1" opacity=".7"/><line x1="18" y1="25" x2="18" y2="27" stroke="#1A9E92" stroke-width="1" opacity=".5"/></svg></span>
-  <h1>Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
-  <p class="hero-sub">Ingresa los detalles de tu boda, quinceañera o fiesta y la IA genera un plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable.</p>
+  <h1 data-es="Tu evento <em>perfecto,</em><br>planeado en segundos" data-en="Your <em>perfect</em> event,<br>planned in seconds">Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
+  <p class="hero-sub" data-es="Ingresa los detalles de tu boda, quinceañera o fiesta y la IA genera un plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable." data-en="Enter the details of your wedding, quinceañera, or party and the AI generates a complete plan — timeline, budget, checklist, vendors, and Save the Date. With full access, download it as an editable Excel too.">Ingresa los detalles de tu boda, quinceañera o fiesta y la IA genera un plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable.</p>
   <div class="hero-cta">
     <a href="dragonflai-v2.html" class="btn-primary">
-      <span>✦</span> Generar mi plan gratis
+      <span>✦</span> <span data-es="Generar mi plan gratis" data-en="Generate my free plan">Generar mi plan gratis</span>
     </a>
-    <a href="#como-funciona" class="btn-secondary">Ver cómo funciona</a>
+    <a href="#como-funciona" class="btn-secondary" data-es="Ver cómo funciona" data-en="See how it works">Ver cómo funciona</a>
   </div>
   <div class="hero-proof">
-    <span class="proof-item">✓ 3 planes gratis</span>
+    <span class="proof-item" data-es="✓ 2 planes gratis" data-en="✓ 2 free plans">✓ 2 planes gratis</span>
     <span class="proof-dot"></span>
-    <span class="proof-item">✓ Sin registro</span>
+    <span class="proof-item" data-es="✓ Sin registro" data-en="✓ No signup">✓ Sin registro</span>
     <span class="proof-dot"></span>
-    <span class="proof-item">✓ Español e inglés</span>
+    <span class="proof-item" data-es="✓ Español e inglés" data-en="✓ Spanish &amp; English">✓ Español e inglés</span>
     <span class="proof-dot"></span>
-    <span class="proof-item">✓ Listo en 30 segundos</span>
+    <span class="proof-item" data-es="✓ Listo en 30 segundos" data-en="✓ Ready in 30 seconds">✓ Listo en 30 segundos</span>
   </div>
 </section>
-
+ 
 <!-- DEMO PREVIEW -->
 <section class="demo-section">
-  <p class="section-eyebrow">Vista previa</p>
-  <h2 class="section-title">Lo que genera la IA por ti</h2>
-  <p class="section-sub">Un plan completo y personalizado basado en tu presupuesto, estilo y detalles únicos</p>
+  <p class="section-eyebrow" data-es="Vista previa" data-en="Preview">Vista previa</p>
+  <h2 class="section-title" data-es="Lo que genera la IA por ti" data-en="What the AI generates for you">Lo que genera la IA por ti</h2>
+  <p class="section-sub" data-es="Un plan completo y personalizado basado en tu presupuesto, estilo y detalles únicos" data-en="A complete, personalized plan based on your budget, style, and unique details">Un plan completo y personalizado basado en tu presupuesto, estilo y detalles únicos</p>
   <div class="demo-window">
     <div class="demo-bar">
       <div class="demo-dots">
@@ -275,260 +528,296 @@ footer a:hover{color:var(--teal-dark)}
       <div class="demo-url">dragonflaievents.com/app</div>
     </div>
     <div class="demo-tabs">
-      <div class="demo-tab active">Vista general</div>
-      <div class="demo-tab">Cronograma</div>
-      <div class="demo-tab">Presupuesto</div>
-      <div class="demo-tab">Checklist</div>
+      <div class="demo-tab active" data-es="Vista general" data-en="Overview">Vista general</div>
+      <div class="demo-tab" data-es="Cronograma" data-en="Timeline">Cronograma</div>
+      <div class="demo-tab" data-es="Presupuesto" data-en="Budget">Presupuesto</div>
+      <div class="demo-tab" data-es="Checklist" data-en="Checklist">Checklist</div>
       <div class="demo-tab">💌 Save the Date</div>
     </div>
     <div class="demo-content">
       <div class="demo-card">
-        <div class="demo-card-label">◆ Tu plan personalizado</div>
-        <div class="demo-card-text">Sofía, con 6 meses por delante y un presupuesto de $80,000 MXN, tu boda romántica en Querétaro tiene todo para ser perfecta. Priorizamos la experiencia de tus invitados sin sacrificar los momentos visuales que amas.</div>
+        <div class="demo-card-label" data-es="◆ Tu plan personalizado" data-en="◆ Your personalized plan">◆ Tu plan personalizado</div>
+        <div class="demo-card-text" data-es="Sofía, con 6 meses por delante y un presupuesto de $80,000 MXN, tu boda romántica en Querétaro tiene todo para ser perfecta. Priorizamos la experiencia de tus invitados sin sacrificar los momentos visuales que amas." data-en="Sofía, with 6 months ahead and a budget of $80,000 MXN, your romantic wedding in Querétaro has everything to be perfect. We prioritized your guests' experience without sacrificing the visual moments you love.">Sofía, con 6 meses por delante y un presupuesto de $80,000 MXN, tu boda romántica en Querétaro tiene todo para ser perfecta. Priorizamos la experiencia de tus invitados sin sacrificar los momentos visuales que amas.</div>
       </div>
       <div class="demo-grid">
-        <div class="demo-mini"><div class="demo-mini-label">Tipo</div><div class="demo-mini-val">💍 Boda</div></div>
-        <div class="demo-mini"><div class="demo-mini-label">Invitados</div><div class="demo-mini-val">120</div></div>
-        <div class="demo-mini"><div class="demo-mini-label">Presupuesto</div><div class="demo-mini-val">$80K</div></div>
+        <div class="demo-mini"><div class="demo-mini-label" data-es="Tipo" data-en="Type">Tipo</div><div class="demo-mini-val" data-es="💍 Boda" data-en="💍 Wedding">💍 Boda</div></div>
+        <div class="demo-mini"><div class="demo-mini-label" data-es="Invitados" data-en="Guests">Invitados</div><div class="demo-mini-val">120</div></div>
+        <div class="demo-mini"><div class="demo-mini-label" data-es="Presupuesto" data-en="Budget">Presupuesto</div><div class="demo-mini-val">$80K</div></div>
       </div>
       <div class="demo-std">
-        <div class="demo-card-label" style="margin-bottom:.5rem">💌 Save the Date generado</div>
+        <div class="demo-card-label" style="margin-bottom:.5rem" data-es="💌 Save the Date generado" data-en="💌 Generated Save the Date">💌 Save the Date generado</div>
         <div class="demo-std-title"><em>Sofía & Rodrigo</em></div>
-        <div class="demo-std-detail">📅 15 de Marzo, 2026 &nbsp;·&nbsp; 📍 Querétaro, México</div>
-        <div style="font-size:12px;color:var(--text-3);margin-top:.5rem;font-style:italic">La invitación formal llegará pronto — guarden la fecha ✨</div>
+        <div class="demo-std-detail" data-es="📅 15 de Marzo, 2026 &nbsp;·&nbsp; 📍 Querétaro, México" data-en="📅 March 15, 2026 &nbsp;·&nbsp; 📍 Querétaro, Mexico">📅 15 de Marzo, 2026 &nbsp;·&nbsp; 📍 Querétaro, México</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:.5rem;font-style:italic" data-es="La invitación formal llegará pronto — guarden la fecha ✨" data-en="Formal invitation coming soon — save the date ✨">La invitación formal llegará pronto — guarden la fecha ✨</div>
       </div>
     </div>
   </div>
 </section>
-
+ 
 <!-- FEATURES -->
 <section class="features-section" id="como-funciona">
-  <p class="section-eyebrow">Funcionalidades</p>
-  <h2 class="section-title">Todo lo que genera en 30 segundos</h2>
-  <p class="section-sub">8 tipos de evento · Español e inglés · Modo personal y profesional</p>
+  <p class="section-eyebrow" data-es="Funcionalidades" data-en="Features">Funcionalidades</p>
+  <h2 class="section-title" data-es="Todo lo que genera en 30 segundos" data-en="Everything it generates in 30 seconds">Todo lo que genera en 30 segundos</h2>
+  <p class="section-sub" data-es="8 tipos de evento · Español e inglés · Modo personal y profesional" data-en="8 event types · Spanish &amp; English · Personal &amp; professional mode">8 tipos de evento · Español e inglés · Modo personal y profesional</p>
   <div class="features-grid" style="margin-top:2.5rem">
     <div class="feature-card">
       <span class="feature-icon">📅</span>
-      <div class="feature-title">Cronograma detallado</div>
-      <div class="feature-desc">12-14 hitos desde meses antes hasta el día del evento. Se adapta a lo que ya tienes contratado.</div>
+      <div class="feature-title" data-es="Cronograma detallado" data-en="Detailed timeline">Cronograma detallado</div>
+      <div class="feature-desc" data-es="12-14 hitos desde meses antes hasta el día del evento. Se adapta a lo que ya tienes contratado." data-en="12-14 milestones from months before to the day of the event. Adapts to what you've already booked.">12-14 hitos desde meses antes hasta el día del evento. Se adapta a lo que ya tienes contratado.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">💰</span>
-      <div class="feature-title">Presupuesto inteligente</div>
-      <div class="feature-desc">Distribuye tu presupuesto real entre 7-8 categorías según tu prioridad — fotos, experiencia, o ahorro.</div>
+      <div class="feature-title" data-es="Presupuesto inteligente" data-en="Smart budget">Presupuesto inteligente</div>
+      <div class="feature-desc" data-es="Distribuye tu presupuesto real entre 7-8 categorías según tu prioridad — fotos, experiencia, o ahorro." data-en="Distributes your real budget across 7-8 categories based on your priority — photos, experience, or savings.">Distribuye tu presupuesto real entre 7-8 categorías según tu prioridad — fotos, experiencia, o ahorro.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">✅</span>
-      <div class="feature-title">Checklist interactivo</div>
-      <div class="feature-desc">Lista completa de tareas agrupadas por categoría. Marca lo que vas completando.</div>
+      <div class="feature-title" data-es="Checklist interactivo" data-en="Interactive checklist">Checklist interactivo</div>
+      <div class="feature-desc" data-es="Lista completa de tareas agrupadas por categoría. Marca lo que vas completando." data-en="Complete task list grouped by category. Check off items as you complete them.">Lista completa de tareas agrupadas por categoría. Marca lo que vas completando.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">🏪</span>
-      <div class="feature-title">Guía de proveedores</div>
-      <div class="feature-desc">Qué buscar, preguntas clave y tips de negociación específicos para tu estilo y ciudad.</div>
+      <div class="feature-title" data-es="Guía de proveedores" data-en="Vendor guide">Guía de proveedores</div>
+      <div class="feature-desc" data-es="Qué buscar, preguntas clave y tips de negociación específicos para tu estilo y ciudad." data-en="What to look for, key questions, and negotiation tips specific to your style and city.">Qué buscar, preguntas clave y tips de negociación específicos para tu estilo y ciudad.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">✨</span>
-      <div class="feature-title">Ideas creativas únicas</div>
-      <div class="feature-desc">Ideas específicas a tu vibe, ciudad y detalles personales — no sugerencias genéricas.</div>
+      <div class="feature-title" data-es="Ideas creativas únicas" data-en="Unique creative ideas">Ideas creativas únicas</div>
+      <div class="feature-desc" data-es="Ideas específicas a tu vibe, ciudad y detalles personales — no sugerencias genéricas." data-en="Ideas tailored to your vibe, city, and personal details — not generic suggestions.">Ideas específicas a tu vibe, ciudad y detalles personales — no sugerencias genéricas.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">💌</span>
-      <div class="feature-title">Save the Date listo</div>
-      <div class="feature-desc">Tarjeta elegante generada por IA lista para compartir por WhatsApp en un click.</div>
+      <div class="feature-title" data-es="Save the Date listo" data-en="Ready-to-send Save the Date">Save the Date listo</div>
+      <div class="feature-desc" data-es="Tarjeta elegante generada por IA lista para compartir por WhatsApp en un click." data-en="Elegant AI-generated card ready to share via WhatsApp in one click.">Tarjeta elegante generada por IA lista para compartir por WhatsApp en un click.</div>
     </div>
     <div class="feature-card">
       <span class="feature-icon">📊</span>
-      <div class="feature-title">Excel editable <span style="font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--violet);background:var(--violet-light);border:1px solid rgba(123,47,190,.25);padding:2px 8px;border-radius:100px;vertical-align:middle;margin-left:4px">Plan completo</span></div>
-      <div class="feature-desc">Descarga tu plan como spreadsheet real — presupuesto con fórmulas, invitados, cronograma, decoración y más. Edítalo como quieras.</div>
+      <div class="feature-title"><span data-es="Excel editable" data-en="Editable Excel">Excel editable</span> <span style="font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--violet);background:var(--violet-light);border:1px solid rgba(123,47,190,.25);padding:2px 8px;border-radius:100px;vertical-align:middle;margin-left:4px" data-es="Plan completo" data-en="Full plan">Plan completo</span></div>
+      <div class="feature-desc" data-es="Descarga tu plan como spreadsheet real — presupuesto con fórmulas, invitados, cronograma, decoración y más. Edítalo como quieras." data-en="Download your plan as a real spreadsheet — budget with formulas, guest list, timeline, decor, and more. Edit it however you like.">Descarga tu plan como spreadsheet real — presupuesto con fórmulas, invitados, cronograma, decoración y más. Edítalo como quieras.</div>
     </div>
   </div>
 </section>
-
+ 
 <!-- HOW IT WORKS -->
 <section class="how-section">
-  <p class="section-eyebrow">Así de fácil</p>
-  <h2 class="section-title">De cero a plan completo<br>en 3 pasos</h2>
+  <p class="section-eyebrow" data-es="Así de fácil" data-en="It's this easy">Así de fácil</p>
+  <h2 class="section-title" data-es="De cero a plan completo<br>en 3 pasos" data-en="From zero to a complete plan<br>in 3 steps">De cero a plan completo<br>en 3 pasos</h2>
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
-      <div class="step-title">Cuéntanos de tu evento</div>
-      <div class="step-desc">Tipo, fecha, ciudad, presupuesto, estilo y tus must-haves</div>
+      <div class="step-title" data-es="Cuéntanos de tu evento" data-en="Tell us about your event">Cuéntanos de tu evento</div>
+      <div class="step-desc" data-es="Tipo, fecha, ciudad, presupuesto, estilo y tus must-haves" data-en="Type, date, city, budget, style, and your must-haves">Tipo, fecha, ciudad, presupuesto, estilo y tus must-haves</div>
     </div>
     <div class="step">
       <div class="step-num">2</div>
-      <div class="step-title">La IA genera tu plan</div>
-      <div class="step-desc">7 secciones personalizadas en paralelo — listo en ~30 segundos</div>
+      <div class="step-title" data-es="La IA genera tu plan" data-en="The AI generates your plan">La IA genera tu plan</div>
+      <div class="step-desc" data-es="7 secciones personalizadas en paralelo — listo en ~30 segundos" data-en="7 personalized sections in parallel — ready in ~30 seconds">7 secciones personalizadas en paralelo — listo en ~30 segundos</div>
     </div>
     <div class="step">
       <div class="step-num">3</div>
-      <div class="step-title">Comparte y ejecuta</div>
-      <div class="step-desc">Descarga en PDF o Excel editable, comparte por WhatsApp o úsalo como guía diaria</div>
+      <div class="step-title" data-es="Comparte y ejecuta" data-en="Share and execute">Comparte y ejecuta</div>
+      <div class="step-desc" data-es="Descarga en PDF o Excel editable, comparte por WhatsApp o úsalo como guía diaria" data-en="Download as PDF or editable Excel, share via WhatsApp, or use it as your daily guide">Descarga en PDF o Excel editable, comparte por WhatsApp o úsalo como guía diaria</div>
     </div>
   </div>
 </section>
-
+ 
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
-  <p class="section-eyebrow">Precios</p>
-  <h2 class="section-title">Empieza gratis,<br>desbloquea cuando quieras</h2>
-  <p class="section-sub">Sin suscripciones sorpresa. Pagas una vez y es tuyo para siempre.</p>
-  <div class="pricing-grid">
-
-    <!-- FREE -->
-    <div class="price-card">
-      <div class="price-name">Gratis</div>
-      <div class="price-amount">$0 <span>MXN</span></div>
-      <div class="price-desc">Para conocer la herramienta y generar tus primeros planes de prueba.</div>
-      <ul class="price-features">
-        <li>3 planes completos</li>
-        <li>Todos los tipos de evento</li>
-        <li>Save the Date incluido</li>
-        <li>Compartir por WhatsApp</li>
-        <li class="muted">Sin límite de secciones</li>
-        <li class="muted" style="text-decoration:line-through;opacity:.5">Descarga en Excel editable</li>
-        <li class="muted" style="text-decoration:line-through;opacity:.5">Planes ilimitados</li>
-        <li class="muted" style="text-decoration:line-through;opacity:.5">Modo planner profesional</li>
-      </ul>
-      <button class="btn-price free" onclick="window.location.href='dragonflai-v2.html'">Empezar gratis →</button>
-    </div>
-
-    <!-- PAID -->
-    <div class="price-card featured">
-      <div class="price-name">Completo</div>
-      <div class="price-amount">$497 <span>MXN</span></div>
-      <div class="price-desc">Acceso de por vida. Un solo pago, sin renovaciones ni sorpresas.</div>
-      <ul class="price-features">
-        <li>Planes ilimitados</li>
-        <li>Todos los tipos de evento</li>
-        <li>Save the Date incluido</li>
-        <li>Compartir por WhatsApp</li>
-        <li><strong>Descarga en Excel editable</strong></li>
-        <li>Modo planner profesional</li>
-        <li>Propuestas para clientes</li>
-        <li>Acceso a todas las versiones futuras</li>
-      </ul>
-      <button class="btn-price paid" onclick="openModal()">Desbloquear acceso completo →</button>
-    </div>
+  <p class="section-eyebrow" data-es="Precios" data-en="Pricing">Precios</p>
+  <h2 class="section-title" data-es="Empieza gratis,<br>desbloquea cuando quieras" data-en="Start free,<br>unlock whenever you want">Empieza gratis,<br>desbloquea cuando quieras</h2>
+  <p class="section-sub" data-es="Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año." data-en="No surprise subscriptions. Pay once — if you choose Annual, you just pay the same link again when the year is up.">Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año.</p>
+ 
+  <div class="pricing-toggle">
+    <button class="pt-btn active" id="pt-diy" onclick="showPricingGroup('diy')" data-es="Para mi evento (DIY)" data-en="For my event (DIY)">Para mi evento (DIY)</button>
+    <button class="pt-btn" id="pt-planner" onclick="showPricingGroup('planner')" data-es="Soy planner profesional" data-en="I'm a professional planner">Soy planner profesional</button>
   </div>
-  <p class="pricing-note">💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español</p>
+ 
+  <!-- GRUPO DIY -->
+  <div class="pricing-grid pricing-group" id="pg-diy">
+ 
+    <div class="price-card">
+      <div class="price-name" data-es="Gratis" data-en="Free">Gratis</div>
+      <div class="price-amount">$0 <span>MXN</span></div>
+      <div class="price-desc" data-es="Para conocer la herramienta y generar tus primeros planes de prueba." data-en="To try out the tool and generate your first test plans.">Para conocer la herramienta y generar tus primeros planes de prueba.</div>
+      <ul class="price-features">
+        <li data-es="2 planes completos" data-en="2 complete plans">2 planes completos</li>
+        <li data-es="Todos los tipos de evento" data-en="All event types">Todos los tipos de evento</li>
+        <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
+        <li class="muted" style="text-decoration:line-through;opacity:.5" data-es="Excel, invitación y RSVP" data-en="Excel, invitation and RSVP">Excel, invitación y RSVP</li>
+      </ul>
+      <button class="btn-price free" onclick="window.location.href='dragonflai-v2.html'" data-es="Empezar gratis →" data-en="Start free →">Empezar gratis →</button>
+    </div>
+ 
+    <div class="price-card featured">
+      <span class="featured-badge" data-es="Más popular" data-en="Most popular">Más popular</span>
+      <div class="price-name" data-es="1 evento" data-en="1 event">1 evento</div>
+      <div class="price-amount">$179 <span>MXN</span></div>
+      <div class="price-desc" data-es="Acceso completo para un solo evento. Perfecto si vas a planear solo el tuyo." data-en="Full access for a single event. Perfect if you're only planning your own.">Acceso completo para un solo evento. Perfecto si vas a planear solo el tuyo.</div>
+      <ul class="price-features">
+        <li data-es="Ese evento, sin límite de regeneraciones" data-en="That event, unlimited regenerations">Ese evento, sin límite de regeneraciones</li>
+        <li><strong data-es="Descarga en Excel editable" data-en="Editable Excel download">Descarga en Excel editable</strong></li>
+        <li data-es="Publicar invitación + RSVP" data-en="Publish invitation + RSVP">Publicar invitación + RSVP</li>
+        <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
+      </ul>
+      <button class="btn-price paid" onclick="goToPay('diy_event')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+    </div>
+ 
+    <div class="price-card">
+      <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
+      <div class="price-amount">$299 <span>MXN</span></div>
+      <div class="price-desc" data-es="Acceso completo ilimitado por 365 días. Ideal si planeas más de un evento este año." data-en="Unlimited full access for 365 days. Ideal if you'll plan more than one event this year.">Acceso completo ilimitado por 365 días. Ideal si planeas más de un evento este año.</div>
+      <ul class="price-features">
+        <li data-es="Eventos ilimitados por 365 días" data-en="Unlimited events for 365 days">Eventos ilimitados por 365 días</li>
+        <li><strong data-es="Descarga en Excel editable" data-en="Editable Excel download">Descarga en Excel editable</strong></li>
+        <li data-es="Publicar invitación + RSVP" data-en="Publish invitation + RSVP">Publicar invitación + RSVP</li>
+        <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
+      </ul>
+      <button class="btn-price paid" onclick="goToPay('diy_annual')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+    </div>
+ 
+  </div>
+ 
+  <!-- GRUPO PLANNER -->
+  <div class="pricing-grid pricing-group" id="pg-planner" style="display:none">
+ 
+    <div class="price-card">
+      <div class="price-name" data-es="3 eventos" data-en="3 events">3 eventos</div>
+      <div class="price-amount">$249 <span>MXN</span></div>
+      <div class="price-desc" data-es="Ideal para probar el modo Planner con tus primeros clientes." data-en="Perfect for trying Planner mode with your first clients.">Ideal para probar el modo Planner con tus primeros clientes.</div>
+      <ul class="price-features">
+        <li data-es="3 eventos de cliente" data-en="3 client events">3 eventos de cliente</li>
+        <li data-es="Generar propuestas de cliente" data-en="Generate client proposals">Generar propuestas de cliente</li>
+        <li data-es="Save the Date + invitación/RSVP" data-en="Save the Date + invitation/RSVP">Save the Date + invitación/RSVP</li>
+      </ul>
+      <button class="btn-price paid" onclick="goToPay('planner_3')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+    </div>
+ 
+    <div class="price-card featured">
+      <span class="featured-badge" data-es="Mejor valor" data-en="Best value">Mejor valor</span>
+      <div class="price-name" data-es="10 eventos" data-en="10 events">10 eventos</div>
+      <div class="price-amount">$399 <span>MXN</span></div>
+      <div class="price-desc" data-es="El mejor precio por evento si ya tienes varios clientes en fila." data-en="The best price per event if you already have several clients lined up.">El mejor precio por evento si ya tienes varios clientes en fila.</div>
+      <ul class="price-features">
+        <li data-es="10 eventos de cliente" data-en="10 client events">10 eventos de cliente</li>
+        <li data-es="Generar propuestas de cliente" data-en="Generate client proposals">Generar propuestas de cliente</li>
+        <li data-es="Save the Date + invitación/RSVP" data-en="Save the Date + invitation/RSVP">Save the Date + invitación/RSVP</li>
+      </ul>
+      <button class="btn-price paid" onclick="goToPay('planner_10')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+    </div>
+ 
+    <div class="price-card">
+      <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
+      <div class="price-amount">$599 <span>MXN</span></div>
+      <div class="price-desc" data-es="Eventos de cliente ilimitados por 365 días, más Excel para tus propuestas." data-en="Unlimited client events for 365 days, plus Excel for your proposals.">Eventos de cliente ilimitados por 365 días, más Excel para tus propuestas.</div>
+      <ul class="price-features">
+        <li data-es="Eventos de cliente ilimitados por 365 días" data-en="Unlimited client events for 365 days">Eventos de cliente ilimitados por 365 días</li>
+        <li data-es="Generar propuestas de cliente" data-en="Generate client proposals">Generar propuestas de cliente</li>
+        <li><strong data-es="Descarga en Excel editable" data-en="Editable Excel download">Descarga en Excel editable</strong></li>
+        <li data-es="Save the Date + invitación/RSVP" data-en="Save the Date + invitation/RSVP">Save the Date + invitación/RSVP</li>
+      </ul>
+      <button class="btn-price paid" onclick="goToPay('planner_annual')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+    </div>
+ 
+  </div>
+ 
+  <p class="pricing-note" data-es="💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español" data-en="💳 Secure payment · Card, OXXO, wire transfer · Support in English &amp; Spanish">💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español</p>
 </section>
-
+ 
 <!-- FAQ -->
 <section class="faq-section">
-  <p class="section-eyebrow">Preguntas frecuentes</p>
-  <h2 class="section-title" style="margin-bottom:2rem">Lo que más nos preguntan</h2>
-
+  <p class="section-eyebrow" data-es="Preguntas frecuentes" data-en="Frequently asked questions">Preguntas frecuentes</p>
+  <h2 class="section-title" style="margin-bottom:2rem" data-es="Lo que más nos preguntan" data-en="What people ask us most">Lo que más nos preguntan</h2>
+ 
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">¿Necesito saber de tecnología para usarlo?<span class="faq-icon">+</span></div>
-    <div class="faq-a">No. Abres el link, llenas el formulario y la IA hace todo. No hay instalaciones ni cuentas que crear. Funciona en cualquier celular o computadora.</div>
+    <div class="faq-q"><span data-es="¿Necesito saber de tecnología para usarlo?" data-en="Do I need to be tech-savvy to use it?">¿Necesito saber de tecnología para usarlo?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="No. Abres el link, llenas el formulario y la IA hace todo. No hay instalaciones ni cuentas que crear. Funciona en cualquier celular o computadora." data-en="No. You open the link, fill out the form, and the AI does everything. No installs or accounts to create. Works on any phone or computer.">No. Abres el link, llenas el formulario y la IA hace todo. No hay instalaciones ni cuentas que crear. Funciona en cualquier celular o computadora.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">¿Qué tan personalizado es el plan?<span class="faq-icon">+</span></div>
-    <div class="faq-a">Muy personalizado. La IA usa tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico.</div>
+    <div class="faq-q"><span data-es="¿Qué tan personalizado es el plan?" data-en="How personalized is the plan?">¿Qué tan personalizado es el plan?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="Muy personalizado. La IA usa tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico." data-en="Very personalized. The AI uses your name, city, real budget, style, and any details you write (the couple's story, restrictions, special ideas) to generate something unique — not a generic template.">Muy personalizado. La IA usa tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">¿El Save the Date se puede editar?<span class="faq-icon">+</span></div>
-    <div class="faq-a">Puedes copiarlo y editarlo en WhatsApp antes de enviarlo, o regenerar el plan para obtener una versión diferente. Próximamente añadiremos edición directa.</div>
+    <div class="faq-q"><span data-es="¿El Save the Date se puede editar?" data-en="Can the Save the Date be edited?">¿El Save the Date se puede editar?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="Sí — puedes hacer clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, hora, vestimenta, hashtag, mensaje) para editarlo, además de elegir entre 6 paletas de color." data-en="Yes — you can click directly on any text on the card (names, date, location, time, dress code, hashtag, message) to edit it, plus choose from 6 color themes.">Sí — puedes hacer clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, hora, vestimenta, hashtag, mensaje) para editarlo, además de elegir entre 6 paletas de color.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">¿Funciona para eventos corporativos o solo bodas?<span class="faq-icon">+</span></div>
-    <div class="faq-a">Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado.</div>
+    <div class="faq-q"><span data-es="¿Funciona para eventos corporativos o solo bodas?" data-en="Does it work for corporate events, or just weddings?">¿Funciona para eventos corporativos o solo bodas?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado." data-en="It works for 8 event types: Wedding, Birthday, Baby Shower, Corporate, Quinceañera, Graduation, Anniversary, and Kids Party. The plan adapts to the selected event type.">Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">¿Puedo descargar mi plan en Excel?<span class="faq-icon">+</span></div>
-    <div class="faq-a">Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar.</div>
+    <div class="faq-q"><span data-es="¿Puedo descargar mi plan en Excel?" data-en="Can I download my plan as Excel?">¿Puedo descargar mi plan en Excel?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar." data-en="Yes, with full access you can download your plan as a real, editable Excel file: budget with formulas (recalculates automatically as you log expenses), guest list, timeline, checklist, decor, and food — all in separate sheets, ready to customize.">Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q">¿Qué pasa si ya usé mis 3 planes gratis?<span class="faq-icon">+</span></div>
-    <div class="faq-a">Con el pago único de $497 MXN desbloqueas planes ilimitados de por vida, más el modo planner profesional para generar propuestas para clientes. Sin renovaciones ni pagos adicionales.</div>
+    <div class="faq-q"><span data-es="¿Qué pasa si ya usé mis 2 planes gratis?" data-en="What happens if I've already used my 2 free plans?">¿Qué pasa si ya usé mis 2 planes gratis?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="Con el pago único de $497 MXN desbloqueas planes ilimitados de por vida, más el modo planner profesional para generar propuestas para clientes. Sin renovaciones ni pagos adicionales." data-en="With the one-time payment of $497 MXN, you unlock unlimited plans for life, plus professional planner mode to generate client proposals. No renewals or extra payments.">Con el pago único de $497 MXN desbloqueas planes ilimitados de por vida, más el modo planner profesional para generar propuestas para clientes. Sin renovaciones ni pagos adicionales.</div>
   </div>
 </section>
-
+ 
 <!-- CTA FINAL -->
 <section class="cta-section">
   <div class="cta-box">
     <span style="display:block;text-align:center;margin-bottom:1rem"><svg width="64" height="64" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><circle cx="16.8" cy="12.2" r=".9" fill="#0D1B2A"/><circle cx="19.2" cy="12.2" r=".9" fill="#0D1B2A"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".4" transform="rotate(-20 10 14)"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="none" stroke="#2EC4B6" stroke-width=".8" opacity=".8" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".4" transform="rotate(20 26 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="none" stroke="#7B2FBE" stroke-width=".8" opacity=".8" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/><line x1="18" y1="22" x2="18" y2="24" stroke="#1A9E92" stroke-width="1" opacity=".7"/><line x1="18" y1="25" x2="18" y2="27" stroke="#1A9E92" stroke-width="1" opacity=".5"/></svg></span>
-    <h2>Tu evento perfecto<br>empieza aquí</h2>
-    <p>Prueba gratis ahora mismo — sin registro, sin tarjeta, sin complicaciones. Tu primer plan completo en menos de un minuto.</p>
+    <h2 data-es="Tu evento perfecto<br>empieza aquí" data-en="Your perfect event<br>starts here">Tu evento perfecto<br>empieza aquí</h2>
+    <p data-es="Prueba gratis ahora mismo — sin registro, sin tarjeta, sin complicaciones. Tu primer plan completo en menos de un minuto." data-en="Try it free right now — no signup, no card, no hassle. Your first complete plan in under a minute.">Prueba gratis ahora mismo — sin registro, sin tarjeta, sin complicaciones. Tu primer plan completo en menos de un minuto.</p>
     <a href="dragonflai-v2.html" class="btn-primary" style="display:inline-flex">
-      <span>✦</span> Generar mi plan gratis
+      <span>✦</span> <span data-es="Generar mi plan gratis" data-en="Generate my free plan">Generar mi plan gratis</span>
     </a>
   </div>
 </section>
-
+ 
 <footer>
   <p style="margin-bottom:.5rem">
     <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg> <strong style="color:var(--teal-dark)">DragonflAI Events</strong>
-    &nbsp;·&nbsp; Desarrollado con Claude AI de Anthropic
+    &nbsp;·&nbsp; <span data-es="Desarrollado con Claude AI de Anthropic" data-en="Built with Claude AI by Anthropic">Desarrollado con Claude AI de Anthropic</span>
     &nbsp;·&nbsp; Querétaro, México
   </p>
   <p>
-    <a href="/terminos.html">Términos de servicio</a> &nbsp;·&nbsp;
-    <a href="/aviso-de-privacidad.html">Aviso de privacidad</a> &nbsp;·&nbsp;
-    <a href="mailto:hola@dragonflaievents.com">Contacto</a>
+    <a href="/terminos.html" data-es="Términos de servicio" data-en="Terms of service">Términos de servicio</a> &nbsp;·&nbsp;
+    <a href="/aviso-de-privacidad.html" data-es="Aviso de privacidad" data-en="Privacy notice">Aviso de privacidad</a> &nbsp;·&nbsp;
+    <a href="mailto:hola@dragonflaievents.com" data-es="Contacto" data-en="Contact">Contacto</a>
   </p>
 </footer>
-
-<!-- MODAL DE PAGO -->
-<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <h3><svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg> Acceso completo</h3>
-    <p>Un solo pago. Planes ilimitados de por vida + modo planner profesional.</p>
-    <div class="modal-price">
-      <div class="modal-price-amt">$497</div>
-      <div class="modal-price-info"><strong style="color:var(--text)">MXN</strong><br>pago único · sin renovaciones</div>
-    </div>
-    <ul class="modal-features">
-      <li>Planes ilimitados para siempre</li>
-      <li>Modo planner profesional</li>
-      <li>Propuestas listas para clientes</li>
-      <li>Save the Date ilimitados</li>
-      <li>Todas las versiones futuras incluidas</li>
-    </ul>
-    <button class="btn-modal-pay" onclick="goToPay()">
-      Ir a pago seguro →
-    </button>
-    <button class="btn-modal-close" onclick="closeModal()">Cancelar</button>
-    <p class="modal-secure">🔒 Pago procesado por Stripe · Tarjeta, OXXO, transferencia</p>
-  </div>
-</div>
-
+ 
 <!-- LOGIN: MAGIC LINK -->
 <div class="modal-overlay" id="auth-modal" onclick="if(event.target===this) closeAuthModal()">
   <div class="modal">
-    <h3>🪄 Inicia sesión</h3>
-    <p>Sin contraseñas — te mandamos un link mágico a tu correo para entrar y completar tu compra.</p>
+    <h3>🪄 <span data-es="Inicia sesión" data-en="Log in">Inicia sesión</span></h3>
+    <p data-es="Sin contraseñas — te mandamos un link mágico a tu correo para entrar y completar tu compra." data-en="No passwords — we'll email you a magic link to log in and complete your purchase.">Sin contraseñas — te mandamos un link mágico a tu correo para entrar y completar tu compra.</p>
     <input type="email" id="auth-email" placeholder="tu@correo.com" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin:.75rem 0;box-sizing:border-box">
-    <button class="btn-modal-pay" onclick="sendMagicLink()">Enviarme el link mágico →</button>
-    <button class="btn-modal-close" onclick="closeAuthModal()">Ahora no</button>
+    <button class="btn-modal-pay" onclick="sendMagicLink()" data-es="Enviarme el link mágico →" data-en="Send me the magic link →">Enviarme el link mágico →</button>
+    <button class="btn-modal-close" onclick="closeAuthModal()" data-es="Ahora no" data-en="Not now">Ahora no</button>
   </div>
 </div>
-
+ 
 <!-- UNLOCK BANNER (aparece después de 2 planes) -->
 <div class="unlock-banner" id="unlock-banner">
-  <span class="ub-text">Te queda <strong id="ub-count">1</strong> plan gratis</span>
-  <button class="ub-btn" onclick="openModal()">Desbloquear ilimitados →</button>
+  <span class="ub-text" id="ub-text">Te queda <strong id="ub-count">1</strong> plan gratis</span>
+  <button class="ub-btn" onclick="document.getElementById('precios').scrollIntoView({behavior:'smooth'})" data-es="Ver planes →" data-en="See plans →">Ver planes →</button>
 </div>
-
+ 
 <script>
 // ══════════════════════════════
 //  CONFIG — actualiza estos valores
 // ══════════════════════════════
-const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/TU_LINK_AQUI';
-// Para crear el link: stripe.com → Products → Payment Links
-// Precio: $497 MXN · Descripción: DragonflAI Events — Acceso completo
-
+const STRIPE_LINKS = {
+  diy_event:      'https://buy.stripe.com/cNibJ295kbD49N6bPtdEs00', // DIY — 1 evento — $179 MXN
+  diy_annual:     'https://buy.stripe.com/9B68wQa9o7mO2kEaLpdEs01', // DIY — Anual — $299 MXN
+  planner_3:      'https://buy.stripe.com/aFa5kE81g22ugbudXBdEs02', // Planner — 3 eventos — $249 MXN
+  planner_10:     'https://buy.stripe.com/5kQaEY3L0cH88J206LdEs04', // Planner — 10 eventos — $399 MXN
+  planner_annual: 'https://buy.stripe.com/5kQ3cw1CS5eG7EY5r5dEs03'  // Planner — Anual — $599 MXN
+};
+ 
 const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
-const MAX_FREE = 3;
-
+const MAX_FREE = 2;
+ 
 // Supabase dashboard → Settings → API (mismas llaves que en dragonflai-v2.html)
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
-
+ 
 // ══════════════════════════════
 //  LÓGICA DE PLANES Y ACCESO
 //  isPaid se confirma contra Supabase (nunca se confía en localStorage).
@@ -536,7 +825,35 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 const gensUsed = parseInt(localStorage.getItem('dflai_gens') || '0');
 let currentUser = null;
 let isPaid = false;
-
+let lang = 'es';
+ 
+function setLang(l){
+  lang = l;
+  document.getElementById('btn-es').className = 'lang-btn' + (l === 'es' ? ' active' : '');
+  document.getElementById('btn-en').className = 'lang-btn' + (l === 'en' ? ' active' : '');
+  document.documentElement.lang = l;
+  document.querySelectorAll('[data-es]').forEach(el => {
+    const txt = el.getAttribute('data-' + l);
+    if (txt) el.innerHTML = txt;
+  });
+  updateNavLogin();
+  updateUnlockBannerText();
+}
+ 
+function updateUnlockBannerText(){
+  const left = Math.max(0, MAX_FREE - gensUsed);
+  let txt;
+  if (left <= 0) {
+    txt = lang === 'es' ? '<strong>Agotaste tus planes gratis</strong>' : '<strong>You\'ve used all your free plans</strong>';
+  } else {
+    txt = lang === 'es'
+      ? `Te queda <strong id="ub-count">${left}</strong> plan${left===1?'':'es'} gratis`
+      : `You have <strong id="ub-count">${left}</strong> free plan${left===1?'':'s'} left`;
+  }
+  const el = document.getElementById('ub-text');
+  if (el) el.innerHTML = isPaid ? '' : txt;
+}
+ 
 async function refreshPaidStatus() {
   if (!sb) return;
   const { data: { session } } = await sb.auth.getSession();
@@ -546,103 +863,111 @@ async function refreshPaidStatus() {
   const { data } = await sb.from('profiles').select('paid').eq('id', currentUser.id).single();
   isPaid = !!(data && data.paid);
 }
-
+ 
 function updateNavLogin() {
   const navLogin = document.getElementById('nav-login');
   if (!navLogin) return;
   if (currentUser) {
-    navLogin.textContent = 'Mi cuenta →';
+    navLogin.textContent = lang === 'es' ? 'Mi cuenta →' : 'My account →';
     navLogin.onclick = () => { window.location.href = 'dragonflai-v2.html'; return false; };
   } else {
-    navLogin.textContent = 'Iniciar sesión';
+    navLogin.textContent = lang === 'es' ? 'Iniciar sesión' : 'Log in';
     navLogin.onclick = () => { openAuthModal(); return false; };
   }
 }
-
+ 
 function handleNavLogin() {
   if (currentUser) { window.location.href = 'dragonflai-v2.html'; }
   else { openAuthModal(); }
 }
-
+ 
 refreshPaidStatus().then(() => {
   // Mostrar banner si ya usó 2+ planes gratis y no pagó
   if (!isPaid && gensUsed >= MAX_FREE - 1) {
     const banner = document.getElementById('unlock-banner');
-    const left = Math.max(0, MAX_FREE - gensUsed);
-    document.getElementById('ub-count').textContent = left;
-    if (left <= 0) {
-      document.querySelector('.ub-text').innerHTML = '<strong>Agotaste tus planes gratis</strong>';
-    }
+    updateUnlockBannerText();
     setTimeout(() => banner.classList.add('visible'), 1500);
   }
 });
-
+ 
 if (sb) {
   sb.auth.onAuthStateChange((_event, session) => {
     currentUser = session ? session.user : null;
     refreshPaidStatus();
   });
 }
-
+ 
 // ══════════════════════════════
 //  MODAL
 // ══════════════════════════════
-function openModal() {
-  document.getElementById('modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+function showPricingGroup(group){
+  document.getElementById('pg-diy').style.display = group==='diy' ? 'grid' : 'none';
+  document.getElementById('pg-planner').style.display = group==='planner' ? 'grid' : 'none';
+  document.getElementById('pt-diy').classList.toggle('active', group==='diy');
+  document.getElementById('pt-planner').classList.toggle('active', group==='planner');
 }
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function closeModalOutside(e) {
-  if (e.target === document.getElementById('modal')) closeModal();
-}
-
+ 
 function openAuthModal() {
   document.getElementById('auth-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
+ 
 function closeAuthModal() {
   document.getElementById('auth-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
-
+ 
 async function sendMagicLink() {
-  if (!sb) { alert('Supabase no está configurado todavía.'); return; }
+  if (!sb) { showToast(lang==='es'?'Supabase no está configurado todavía.':'Supabase is not configured yet.', true); return; }
   const email = document.getElementById('auth-email').value.trim();
-  if (!email) { alert('Escribe tu correo.'); return; }
+  if (!email) { showToast(lang==='es'?'Escribe tu correo.':'Enter your email.', true); return; }
   const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
-  if (error) { alert(error.message); return; }
-  alert('✉️ Revisa tu correo — te mandamos un link para entrar. Al volver, da clic en "Ir a pago seguro" de nuevo.');
+  if (error) { showToast(error.message, true); return; }
+  showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link para entrar.':'✉️ Check your email — we sent you a link to log in.');
   closeAuthModal();
 }
-
-function goToPay() {
+ 
+function goToPay(productKey) {
+  const link = STRIPE_LINKS[productKey];
+  if (!link) { console.error('Producto no reconocido:', productKey); return; }
   if (!currentUser) {
-    closeModal();
+    showToast(lang==='es'?'Inicia sesión primero para comprar':'Log in first to purchase', true);
     openAuthModal();
     return;
   }
   // Mandamos el UUID real del usuario como client_reference_id — así el
-  // webhook de Stripe sabe a qué cuenta marcar como pagada en Supabase.
-  const sep = STRIPE_PAYMENT_LINK.includes('?') ? '&' : '?';
-  window.location.href = STRIPE_PAYMENT_LINK + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
+  // Worker sabe a qué cuenta aplicarle los créditos cuando Stripe confirme el pago.
+  const sep = link.includes('?') ? '&' : '?';
+  window.location.href = link + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
 }
-
+ 
 // ══════════════════════════════
 //  FAQ
 // ══════════════════════════════
 function toggleFaq(el) {
   el.classList.toggle('open');
 }
-
+ 
 // ══════════════════════════════
 //  SMOOTH SCROLL NAV
 // ══════════════════════════════
+// ══════════════════════════════
+//  TOAST (reemplaza los alert() nativos)
+// ══════════════════════════════
+function showToast(msg,isError){
+  let t=document.getElementById('toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='toast'; t.className='toast';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.className='toast'+(isError?' error':'');
+  requestAnimationFrame(()=>t.classList.add('show'));
+  clearTimeout(t._hideTimer);
+  t._hideTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+ 
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     e.preventDefault();

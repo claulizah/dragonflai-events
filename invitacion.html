@@ -35,7 +35,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .card.theme-night .eyebrow,.card.theme-night .hashtag{color:#1A2332}
 .card.theme-blanco .eyebrow,.card.theme-blanco .hashtag{color:var(--text-3)}
 .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
-.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;text-transform:uppercase;line-height:1.15;margin-bottom:1rem;color:var(--text)}
+.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--text)}
 .divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
 .details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px;color:var(--text-2)}
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
@@ -60,13 +60,19 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .btn-submit:disabled{opacity:.5;cursor:not-allowed}
 .state-msg{text-align:center;padding:3rem 1rem;color:var(--text-2)}
 .state-msg h2{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);margin-bottom:.5rem}
-.thanks-card{text-align:center;padding:3rem 2rem;background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border-radius:var(--radius-lg);box-shadow:var(--shadow-md)}
+.thanks-card{text-align:center;padding:3rem 2rem;background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border-radius:var(--radius-lg);box-shadow:var(--shadow-md);cursor:default}
 .thanks-emoji{font-size:52px;margin-bottom:.5rem}
 .thanks-card h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--text);margin-bottom:.6rem}
 .thanks-card p{font-size:15px;color:var(--text-2)}
 .thanks-brand{margin-top:1.5rem;font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--teal-dark);letter-spacing:.03em}
+.planner-watermark{margin-top:1.2rem;font-size:10px;color:var(--text-3);letter-spacing:.03em;opacity:.6}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--night);color:#fff;padding:12px 20px;border-radius:100px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s;z-index:100}
 .toast.show{opacity:1}
+.lang-toggle{display:flex;justify-content:center;gap:6px;margin-bottom:1rem}
+.lang-btn{padding:4px 12px;border-radius:100px;border:1px solid var(--border-gray);background:var(--white);color:var(--text-2);font-size:11px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.lang-btn.active{background:var(--teal-light);border-color:var(--teal);color:var(--teal-dark);font-weight:600}
+.guest-match{padding:10px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);margin-top:6px;cursor:pointer;font-size:13.5px;transition:all .15s}
+.guest-match:hover{border-color:var(--teal);background:var(--teal-light)}
 </style>
 </head>
 <body>
@@ -77,13 +83,18 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
     <span>DragonflAI Events</span>
   </div>
 
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
+    <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+  </div>
+
   <div id="content">
-    <div class="state-msg"><h2>Cargando…</h2></div>
+    <div class="state-msg"><h2 id="loading-text">Cargando…</h2></div>
   </div>
 
   <p style="text-align:center;margin-top:2rem;font-size:11px;color:var(--text-3)">
-    <a href="/terminos.html" style="color:var(--text-3)">Términos</a> &nbsp;·&nbsp;
-    <a href="/aviso-de-privacidad.html" style="color:var(--text-3)">Aviso de privacidad</a>
+    <a href="/terminos.html" style="color:var(--text-3)" id="footer-terms">Términos</a> &nbsp;·&nbsp;
+    <a href="/aviso-de-privacidad.html" style="color:var(--text-3)" id="footer-privacy">Aviso de privacidad</a>
   </p>
 </div>
 
@@ -97,6 +108,105 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   : null;
 
 let invitation=null;
+let lang='es';
+
+const T={
+  es:{
+    loading:'Cargando…',
+    notFoundTitle:'😕 No encontramos esta invitación',
+    notFoundText:'Puede que el link esté incompleto o que la invitación ya no esté disponible.',
+    invitedFallback:'Estás invitado',
+    daysLabel:'Días',
+    rsvpTitle:'Confirma tu asistencia',
+    yourName:'Tu nombre',
+    yourEmail:'Tu correo (opcional, para recordatorios)',
+    attendingQ:'¿Asistes?',
+    yesAttend:'Sí, ahí estaré 🎉',
+    noAttend:'No podré ir',
+    guestCount:'Número de acompañantes',
+    dietary:'Restricción alimentaria (opcional)',
+    dietaryPh:'ej. Vegetariano, sin gluten…',
+    songRequest:'Canción que no puede faltar (opcional)',
+    songPh:'ej. Vivir mi vida — Marc Anthony',
+    lodgingQ:'¿Necesitas ayuda con hospedaje?',
+    yes:'Sí',
+    no:'No',
+    messageLabel:'Mensaje para los anfitriones (opcional)',
+    messagePh:'¡Felicidades! 💌',
+    confirmBtn:'Confirmar',
+    sendingBtn:'Enviando…',
+    toastNoName:'Escribe tu nombre',
+    toastNoAttend:'Indica si asistes o no',
+    toastError:'No se pudo enviar, intenta de nuevo',
+    thanksYesTitle:'¡Gracias por confirmar!',
+    thanksNoTitle:'Gracias por avisarnos',
+    thanksYesText:'Nos vemos pronto — va a estar increíble.',
+    thanksNoText:'Te vamos a extrañar, pero gracias por decirnos.',
+    footerTerms:'Términos',
+    footerPrivacy:'Aviso de privacidad',
+    searchNamePlaceholder:'Escribe tu nombre para buscarte…',
+    searchHint:'Este evento solo permite confirmar a invitados en la lista del anfitrión.',
+    searchNoResults:'No encontramos ese nombre en la lista — revisa cómo lo escribiste, o pregúntale al anfitrión.',
+    searchAreYouThisPerson:'¿Eres tú?',
+    changeNameLink:'No soy yo, buscar otro nombre',
+    alreadyResponded:'Ya confirmaste tu asistencia anteriormente — ¡gracias!',
+    maxCompanionsNote:'Puedes traer hasta {n} acompañante(s).'
+  },
+  en:{
+    loading:'Loading…',
+    notFoundTitle:"😕 We couldn't find this invitation",
+    notFoundText:'The link may be incomplete, or the invitation may no longer be available.',
+    invitedFallback:"You're invited",
+    daysLabel:'Days',
+    rsvpTitle:'Confirm your attendance',
+    yourName:'Your name',
+    yourEmail:'Your email (optional, for reminders)',
+    attendingQ:'Will you attend?',
+    yesAttend:"Yes, I'll be there 🎉",
+    noAttend:"I can't make it",
+    guestCount:'Number of guests',
+    dietary:'Dietary restriction (optional)',
+    dietaryPh:'e.g. Vegetarian, gluten-free…',
+    songRequest:'A song that must be played (optional)',
+    songPh:'e.g. Uptown Funk — Bruno Mars',
+    lodgingQ:'Do you need help with lodging?',
+    yes:'Yes',
+    no:'No',
+    messageLabel:'Message for the hosts (optional)',
+    messagePh:'Congratulations! 💌',
+    confirmBtn:'Confirm',
+    sendingBtn:'Sending…',
+    toastNoName:'Enter your name',
+    toastNoAttend:'Let us know if you can attend',
+    toastError:'Could not send, please try again',
+    thanksYesTitle:'Thanks for confirming!',
+    thanksNoTitle:'Thanks for letting us know',
+    thanksYesText:"See you soon — it's going to be amazing.",
+    thanksNoText:"We'll miss you, but thanks for telling us.",
+    footerTerms:'Terms',
+    footerPrivacy:'Privacy notice',
+    searchNamePlaceholder:'Type your name to find yourself…',
+    searchHint:'This event only allows guests on the host\'s list to confirm.',
+    searchNoResults:"We couldn't find that name on the list — check how you typed it, or ask the host.",
+    searchAreYouThisPerson:'Is this you?',
+    changeNameLink:"That's not me, search another name",
+    alreadyResponded:'You already confirmed your attendance — thank you!',
+    maxCompanionsNote:'You can bring up to {n} guest(s).'
+  }
+};
+
+function setLang(l){
+  lang=l;
+  document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
+  document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+  document.documentElement.lang=l;
+  const loadingText=document.getElementById('loading-text');
+  if(loadingText) loadingText.textContent=T[lang].loading;
+  document.getElementById('footer-terms').textContent=T[lang].footerTerms;
+  document.getElementById('footer-privacy').textContent=T[lang].footerPrivacy;
+  // Si ya hay una invitación cargada, volver a pintarla en el nuevo idioma
+  if(invitation) renderInvitation(invitation);
+}
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -119,8 +229,8 @@ function getSlug(){
 function renderNotFound(){
   document.getElementById('content').innerHTML=`
     <div class="state-msg">
-      <h2>😕 No encontramos esta invitación</h2>
-      <p>Puede que el link esté incompleto o que la invitación ya no esté disponible.</p>
+      <h2>${T[lang].notFoundTitle}</h2>
+      <p>${T[lang].notFoundText}</p>
     </div>`;
 }
 
@@ -132,11 +242,17 @@ function daysUntil(dateStr){
   return diff>=0?diff:null;
 }
 
+let selectedGuest=null;
+let lastSearchResults=[];
+let guestSearchTimer=null;
+
 function renderInvitation(inv){
   const days=daysUntil(inv.event_date_raw);
+  const t=T[lang];
+  const restricted=!!inv.restrict_to_guest_list;
   document.getElementById('content').innerHTML=`
     <div class="card ${esc(inv.theme||'theme-teal')}">
-      <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):'Estás invitado'} —</div>
+      <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
       <div class="names">${esc(inv.host_names)}</div>
       <div class="divider"></div>
       <div class="details">
@@ -148,59 +264,132 @@ function renderInvitation(inv){
       </div>
       ${inv.message?`<div class="msg">${esc(inv.message)}</div>`:''}
       ${inv.hashtag?`<div class="hashtag">${esc(inv.hashtag)}</div>`:''}
-      ${days!==null?`<div class="countdown"><div><div class="cd-num">${days}</div><div class="cd-lbl">Días</div></div></div>`:''}
+      ${days!==null?`<div class="countdown"><div><div class="cd-num">${days}</div><div class="cd-lbl">${t.daysLabel}</div></div></div>`:''}
+      ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
     </div>
 
     <div class="rsvp-card">
-      <div class="rsvp-title">Confirma tu asistencia</div>
+      <div class="rsvp-title">${t.rsvpTitle}</div>
       <form id="rsvp-form">
+        ${restricted?`
+        <div class="field" id="field-name-search">
+          <label>${t.yourName}</label>
+          <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem">${t.searchHint}</p>
+          <input type="text" id="r-name-search" placeholder="${t.searchNamePlaceholder}" oninput="onGuestSearchInput()" autocomplete="off">
+          <div id="guest-search-results"></div>
+        </div>
+        <div class="field" id="field-name-selected" style="display:none">
+          <div id="selected-guest-display" style="padding:11px;border-radius:var(--radius);background:var(--teal-light);border:1.5px solid var(--teal);font-weight:600;font-size:14px"></div>
+          <a href="#" onclick="resetGuestSearch();return false" style="font-size:11.5px;color:var(--text-3);display:inline-block;margin-top:.5rem">${t.changeNameLink}</a>
+        </div>
+        `:`
         <div class="field">
-          <label>Tu nombre</label>
+          <label>${t.yourName}</label>
           <input type="text" id="r-name" required>
         </div>
-        <div class="field">
-          <label>Tu correo (opcional, para recordatorios)</label>
-          <input type="text" id="r-email" placeholder="tu@correo.com">
-        </div>
-        <div class="field">
-          <label>¿Asistes?</label>
-          <div class="attend-toggle">
-            <div class="attend-opt" id="opt-yes" onclick="setAttending(true)">Sí, ahí estaré 🎉</div>
-            <div class="attend-opt" id="opt-no" onclick="setAttending(false)">No podré ir</div>
+        `}
+
+        <div id="rsvp-rest" ${restricted?'style="display:none"':''}>
+          <div class="field">
+            <label>${t.yourEmail}</label>
+            <input type="text" id="r-email" placeholder="tu@correo.com">
           </div>
-        </div>
-        ${inv.ask_guest_count?`<div class="field" id="field-guests" style="display:none">
-          <label>Número de acompañantes</label>
-          <input type="number" id="r-guests" min="0" value="0">
-        </div>`:''}
-        ${inv.ask_dietary?`<div class="field" id="field-dietary" style="display:none">
-          <label>Restricción alimentaria (opcional)</label>
-          <input type="text" id="r-dietary" placeholder="ej. Vegetariano, sin gluten…">
-        </div>`:''}
-        ${inv.ask_song_request?`<div class="field" id="field-song" style="display:none">
-          <label>Canción que no puede faltar (opcional)</label>
-          <input type="text" id="r-song" placeholder="ej. Vivir mi vida — Marc Anthony">
-        </div>`:''}
-        ${inv.ask_lodging_need?`<div class="field" id="field-lodging" style="display:none">
-          <label>¿Necesitas ayuda con hospedaje?</label>
-          <div class="attend-toggle">
-            <div class="attend-opt" id="opt-lodging-yes" onclick="setLodging(true)">Sí</div>
-            <div class="attend-opt" id="opt-lodging-no" onclick="setLodging(false)">No</div>
+          <div class="field">
+            <label>${t.attendingQ}</label>
+            <div class="attend-toggle">
+              <div class="attend-opt" id="opt-yes" onclick="setAttending(true)">${t.yesAttend}</div>
+              <div class="attend-opt" id="opt-no" onclick="setAttending(false)">${t.noAttend}</div>
+            </div>
           </div>
-        </div>`:''}
-        ${inv.custom_question?`<div class="field" id="field-custom" style="display:none">
-          <label>${esc(inv.custom_question)}</label>
-          <input type="text" id="r-custom">
-        </div>`:''}
-        ${inv.ask_message?`<div class="field" id="field-message" style="display:none">
-          <label>Mensaje para los anfitriones (opcional)</label>
-          <textarea id="r-message" placeholder="¡Felicidades! 💌"></textarea>
-        </div>`:''}
-        <button type="submit" class="btn-submit" id="btn-submit" disabled>Confirmar</button>
+          ${inv.ask_guest_count?`<div class="field" id="field-guests" style="display:none">
+            <label>${t.guestCount}</label>
+            <input type="number" id="r-guests" min="0" value="0">
+            <p id="max-companions-note" style="font-size:11px;color:var(--text-3);margin-top:.3rem"></p>
+          </div>`:''}
+          ${inv.ask_dietary?`<div class="field" id="field-dietary" style="display:none">
+            <label>${t.dietary}</label>
+            <input type="text" id="r-dietary" placeholder="${t.dietaryPh}">
+          </div>`:''}
+          ${inv.ask_song_request?`<div class="field" id="field-song" style="display:none">
+            <label>${t.songRequest}</label>
+            <input type="text" id="r-song" placeholder="${t.songPh}">
+          </div>`:''}
+          ${inv.ask_lodging_need?`<div class="field" id="field-lodging" style="display:none">
+            <label>${t.lodgingQ}</label>
+            <div class="attend-toggle">
+              <div class="attend-opt" id="opt-lodging-yes" onclick="setLodging(true)">${t.yes}</div>
+              <div class="attend-opt" id="opt-lodging-no" onclick="setLodging(false)">${t.no}</div>
+            </div>
+          </div>`:''}
+          ${inv.custom_question?`<div class="field" id="field-custom" style="display:none">
+            <label>${esc(inv.custom_question)}</label>
+            <input type="text" id="r-custom">
+          </div>`:''}
+          ${inv.ask_message?`<div class="field" id="field-message" style="display:none">
+            <label>${t.messageLabel}</label>
+            <textarea id="r-message" placeholder="${t.messagePh}"></textarea>
+          </div>`:''}
+          <button type="submit" class="btn-submit" id="btn-submit" disabled>${t.confirmBtn}</button>
+        </div>
       </form>
     </div>`;
 
   document.getElementById('rsvp-form').addEventListener('submit',submitRSVP);
+  if(restricted && selectedGuest) showSelectedGuest(selectedGuest);
+  if(attending!==null) setAttending(attending);
+  if(lodgingNeeded!==null && document.getElementById('opt-lodging-yes')) setLodging(lodgingNeeded);
+}
+
+async function onGuestSearchInput(){
+  const q=document.getElementById('r-name-search').value.trim();
+  const resultsEl=document.getElementById('guest-search-results');
+  clearTimeout(guestSearchTimer);
+  if(q.length<2){ resultsEl.innerHTML=''; return; }
+  guestSearchTimer=setTimeout(async()=>{
+    const {data,error}=await sb.rpc('search_guest_list',{p_invitation_id:invitation.id,p_query:q});
+    if(error||!data||!data.length){
+      resultsEl.innerHTML=`<p style="font-size:12px;color:var(--text-3);margin-top:.5rem">${T[lang].searchNoResults}</p>`;
+      return;
+    }
+    lastSearchResults=data;
+    resultsEl.innerHTML=data.map((g,i)=>`<div class="guest-match" onclick="selectGuestMatch(${i})">${esc(g.guest_name)}</div>`).join('');
+  },350);
+}
+
+function selectGuestMatch(i){
+  selectedGuest=lastSearchResults[i];
+  showSelectedGuest(selectedGuest);
+}
+
+function showSelectedGuest(g){
+  const t=T[lang];
+  document.getElementById('field-name-search').style.display='none';
+  document.getElementById('field-name-selected').style.display='block';
+
+  if(g.already_responded){
+    document.getElementById('selected-guest-display').innerHTML=`${esc(g.guest_name)}<br><span style="font-weight:400;font-size:12px">${t.alreadyResponded}</span>`;
+    document.getElementById('rsvp-rest').style.display='none';
+    return;
+  }
+
+  document.getElementById('selected-guest-display').textContent=`${t.searchAreYouThisPerson} ${g.guest_name}`;
+  document.getElementById('rsvp-rest').style.display='block';
+
+  const guestsField=document.getElementById('r-guests');
+  if(guestsField){
+    guestsField.max=g.max_companions;
+    const note=document.getElementById('max-companions-note');
+    if(note) note.textContent=t.maxCompanionsNote.replace('{n}',g.max_companions);
+  }
+}
+
+function resetGuestSearch(){
+  selectedGuest=null;
+  document.getElementById('field-name-search').style.display='block';
+  document.getElementById('field-name-selected').style.display='none';
+  document.getElementById('rsvp-rest').style.display='none';
+  document.getElementById('r-name-search').value='';
+  document.getElementById('guest-search-results').innerHTML='';
 }
 
 let attending=null;
@@ -223,15 +412,18 @@ function setAttending(val){
 
 async function submitRSVP(e){
   e.preventDefault();
-  const name=document.getElementById('r-name').value.trim();
-  if(!name){ showToast('Escribe tu nombre'); return; }
-  if(attending===null){ showToast('Indica si asistes o no'); return; }
+  const t=T[lang];
+  const restricted=!!invitation.restrict_to_guest_list;
+  const name=restricted?(selectedGuest?selectedGuest.guest_name:''):document.getElementById('r-name').value.trim();
+  if(!name){ showToast(t.toastNoName); return; }
+  if(attending===null){ showToast(t.toastNoAttend); return; }
 
   const btn=document.getElementById('btn-submit');
-  btn.disabled=true; btn.textContent='Enviando…';
+  btn.disabled=true; btn.textContent=t.sendingBtn;
 
   const payload={
     invitation_id: invitation.id,
+    guest_list_id: restricted&&selectedGuest?selectedGuest.id:null,
     guest_name: name,
     guest_email: document.getElementById('r-email').value.trim()||null,
     attending,
@@ -245,17 +437,19 @@ async function submitRSVP(e){
 
   const {error}=await sb.from('rsvps').insert(payload);
   if(error){
-    showToast('No se pudo enviar, intenta de nuevo');
-    btn.disabled=false; btn.textContent='Confirmar';
+    showToast(t.toastError);
+    btn.disabled=false; btn.textContent=t.confirmBtn;
     return;
   }
+
+  if(document.activeElement) document.activeElement.blur();
 
   document.getElementById('content').innerHTML=`
     <div class="thanks-card">
       <svg width="56" height="56" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.75rem"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#0D6E65"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#0D6E65"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".55" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".55" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".35" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".35" transform="rotate(10 27 18)"/></svg>
       <div class="thanks-emoji">${attending?'🎉':'💌'}</div>
-      <h2>${attending?'¡Gracias por confirmar!':'Gracias por avisarnos'}</h2>
-      <p>${attending?'Nos vemos pronto — va a estar increíble.':'Te vamos a extrañar, pero gracias por decirnos.'}</p>
+      <h2>${attending?t.thanksYesTitle:t.thanksNoTitle}</h2>
+      <p>${attending?t.thanksYesText:t.thanksNoText}</p>
       <div class="thanks-brand">DragonflAI Events</div>
     </div>`;
 }
