@@ -19,7 +19,7 @@
   --cream-2:#F3F1EE;
   --cream-3:#EAE7E2;
   --white:#FFFFFF;
- 
+
   /* Marca */
   --teal:#2EC4B6;
   --teal-dark:#1A9E92;
@@ -30,22 +30,22 @@
   --violet-light:rgba(123,47,190,.1);
   --gold:#D4972A;
   --gold-light:rgba(212,151,42,.12);
- 
+
   /* Texto */
   --text:#1A1A2E;
   --text-2:#4A4A6A;
   --text-3:#8A8AAA;
- 
+
   /* Bordes */
   --border:rgba(46,196,182,.2);
   --border-strong:rgba(46,196,182,.5);
   --border-gray:rgba(0,0,0,.08);
- 
+
   /* Sombras */
   --shadow-sm:0 1px 4px rgba(0,0,0,.06);
   --shadow:0 4px 20px rgba(0,0,0,.08);
   --shadow-teal:0 4px 20px rgba(46,196,182,.2);
- 
+
   /* Radios */
   --radius:12px;
   --radius-lg:20px;
@@ -53,12 +53,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
- 
+
 /* ── ORBS ── */
 .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.12}
 .orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-150px;right:-150px}
 .orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-150px;left:-150px}
- 
+
 /* ── NAV ── */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border-gray);box-shadow:var(--shadow-sm);height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
@@ -71,7 +71,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .nav-link:hover{color:var(--teal-dark)}
 .btn-nav{padding:8px 20px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
 .btn-nav:hover{opacity:.9;transform:translateY(-1px)}
- 
+
 /* ── HERO ── */
 .hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 1.5rem 5rem}
 .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-dark);background:var(--teal-light);border:1px solid var(--border);padding:6px 18px;border-radius:100px;margin-bottom:1.5rem;animation:fadeup .6s ease both}
@@ -89,7 +89,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .proof-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2)}
 .proof-dot{width:4px;height:4px;border-radius:50%;background:var(--text-3)}
 @keyframes fadeup{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
- 
+
 /* ── DEMO PREVIEW ── */
 .demo-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:900px;margin:0 auto}
 .section-eyebrow{text-align:center;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:.75rem}
@@ -114,7 +114,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .demo-std{background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border:1.5px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center}
 .demo-std-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:.5rem}
 .demo-std-detail{font-size:13px;color:var(--text-2)}
- 
+
 /* ── FEATURES ── */
 .features-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:900px;margin:0 auto}
 .features-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
@@ -123,7 +123,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .feature-icon{font-size:28px;margin-bottom:.875rem;display:block}
 .feature-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:.5rem}
 .feature-desc{font-size:13px;color:var(--text-2);line-height:1.6}
- 
+
 /* ── HOW IT WORKS ── */
 .how-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:760px;margin:0 auto}
 .steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:2rem}
@@ -131,7 +131,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .step-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:var(--teal-light);line-height:1;margin-bottom:.5rem;-webkit-text-stroke:1px var(--teal)}
 .step-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:.375rem}
 .step-desc{font-size:13px;color:var(--text-2)}
- 
+
 /* ── PRICING ── */
 .pricing-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:820px;margin:0 auto}
 .pricing-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:2rem}
@@ -156,7 +156,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .btn-price.paid{background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff}
 .btn-price.paid:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,196,182,.3)}
 .pricing-note{text-align:center;font-size:12px;color:var(--text-2);margin-top:1rem}
- 
+
 /* ── SOCIAL PROOF / FAQ ── */
 .faq-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:680px;margin:0 auto}
 .faq-item{border-bottom:1px solid var(--border-gray);padding:1.25rem 0;cursor:pointer}
@@ -166,18 +166,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .faq-item.open .faq-icon{transform:rotate(45deg)}
 .faq-a{font-size:14px;color:var(--text-2);line-height:1.7;margin-top:.75rem;display:none}
 .faq-item.open .faq-a{display:block}
- 
+
 /* ── CTA FINAL ── */
 .cta-section{position:relative;z-index:1;padding:5rem 1.5rem;text-align:center;max-width:700px;margin:0 auto}
 .cta-box{background:linear-gradient(135deg,var(--teal-light),var(--violet-light));border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:3rem 2rem}
 .cta-box h2{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3rem);font-weight:600;margin-bottom:.875rem;line-height:1.15;color:var(--text)}
 .cta-box p{font-size:15px;color:var(--text-2);margin-bottom:2rem;line-height:1.6}
- 
+
 /* ── FOOTER ── */
 footer{position:relative;z-index:1;border-top:1px solid var(--border-gray);padding:2rem;text-align:center;font-size:12px;color:var(--text-3);background:var(--white)}
 footer a{color:var(--text-2);text-decoration:none}
 footer a:hover{color:var(--teal-dark)}
- 
+
 /* ── MODAL DE PAGO ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
@@ -195,7 +195,7 @@ footer a:hover{color:var(--teal-dark)}
 .btn-modal-close{width:100%;padding:11px;border-radius:var(--radius);background:var(--cream-2);color:var(--text-2);font-size:13px;border:1.5px solid var(--border-gray);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
 .btn-modal-close:hover{color:var(--text);border-color:var(--teal)}
 .modal-secure{text-align:center;font-size:11px;color:var(--text-3);margin-top:.75rem}
- 
+
 /* ── UNLOCK BANNER ── */
 .unlock-banner{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--white);border:1.5px solid var(--border);border-radius:100px;padding:12px 20px;z-index:90;box-shadow:0 8px 32px rgba(0,0,0,.12);align-items:center;gap:14px;white-space:nowrap;max-width:90vw}
 .unlock-banner.visible{display:flex}
@@ -203,7 +203,7 @@ footer a:hover{color:var(--teal-dark)}
 .ub-text strong{color:var(--text)}
 .ub-btn{padding:8px 18px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .2s}
 .ub-btn:hover{opacity:.9}
- 
+
 @media(max-width:600px){
   nav{padding:0 1rem}
   .hero{padding:7rem 1rem 4rem}
@@ -219,10 +219,10 @@ footer a:hover{color:var(--teal-dark)}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
- 
+
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
- 
+
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="#">
@@ -245,7 +245,7 @@ footer a:hover{color:var(--teal-dark)}
     <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
   </div>
 </nav>
- 
+
 <!-- HERO -->
 <section class="hero">
   <span class="hero-tag" data-es="✦ Inteligencia artificial para eventos" data-en="✦ AI for event planning">✦ Inteligencia artificial para eventos</span>
@@ -268,7 +268,7 @@ footer a:hover{color:var(--teal-dark)}
     <span class="proof-item" data-es="✓ Listo en 30 segundos" data-en="✓ Ready in 30 seconds">✓ Listo en 30 segundos</span>
   </div>
 </section>
- 
+
 <!-- DEMO PREVIEW -->
 <section class="demo-section">
   <p class="section-eyebrow" data-es="Vista previa" data-en="Preview">Vista previa</p>
@@ -309,7 +309,7 @@ footer a:hover{color:var(--teal-dark)}
     </div>
   </div>
 </section>
- 
+
 <!-- FEATURES -->
 <section class="features-section" id="como-funciona">
   <p class="section-eyebrow" data-es="Funcionalidades" data-en="Features">Funcionalidades</p>
@@ -353,7 +353,7 @@ footer a:hover{color:var(--teal-dark)}
     </div>
   </div>
 </section>
- 
+
 <!-- HOW IT WORKS -->
 <section class="how-section">
   <p class="section-eyebrow" data-es="Así de fácil" data-en="It's this easy">Así de fácil</p>
@@ -376,21 +376,21 @@ footer a:hover{color:var(--teal-dark)}
     </div>
   </div>
 </section>
- 
+
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
   <p class="section-eyebrow" data-es="Precios" data-en="Pricing">Precios</p>
   <h2 class="section-title" data-es="Empieza gratis,<br>desbloquea cuando quieras" data-en="Start free,<br>unlock whenever you want">Empieza gratis,<br>desbloquea cuando quieras</h2>
   <p class="section-sub" data-es="Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año." data-en="No surprise subscriptions. Pay once — if you choose Annual, you just pay the same link again when the year is up.">Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año.</p>
- 
+
   <div class="pricing-toggle">
     <button class="pt-btn active" id="pt-diy" onclick="showPricingGroup('diy')" data-es="Para mi evento (DIY)" data-en="For my event (DIY)">Para mi evento (DIY)</button>
     <button class="pt-btn" id="pt-planner" onclick="showPricingGroup('planner')" data-es="Soy planner profesional" data-en="I'm a professional planner">Soy planner profesional</button>
   </div>
- 
+
   <!-- GRUPO DIY -->
   <div class="pricing-grid pricing-group" id="pg-diy">
- 
+
     <div class="price-card">
       <div class="price-name" data-es="Gratis" data-en="Free">Gratis</div>
       <div class="price-amount">$0 <span>MXN</span></div>
@@ -403,7 +403,7 @@ footer a:hover{color:var(--teal-dark)}
       </ul>
       <button class="btn-price free" onclick="window.location.href='dragonflai-v2.html'" data-es="Empezar gratis →" data-en="Start free →">Empezar gratis →</button>
     </div>
- 
+
     <div class="price-card featured">
       <span class="featured-badge" data-es="Más popular" data-en="Most popular">Más popular</span>
       <div class="price-name" data-es="1 evento" data-en="1 event">1 evento</div>
@@ -417,7 +417,7 @@ footer a:hover{color:var(--teal-dark)}
       </ul>
       <button class="btn-price paid" onclick="goToPay('diy_event')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
- 
+
     <div class="price-card">
       <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
       <div class="price-amount">$299 <span>MXN</span></div>
@@ -430,12 +430,12 @@ footer a:hover{color:var(--teal-dark)}
       </ul>
       <button class="btn-price paid" onclick="goToPay('diy_annual')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
- 
+
   </div>
- 
+
   <!-- GRUPO PLANNER -->
   <div class="pricing-grid pricing-group" id="pg-planner" style="display:none">
- 
+
     <div class="price-card">
       <div class="price-name" data-es="3 eventos" data-en="3 events">3 eventos</div>
       <div class="price-amount">$249 <span>MXN</span></div>
@@ -447,7 +447,7 @@ footer a:hover{color:var(--teal-dark)}
       </ul>
       <button class="btn-price paid" onclick="goToPay('planner_3')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
- 
+
     <div class="price-card featured">
       <span class="featured-badge" data-es="Mejor valor" data-en="Best value">Mejor valor</span>
       <div class="price-name" data-es="10 eventos" data-en="10 events">10 eventos</div>
@@ -460,7 +460,7 @@ footer a:hover{color:var(--teal-dark)}
       </ul>
       <button class="btn-price paid" onclick="goToPay('planner_10')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
- 
+
     <div class="price-card">
       <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
       <div class="price-amount">$599 <span>MXN</span></div>
@@ -473,17 +473,17 @@ footer a:hover{color:var(--teal-dark)}
       </ul>
       <button class="btn-price paid" onclick="goToPay('planner_annual')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
- 
+
   </div>
- 
+
   <p class="pricing-note" data-es="💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español" data-en="💳 Secure payment · Card, OXXO, wire transfer · Support in English &amp; Spanish">💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español</p>
 </section>
- 
+
 <!-- FAQ -->
 <section class="faq-section">
   <p class="section-eyebrow" data-es="Preguntas frecuentes" data-en="Frequently asked questions">Preguntas frecuentes</p>
   <h2 class="section-title" style="margin-bottom:2rem" data-es="Lo que más nos preguntan" data-en="What people ask us most">Lo que más nos preguntan</h2>
- 
+
   <div class="faq-item" onclick="toggleFaq(this)">
     <div class="faq-q"><span data-es="¿Necesito saber de tecnología para usarlo?" data-en="Do I need to be tech-savvy to use it?">¿Necesito saber de tecnología para usarlo?</span><span class="faq-icon">+</span></div>
     <div class="faq-a" data-es="No. Abres el link, llenas el formulario y la IA hace todo. No hay instalaciones ni cuentas que crear. Funciona en cualquier celular o computadora." data-en="No. You open the link, fill out the form, and the AI does everything. No installs or accounts to create. Works on any phone or computer.">No. Abres el link, llenas el formulario y la IA hace todo. No hay instalaciones ni cuentas que crear. Funciona en cualquier celular o computadora.</div>
@@ -509,7 +509,7 @@ footer a:hover{color:var(--teal-dark)}
     <div class="faq-a" data-es="Con el pago único de $497 MXN desbloqueas planes ilimitados de por vida, más el modo planner profesional para generar propuestas para clientes. Sin renovaciones ni pagos adicionales." data-en="With the one-time payment of $497 MXN, you unlock unlimited plans for life, plus professional planner mode to generate client proposals. No renewals or extra payments.">Con el pago único de $497 MXN desbloqueas planes ilimitados de por vida, más el modo planner profesional para generar propuestas para clientes. Sin renovaciones ni pagos adicionales.</div>
   </div>
 </section>
- 
+
 <!-- CTA FINAL -->
 <section class="cta-section">
   <div class="cta-box">
@@ -521,7 +521,7 @@ footer a:hover{color:var(--teal-dark)}
     </a>
   </div>
 </section>
- 
+
 <footer>
   <p style="margin-bottom:.5rem">
     <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg> <strong style="color:var(--teal-dark)">DragonflAI Events</strong>
@@ -534,7 +534,7 @@ footer a:hover{color:var(--teal-dark)}
     <a href="mailto:hola@dragonflaievents.com" data-es="Contacto" data-en="Contact">Contacto</a>
   </p>
 </footer>
- 
+
 <!-- LOGIN: MAGIC LINK -->
 <div class="modal-overlay" id="auth-modal" onclick="if(event.target===this) closeAuthModal()">
   <div class="modal">
@@ -545,13 +545,13 @@ footer a:hover{color:var(--teal-dark)}
     <button class="btn-modal-close" onclick="closeAuthModal()" data-es="Ahora no" data-en="Not now">Ahora no</button>
   </div>
 </div>
- 
+
 <!-- UNLOCK BANNER (aparece después de 2 planes) -->
 <div class="unlock-banner" id="unlock-banner">
   <span class="ub-text" id="ub-text">Te queda <strong id="ub-count">1</strong> plan gratis</span>
   <button class="ub-btn" onclick="document.getElementById('precios').scrollIntoView({behavior:'smooth'})" data-es="Ver planes →" data-en="See plans →">Ver planes →</button>
 </div>
- 
+
 <script>
 // ══════════════════════════════
 //  CONFIG — actualiza estos valores
@@ -563,17 +563,17 @@ const STRIPE_LINKS = {
   planner_10:     'https://buy.stripe.com/5kQaEY3L0cH88J206LdEs04', // Planner — 10 eventos — $399 MXN
   planner_annual: 'https://buy.stripe.com/5kQ3cw1CS5eG7EY5r5dEs03'  // Planner — Anual — $599 MXN
 };
- 
-const WORKER_URL = 'https://dragonflai-worker.clauliz-acosta.workers.dev';
+
+const WORKER_URL = 'https://dragonflai-worker-v2.clauliz-acosta.workers.dev';
 const MAX_FREE = 2;
- 
+
 // Supabase dashboard → Settings → API (mismas llaves que en dragonflai-v2.html)
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
- 
+
 // ══════════════════════════════
 //  LÓGICA DE PLANES Y ACCESO
 //  isPaid se confirma contra Supabase (nunca se confía en localStorage).
@@ -582,7 +582,7 @@ const gensUsed = parseInt(localStorage.getItem('dflai_gens') || '0');
 let currentUser = null;
 let isPaid = false;
 let lang = 'es';
- 
+
 function setLang(l){
   lang = l;
   document.getElementById('btn-es').className = 'lang-btn' + (l === 'es' ? ' active' : '');
@@ -595,7 +595,7 @@ function setLang(l){
   updateNavLogin();
   updateUnlockBannerText();
 }
- 
+
 function updateUnlockBannerText(){
   const left = Math.max(0, MAX_FREE - gensUsed);
   let txt;
@@ -609,7 +609,7 @@ function updateUnlockBannerText(){
   const el = document.getElementById('ub-text');
   if (el) el.innerHTML = isPaid ? '' : txt;
 }
- 
+
 async function refreshPaidStatus() {
   if (!sb) return;
   const { data: { session } } = await sb.auth.getSession();
@@ -619,7 +619,7 @@ async function refreshPaidStatus() {
   const { data } = await sb.from('profiles').select('paid').eq('id', currentUser.id).single();
   isPaid = !!(data && data.paid);
 }
- 
+
 function updateNavLogin() {
   const navLogin = document.getElementById('nav-login');
   if (!navLogin) return;
@@ -631,12 +631,12 @@ function updateNavLogin() {
     navLogin.onclick = () => { openAuthModal(); return false; };
   }
 }
- 
+
 function handleNavLogin() {
   if (currentUser) { window.location.href = 'dragonflai-v2.html'; }
   else { openAuthModal(); }
 }
- 
+
 refreshPaidStatus().then(() => {
   // Mostrar banner si ya usó 2+ planes gratis y no pagó
   if (!isPaid && gensUsed >= MAX_FREE - 1) {
@@ -645,14 +645,14 @@ refreshPaidStatus().then(() => {
     setTimeout(() => banner.classList.add('visible'), 1500);
   }
 });
- 
+
 if (sb) {
   sb.auth.onAuthStateChange((_event, session) => {
     currentUser = session ? session.user : null;
     refreshPaidStatus();
   });
 }
- 
+
 // ══════════════════════════════
 //  MODAL
 // ══════════════════════════════
@@ -662,17 +662,17 @@ function showPricingGroup(group){
   document.getElementById('pt-diy').classList.toggle('active', group==='diy');
   document.getElementById('pt-planner').classList.toggle('active', group==='planner');
 }
- 
+
 function openAuthModal() {
   document.getElementById('auth-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
- 
+
 function closeAuthModal() {
   document.getElementById('auth-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
- 
+
 async function sendMagicLink() {
   if (!sb) { showToast(lang==='es'?'Supabase no está configurado todavía.':'Supabase is not configured yet.', true); return; }
   const email = document.getElementById('auth-email').value.trim();
@@ -682,7 +682,7 @@ async function sendMagicLink() {
   showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link para entrar.':'✉️ Check your email — we sent you a link to log in.');
   closeAuthModal();
 }
- 
+
 function goToPay(productKey) {
   const link = STRIPE_LINKS[productKey];
   if (!link) { console.error('Producto no reconocido:', productKey); return; }
@@ -696,14 +696,14 @@ function goToPay(productKey) {
   const sep = link.includes('?') ? '&' : '?';
   window.location.href = link + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
 }
- 
+
 // ══════════════════════════════
 //  FAQ
 // ══════════════════════════════
 function toggleFaq(el) {
   el.classList.toggle('open');
 }
- 
+
 // ══════════════════════════════
 //  SMOOTH SCROLL NAV
 // ══════════════════════════════
@@ -723,7 +723,7 @@ function showToast(msg,isError){
   clearTimeout(t._hideTimer);
   t._hideTimer=setTimeout(()=>t.classList.remove('show'),3200);
 }
- 
+
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     e.preventDefault();
