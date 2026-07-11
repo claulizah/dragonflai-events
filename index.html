@@ -651,6 +651,14 @@ function handleNavLogin() {
 }
 
 refreshPaidStatus().then(() => {
+  // Si ya tiene una cuenta con acceso activo, mándalo directo a su cuenta
+  // en vez de empujarlo otra vez hacia la página de compra — salvo que
+  // haya llegado con un link a una sección específica (ej. #precios),
+  // en cuyo caso respetamos que quería ver algo puntual.
+  if (currentUser && isPaid && !window.location.hash) {
+    window.location.href = 'dragonflai-v2.html';
+    return;
+  }
   // Mostrar banner si ya usó 2+ planes gratis y no pagó
   if (!isPaid && gensUsed >= MAX_FREE - 1) {
     const banner = document.getElementById('unlock-banner');
