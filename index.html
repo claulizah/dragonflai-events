@@ -384,7 +384,7 @@ footer a:hover{color:var(--teal-dark)}
   <p class="section-sub" data-es="Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año." data-en="No surprise subscriptions. Pay once — if you choose Annual, you just pay the same link again when the year is up.">Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año.</p>
 
   <div class="pricing-toggle">
-    <button class="pt-btn active" id="pt-diy" onclick="showPricingGroup('diy')" data-es="Para mi evento (DIY)" data-en="For my event (DIY)">Para mi evento (DIY)</button>
+    <button class="pt-btn active" id="pt-diy" onclick="showPricingGroup('diy')" data-es="Para mi evento" data-en="For my event (DIY)">Para mi evento</button>
     <button class="pt-btn" id="pt-planner" onclick="showPricingGroup('planner')" data-es="Soy planner profesional" data-en="I'm a professional planner">Soy planner profesional</button>
   </div>
 
@@ -552,6 +552,19 @@ footer a:hover{color:var(--teal-dark)}
   <button class="ub-btn" onclick="document.getElementById('precios').scrollIntoView({behavior:'smooth'})" data-es="Ver planes →" data-en="See plans →">Ver planes →</button>
 </div>
 
+<!-- Botón flotante para reportar bugs (beta) -->
+<button id="bug-report-fab" onclick="openBugReportModal()" title="Reportar un problema" style="position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">🐞</button>
+
+<div class="modal-overlay" id="bug-report-modal" onclick="if(event.target===this) closeBugReportModal()">
+  <div class="modal">
+    <h3 style="text-align:center" data-es="🐞 Reportar un problema" data-en="🐞 Report a problem">🐞 Reportar un problema</h3>
+    <p style="font-size:13px;color:var(--text-2);text-align:center;margin-bottom:1rem" data-es="Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos." data-en="Tell us what happened — the more detail, the easier it is for us to find it.">Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos.</p>
+    <textarea id="bug-report-message" style="width:100%;min-height:110px;resize:vertical;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;box-sizing:border-box" placeholder="ej. El botón de 'Generar plan gratis' no hizo nada…"></textarea>
+    <button class="btn-modal-pay" style="margin-top:.75rem" onclick="submitBugReport()" data-es="Enviar reporte" data-en="Send report">Enviar reporte</button>
+    <button class="btn-modal-close" onclick="closeBugReportModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════
 //  CONFIG — actualiza estos valores
@@ -710,6 +723,35 @@ function toggleFaq(el) {
 // ══════════════════════════════
 //  TOAST (reemplaza los alert() nativos)
 // ══════════════════════════════
+function openBugReportModal(){
+  document.getElementById('bug-report-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeBugReportModal(){
+  document.getElementById('bug-report-modal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('bug-report-message').value='';
+}
+
+async function submitBugReport(){
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  const message=document.getElementById('bug-report-message').value.trim();
+  if(!message){ showToast(lang==='es'?'Escribe qué pasó':'Describe what happened',true); return; }
+
+  const {error}=await sb.from('bug_reports').insert({
+    user_id: currentUser?currentUser.id:null,
+    user_email: currentUser?currentUser.email:null,
+    page: 'landing',
+    message,
+    browser_info: navigator.userAgent
+  });
+
+  if(error){ showToast(lang==='es'?'No se pudo enviar el reporte, intenta de nuevo':'Could not send the report, try again',true); return; }
+  closeBugReportModal();
+  showToast(lang==='es'?'✅ ¡Gracias! Ya lo tenemos anotado':'✅ Thanks! We\'ve got it noted');
+}
+
 function showToast(msg,isError){
   let t=document.getElementById('toast');
   if(!t){

@@ -916,8 +916,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem" id="paywall-icon">📊🔒</span>
     <h3 id="paywall-title" data-es="Descarga tu Excel editable" data-en="Download your editable Excel">Descarga tu Excel editable</h3>
     <p id="paywall-text" data-es="La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre." data-en="Excel export (budget with formulas, guest list, timeline, checklist and more) is part of full access — one payment, yours forever.">La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre.</p>
-    <a class="btn-excel-unlock" href="index.html#precios" data-es="Ver acceso completo — $497 MXN →" data-en="See full access — $497 MXN →">Ver acceso completo — $497 MXN →</a>
+    <a class="btn-excel-unlock" href="index.html#precios" data-es="Ver planes →" data-en="See plans →">Ver planes →</a>
     <button class="btn-excel-close" onclick="closeExcelPaywall()" data-es="Ahora no" data-en="Not now">Ahora no</button>
+
+    <div id="redeem-code-toggle" style="text-align:center;margin-top:.75rem">
+      <a href="#" onclick="toggleRedeemBox();return false" style="font-size:12.5px;color:var(--text-3)" data-es="¿Tienes un código de acceso?" data-en="Have an access code?">¿Tienes un código de acceso?</a>
+    </div>
+    <div id="redeem-code-box" style="display:none;margin-top:.75rem">
+      <input type="text" id="redeem-code-input" class="profile-input" placeholder="ej. BETA2026" style="text-align:center;text-transform:uppercase">
+      <button class="btn-excel-unlock" style="margin-top:.5rem" onclick="redeemAccessCode()" data-es="Canjear código" data-en="Redeem code">Canjear código</button>
+    </div>
   </div>
 </div>
 
@@ -947,6 +955,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <div class="excel-modal-overlay" id="profile-modal" onclick="if(event.target===this) closeProfileModal()">
   <div class="excel-modal" style="max-width:480px;text-align:left;max-height:85vh;overflow-y:auto">
     <h3 style="text-align:center" data-es="Mi perfil" data-en="My profile">Mi perfil</h3>
+
+    <div id="pf-access-summary" style="background:var(--cream-2);border-radius:var(--radius);padding:12px 14px;margin-bottom:1rem;font-size:13px;line-height:1.6"></div>
 
     <label class="profile-label" data-es="Nombre" data-en="Name">Nombre</label>
     <input type="text" id="pf-name" class="profile-input" placeholder="ej. Ana Martínez">
@@ -1046,7 +1056,11 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
       <div class="profile-section-divider" data-es="Lista de invitados (opcional)" data-en="Guest list (optional)">Lista de invitados (opcional)</div>
       <p style="font-size:11.5px;color:var(--text-3);margin-bottom:.5rem" data-es="Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. 'Ana Pérez, 2')." data-en="One name per line. Add a comma and a number if they can bring companions (e.g. 'Ana Pérez, 2').">Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. "Ana Pérez, 2").</p>
-      <textarea id="pub-guest-list" class="profile-input" style="min-height:100px;resize:vertical" placeholder="Ana Pérez, 2&#10;Juan Gómez&#10;Familia López, 4"></textarea>
+      <a href="#" onclick="exportGuestListExcel();return false" style="font-size:12px;color:var(--teal-dark);display:inline-block;margin-right:14px" data-es="📥 Descargar plantilla en Excel" data-en="📥 Download Excel template">📥 Descargar plantilla en Excel</a>
+      <a href="#" onclick="document.getElementById('pub-guest-list-file').click();return false" style="font-size:12px;color:var(--teal-dark);display:inline-block" data-es="📤 Subir Excel lleno" data-en="📤 Upload filled Excel">📤 Subir Excel lleno</a>
+      <input type="file" id="pub-guest-list-file" accept=".xlsx" style="display:none" onchange="onGuestExcelFileSelected(event)">
+      <textarea id="pub-guest-list" class="profile-input" style="min-height:100px;resize:vertical;margin-top:.5rem" placeholder="Ana Pérez, 2&#10;Juan Gómez&#10;Familia López, 4"></textarea>
+      <p style="font-size:11px;color:var(--text-3);margin-top:.3rem" data-es="Para agrupar varias personas (ej. una familia), usa dos puntos: 'Familia López: Juan López, María López'" data-en="To group several people (e.g. a family), use a colon: 'The Lopez Family: Juan Lopez, Maria Lopez'">Para agrupar varias personas (ej. una familia), usa dos puntos: "Familia López: Juan López, María López"</p>
       <label style="display:flex;align-items:center;gap:8px;margin:.5rem 0 .75rem;font-size:13px;color:var(--text-2);cursor:pointer">
         <input type="checkbox" id="pub-restrict-list" style="width:16px;height:16px;cursor:pointer">
         <span data-es="Solo las personas de esta lista pueden confirmar asistencia" data-en="Only people on this list can confirm attendance">Solo las personas de esta lista pueden confirmar asistencia</span>
@@ -1082,6 +1096,19 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   &nbsp;·&nbsp; <a href="/terminos.html" style="color:inherit" data-es="Términos" data-en="Terms">Términos</a>
   &nbsp;·&nbsp; <a href="/aviso-de-privacidad.html" style="color:inherit" data-es="Aviso de privacidad" data-en="Privacy notice">Aviso de privacidad</a>
 </footer>
+
+<!-- Botón flotante para reportar bugs (beta) -->
+<button id="bug-report-fab" onclick="openBugReportModal()" title="Reportar un problema" style="position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">🐞</button>
+
+<div class="excel-modal-overlay" id="bug-report-modal" onclick="if(event.target===this) closeBugReportModal()">
+  <div class="excel-modal">
+    <h3 style="text-align:center" data-es="🐞 Reportar un problema" data-en="🐞 Report a problem">🐞 Reportar un problema</h3>
+    <p style="font-size:13px;color:var(--text-2);text-align:center;margin-bottom:1rem" data-es="Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos." data-en="Tell us what happened — the more detail, the easier it is for us to find it.">Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos.</p>
+    <textarea id="bug-report-message" class="profile-input" style="min-height:110px;resize:vertical" placeholder="ej. Al darle clic en 'Descargar Excel' no pasó nada…"></textarea>
+    <button class="btn-excel-unlock" style="margin-top:.75rem" onclick="submitBugReport()" data-es="Enviar reporte" data-en="Send report">Enviar reporte</button>
+    <button class="btn-excel-close" onclick="closeBugReportModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+  </div>
+</div>
 
 <script>
 // ══════════════════════════════
@@ -1219,6 +1246,21 @@ async function openProfileModal(){
   document.getElementById('account-dropdown').style.display='none';
   if(!currentUser){ openAuthModal(); return; }
 
+  await refreshPaidStatus(); // traer el saldo de créditos más reciente
+  const L=lang==='es';
+  const diyLine=access.diyUnlimitedActive
+    ? (L?'✅ Haz tu propio evento: ilimitado activo':'✅ DIY: unlimited active')
+    : access.diyEventCredits>0
+      ? (L?`✅ Haz tu propio evento: ${access.diyEventCredits} evento(s) disponible(s)`:`✅ DIY: ${access.diyEventCredits} event(s) available`)
+      : (L?'⚪ Haz tu propio evento: sin créditos':'⚪ DIY: no credits');
+  const plannerLine=access.plannerUnlimitedActive
+    ? (L?'✅ Planner: ilimitado activo':'✅ Planner: unlimited active')
+    : access.plannerEventCredits>0
+      ? (L?`✅ Planner: ${access.plannerEventCredits} evento(s) disponible(s)`:`✅ Planner: ${access.plannerEventCredits} event(s) available`)
+      : (L?'⚪ Planner: sin créditos':'⚪ Planner: no credits');
+  document.getElementById('pf-access-summary').innerHTML=
+    `<strong>${L?'Tu acceso':'Your access'}</strong><br>${diyLine}<br>${plannerLine}`;
+
   document.getElementById('pf-name').value=userProfile.full_name||'';
   document.getElementById('pf-phone').value=userProfile.phone||'';
   document.getElementById('pf-lang').value=userProfile.preferred_lang||lang;
@@ -1343,12 +1385,23 @@ function closePublishModal(){
 let lastPublishedUrl='';
 
 function parseGuestList(text){
-  return text.split('\n').map(line=>line.trim()).filter(Boolean).map(line=>{
-    const parts=line.split(',');
-    const name=parts[0].trim();
-    const num=parts.length>1?parseInt(parts[1].trim(),10):0;
-    return {guest_name:name, max_companions: isNaN(num)?0:num};
-  }).filter(g=>g.guest_name);
+  const entries=[];
+  text.split('\n').map(line=>line.trim()).filter(Boolean).forEach(line=>{
+    if(line.includes(':')){
+      // "Familia López: Juan López, María López, Pedro López" — grupo
+      const idx=line.indexOf(':');
+      const groupName=line.slice(0,idx).trim();
+      const members=line.slice(idx+1).split(',').map(m=>m.trim()).filter(Boolean);
+      members.forEach(m=>entries.push({guest_name:m, group_name:groupName||null, max_companions:0}));
+    } else {
+      // "Ana Pérez, 2" — individual con acompañantes opcionales
+      const parts=line.split(',');
+      const name=parts[0].trim();
+      const num=parts.length>1?parseInt(parts[1].trim(),10):0;
+      if(name) entries.push({guest_name:name, group_name:null, max_companions:isNaN(num)?0:num});
+    }
+  });
+  return entries;
 }
 
 async function publishInvitation(){
@@ -1400,7 +1453,7 @@ async function publishInvitation(){
 
   // Si el anfitrión pegó una lista de invitados, la guardamos ligada a esta invitación
   if(guestListEntries.length>0 && newInv){
-    const rows=guestListEntries.map(g=>({invitation_id:newInv.id,guest_name:g.guest_name,max_companions:g.max_companions}));
+    const rows=guestListEntries.map(g=>({invitation_id:newInv.id,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null}));
     const {error:glError}=await sb.from('guest_list').insert(rows);
     if(glError) console.error('Error guardando lista de invitados:',glError);
   }
@@ -1909,7 +1962,9 @@ async function generate(){
       await refreshPaidStatus();
     }
   } else if(!isPaid&&gensUsed>=MAX_GENERATIONS){
-    showToast(lang==='es'?'Has usado todos tus planes disponibles':'All plans used',true);return;
+    showToast(lang==='es'?'Has usado todos tus planes disponibles — te llevamos a los planes':'You\'ve used all your free plans — taking you to pricing',true);
+    setTimeout(()=>{ window.location.href='index.html#precios'; },1800);
+    return;
   }
 
   // Limpiar el plan anterior de todas las pestañas ANTES de generar el nuevo —
@@ -2909,13 +2964,13 @@ async function deleteSavedPlan(id){
 const PAYWALL_CONTENT={
   excel:{icon:'📊🔒',
     title:{es:'Descarga tu Excel editable',en:'Download your editable Excel'},
-    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso DIY — desde $179 por evento, o ilimitado por un año.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
+    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso Haz tu propio evento — desde $179 por evento, o ilimitado por un año.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
   publish:{icon:'🌐🔒',
     title:{es:'Publica tu invitación',en:'Publish your invitation'},
-    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) es parte del acceso DIY — desde $179 por evento, o ilimitado por un año.',en:'Your own invitation site with a custom URL and RSVP is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
+    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) es parte del acceso Haz tu propio evento — desde $179 por evento, o ilimitado por un año.',en:'Your own invitation site with a custom URL and RSVP is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
   planner:{icon:'💼🔒',
     title:{es:'Genera propuestas para tus clientes',en:'Generate client proposals'},
-    text:{es:'El modo Planner (propuestas de cliente, y todo lo de DIY incluido) es parte del acceso Planner — paquetes desde $249, o ilimitado por un año.',en:'Planner mode (client proposals, plus everything in DIY) is part of Planner access — packages from $249 MXN, or unlimited for a year.'}}
+    text:{es:'El modo Planner (propuestas de cliente, y todo lo de Haz tu propio evento incluido) es parte del acceso Planner — paquetes desde $249, o ilimitado por un año.',en:'Planner mode (client proposals, plus everything in DIY) is part of Planner access — packages from $249 MXN, or unlimited for a year.'}}
 };
 
 function openExcelPaywall(feature){
@@ -2934,6 +2989,41 @@ function openExcelPaywall(feature){
 function closeExcelPaywall(){
   document.getElementById('excel-modal').classList.remove('open');
   document.body.style.overflow='';
+  // Reiniciar el cuadro de canje para la próxima vez que se abra el paywall
+  document.getElementById('redeem-code-box').style.display='none';
+  document.getElementById('redeem-code-toggle').style.display='block';
+  document.getElementById('redeem-code-input').value='';
+}
+
+function toggleRedeemBox(){
+  document.getElementById('redeem-code-toggle').style.display='none';
+  document.getElementById('redeem-code-box').style.display='block';
+}
+
+async function redeemAccessCode(){
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión primero para canjear tu código':'Log in first to redeem your code',true); return; }
+  const code=document.getElementById('redeem-code-input').value.trim();
+  if(!code){ showToast(lang==='es'?'Escribe tu código':'Enter your code',true); return; }
+
+  const {data,error}=await sb.rpc('redeem_code',{p_code:code});
+  if(error||!data){ showToast(lang==='es'?'No se pudo canjear el código':'Could not redeem code',true); return; }
+
+  if(!data.success){
+    const L=lang==='es';
+    const messages={
+      code_not_found:L?'Ese código no existe':'That code does not exist',
+      code_expired:L?'Ese código ya venció':'That code has expired',
+      code_exhausted:L?'Ese código ya alcanzó su límite de usos':'That code has reached its usage limit',
+      already_used_by_you:L?'Ya usaste ese código antes':'You already used that code'
+    };
+    showToast(messages[data.reason]||(L?'No se pudo canjear el código':'Could not redeem code'),true);
+    return;
+  }
+
+  await refreshPaidStatus();
+  showToast(lang==='es'?'✅ ¡Código canjeado! Ya tienes acceso':'✅ Code redeemed! You now have access');
+  closeExcelPaywall();
 }
 
 // ══════════════════════════════
@@ -3139,15 +3229,6 @@ async function exportSpreadsheet(){
     ws.views=[{state:'frozen',ySplit:1}];
   }
 
-  // Lista de invitados — plantilla editable en blanco
-  {
-    const guestCount=Math.min(Math.max(parseInt(guests)||30,10),80);
-    xlAddSheet(wb,L?'Invitados':'Guest List',
-      [L?'Nombre':'Name','RSVP',L?'Número de mesa':'Table number',L?'Agradecimiento enviado':'Thank you sent',L?'Restricción alimentaria':'Dietary'],
-      Array.from({length:guestCount},()=>['','','','','']),
-      [24,12,14,20,20]);
-  }
-
   // Decoración — plantilla editable en blanco
   xlAddSheet(wb,L?'Decoración':'Decor',
     [L?'Artículo':'Item',L?'Cantidad':'Qty',L?'¿Renta?':'Rental?',L?'Proveedor':'Vendor',L?'Costo':'Cost'],
@@ -3188,6 +3269,88 @@ async function exportSpreadsheet(){
   link.href=url; link.download=filename; link.click();
   URL.revokeObjectURL(url);
   showToast(L?'📊 Excel descargado':'📊 Excel downloaded');
+}
+
+// Plantilla de lista de invitados, en su propio archivo — así se puede llenar
+// y volver a subir directo en el modal de publicar, sin tocar el Excel grande.
+// Es solo una plantilla en blanco (no lleva datos del plan), así que no gasta
+// crédito ni requiere haber pagado — ayuda a armar la lista antes de decidir.
+async function exportGuestListExcel(){
+  if(typeof ExcelJS==='undefined'){showToast(lang==='es'?'No se pudo cargar el generador de Excel':'Could not load Excel generator',true);return;}
+  const L=lang==='es';
+  const wb=new ExcelJS.Workbook();
+  wb.creator='DragonflAI Events';
+  wb.created=new Date();
+
+  const guestCount=Math.min(Math.max(parseInt(guests)||30,10),80);
+  xlAddSheet(wb,L?'Invitados':'Guest List',
+    [
+      L?'Nombre':'Name',
+      L?'Grupo / Familia (opcional)':'Group / Family (optional)',
+      L?'Acompañantes permitidos (opcional)':'Allowed companions (optional)',
+      'RSVP',
+      L?'Número de mesa':'Table number',
+      L?'Restricción alimentaria':'Dietary'
+    ],
+    Array.from({length:guestCount},()=>['','','','','','']),
+    [24,26,20,12,14,20]);
+
+  const filename=`DragonflAI_Invitados_${(plan.typeName||'evento').replace(/[^\w]+/g,'_')}.xlsx`;
+  const buffer=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url; link.download=filename; link.click();
+  URL.revokeObjectURL(url);
+  showToast(L?'📋 Plantilla de invitados descargada':'📋 Guest list template downloaded');
+}
+
+// Lee el Excel que el usuario sube (mismo formato que exportGuestListExcel genera)
+// y lo convierte al texto del cuadro de lista de invitados, para que lo revise
+// y edite antes de publicar.
+async function onGuestExcelFileSelected(event){
+  const file=event.target.files[0];
+  event.target.value=''; // permitir volver a subir el mismo archivo si hace falta
+  if(!file) return;
+  const L=lang==='es';
+  if(typeof ExcelJS==='undefined'){ showToast(L?'No se pudo cargar el lector de Excel':'Could not load Excel reader',true); return; }
+
+  try{
+    const buffer=await file.arrayBuffer();
+    const wb=new ExcelJS.Workbook();
+    await wb.xlsx.load(buffer);
+    const ws=wb.worksheets[0];
+    if(!ws){ showToast(L?'Ese archivo no tiene hojas legibles':'That file has no readable sheets',true); return; }
+
+    const groups={};  // nombre de grupo -> [nombres]
+    const solos=[];   // líneas individuales ya formateadas
+
+    ws.eachRow((row,rowNumber)=>{
+      if(rowNumber===1) return; // encabezado
+      const name=String(row.getCell(1).text||'').trim();
+      const group=String(row.getCell(2).text||'').trim();
+      const companions=String(row.getCell(3).text||'').trim();
+      if(!name) return;
+      if(group){
+        if(!groups[group]) groups[group]=[];
+        groups[group].push(name);
+      } else {
+        solos.push(companions?`${name}, ${companions}`:name);
+      }
+    });
+
+    const groupLines=Object.keys(groups).map(g=>`${g}: ${groups[g].join(', ')}`);
+    const finalText=[...groupLines,...solos].join('\n');
+    const total=Object.values(groups).reduce((s,arr)=>s+arr.length,0)+solos.length;
+
+    if(!total){ showToast(L?'No encontramos filas con nombre en ese archivo':'No named rows found in that file',true); return; }
+
+    document.getElementById('pub-guest-list').value=finalText;
+    showToast(L?`✅ Se cargaron ${total} invitado(s) — revísalos antes de publicar`:`✅ Loaded ${total} guest(s) — review before publishing`);
+  }catch(err){
+    console.error('Error leyendo el Excel de invitados:',err);
+    showToast(L?'No se pudo leer ese archivo — confirma que sea el formato de la plantilla':'Could not read that file — confirm it matches the template format',true);
+  }
 }
 
 
@@ -3365,6 +3528,35 @@ function printPlan(){
     document.querySelectorAll('.tpanel.active').forEach(p=>p.style.display='block');
     const t=document.getElementById('print-toc'); if(t) t.remove();
   }, 1000);
+}
+
+function openBugReportModal(){
+  document.getElementById('bug-report-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeBugReportModal(){
+  document.getElementById('bug-report-modal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('bug-report-message').value='';
+}
+
+async function submitBugReport(){
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  const message=document.getElementById('bug-report-message').value.trim();
+  if(!message){ showToast(lang==='es'?'Escribe qué pasó':'Describe what happened',true); return; }
+
+  const {error}=await sb.from('bug_reports').insert({
+    user_id: currentUser?currentUser.id:null,
+    user_email: currentUser?currentUser.email:null,
+    page: 'app',
+    message,
+    browser_info: navigator.userAgent
+  });
+
+  if(error){ showToast(lang==='es'?'No se pudo enviar el reporte, intenta de nuevo':'Could not send the report, try again',true); return; }
+  closeBugReportModal();
+  showToast(lang==='es'?'✅ ¡Gracias! Ya lo tenemos anotado':'✅ Thanks! We\'ve got it noted');
 }
 
 function showToast(msg,isErr=false){
