@@ -1552,6 +1552,7 @@ async function exportRsvpsToExcel(invId,hostNames){
   if(!data||!data.length){ showToast(lang==='es'?'Todavía no hay RSVPs para exportar':'No RSVPs to export yet',true); return; }
 
   const wb=new ExcelJS.Workbook();
+  wb.calcProperties.fullCalcOnLoad=true;
   const ws=wb.addWorksheet(L?'RSVPs':'RSVPs',{properties:{tabColor:{argb:XL_TEAL}}});
   ws.columns=[{width:22},{width:26},{width:12},{width:12},{width:24},{width:24},{width:12},{width:30},{width:24},{width:18}];
   const header=[L?'Invitado':'Guest',L?'Correo':'Email',L?'Asiste':'Attending',L?'Acompañantes':'Guests',L?'Restricción alimentaria':'Dietary',L?'Canción':'Song request',L?'Hospedaje':'Lodging',L?'Mensaje':'Message',L?'Respuesta extra':'Custom answer',L?'Fecha de respuesta':'Response date'];
@@ -3083,6 +3084,7 @@ async function exportSpreadsheet(){
   const wb=new ExcelJS.Workbook();
   wb.creator='DragonflAI Events';
   wb.created=new Date();
+  wb.calcProperties.fullCalcOnLoad=true; // evita el diálogo de "reparar" en Excel de escritorio cuando hay fórmulas
 
   // Overview — ahora con un bloque de "dashboard" arriba (fórmulas que jalan de otras hojas)
   const e=plan.extra||{};
@@ -3281,6 +3283,7 @@ async function exportGuestListExcel(){
   const wb=new ExcelJS.Workbook();
   wb.creator='DragonflAI Events';
   wb.created=new Date();
+  wb.calcProperties.fullCalcOnLoad=true; // evita el diálogo de "reparar" en Excel de escritorio cuando hay fórmulas
 
   const guestCount=Math.min(Math.max(parseInt(guests)||30,10),80);
   xlAddSheet(wb,L?'Invitados':'Guest List',
