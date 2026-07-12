@@ -281,6 +281,39 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-card.theme-sage .std-eyebrow,.std-card.theme-sage .std-divider-icon,.std-card.theme-sage .std-hashtag{color:#5A7C52}
 .std-card.theme-night .std-eyebrow,.std-card.theme-night .std-divider-icon,.std-card.theme-night .std-hashtag{color:#1A2332}
 .std-card.theme-blanco .std-eyebrow,.std-card.theme-blanco .std-divider-icon,.std-card.theme-blanco .std-hashtag{color:var(--text-3)}
+/* ── Fondos con patrón (no solo color plano) — hechos 100% con CSS, sin fotos reales ── */
+.std-card.theme-confetti{background:
+  radial-gradient(circle at 15% 20%, rgba(46,196,182,.16) 3px, transparent 3px),
+  radial-gradient(circle at 45% 60%, rgba(123,47,190,.16) 4px, transparent 4px),
+  radial-gradient(circle at 75% 25%, rgba(212,151,42,.16) 3px, transparent 3px),
+  radial-gradient(circle at 30% 82%, rgba(232,99,122,.16) 3px, transparent 3px),
+  radial-gradient(circle at 85% 70%, rgba(46,196,182,.13) 4px, transparent 4px),
+  radial-gradient(circle at 60% 12%, rgba(123,47,190,.11) 3px, transparent 3px),
+  radial-gradient(circle at 10% 55%, rgba(212,151,42,.11) 3px, transparent 3px),
+  #FFFFFF!important}
+.std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:var(--violet)}
+.std-card.theme-waves{background:
+  radial-gradient(ellipse 320px 220px at 8% 8%, rgba(46,196,182,.12), transparent 60%),
+  radial-gradient(ellipse 360px 260px at 92% 92%, rgba(123,47,190,.12), transparent 60%),
+  radial-gradient(ellipse 260px 200px at 82% 15%, rgba(212,151,42,.09), transparent 60%),
+  #FFFFFF!important}
+.std-card.theme-waves .std-eyebrow,.std-card.theme-waves .std-divider-icon,.std-card.theme-waves .std-hashtag{color:var(--teal-dark)}
+.std-card.theme-paper{background:
+  repeating-linear-gradient(135deg, rgba(0,0,0,.018) 0px, rgba(0,0,0,.018) 1px, transparent 1px, transparent 3px),
+  radial-gradient(ellipse at center, #FFFFFF 55%, #F6F0E6 100%)!important}
+.std-card.theme-paper .std-eyebrow,.std-card.theme-paper .std-divider-icon,.std-card.theme-paper .std-hashtag{color:#8B7355}
+.std-card.theme-sparkle{background-image:
+  radial-gradient(circle, rgba(212,151,42,.45) 1px, transparent 1.5px),
+  radial-gradient(circle, rgba(123,47,190,.32) 1px, transparent 1.5px)!important;
+  background-size:40px 40px,55px 55px!important;
+  background-position:0 0,20px 25px!important;
+  background-color:#FFFCF5!important}
+.std-card.theme-sparkle .std-eyebrow,.std-card.theme-sparkle .std-divider-icon,.std-card.theme-sparkle .std-hashtag{color:#B8860B}
+/* ── Fondo con foto propia — la imagen se pone inline vía JS, aquí solo el overlay para que el texto se lea ── */
+.std-card.theme-custom-photo{background-size:cover!important;background-position:center!important}
+.std-card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0}
+.std-card.theme-custom-photo .std-content,.std-card.theme-custom-photo .std-bg-dragonfly,.std-card.theme-custom-photo .std-logo-mark{position:relative;z-index:1}
+.std-card.theme-custom-photo .std-eyebrow,.std-card.theme-custom-photo .std-divider-icon,.std-card.theme-custom-photo .std-hashtag{color:var(--violet)}
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem}
 .theme-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
@@ -290,6 +323,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .theme-swatch.sw-sage{background:#5A7C52}
 .theme-swatch.sw-night{background:#1A2332}
 .theme-swatch.sw-blanco{background:#FFFFFF;border-color:var(--border-gray)}
+.theme-swatch.sw-confetti{background:radial-gradient(circle at 30% 30%,#2EC4B6 2px,transparent 2px),radial-gradient(circle at 65% 60%,#7B2FBE 2px,transparent 2px),radial-gradient(circle at 40% 75%,#D4972A 2px,transparent 2px),#FFFFFF;background-size:10px 10px}
+.theme-swatch.sw-waves{background:radial-gradient(ellipse at 20% 20%,rgba(46,196,182,.5),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(123,47,190,.5),transparent 60%),#FFFFFF}
+.theme-swatch.sw-paper{background:radial-gradient(ellipse at center,#FFFFFF 50%,#E9DFC8 100%)}
+.theme-swatch.sw-sparkle{background:radial-gradient(circle,rgba(212,151,42,.7) 1px,transparent 1.5px),#FFFCF5;background-size:8px 8px}
+.theme-swatch.sw-upload{background:var(--cream-2);border-color:var(--border-gray);display:flex;align-items:center;justify-content:center;font-size:12px}
 .std-logo-mark{position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:4px;opacity:.55}
 .std-logo-mark span{font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--text-3)}
 .std-editable{outline:1.5px dashed transparent;border-radius:6px;cursor:text;transition:outline-color .15s;padding:2px 4px;display:inline-block}
@@ -1003,11 +1041,11 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   </div>
 </div>
 
-<!-- PUBLICAR INVITACIÓN -->
+<!-- PUBLICAR / EDITAR INVITACIÓN -->
 <div class="excel-modal-overlay" id="publish-modal" onclick="if(event.target===this) closePublishModal()">
   <div class="excel-modal" style="max-width:480px;text-align:left;max-height:85vh;overflow-y:auto">
-    <h3 style="text-align:center" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
-    <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
+    <h3 style="text-align:center" id="publish-modal-title" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
+    <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" id="publish-modal-sub" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
 
     <div id="publish-form">
       <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
@@ -1015,6 +1053,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/i/</span>
         <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
       </div>
+      <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem;display:none" id="pub-slug-locked-note" data-es="El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste." data-en="The link can't change once published — avoids breaking links you already shared.">El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste.</p>
 
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <div class="std-theme-picker" id="pub-theme-picker" style="margin-bottom:.75rem">
@@ -1055,18 +1094,18 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <input type="text" id="pub-directions" class="profile-input" placeholder="ej. Entrada por Av. Reforma, estacionamiento gratis">
 
       <div class="profile-section-divider" data-es="Lista de invitados (opcional)" data-en="Guest list (optional)">Lista de invitados (opcional)</div>
-      <p style="font-size:11.5px;color:var(--text-3);margin-bottom:.5rem" data-es="Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. 'Ana Pérez, 2')." data-en="One name per line. Add a comma and a number if they can bring companions (e.g. 'Ana Pérez, 2').">Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. "Ana Pérez, 2").</p>
+      <p style="font-size:11.5px;color:var(--text-3);margin-bottom:.5rem" id="pub-guestlist-hint" data-es="Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. 'Ana Pérez, 2')." data-en="One name per line. Add a comma and a number if they can bring companions (e.g. 'Ana Pérez, 2').">Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. "Ana Pérez, 2").</p>
       <a href="#" onclick="exportGuestListExcel();return false" style="font-size:12px;color:var(--teal-dark);display:inline-block;margin-right:14px" data-es="📥 Descargar plantilla en Excel" data-en="📥 Download Excel template">📥 Descargar plantilla en Excel</a>
       <a href="#" onclick="document.getElementById('pub-guest-list-file').click();return false" style="font-size:12px;color:var(--teal-dark);display:inline-block" data-es="📤 Subir Excel lleno" data-en="📤 Upload filled Excel">📤 Subir Excel lleno</a>
       <input type="file" id="pub-guest-list-file" accept=".xlsx" style="display:none" onchange="onGuestExcelFileSelected(event)">
       <textarea id="pub-guest-list" class="profile-input" style="min-height:100px;resize:vertical;margin-top:.5rem" placeholder="Ana Pérez, 2&#10;Juan Gómez&#10;Familia López, 4"></textarea>
       <p style="font-size:11px;color:var(--text-3);margin-top:.3rem" data-es="Para agrupar varias personas (ej. una familia), usa dos puntos: 'Familia López: Juan López, María López'" data-en="To group several people (e.g. a family), use a colon: 'The Lopez Family: Juan Lopez, Maria Lopez'">Para agrupar varias personas (ej. una familia), usa dos puntos: "Familia López: Juan López, María López"</p>
-      <label style="display:flex;align-items:center;gap:8px;margin:.5rem 0 .75rem;font-size:13px;color:var(--text-2);cursor:pointer">
+      <label style="display:flex;align-items:center;gap:8px;margin:.5rem 0 .75rem;font-size:13px;color:var(--text-2);cursor:pointer" id="pub-restrict-list-label">
         <input type="checkbox" id="pub-restrict-list" style="width:16px;height:16px;cursor:pointer">
         <span data-es="Solo las personas de esta lista pueden confirmar asistencia" data-en="Only people on this list can confirm attendance">Solo las personas de esta lista pueden confirmar asistencia</span>
       </label>
 
-      <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none">Publicar →</a>
+      <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none">Publicar →</a>
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
@@ -1380,9 +1419,63 @@ function setPublishTheme(theme,el){
 function closePublishModal(){
   document.getElementById('publish-modal').classList.remove('open');
   document.body.style.overflow='';
+  // Restaurar el modal a su estado de "publicar nuevo" para la próxima vez
+  editingInvitationId=null;
+  const L=lang==='es';
+  document.getElementById('publish-modal-title').textContent=L?'Publicar invitación':'Publish invitation';
+  document.getElementById('publish-modal-sub').textContent=L?'Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.':'Generate a public page with RSVP so your guests can confirm — no account needed.';
+  document.getElementById('publish-btn').textContent=L?'Publicar →':'Publish →';
+  document.getElementById('pub-guestlist-hint').textContent=L?"Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. 'Ana Pérez, 2').":"One name per line. Add a comma and a number if they can bring companions (e.g. 'Ana Pérez, 2').";
+  document.getElementById('pub-slug-locked-note').style.display='none';
+  document.getElementById('pub-slug').disabled=false;
+  document.getElementById('pub-restrict-list-label').style.opacity='1';
 }
 
 let lastPublishedUrl='';
+let editingInvitationId=null;
+
+async function openEditInvitationModal(invId){
+  if(!sb||!currentUser) return;
+  const L=lang==='es';
+  showToast(L?'Cargando invitación…':'Loading invitation…');
+  const {data:inv,error}=await sb.from('invitations').select('*').eq('id',invId).eq('user_id',currentUser.id).single();
+  if(error||!inv){ showToast(L?'No se pudo cargar la invitación':'Could not load the invitation',true); return; }
+
+  editingInvitationId=invId;
+
+  // Textos del modal en modo edición
+  document.getElementById('publish-modal-title').textContent=L?'Editar invitación':'Edit invitation';
+  document.getElementById('publish-modal-sub').textContent=L?'Los cambios se aplican a la invitación ya publicada.':'Changes apply to the already-published invitation.';
+  document.getElementById('publish-btn').textContent=L?'Guardar cambios →':'Save changes →';
+  document.getElementById('pub-guestlist-hint').textContent=L?'Esto AGREGA personas nuevas a la lista — no borra ni reemplaza a quienes ya están.':'This ADDS new people to the list — it does not remove or replace who is already there.';
+  document.getElementById('pub-slug-locked-note').style.display='block';
+
+  // Slug de solo lectura — no se puede romper un link ya compartido
+  document.getElementById('pub-domain-label').textContent=location.host+'/i/';
+  document.getElementById('pub-slug').value=inv.slug;
+  document.getElementById('pub-slug').disabled=true;
+
+  // Pre-llenar el resto de los campos con lo que ya tiene guardado
+  pubSelectedTheme=inv.theme||'theme-teal';
+  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
+    s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
+  });
+  document.getElementById('pub-ask-guests').checked=!!inv.ask_guest_count;
+  document.getElementById('pub-ask-dietary').checked=!!inv.ask_dietary;
+  document.getElementById('pub-ask-message').checked=!!inv.ask_message;
+  document.getElementById('pub-ask-song').checked=!!inv.ask_song_request;
+  document.getElementById('pub-ask-lodging').checked=!!inv.ask_lodging_need;
+  document.getElementById('pub-custom-question').value=inv.custom_question||'';
+  document.getElementById('pub-directions').value=inv.directions_info||'';
+  document.getElementById('pub-guest-list').value=''; // vacío a propósito — aquí solo se agregan personas nuevas
+  document.getElementById('pub-restrict-list').checked=!!inv.restrict_to_guest_list;
+  document.getElementById('pub-restrict-list-label').style.opacity=inv.restrict_to_guest_list?'1':'.6';
+
+  document.getElementById('publish-form').style.display='block';
+  document.getElementById('publish-success').style.display='none';
+  document.getElementById('publish-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
 
 function parseGuestList(text){
   const entries=[];
@@ -1406,6 +1499,48 @@ function parseGuestList(text){
 
 async function publishInvitation(){
   if(!sb||!currentUser) return;
+  const L=lang==='es';
+
+  // ── MODO EDICIÓN: actualiza la invitación ya publicada, sin gastar
+  //    crédito de nuevo y sin poder cambiar el link ──
+  if(editingInvitationId){
+    const theme=pubSelectedTheme||'theme-teal';
+    const guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
+    const restrictToList=document.getElementById('pub-restrict-list').checked;
+
+    const updatePayload={
+      theme,
+      ask_guest_count: document.getElementById('pub-ask-guests').checked,
+      ask_dietary: document.getElementById('pub-ask-dietary').checked,
+      ask_message: document.getElementById('pub-ask-message').checked,
+      ask_song_request: document.getElementById('pub-ask-song').checked,
+      ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
+      directions_info: document.getElementById('pub-directions').value.trim()||null,
+      custom_question: document.getElementById('pub-custom-question').value.trim()||null,
+      restrict_to_guest_list: restrictToList
+    };
+
+    const {error}=await sb.from('invitations').update(updatePayload).eq('id',editingInvitationId).eq('user_id',currentUser.id);
+    if(error){
+      showToast((L?'No se pudo guardar: ':'Could not save: ')+(error.message||error.code||''),true);
+      console.error('editInvitation error:',error);
+      return;
+    }
+
+    // Agregar invitados NUEVOS a la lista existente — nunca se borra ni reemplaza lo que ya había
+    if(guestListEntries.length>0){
+      const rows=guestListEntries.map(g=>({invitation_id:editingInvitationId,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null}));
+      const {error:glError}=await sb.from('guest_list').insert(rows);
+      if(glError) console.error('Error agregando invitados:',glError);
+    }
+
+    showToast(L?'✅ Cambios guardados':'✅ Changes saved');
+    closePublishModal();
+    loadMyInvitations();
+    return;
+  }
+
+  // ── MODO PUBLICAR NUEVO ──
   const result=await tryUnlockAccess('diy');
   if(!result.success){ closePublishModal(); openExcelPaywall('publish'); return; }
   const slug=slugify(document.getElementById('pub-slug').value);
@@ -1513,6 +1648,7 @@ async function loadMyInvitations(){
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
           <button class="btn-account" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
+          <button class="btn-account" onclick="openEditInvitationModal('${inv.id}')">✏️</button>
           <button class="btn-account" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
           <button class="btn-account" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
         </div>
@@ -2100,10 +2236,10 @@ async function generate(){
       setTabHTML('overview',overviewHtml);
       setTabHTML('ideas',ideasHtml);
     } else if(v.id==='savethedate'){
-      setTabHTML('savethedate',v.h);
+      setTabHTML('savethedate',wrapSTDCard(v.h));
       makeSTDEditable();
     } else if(v.id==='proposal'){
-      setTabHTML('proposal',v.h);
+      setTabHTML('proposal',renderProposalSummary()+v.h);
     }
   });
 
@@ -2207,16 +2343,7 @@ function buildSTDPrompt(){
   return `Return ONLY clean HTML. No markdown, no code fences. Write ALL text in ${outLang}.
 You are an elegant wedding stationer and copywriter. Create a beautiful Save the Date card.
 ${ctx}
-Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure (do not change or omit the dress-code/hashtag lines below — use them exactly as given, they contain real user data):
-<div class="std-theme-picker">
-<span class="theme-swatch sw-teal active" onclick="setSTDTheme('theme-teal',this)" title="Teal"></span>
-<span class="theme-swatch sw-blush" onclick="setSTDTheme('theme-blush',this)" title="Blush"></span>
-<span class="theme-swatch sw-gold" onclick="setSTDTheme('theme-gold',this)" title="Gold"></span>
-<span class="theme-swatch sw-sage" onclick="setSTDTheme('theme-sage',this)" title="Sage"></span>
-<span class="theme-swatch sw-night" onclick="setSTDTheme('theme-night',this)" title="Night"></span>
-<span class="theme-swatch sw-blanco" onclick="setSTDTheme('theme-blanco',this)" title="Blanco"></span>
-</div>
-<div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>
+Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure (do not change or omit the dress-code/hashtag lines below — use them exactly as given, they contain real user data). Return ONLY this single block below, nothing before or after it — no buttons, no theme picker, no extra wrapper:
 <div class="std-card theme-teal">
 <div class="std-bg-dragonfly" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);opacity:.06;pointer-events:none"><svg width="180" height="180" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg></div>
 <div class="std-content">
@@ -2233,13 +2360,39 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 <div class="std-hashtag" data-field="hashtag">${hashtagText}</div>
 </div>
 <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
-</div>
-<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
+</div>`;
+}
+
+// Envuelve la tarjeta que devolvió la IA con las partes FIJAS (selector de tema,
+// hint de edición, y botones de acción) — así estas nunca dependen de que la IA
+// las copie perfecto. Antes todo esto se le pedía a la IA junto con la tarjeta,
+// y a veces truncaba el ícono de WhatsApp o se saltaba el botón de descargar imagen.
+function wrapSTDCard(cardHtml){
+  const p=plan;
+  // Por si la IA agrega code fences a pesar de la instrucción de no hacerlo
+  const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
+  const themePicker=`<div class="std-theme-picker">
+<span class="theme-swatch sw-teal active" onclick="setSTDTheme('theme-teal',this)" title="Teal"></span>
+<span class="theme-swatch sw-blush" onclick="setSTDTheme('theme-blush',this)" title="Blush"></span>
+<span class="theme-swatch sw-gold" onclick="setSTDTheme('theme-gold',this)" title="Gold"></span>
+<span class="theme-swatch sw-sage" onclick="setSTDTheme('theme-sage',this)" title="Sage"></span>
+<span class="theme-swatch sw-night" onclick="setSTDTheme('theme-night',this)" title="Night"></span>
+<span class="theme-swatch sw-blanco" onclick="setSTDTheme('theme-blanco',this)" title="Blanco"></span>
+<span class="theme-swatch sw-confetti" onclick="setSTDTheme('theme-confetti',this)" title="Confeti"></span>
+<span class="theme-swatch sw-waves" onclick="setSTDTheme('theme-waves',this)" title="Ondas"></span>
+<span class="theme-swatch sw-paper" onclick="setSTDTheme('theme-paper',this)" title="Papel"></span>
+<span class="theme-swatch sw-sparkle" onclick="setSTDTheme('theme-sparkle',this)" title="Destellos"></span>
+<span class="theme-swatch sw-upload" onclick="document.getElementById('std-photo-input').click()" title="${p.lang==='es'?'Subir tu foto':'Upload your photo'}">📷</span>
+<input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
+</div>`;
+  const editHint=`<div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>`;
+  const actions=`<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
 <div class="std-actions">
 <button class="btn-std-copy" onclick="copySTD()">${p.lang==='es'?'📋 Copiar texto':'📋 Copy text'}</button>
 <button class="btn-std-wa" onclick="shareSTDWA()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.108.549 4.09 1.51 5.814L.057 23.997l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.889 9.889 0 01-5.042-1.379l-.361-.214-3.741.981.999-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/></svg>${p.lang==='es'?'Enviar por WhatsApp':'Send via WhatsApp'}</button>
 <button class="btn-std-img" onclick="downloadSTDImage()">🖼️ ${p.lang==='es'?'Descargar imagen':'Download image'}</button>
 </div>`;
+  return themePicker+editHint+clean+actions;
 }
 
 // ══════════════════════════════
@@ -2642,25 +2795,12 @@ function buildVendors(){
 function buildProposalPrompt(){
   const p=plan;
   const {outLang,ctx}=buildCtx();
-  const clientName=p.clientName||(p.lang==='es'?'el cliente':'the client');
   return `Return ONLY clean HTML. No markdown, no code fences. Write ALL text in ${outLang}.
 You are a professional event planner writing a formal client proposal.
 ${ctx}
-CRITICAL: Return ONLY valid HTML. Use ONLY these CSS classes that exist: pro-summary, ps-title, ps-grid, ps-label, ps-val, bcards, bcard, bcard-label, bcard-amt, bcard-pct. For lists use <ul><li>. For sections use <h2> and <p>.
+CRITICAL: Return ONLY valid HTML. For lists use <ul><li>. For sections use <h2> and <p>. Do NOT include any summary card, title, or client info block — that part is added separately. Start directly with the first <h2> section below.
 
-Start with this EXACT summary card (do not invent or guess any values — use these exact strings):
-<div class="pro-summary">
-<div class="ps-title">${p.lang==='es'?'Resumen de Propuesta':'Proposal Summary'}</div>
-<div class="ps-grid">
-<div><div class="ps-label">${p.lang==='es'?'Cliente':'Client'}</div><div class="ps-val">${esc(clientName)}</div></div>
-<div><div class="ps-label">${p.lang==='es'?'Evento':'Event'}</div><div class="ps-val">${esc(p.typeName)}</div></div>
-<div><div class="ps-label">${p.lang==='es'?'Fecha':'Date'}</div><div class="ps-val">${esc(p.date)}</div></div>
-<div><div class="ps-label">${p.lang==='es'?'Inversión':'Investment'}</div><div class="ps-val">$${parseInt(p.budget).toLocaleString()} MXN</div></div>
-</div>
-</div>
-<p style="font-size:12px;color:var(--text-3);margin-top:.5rem">${p.lang==='es'?'Preparado por':'Prepared by'}: ${esc(p.name||'')}</p>
-
-Then write these <h2> sections with <p> and <ul><li> content:
+Write these <h2> sections with <p> and <ul><li> content:
 1. ${p.lang==='es'?'Nuestra visión para tu evento':'Our vision for your event'} — 2-3 sentences capturing the spirit
 2. ${p.lang==='es'?'Qué incluye esta propuesta':'What this proposal includes'} — bullet list of 6-8 deliverables
 3. ${p.lang==='es'?'Desglose de inversión':'Investment breakdown'} — reference budget categories naturally in text
@@ -2669,6 +2809,23 @@ Then write these <h2> sections with <p> and <ul><li> content:
 6. ${p.lang==='es'?'Próximos pasos':'Next steps'} — clear 3-step CTA
 
 Tone: professional, warm and exclusive. Make the client feel their event is in the best hands.`;
+}
+
+// Tarjeta de resumen de la propuesta — 100% determinística, sin depender de que
+// la IA copie bien la estructura (mismo motivo que wrapSTDCard).
+function renderProposalSummary(){
+  const p=plan;
+  const clientName=p.clientName||(p.lang==='es'?'el cliente':'the client');
+  return `<div class="pro-summary">
+<div class="ps-title">${p.lang==='es'?'Resumen de Propuesta':'Proposal Summary'}</div>
+<div class="ps-grid">
+<div><div class="ps-label">${p.lang==='es'?'Cliente':'Client'}</div><div class="ps-val">${esc(clientName)}</div></div>
+<div><div class="ps-label">${p.lang==='es'?'Evento':'Event'}</div><div class="ps-val">${esc(p.typeName)}</div></div>
+<div><div class="ps-label">${p.lang==='es'?'Fecha':'Date'}</div><div class="ps-val">${esc(p.date)}</div></div>
+<div><div class="ps-label">${p.lang==='es'?'Inversión':'Investment'}</div><div class="ps-val">$${parseInt(p.budget).toLocaleString()} MXN</div></div>
+</div>
+</div>
+<p style="font-size:12px;color:var(--text-3);margin-top:.5rem">${p.lang==='es'?'Preparado por':'Prepared by'}: ${esc(p.name||'')}</p>`;
 }
 
 // ══════════════════════════════
@@ -3032,7 +3189,12 @@ async function redeemAccessCode(){
 // ══════════════════════════════
 const XL_TEAL='FF2EC4B6', XL_TEAL_DARK='FF0D6E65', XL_VIOLET='FF7B2FBE', XL_NAVY='FF0D1B2A', XL_CREAM='FFF6F1FA', XL_WHITE='FFFFFFFF', XL_BORDER='FFE0D5EE';
 const XL_CORAL='FFE8637A', XL_GOLD='FFD4972A', XL_GREEN='FF4CA36F', XL_BLUE='FF4A7FBE';
-const DASH_COLORS=[XL_TEAL, XL_VIOLET, XL_CORAL, XL_GREEN, XL_GOLD, XL_BLUE];
+// Versiones pastel de los mismos colores, para las tarjetas del dashboard —
+// más claras, con texto navy oscuro en vez de blanco (así se ven suaves sin perder legibilidad)
+const XL_TEAL_PASTEL='FFD6F3F0', XL_VIOLET_PASTEL='FFE6DAF5', XL_CORAL_PASTEL='FFFBE0E5';
+const XL_GREEN_PASTEL='FFDCF0E4', XL_GOLD_PASTEL='FFF7E8CC', XL_BLUE_PASTEL='FFDCE8F7';
+const DASH_COLORS_PASTEL=[XL_TEAL_PASTEL,XL_VIOLET_PASTEL,XL_CORAL_PASTEL,XL_GREEN_PASTEL,XL_GOLD_PASTEL,XL_BLUE_PASTEL];
+const DASH_COLORS_ACCENT=[XL_TEAL_DARK,XL_VIOLET,XL_CORAL,XL_GREEN,'FFB8791F',XL_BLUE]; // para bordes/texto, más oscuros que el pastel
 
 function xlStyleHeader(row){
   row.eachCell(cell=>{
@@ -3136,10 +3298,10 @@ async function exportSpreadsheet(){
   dashTitle.alignment={vertical:'middle',horizontal:'center'};
   wsResumen.getRow(1).height=28;
 
-  // ── Fila de etiquetas de las estadísticas — cada una con su color ──
+  // ── Fila de etiquetas de las estadísticas — cada una con su color pastel ──
   const statLabels=[L?'Días para el evento':'Days to go',L?'Presupuesto':'Budget',L?'Gastado':'Spent',L?'Restante':'Left',L?'Invitados':'Guests',L?'Checklist':'Checklist'];
   const labelRow=wsResumen.addRow(statLabels);
-  labelRow.eachCell((c,colNum)=>{ c.font={bold:true,size:9,color:{argb:XL_WHITE},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:DASH_COLORS[colNum-1]||XL_TEAL}}; });
+  labelRow.eachCell((c,colNum)=>{ c.font={bold:true,size:9,color:{argb:DASH_COLORS_ACCENT[colNum-1]||XL_TEAL_DARK},name:'Calibri'}; c.alignment={horizontal:'center'}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:DASH_COLORS_PASTEL[colNum-1]||XL_TEAL_PASTEL}}; });
   labelRow.height=18;
 
   // ── Fila de valores (con fórmulas reales cuando aplica) ──
@@ -3153,11 +3315,12 @@ async function exportSpreadsheet(){
   ];
   const valueRow=wsResumen.addRow(statValues);
   valueRow.eachCell((c,colNum)=>{
-    const accent=DASH_COLORS[colNum-1]||XL_TEAL;
+    const accent=DASH_COLORS_ACCENT[colNum-1]||XL_TEAL_DARK;
+    const pastel=DASH_COLORS_PASTEL[colNum-1]||XL_TEAL_PASTEL;
     c.font={bold:true,size:16,color:{argb:accent},name:'Calibri'};
     c.alignment={horizontal:'center'};
     c.fill={type:'pattern',pattern:'solid',fgColor:{argb:XL_WHITE}};
-    c.border={bottom:{style:'medium',color:{argb:accent}},left:{style:'thin',color:{argb:XL_BORDER}},right:{style:'thin',color:{argb:XL_BORDER}}};
+    c.border={bottom:{style:'medium',color:{argb:pastel}},left:{style:'thin',color:{argb:XL_BORDER}},right:{style:'thin',color:{argb:XL_BORDER}}};
   });
   valueRow.height=28;
 
@@ -3451,10 +3614,46 @@ function shareSTDWA(){
 function setSTDTheme(theme,el){
   const card=document.querySelector('.std-card');
   if(!card) return;
-  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco');
+  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-custom-photo');
   card.classList.add(theme);
+  if(theme!=='theme-custom-photo') card.style.backgroundImage=''; // quitar cualquier foto que hubiera quedado puesta
   document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
+}
+
+// Sube la imagen que el usuario elija a Supabase Storage, y la aplica como
+// fondo de la tarjeta (con un overlay claro encima para que el texto se lea bien).
+async function uploadSTDBackground(event){
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file) return;
+  const L=lang==='es';
+
+  if(!sb){ showToast(L?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!currentUser){ openAuthModal(); showToast(L?'Inicia sesión para subir tu foto':'Log in to upload your photo',true); return; }
+  if(!file.type.startsWith('image/')){ showToast(L?'Solo se permiten imágenes':'Only images are allowed',true); return; }
+  if(file.size>5*1024*1024){ showToast(L?'La imagen debe pesar menos de 5 MB':'Image must be under 5 MB',true); return; }
+
+  showToast(L?'Subiendo tu foto…':'Uploading your photo…');
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`${currentUser.id}/std-${Date.now()}.${ext}`;
+
+  const {error:upErr}=await sb.storage.from('user-backgrounds').upload(path,file,{upsert:false});
+  if(upErr){ showToast(L?'No se pudo subir la imagen, intenta de nuevo':'Could not upload the image, try again',true); console.error(upErr); return; }
+
+  const {data:urlData}=sb.storage.from('user-backgrounds').getPublicUrl(path);
+  const publicUrl=urlData?.publicUrl;
+  if(!publicUrl){ showToast(L?'No se pudo obtener el link de la imagen':'Could not get the image link',true); return; }
+
+  const card=document.querySelector('.std-card');
+  if(!card) return;
+  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle');
+  card.classList.add('theme-custom-photo');
+  card.style.backgroundImage=`url('${publicUrl}')`;
+  document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
+  const uploadSwatch=document.querySelector('.theme-swatch.sw-upload');
+  if(uploadSwatch) uploadSwatch.classList.add('active');
+  showToast(L?'✅ Foto aplicada como fondo':'✅ Photo applied as background');
 }
 
 function makeSTDEditable(){
