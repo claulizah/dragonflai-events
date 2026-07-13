@@ -56,7 +56,9 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:default}
+/* El cursor de texto solo debe verse en campos que de verdad se pueden editar */
+input,textarea,[contenteditable="true"]{cursor:text}
 
 /* ── ORBS DE FONDO ── */
 .bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.15}
@@ -281,33 +283,50 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-card.theme-sage .std-eyebrow,.std-card.theme-sage .std-divider-icon,.std-card.theme-sage .std-hashtag{color:#5A7C52}
 .std-card.theme-night .std-eyebrow,.std-card.theme-night .std-divider-icon,.std-card.theme-night .std-hashtag{color:#1A2332}
 .std-card.theme-blanco .std-eyebrow,.std-card.theme-blanco .std-divider-icon,.std-card.theme-blanco .std-hashtag{color:var(--text-3)}
-/* ── Fondos con patrón (no solo color plano) — hechos 100% con CSS, sin fotos reales ── */
-.std-card.theme-confetti{background:
-  radial-gradient(circle at 15% 20%, rgba(46,196,182,.16) 3px, transparent 3px),
-  radial-gradient(circle at 45% 60%, rgba(123,47,190,.16) 4px, transparent 4px),
-  radial-gradient(circle at 75% 25%, rgba(212,151,42,.16) 3px, transparent 3px),
-  radial-gradient(circle at 30% 82%, rgba(232,99,122,.16) 3px, transparent 3px),
-  radial-gradient(circle at 85% 70%, rgba(46,196,182,.13) 4px, transparent 4px),
-  radial-gradient(circle at 60% 12%, rgba(123,47,190,.11) 3px, transparent 3px),
-  radial-gradient(circle at 10% 55%, rgba(212,151,42,.11) 3px, transparent 3px),
-  #FFFFFF!important}
-.std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:var(--violet)}
-.std-card.theme-waves{background:
-  radial-gradient(ellipse 320px 220px at 8% 8%, rgba(46,196,182,.12), transparent 60%),
-  radial-gradient(ellipse 360px 260px at 92% 92%, rgba(123,47,190,.12), transparent 60%),
-  radial-gradient(ellipse 260px 200px at 82% 15%, rgba(212,151,42,.09), transparent 60%),
-  #FFFFFF!important}
-.std-card.theme-waves .std-eyebrow,.std-card.theme-waves .std-divider-icon,.std-card.theme-waves .std-hashtag{color:var(--teal-dark)}
+/* ── Fondos con detalle decorativo en las esquinas — base blanca/crema,
+      con elementos naturales/festivos hechos 100% con CSS, sin fotos reales ── */
+
+/* Floral — ideal para bodas/aniversarios: ramas de flores en 2 esquinas */
+.std-card.theme-confetti{background-color:#FFFEFC!important;background-image:
+  radial-gradient(circle at 8% 10%, rgba(232,99,122,.55) 5px, transparent 5.5px),
+  radial-gradient(circle at 13% 6%, rgba(212,151,42,.5) 4px, transparent 4.5px),
+  radial-gradient(circle at 5% 18%, rgba(123,47,190,.4) 4px, transparent 4.5px),
+  radial-gradient(circle at 16% 15%, rgba(46,196,182,.4) 3.5px, transparent 4px),
+  radial-gradient(circle at 92% 90%, rgba(232,99,122,.55) 5px, transparent 5.5px),
+  radial-gradient(circle at 87% 94%, rgba(212,151,42,.5) 4px, transparent 4.5px),
+  radial-gradient(circle at 95% 82%, rgba(123,47,190,.4) 4px, transparent 4.5px),
+  radial-gradient(circle at 84% 85%, rgba(46,196,182,.4) 3.5px, transparent 4px)!important;
+  background-repeat:no-repeat!important}
+.std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:#C14A5E}
+
+/* Naturaleza — ideal para baby shower/eventos al aire libre: hojas en 2 esquinas */
+.std-card.theme-waves{background-color:#FFFEFB!important;background-image:
+  radial-gradient(ellipse 34px 14px at 6% 8%, rgba(90,124,82,.5), transparent 70%),
+  radial-gradient(ellipse 26px 12px at 11% 14%, rgba(90,124,82,.4), transparent 70%),
+  radial-gradient(ellipse 20px 10px at 4% 20%, rgba(46,196,182,.35), transparent 70%),
+  radial-gradient(ellipse 34px 14px at 94% 92%, rgba(90,124,82,.5), transparent 70%),
+  radial-gradient(ellipse 26px 12px at 89% 86%, rgba(90,124,82,.4), transparent 70%),
+  radial-gradient(ellipse 20px 10px at 96% 80%, rgba(46,196,182,.35), transparent 70%)!important;
+  background-repeat:no-repeat!important}
+.std-card.theme-waves .std-eyebrow,.std-card.theme-waves .std-divider-icon,.std-card.theme-waves .std-hashtag{color:#5A7C52}
+
+/* Papel elegante — textura fina, discreta y formal */
 .std-card.theme-paper{background:
-  repeating-linear-gradient(135deg, rgba(0,0,0,.018) 0px, rgba(0,0,0,.018) 1px, transparent 1px, transparent 3px),
-  radial-gradient(ellipse at center, #FFFFFF 55%, #F6F0E6 100%)!important}
+  repeating-linear-gradient(135deg, rgba(0,0,0,.022) 0px, rgba(0,0,0,.022) 1px, transparent 1px, transparent 3px),
+  radial-gradient(ellipse at center, #FFFFFF 50%, #F2E9D8 100%)!important}
 .std-card.theme-paper .std-eyebrow,.std-card.theme-paper .std-divider-icon,.std-card.theme-paper .std-hashtag{color:#8B7355}
-.std-card.theme-sparkle{background-image:
-  radial-gradient(circle, rgba(212,151,42,.45) 1px, transparent 1.5px),
-  radial-gradient(circle, rgba(123,47,190,.32) 1px, transparent 1.5px)!important;
-  background-size:40px 40px,55px 55px!important;
-  background-position:0 0,20px 25px!important;
-  background-color:#FFFCF5!important}
+
+/* Destellos dorados — ideal para quinceañera/corporativo elegante: chispas en 2 esquinas */
+.std-card.theme-sparkle{background-color:#FFFEFA!important;background-image:
+  radial-gradient(circle at 7% 9%, rgba(212,151,42,.8) 2.5px, transparent 3px),
+  radial-gradient(circle at 14% 6%, rgba(212,151,42,.6) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 4% 16%, rgba(123,47,190,.5) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 18% 13%, rgba(212,151,42,.5) 1.5px, transparent 2px),
+  radial-gradient(circle at 93% 91%, rgba(212,151,42,.8) 2.5px, transparent 3px),
+  radial-gradient(circle at 86% 94%, rgba(212,151,42,.6) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 96% 84%, rgba(123,47,190,.5) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 82% 87%, rgba(212,151,42,.5) 1.5px, transparent 2px)!important;
+  background-repeat:no-repeat!important}
 .std-card.theme-sparkle .std-eyebrow,.std-card.theme-sparkle .std-divider-icon,.std-card.theme-sparkle .std-hashtag{color:#B8860B}
 /* ── Fondo con foto propia — la imagen se pone inline vía JS, aquí solo el overlay para que el texto se lea ── */
 .std-card.theme-custom-photo{background-size:cover!important;background-position:center!important}
@@ -323,11 +342,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .theme-swatch.sw-sage{background:#5A7C52}
 .theme-swatch.sw-night{background:#1A2332}
 .theme-swatch.sw-blanco{background:#FFFFFF;border-color:var(--border-gray)}
-.theme-swatch.sw-confetti{background:radial-gradient(circle at 30% 30%,#2EC4B6 2px,transparent 2px),radial-gradient(circle at 65% 60%,#7B2FBE 2px,transparent 2px),radial-gradient(circle at 40% 75%,#D4972A 2px,transparent 2px),#FFFFFF;background-size:10px 10px}
-.theme-swatch.sw-waves{background:radial-gradient(ellipse at 20% 20%,rgba(46,196,182,.5),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(123,47,190,.5),transparent 60%),#FFFFFF}
+.theme-swatch.sw-confetti{background:radial-gradient(circle at 35% 35%,#E8637A 3px,transparent 3.3px),radial-gradient(circle at 55% 55%,#D4972A 2.5px,transparent 2.8px),radial-gradient(circle at 65% 35%,#7B2FBE 2px,transparent 2.3px),#FFFEFC}
+.theme-swatch.sw-waves{background:radial-gradient(ellipse 10px 5px at 40% 45%,rgba(90,124,82,.7),transparent 70%),radial-gradient(ellipse 7px 4px at 60% 60%,rgba(90,124,82,.6),transparent 70%),#FFFEFB}
 .theme-swatch.sw-paper{background:radial-gradient(ellipse at center,#FFFFFF 50%,#E9DFC8 100%)}
 .theme-swatch.sw-sparkle{background:radial-gradient(circle,rgba(212,151,42,.7) 1px,transparent 1.5px),#FFFCF5;background-size:8px 8px}
-.theme-swatch.sw-upload{background:var(--cream-2);border-color:var(--border-gray);display:flex;align-items:center;justify-content:center;font-size:12px}
+.btn-std-upload-photo{padding:9px 18px;border-radius:100px;border:1.5px dashed var(--violet);background:var(--violet-light);color:var(--violet-dark);font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-std-upload-photo:hover{background:var(--violet);color:#fff;border-style:solid}
 .std-logo-mark{position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:4px;opacity:.55}
 .std-logo-mark span{font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--text-3)}
 .std-editable{outline:1.5px dashed transparent;border-radius:6px;cursor:text;transition:outline-color .15s;padding:2px 4px;display:inline-block}
@@ -642,7 +662,12 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <div class="budget-num">
             <span class="budget-cur">$</span>
             <span class="budget-val" id="bval">15,000</span>
-            <span class="budget-cur2">MXN</span>
+            <select id="f-currency" style="border:none;background:none;font:inherit;color:inherit;cursor:pointer;padding:0 0 0 4px">
+              <option value="MXN">MXN</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="NOK">NOK</option>
+            </select>
           </div>
           <input type="range" id="f-budget" min="5000" max="500000" step="5000" value="15000" oninput="updateBudget(this.value)">
           <div class="budget-ticks"><span>$5K</span><span>$100K</span><span>$250K</span><span>$500K</span></div>
@@ -660,7 +685,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <input type="number" id="f-graduados" placeholder="ej. 120" min="0">
         </div>
         <div class="field" id="costoboleto-row-main" style="display:none">
-          <label data-es="Costo esperado por boleto (MXN)" data-en="Expected ticket price (MXN)">Costo esperado por boleto (MXN)</label>
+          <label data-es="Costo esperado por boleto" data-en="Expected ticket price">Costo esperado por boleto</label>
           <input type="number" id="f-costoboleto" placeholder="ej. 350" min="0">
         </div>
         <div class="field">
@@ -758,7 +783,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </div>
         <div id="precio-persona-row" style="display:none;margin-top:10px">
           <div class="field">
-            <label data-es="Precio por persona (MXN)" data-en="Price per person (MXN)">Precio por persona (MXN)</label>
+            <label data-es="Precio por persona" data-en="Price per person">Precio por persona</label>
             <input type="number" id="f-precio-persona" placeholder="ej. 850" min="0" style="max-width:200px">
           </div>
         </div>
@@ -803,7 +828,13 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <select id="f-ceremony"></select>
         </div>
         <div class="field">
+          <label data-es="Temática (opcional, elige o escribe la tuya)" data-en="Theme (optional, pick or write your own)">Temática (opcional, elige o escribe la tuya)</label>
+          <div id="theme-suggestions" class="rgroup" style="margin-bottom:.5rem"></div>
+          <input type="text" id="f-theme" placeholder="ej. Jardín botánico al atardecer">
+        </div>
+        <div class="field">
           <label data-es="Paleta de colores" data-en="Color palette">Paleta de colores</label>
+          <div id="color-suggestions" class="rgroup" style="margin-bottom:.5rem"></div>
           <input type="text" id="f-colors" placeholder="ej. Verde sage, dorado y crema">
         </div>
         <div class="field">
@@ -1063,6 +1094,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span class="theme-swatch sw-sage" onclick="setPublishTheme('theme-sage',this)" title="Sage"></span>
         <span class="theme-swatch sw-night" onclick="setPublishTheme('theme-night',this)" title="Night"></span>
         <span class="theme-swatch sw-blanco" onclick="setPublishTheme('theme-blanco',this)" title="Blanco"></span>
+        <span class="theme-swatch sw-confetti" onclick="setPublishTheme('theme-confetti',this)" title="Floral"></span>
+        <span class="theme-swatch sw-waves" onclick="setPublishTheme('theme-waves',this)" title="Naturaleza"></span>
+        <span class="theme-swatch sw-paper" onclick="setPublishTheme('theme-paper',this)" title="Papel"></span>
+        <span class="theme-swatch sw-sparkle" onclick="setPublishTheme('theme-sparkle',this)" title="Destellos"></span>
+      </div>
+      <div style="text-align:center;margin-bottom:1rem">
+        <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
+        <input type="file" id="pub-bg-photo-input" accept="image/*" style="display:none" onchange="uploadPublishBackground(event)">
+        <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0" data-es="Ideal: foto vertical, buena luz, sin texto — menos de 5 MB" data-en="Ideal: portrait photo, good lighting, no text — under 5 MB">Ideal: foto vertical, buena luz, sin texto — menos de 5 MB</p>
+        <div id="pub-bg-photo-preview" style="margin-top:.5rem"></div>
       </div>
 
       <div class="profile-section-divider" data-es="¿Qué pedirle al invitado en el RSVP?" data-en="What to ask guests in the RSVP?">¿Qué pedirle al invitado en el RSVP?</div>
@@ -1105,7 +1146,32 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span data-es="Solo las personas de esta lista pueden confirmar asistencia" data-en="Only people on this list can confirm attendance">Solo las personas de esta lista pueden confirmar asistencia</span>
       </label>
 
-      <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none">Publicar →</a>
+      <div class="profile-section-divider" data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">Itinerario de eventos (opcional)</div>
+      <p style="font-size:11px;color:var(--text-3);margin-bottom:.5rem" data-es="Uno por línea: Nombre | Fecha y hora | Lugar | Descripción" data-en="One per line: Name | Date and time | Location | Description">Uno por línea: Nombre | Fecha y hora | Lugar | Descripción</p>
+      <textarea id="pub-events" class="profile-input" style="min-height:80px;resize:vertical" placeholder="Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia&#10;Ceremonia | Sábado 4:00 PM | Iglesia San Miguel&#10;Recepción | Sábado 6:00 PM | Salón Las Rosas"></textarea>
+
+      <div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</div>
+      <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
+      <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" placeholder="Link de Google Maps (opcional)">
+
+      <div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</div>
+      <p style="font-size:11px;color:var(--text-3);margin-bottom:.5rem" data-es="Uno por línea: Nombre de la tienda | Link" data-en="One per line: Store name | Link">Uno por línea: Nombre de la tienda | Link</p>
+      <textarea id="pub-registry" class="profile-input" style="min-height:60px;resize:vertical" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
+
+      <div class="profile-section-divider" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">Nuestra historia (opcional)</div>
+      <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" placeholder="Nos conocimos hace 10 años..."></textarea>
+
+      <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
+      <p style="font-size:11px;color:var(--text-3);margin-bottom:.5rem" data-es="Uno por línea: Pregunta | Respuesta" data-en="One per line: Question | Answer">Uno por línea: Pregunta | Respuesta</p>
+      <textarea id="pub-faq" class="profile-input" style="min-height:70px;resize:vertical" placeholder="¿Qué me pongo? | Formal, colores neutros&#10;¿Puedo llevar niños? | Sí, hay área de juegos"></textarea>
+
+      <div class="profile-section-divider" data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">Galería de fotos (opcional)</div>
+      <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-gallery-input').click()" data-es="📷 Agregar fotos" data-en="📷 Add photos">📷 Agregar fotos</button>
+      <input type="file" id="pub-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
+      <div id="pub-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
+
+      <button type="button" class="btn-excel-close" onclick="showInvitationPreview()" style="margin-bottom:.5rem" data-es="👁️ Vista previa" data-en="👁️ Preview">👁️ Vista previa</button>
+      <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:1rem">Publicar →</a>
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
@@ -1113,9 +1179,24 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="copyPublishUrl();return false" data-es="📋 Copiar link" data-en="📋 Copy link" style="display:block;text-align:center;text-decoration:none">📋 Copiar link</a>
+
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
+        <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.6rem" data-es="Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos" data-en="Print this QR code and place it at your event — guests scan it to upload and see photos together">Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos</p>
+        <img id="publish-qr-img" src="" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-gray)">
+        <a id="publish-qr-download" href="" download="qr-fotos-evento.png" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none;margin-top:.6rem" data-es="⬇️ Descargar QR" data-en="⬇️ Download QR">⬇️ Descargar QR</a>
+      </div>
     </div>
 
     <button class="btn-excel-close" onclick="closePublishModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
+  </div>
+</div>
+
+<!-- VISTA PREVIA DE LA INVITACIÓN -->
+<div class="excel-modal-overlay" id="preview-modal" onclick="if(event.target===this) closeInvitationPreview()" style="z-index:250">
+  <div class="excel-modal" style="max-width:420px;padding:1.5rem">
+    <p id="preview-modal-hint" style="text-align:center;font-size:11.5px;color:var(--text-3);margin-bottom:1rem" data-es="Así se verá tu invitación — el RSVP no aparece aquí, solo la tarjeta" data-en="This is how your invitation will look — RSVP isn't shown here, just the card">Así se verá tu invitación — el RSVP no aparece aquí, solo la tarjeta</p>
+    <div id="preview-card-container"></div>
+    <button class="btn-excel-close" onclick="closeInvitationPreview()" style="margin-top:1rem" data-es="Cerrar" data-en="Close">Cerrar</button>
   </div>
 </div>
 
@@ -1138,6 +1219,21 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <!-- Botón flotante para reportar bugs (beta) -->
 <button id="bug-report-fab" onclick="openBugReportModal()" title="Reportar un problema" style="position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">🐞</button>
+
+<!-- Chat de ayuda -->
+<button id="help-chat-fab" onclick="toggleHelpChat()" title="Ayuda" style="position:fixed;bottom:82px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7B2FBE,#2EC4B6);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">💬</button>
+
+<div id="help-chat-panel" style="display:none;position:fixed;bottom:142px;right:20px;width:340px;max-width:calc(100vw - 40px);height:440px;max-height:calc(100vh - 180px);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:81;flex-direction:column;overflow:hidden">
+  <div style="background:linear-gradient(135deg,#7B2FBE,#2EC4B6);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-weight:700;font-size:14px" data-es="💬 Asistente DragonflAI" data-en="💬 DragonflAI Assistant">💬 Asistente DragonflAI</span>
+    <span onclick="toggleHelpChat()" style="cursor:pointer;font-size:18px;line-height:1">✕</span>
+  </div>
+  <div id="help-chat-messages" style="flex:1;overflow-y:auto;padding:14px;font-size:13.5px"></div>
+  <div style="padding:10px;border-top:1px solid var(--border-gray);display:flex;gap:8px">
+    <input type="text" id="help-chat-input" placeholder="Escribe tu pregunta…" style="flex:1;padding:9px 12px;border-radius:100px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif" onkeydown="if(event.key==='Enter')sendHelpChatMessage()">
+    <button onclick="sendHelpChatMessage()" style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;border:none;cursor:pointer;font-size:14px">➤</button>
+  </div>
+</div>
 
 <div class="excel-modal-overlay" id="bug-report-modal" onclick="if(event.target===this) closeBugReportModal()">
   <div class="excel-modal">
@@ -1410,10 +1506,90 @@ async function openPublishModal(){
   document.body.style.overflow='hidden';
 }
 
+let pubBackgroundImageUrl=null;
+let pubGuestEmails={};
+
 function setPublishTheme(theme,el){
   pubSelectedTheme=theme;
+  pubBackgroundImageUrl=null; // elegir un tema de color/patrón cancela la foto subida
+  const preview=document.getElementById('pub-bg-photo-preview');
+  if(preview) preview.innerHTML='';
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
+}
+
+async function uploadPublishBackground(event){
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file) return;
+  const L=lang==='es';
+
+  if(!sb){ showToast(L?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!currentUser){ openAuthModal(); showToast(L?'Inicia sesión para subir tu foto':'Log in to upload your photo',true); return; }
+  if(!file.type.startsWith('image/')){ showToast(L?'Solo se permiten imágenes':'Only images are allowed',true); return; }
+  if(file.size>5*1024*1024){ showToast(L?'La imagen debe pesar menos de 5 MB':'Image must be under 5 MB',true); return; }
+
+  showToast(L?'Subiendo tu foto…':'Uploading your photo…');
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`${currentUser.id}/inv-bg-${Date.now()}.${ext}`;
+
+  const {error:upErr}=await sb.storage.from('user-backgrounds').upload(path,file,{upsert:false});
+  if(upErr){ showToast(L?'No se pudo subir la imagen, intenta de nuevo':'Could not upload the image, try again',true); console.error(upErr); return; }
+
+  const {data:urlData}=sb.storage.from('user-backgrounds').getPublicUrl(path);
+  if(!urlData?.publicUrl){ showToast(L?'No se pudo obtener el link de la imagen':'Could not get the image link',true); return; }
+
+  pubBackgroundImageUrl=urlData.publicUrl;
+  pubSelectedTheme='theme-custom-photo';
+  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
+  const preview=document.getElementById('pub-bg-photo-preview');
+  if(preview) preview.innerHTML=`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`;
+  showToast(L?'✅ Foto lista para tu invitación':'✅ Photo ready for your invitation');
+}
+
+function showInvitationPreview(){
+  const p=plan,e=p.extra||{};
+  const L=lang==='es';
+  const theme=pubSelectedTheme||'theme-teal';
+  document.getElementById('preview-modal-hint').style.display='block';
+
+  const container=document.getElementById('preview-card-container');
+  container.innerHTML=`
+    <div class="std-card ${theme}"${pubBackgroundImageUrl?` style="background-image:url('${pubBackgroundImageUrl}')"`:''}>
+      <div class="std-content">
+        <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
+        <div class="std-names">${esc(p.name||'')}</div>
+        <div class="std-divider"><span class="std-divider-icon">◆</span></div>
+        <div class="std-details">
+          ${p.date?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(p.date)}</span></div>`:''}
+          ${p.location?`<div class="std-detail-item"><span class="std-icon">📍</span><span>${esc(p.location)}</span></div>`:''}
+          ${p.time?`<div class="std-detail-item"><span class="std-icon">🕕</span><span>${esc(p.time)}</span></div>`:''}
+          ${e.dresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(e.dresscode)}</span></div>`:''}
+        </div>
+        ${e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:''}
+      </div>
+      <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
+    </div>`;
+
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+function closeInvitationPreview(){
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+function showQRModal(slug){
+  const L=lang==='es';
+  const invUrl=`${location.origin}/i/${slug}`;
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(invUrl)}`;
+  document.getElementById('preview-modal-hint').style.display='none';
+  document.getElementById('preview-card-container').innerHTML=`
+    <div style="text-align:center">
+      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.75rem">${L?'Imprime este código para el plan de fotos del evento':'Print this code for the event photo plan'}</p>
+      <img src="${qrUrl}" alt="QR" style="width:220px;height:220px;border-radius:8px;border:1px solid var(--border-gray)">
+      <a href="${qrUrl}" download="qr-fotos-evento.png" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none;margin-top:.75rem">${L?'⬇️ Descargar QR':'⬇️ Download QR'}</a>
+    </div>`;
+  document.getElementById('preview-modal').classList.add('open');
 }
 
 function closePublishModal(){
@@ -1429,6 +1605,19 @@ function closePublishModal(){
   document.getElementById('pub-slug-locked-note').style.display='none';
   document.getElementById('pub-slug').disabled=false;
   document.getElementById('pub-restrict-list-label').style.opacity='1';
+  document.getElementById('pub-events').value='';
+  document.getElementById('pub-lodging').value='';
+  document.getElementById('pub-map-url').value='';
+  document.getElementById('pub-registry').value='';
+  document.getElementById('pub-story').value='';
+  document.getElementById('pub-faq').value='';
+  pubGalleryUrls=[];
+  const galleryPreview=document.getElementById('pub-gallery-preview');
+  if(galleryPreview) galleryPreview.innerHTML='';
+  pubBackgroundImageUrl=null;
+  const bgPreview=document.getElementById('pub-bg-photo-preview');
+  if(bgPreview) bgPreview.innerHTML='';
+  pubGuestEmails={};
 }
 
 let lastPublishedUrl='';
@@ -1437,6 +1626,7 @@ let editingInvitationId=null;
 async function openEditInvitationModal(invId){
   if(!sb||!currentUser) return;
   const L=lang==='es';
+  closeMyInvitations(); // cerrar la lista, para no dejar 2 modales encimados
   showToast(L?'Cargando invitación…':'Loading invitation…');
   const {data:inv,error}=await sb.from('invitations').select('*').eq('id',invId).eq('user_id',currentUser.id).single();
   if(error||!inv){ showToast(L?'No se pudo cargar la invitación':'Could not load the invitation',true); return; }
@@ -1471,6 +1661,18 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-restrict-list').checked=!!inv.restrict_to_guest_list;
   document.getElementById('pub-restrict-list-label').style.opacity=inv.restrict_to_guest_list?'1':'.6';
 
+  document.getElementById('pub-events').value=stringifyEventsSchedule(inv.events_schedule);
+  document.getElementById('pub-lodging').value=inv.lodging_info||'';
+  document.getElementById('pub-map-url').value=inv.map_url||'';
+  document.getElementById('pub-registry').value=stringifyRegistryLinks(inv.registry_links);
+  document.getElementById('pub-story').value=inv.couple_story||'';
+  document.getElementById('pub-faq').value=stringifyFAQ(inv.faq);
+  pubGalleryUrls=Array.isArray(inv.gallery_urls)?[...inv.gallery_urls]:[];
+  renderGalleryPreview();
+  pubBackgroundImageUrl=inv.background_image_url||null;
+  const bgPreview=document.getElementById('pub-bg-photo-preview');
+  if(bgPreview) bgPreview.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
+
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
   document.getElementById('publish-modal').classList.add('open');
@@ -1497,6 +1699,43 @@ function parseGuestList(text){
   return entries;
 }
 
+// "Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia"
+function parseEventsSchedule(text){
+  return text.split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const parts=line.split('|').map(p=>p.trim());
+    return {name:parts[0]||'', time:parts[1]||'', location:parts[2]||'', description:parts[3]||''};
+  }).filter(e=>e.name);
+}
+
+// "¿Qué me pongo? | Formal, colores neutros"
+function parseFAQ(text){
+  return text.split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const idx=line.indexOf('|');
+    if(idx<0) return null;
+    return {question:line.slice(0,idx).trim(), answer:line.slice(idx+1).trim()};
+  }).filter(Boolean);
+}
+
+// "Liverpool | https://mesaderegalos.liverpool.com.mx/..."
+function parseRegistryLinks(text){
+  return text.split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const idx=line.indexOf('|');
+    if(idx<0) return null;
+    return {name:line.slice(0,idx).trim(), url:line.slice(idx+1).trim()};
+  }).filter(Boolean);
+}
+
+// Convierte un array de {name,time,location,description} de vuelta al texto editable
+function stringifyEventsSchedule(arr){
+  return (arr||[]).map(e=>[e.name,e.time,e.location,e.description].join(' | ')).join('\n');
+}
+function stringifyFAQ(arr){
+  return (arr||[]).map(f=>`${f.question} | ${f.answer}`).join('\n');
+}
+function stringifyRegistryLinks(arr){
+  return (arr||[]).map(r=>`${r.name} | ${r.url}`).join('\n');
+}
+
 async function publishInvitation(){
   if(!sb||!currentUser) return;
   const L=lang==='es';
@@ -1517,7 +1756,15 @@ async function publishInvitation(){
       ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
       directions_info: document.getElementById('pub-directions').value.trim()||null,
       custom_question: document.getElementById('pub-custom-question').value.trim()||null,
-      restrict_to_guest_list: restrictToList
+      restrict_to_guest_list: restrictToList,
+      events_schedule: parseEventsSchedule(document.getElementById('pub-events').value),
+      lodging_info: document.getElementById('pub-lodging').value.trim()||null,
+      map_url: document.getElementById('pub-map-url').value.trim()||null,
+      registry_links: parseRegistryLinks(document.getElementById('pub-registry').value),
+      couple_story: document.getElementById('pub-story').value.trim()||null,
+      faq: parseFAQ(document.getElementById('pub-faq').value),
+      gallery_urls: pubGalleryUrls,
+      background_image_url: pubBackgroundImageUrl
     };
 
     const {error}=await sb.from('invitations').update(updatePayload).eq('id',editingInvitationId).eq('user_id',currentUser.id);
@@ -1529,9 +1776,15 @@ async function publishInvitation(){
 
     // Agregar invitados NUEVOS a la lista existente — nunca se borra ni reemplaza lo que ya había
     if(guestListEntries.length>0){
-      const rows=guestListEntries.map(g=>({invitation_id:editingInvitationId,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null}));
+      const rows=guestListEntries.map(g=>({invitation_id:editingInvitationId,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null,guest_email:pubGuestEmails[g.guest_name]||null}));
       const {error:glError}=await sb.from('guest_list').insert(rows);
-      if(glError) console.error('Error agregando invitados:',glError);
+      if(glError){
+        console.error('Error agregando invitados:',glError);
+        showToast((L?'⚠️ Se guardaron los cambios, pero NO se pudieron agregar los invitados nuevos: ':'⚠️ Changes saved, but new guests could NOT be added: ')+(glError.message||glError.code||''),true);
+        closePublishModal();
+        loadMyInvitations();
+        return;
+      }
     }
 
     showToast(L?'✅ Cambios guardados':'✅ Changes saved');
@@ -1575,7 +1828,15 @@ async function publishInvitation(){
     ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
     directions_info: document.getElementById('pub-directions').value.trim()||null,
     custom_question: document.getElementById('pub-custom-question').value.trim()||null,
-    restrict_to_guest_list: restrictToList
+    restrict_to_guest_list: restrictToList,
+    events_schedule: parseEventsSchedule(document.getElementById('pub-events').value),
+    lodging_info: document.getElementById('pub-lodging').value.trim()||null,
+    map_url: document.getElementById('pub-map-url').value.trim()||null,
+    registry_links: parseRegistryLinks(document.getElementById('pub-registry').value),
+    couple_story: document.getElementById('pub-story').value.trim()||null,
+    faq: parseFAQ(document.getElementById('pub-faq').value),
+    gallery_urls: pubGalleryUrls,
+    background_image_url: pubBackgroundImageUrl
   };
 
   const {data:newInv,error}=await sb.from('invitations').insert(payload).select().single();
@@ -1587,17 +1848,28 @@ async function publishInvitation(){
   }
 
   // Si el anfitrión pegó una lista de invitados, la guardamos ligada a esta invitación
+  let guestListFailed=false;
   if(guestListEntries.length>0 && newInv){
-    const rows=guestListEntries.map(g=>({invitation_id:newInv.id,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null}));
+    const rows=guestListEntries.map(g=>({invitation_id:newInv.id,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null,guest_email:pubGuestEmails[g.guest_name]||null}));
     const {error:glError}=await sb.from('guest_list').insert(rows);
-    if(glError) console.error('Error guardando lista de invitados:',glError);
+    if(glError){
+      console.error('Error guardando lista de invitados:',glError);
+      guestListFailed=true;
+    }
   }
 
   lastPublishedUrl=`${location.origin}/i/${slug}`;
   document.getElementById('publish-url').textContent=lastPublishedUrl;
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(lastPublishedUrl)}`;
+  document.getElementById('publish-qr-img').src=qrUrl;
+  document.getElementById('publish-qr-download').href=qrUrl;
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
-  showToast(lang==='es'?'🎉 ¡Invitación publicada!':'🎉 Invitation published!');
+  if(guestListFailed){
+    showToast(lang==='es'?'⚠️ Tu invitación se publicó, pero la lista de invitados NO se pudo guardar — edítala para reintentarlo':'⚠️ Your invitation was published, but the guest list could NOT be saved — edit it to try again',true);
+  } else {
+    showToast(lang==='es'?'🎉 ¡Invitación publicada!':'🎉 Invitation published!');
+  }
 }
 
 function copyPublishUrl(){
@@ -1636,22 +1908,32 @@ async function loadMyInvitations(){
   }
   listEl.innerHTML='';
   for(const inv of invs){
-    const {count}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id);
     const {count:yesCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',true);
+    const {count:noCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',false);
+    const {count:guestListTotal}=await sb.from('guest_list').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id);
+    const pending=guestListTotal?Math.max(0,guestListTotal-(yesCount||0)-(noCount||0)):null;
+
     const div=document.createElement('div');
     div.style.cssText='padding:12px 0;border-bottom:1px solid var(--border-gray)';
     div.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px">
         <div style="min-width:0">
           <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(inv.host_names)}</div>
-          <div style="font-size:11.5px;color:var(--text-3)">/i/${esc(inv.slug)} · ${count||0} RSVPs (${yesCount||0} ${L?'confirmados':'attending'})</div>
+          <div style="font-size:11.5px;color:var(--text-3)">/i/${esc(inv.slug)}</div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
           <button class="btn-account" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
           <button class="btn-account" onclick="openEditInvitationModal('${inv.id}')">✏️</button>
           <button class="btn-account" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
           <button class="btn-account" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
+          <button class="btn-account" onclick="sendReminders('${inv.id}')">📧</button>
+          <button class="btn-account" onclick="showQRModal('${esc(inv.slug)}')">▦</button>
         </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark)">✅ ${yesCount||0} ${L?'confirmados':'attending'}</span>
+        <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:#FBE0E5;color:#C14A5E">❌ ${noCount||0} ${L?'no vienen':'not attending'}</span>
+        ${pending!==null?`<span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:var(--cream-2);color:var(--text-3)">⏳ ${pending} ${L?'sin responder':'no response'}</span>`:''}
       </div>
       <div class="rsvp-sublist" id="rsvp-sub-${inv.id}" style="display:none;font-size:12.5px;color:var(--text-2)"></div>
     `;
@@ -1677,6 +1959,110 @@ async function toggleRsvpList(invId){
       ${r.message?`<br>💬 ${esc(r.message)}`:''}
     </div>
   `).join('');
+}
+
+async function sendReminders(invId){
+  const L=lang==='es';
+  if(!confirm(L?'¿Mandar un correo recordatorio a todos los invitados que aún no han respondido (y dejaron su correo)?':'Send a reminder email to everyone who hasn\'t responded yet (and left their email)?')) return;
+
+  showToast(L?'Enviando recordatorios…':'Sending reminders…');
+  try{
+    const resp=await fetch(`${WORKER_URL}/send-reminders`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({invitation_id:invId})
+    });
+    const result=await resp.json();
+    if(!result.success){
+      showToast(L?'No se pudieron enviar los recordatorios':'Could not send reminders',true);
+      return;
+    }
+    if(result.sent===0){
+      showToast(L?'Nadie pendiente tiene correo registrado — no se mandó nada':'No one pending has an email on file — nothing was sent',true);
+      return;
+    }
+    showToast(L?`✅ Se enviaron ${result.sent} recordatorio(s)`:`✅ Sent ${result.sent} reminder(s)`);
+  }catch(err){
+    console.error('Error enviando recordatorios:',err);
+    showToast(L?'No se pudo conectar con el servidor':'Could not connect to the server',true);
+  }
+}
+
+// ══════════════════════════════
+//  CHAT DE AYUDA — dudas sobre la app + planeación de eventos en general
+// ══════════════════════════════
+const HELP_CHAT_SYSTEM=`You are the friendly help assistant for DragonflAI Events, an AI event-planning SaaS. Answer in the same language the user writes in (Spanish or English), warmly and briefly (2-4 sentences unless more detail is truly needed).
+
+You can help with two kinds of questions:
+1) How DragonflAI Events works — use this exact info, don't invent anything beyond it:
+   - Free: 2 free plan generations, no account needed to try
+   - DIY (Haz tu propio evento) — for planning your OWN event: 1 evento $179 MXN, or Anual (365 días ilimitado) $299 MXN. Includes: Excel editable con presupuesto/cronograma/checklist, invitación pública con RSVP, Save the Date personalizado.
+   - Planner — for professional event planners managing client events: 3 eventos $249 MXN, 10 eventos $399 MXN, or Anual $599 MXN. Includes everything in DIY plus: propuestas de cliente profesionales.
+   - To publish an invitation or download the Excel, the event needs an unlocked credit (DIY or Planner).
+   - RSVP: guests confirm via the public invitation link, no account needed on their side.
+   - Support/bugs: there's a 🐞 button in the app for reporting issues directly.
+2) General event-planning questions (budgeting tips, vendor advice, timelines, etiquette, etc.) — answer these using your own general knowledge, exactly as a helpful assistant would.
+
+If asked something you're not sure about regarding the product, say so honestly rather than guessing, and suggest using the 🐞 feedback button to ask the team directly.`;
+
+let helpChatMessages=[];
+let helpChatOpen=false;
+
+function toggleHelpChat(){
+  helpChatOpen=!helpChatOpen;
+  const panel=document.getElementById('help-chat-panel');
+  panel.style.display=helpChatOpen?'flex':'none';
+  if(helpChatOpen&&helpChatMessages.length===0){
+    const welcome=lang==='es'
+      ?'¡Hola! 👋 Puedo ayudarte con dudas sobre cómo usar DragonflAI Events (precios, cómo publicar tu invitación, etc.) o con dudas generales de planeación de tu evento. ¿En qué te ayudo?'
+      :"Hi! 👋 I can help with questions about how DragonflAI Events works (pricing, publishing your invitation, etc.) or general event-planning questions. What can I help with?";
+    addHelpChatBubble('assistant',welcome);
+  }
+}
+
+function addHelpChatBubble(role,text){
+  const box=document.getElementById('help-chat-messages');
+  const bubble=document.createElement('div');
+  bubble.style.cssText=`margin-bottom:10px;display:flex;${role==='user'?'justify-content:flex-end':'justify-content:flex-start'}`;
+  bubble.innerHTML=`<div style="max-width:85%;padding:9px 13px;border-radius:14px;line-height:1.5;white-space:pre-wrap;${role==='user'?'background:var(--violet);color:#fff;border-bottom-right-radius:4px':'background:var(--cream-2);color:var(--text);border-bottom-left-radius:4px'}">${esc(text)}</div>`;
+  box.appendChild(bubble);
+  box.scrollTop=box.scrollHeight;
+}
+
+async function sendHelpChatMessage(){
+  const input=document.getElementById('help-chat-input');
+  const text=input.value.trim();
+  if(!text) return;
+  input.value='';
+  addHelpChatBubble('user',text);
+  helpChatMessages.push({role:'user',content:text});
+
+  const thinkingId='thinking-'+Date.now();
+  const box=document.getElementById('help-chat-messages');
+  const thinkingEl=document.createElement('div');
+  thinkingEl.id=thinkingId;
+  thinkingEl.style.cssText='margin-bottom:10px;color:var(--text-3);font-size:12.5px';
+  thinkingEl.textContent=lang==='es'?'Escribiendo…':'Typing…';
+  box.appendChild(thinkingEl);
+  box.scrollTop=box.scrollHeight;
+
+  try{
+    const res=await fetch(WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:600,system:HELP_CHAT_SYSTEM,messages:helpChatMessages})
+    });
+    document.getElementById(thinkingId)?.remove();
+    if(!res.ok){ addHelpChatBubble('assistant',lang==='es'?'Tuve un problema para responder — intenta de nuevo en un momento.':'I had trouble responding — please try again in a moment.'); return; }
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||(lang==='es'?'No pude generar una respuesta.':'I could not generate a response.');
+    addHelpChatBubble('assistant',reply);
+    helpChatMessages.push({role:'assistant',content:reply});
+  }catch(err){
+    console.error('Error en el chat de ayuda:',err);
+    document.getElementById(thinkingId)?.remove();
+    addHelpChatBubble('assistant',lang==='es'?'No se pudo conectar — revisa tu conexión e intenta de nuevo.':'Could not connect — check your connection and try again.');
+  }
 }
 
 async function exportRsvpsToExcel(invId,hostNames){
@@ -1739,6 +2125,57 @@ if(sb){
 let radios={stress:'',exp:'',priority:[],couple:'Hombre & Mujer',todoIncluido:'No sé todavía'};
 let gensUsed=parseInt(localStorage.getItem('dflai_gens')||'0');
 let loadTmr=null, loadIdx=0;
+
+const THEME_SUGGESTIONS={
+  'Boda/Wedding':{
+    themes:{es:['Naturaleza (flores, hojas, ramas)','Argollas entrelazadas','Palomas blancas','Acuarela romántica','Minimalismo elegante'],
+            en:['Nature (flowers, leaves, branches)','Interlocking rings','White doves','Romantic watercolor','Elegant minimalism']},
+    colors:{es:['Blanco perla','Dorado suave','Verde olivo','Rosa empolvado','Beige cálido'],
+            en:['Pearl white','Soft gold','Olive green','Dusty pink','Warm beige']}
+  },
+  'Cumpleaños/Birthday':{
+    themes:{es:['Globos y confeti','Pastel con velas','Fiesta retro (años 80/90)','Estilo tropical (palmeras, piñas)','Neon party'],
+            en:['Balloons & confetti','Cake with candles','Retro party (80s/90s)','Tropical style (palms, pineapples)','Neon party']},
+    colors:{es:['Amarillo brillante','Azul turquesa','Fucsia','Naranja vibrante','Morado eléctrico'],
+            en:['Bright yellow','Turquoise blue','Fuchsia','Vibrant orange','Electric purple']}
+  },
+  'Baby Shower':{
+    themes:{es:['Nubes y estrellas','Animales tiernos (conejitos, ositos)','Carrito de bebé','Estilo vintage pastel','Arcoíris suave'],
+            en:['Clouds & stars','Cute animals (bunnies, bears)','Baby carriage','Vintage pastel style','Soft rainbow']},
+    colors:{es:['Celeste','Rosa pastel','Gris claro','Amarillo mantequilla','Verde menta'],
+            en:['Sky blue','Pastel pink','Light gray','Butter yellow','Mint green']}
+  },
+  'Corporativo/Corporate':{
+    themes:{es:['Líneas geométricas','Minimalismo con tipografía fuerte','Iconos de networking','Tecnología y digital','Estilo sobrio con textura metálica'],
+            en:['Geometric lines','Minimalism with bold typography','Networking icons','Technology & digital','Sober style with metallic texture']},
+    colors:{es:['Azul marino','Gris oscuro','Blanco','Negro','Plateado'],
+            en:['Navy blue','Dark gray','White','Black','Silver']}
+  },
+  'Quinceañera':{
+    themes:{es:['Corona y tiara','Flores glamorosas','Estilo princesa (sin usar personajes)','Brillos y glitter','Estrellas y luna mágica'],
+            en:['Crown & tiara','Glamorous flowers','Princess style (no characters)','Sparkles & glitter','Magic stars & moon']},
+    colors:{es:['Rosa fucsia','Dorado','Lila','Plata brillante','Azul cielo'],
+            en:['Fuchsia pink','Gold','Lilac','Bright silver','Sky blue']}
+  },
+  'Graduación/Graduation':{
+    themes:{es:['Birrete y diploma','Escenario académico','Estrellas de logro','Minimalismo con tipografía elegante','Estilo moderno con íconos de éxito'],
+            en:['Cap & diploma','Academic setting','Achievement stars','Minimalism with elegant typography','Modern style with success icons']},
+    colors:{es:['Negro','Dorado','Azul marino','Blanco','Verde esmeralda'],
+            en:['Black','Gold','Navy blue','White','Emerald green']}
+  },
+  'Aniversario/Anniversary':{
+    themes:{es:['Corazones entrelazados','Vino y copas','Viaje romántico','Estilo vintage con fotos','Minimalismo con iniciales'],
+            en:['Interlocking hearts','Wine & glasses','Romantic trip','Vintage style with photos','Minimalism with initials']},
+    colors:{es:['Rojo pasión','Blanco','Plata','Champagne','Rosa suave'],
+            en:['Passion red','White','Silver','Champagne','Soft pink']}
+  },
+  'Fiesta Infantil/Kids Party':{
+    themes:{es:['Animales caricaturescos','Superhéroes genéricos','Circo y payasos','Dinosaurios divertidos','Mundo mágico (unicornios, castillos)'],
+            en:['Cartoon animals','Generic superheroes','Circus & clowns','Fun dinosaurs','Magical world (unicorns, castles)']},
+    colors:{es:['Amarillo','Azul cielo','Verde limón','Naranja','Rosa brillante'],
+            en:['Yellow','Sky blue','Lime green','Orange','Bright pink']}
+  }
+};
 
 const T={
   eventTypes:{
@@ -1871,7 +2308,7 @@ function init(){
   updateBudget(15000);
   renderEventTypes();
   renderRadios();
-  renderMustHaves();
+  renderMustHaves(); renderThemeSuggestions();
   renderUpsells();
   renderTabs();
   updateExtraFieldVisibility();
@@ -1900,7 +2337,7 @@ function setLang(l){
   document.querySelectorAll('option[data-'+l+']').forEach(el=>{ el.textContent=el.getAttribute('data-'+l); });
   const ta=document.getElementById('f-notes');
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
-  renderEventTypes(); renderRadios(); renderMustHaves(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
+  renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_lang:l});
 }
@@ -1936,7 +2373,7 @@ function selectType(btn,idx){
   document.querySelectorAll('.epill').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   eventType=T.eventTypes.vals[idx];
-  updateFormTitle(); renderMustHaves(); updateExtraFieldVisibility(); updateNameLabel();
+  updateFormTitle(); renderMustHaves(); renderThemeSuggestions(); updateExtraFieldVisibility(); updateNameLabel();
   // Mostrar campo tipo de pareja solo para bodas y aniversarios
   const coupleEvents=['Boda/Wedding','Aniversario/Anniversary'];
   const coupleRow=document.getElementById('couple-type-row');
@@ -1987,6 +2424,32 @@ function selRadio(el,group){
     const priceRow=document.getElementById('precio-persona-row');
     if(priceRow) priceRow.style.display=showPrice?'block':'none';
   }
+}
+
+function renderThemeSuggestions(){
+  const suggestions=THEME_SUGGESTIONS[eventType];
+  const themesBox=document.getElementById('theme-suggestions');
+  const colorsBox=document.getElementById('color-suggestions');
+  if(!suggestions){ if(themesBox) themesBox.innerHTML=''; if(colorsBox) colorsBox.innerHTML=''; return; }
+
+  const themeOpts=suggestions.themes[lang]||suggestions.themes.es;
+  const colorOpts=suggestions.colors[lang]||suggestions.colors.es;
+  const themeSelected=(document.getElementById('f-theme').value||'').split(' · ').map(s=>s.trim());
+  const colorSelected=(document.getElementById('f-colors').value||'').split(' · ').map(s=>s.trim());
+
+  if(themesBox) themesBox.innerHTML=themeOpts.map(o=>`<span class="ropt${themeSelected.includes(o)?' sel':''}" onclick="toggleSuggestionChip(this,'f-theme')">${esc(o)}</span>`).join('');
+  if(colorsBox) colorsBox.innerHTML=colorOpts.map(o=>`<span class="ropt${colorSelected.includes(o)?' sel':''}" onclick="toggleSuggestionChip(this,'f-colors')">${esc(o)}</span>`).join('');
+}
+
+function toggleSuggestionChip(el,inputId){
+  const value=el.textContent.trim();
+  const input=document.getElementById(inputId);
+  const SEP=' · ';
+  const current=input.value?input.value.split(SEP).map(s=>s.trim()).filter(Boolean):[];
+  const idx=current.indexOf(value);
+  if(idx>=0){ current.splice(idx,1); el.classList.remove('sel'); }
+  else { current.push(value); el.classList.add('sel'); }
+  input.value=current.join(SEP);
 }
 
 function renderMustHaves(){
@@ -2130,9 +2593,10 @@ async function generate(){
   const mustHaveTags=[...document.querySelectorAll('#must-haves .tag.sel')].map(t=>t.textContent);
   const mustHaves=mustHaveTags.join(', ');
   const todoIncluido=radios.todoIncluido||'No sé todavía';
+  const currency=document.getElementById('f-currency').value||'MXN';
   const precioPersona=document.getElementById('f-precio-persona')?.value||'';
   const paqueteInfo=todoIncluido.includes('persona')||todoIncluido.includes('person')
-    ?` | Paquete todo incluido: $${precioPersona||'?'} MXN/persona (incluye lugar, comida, bebidas no alcohólicas y música)`:
+    ?` | Paquete todo incluido: $${precioPersona||'?'} ${currency}/persona (incluye lugar, comida, bebidas no alcohólicas y música)`:
     todoIncluido.includes('separado')||todoIncluido.includes('separately')
     ?' | Contratando proveedores por separado':' | Tipo de venue: por definir';
   const stress=radios.stress||T.stress[lang][1];
@@ -2144,6 +2608,7 @@ async function generate(){
   const kids=parseInt(document.getElementById('f-kids').value)||0;
   const ceremony=document.getElementById('f-ceremony').value||'';
   const colors=document.getElementById('f-colors').value||'';
+  const theme=document.getElementById('f-theme').value||'';
   const venueType=document.getElementById('f-venue-type').options[document.getElementById('f-venue-type').selectedIndex].text;
   const duration=document.getElementById('f-duration').options[document.getElementById('f-duration').selectedIndex].text;
   const dresscode=document.getElementById('f-dresscode').value||'';
@@ -2162,7 +2627,7 @@ async function generate(){
   const numGraduados=document.getElementById('f-graduados').value||'';
   const costoBoleto=document.getElementById('f-costoboleto').value||'';
   const hashtag=document.getElementById('f-hashtag').value||'';
-  const extra={kids,ceremony,colors,venueType,duration,dresscode,menuType,tasting,drinks,drinksLabel,cake,allergies,lodging,lodgingLabel,coordinator,coordinatorLabel,motivo,edadFestejado,numGraduados,costoBoleto,hashtag};
+  const extra={kids,ceremony,colors,theme,currency,venueType,duration,dresscode,menuType,tasting,drinks,drinksLabel,cake,allergies,lodging,lodgingLabel,coordinator,coordinatorLabel,motivo,edadFestejado,numGraduados,costoBoleto,hashtag};
 
   let proCtx='';
   if(mode==='pro'){
@@ -2270,12 +2735,13 @@ function buildCtx(){
   const persona=p.mode==='diy'
     ?`Planning for: ${p.name} (planning their OWN ${p.typeName}). Stress: "${p.stress}". Exp: "${p.exp}". Priority: "${p.priority}". Venue: ${p.venueStatus}. Vendors: ${p.vendorStatus}.`
     :`PROFESSIONAL PLANNER. Planner: ${p.name}.${p.proCtx}. Exp: "${p.exp}".`;
-  let ctx=`${persona}\nEvent: ${p.typeName} | Date: ${p.date} | Location: ${p.location} | Guests: ${p.guests} | Budget: $${parseInt(p.budget).toLocaleString()} MXN | Vibe: ${p.vibe} | Time: ${p.time} | Must-haves: ${p.mustHaves}${p.paqueteInfo||''}${p.notes?' | Details: '+p.notes:''}`;
+  let ctx=`${persona}\nEvent: ${p.typeName} | Date: ${p.date} | Location: ${p.location} | Guests: ${p.guests} | Budget: $${parseInt(p.budget).toLocaleString()} ${e.currency||'MXN'} | Vibe: ${p.vibe} | Time: ${p.time} | Must-haves: ${p.mustHaves}${p.paqueteInfo||''}${p.notes?' | Details: '+p.notes:''}`;
   // Detalles adicionales opcionales — solo se agregan si el usuario los llenó
   const extras=[];
   if(e.kids>0) extras.push(`${e.kids} children among guests`);
   if(e.ceremony) extras.push(`Ceremony format: ${e.ceremony}`);
   if(e.colors) extras.push(`Color palette: ${e.colors}`);
+  if(e.theme) extras.push(`Chosen theme/motif: ${e.theme} — use this as a strong reference for decoration, Save the Date design suggestions, and creative ideas`);
   if(e.venueType&&e.venueType!=='No sé todavía'&&e.venueType!=='Not sure yet') extras.push(`Venue type: ${e.venueType}`);
   if(e.duration&&e.duration!=='No sé todavía'&&e.duration!=='Not sure yet') extras.push(`Duration: ${e.duration}`);
   if(e.dresscode) extras.push(`Dress code: ${e.dresscode}`);
@@ -2288,7 +2754,7 @@ function buildCtx(){
   if(e.motivo) extras.push(`Event purpose: ${e.motivo}`);
   if(e.edadFestejado) extras.push(`Guest of honor's age: ${e.edadFestejado}`);
   if(e.numGraduados) extras.push(`Number of graduates: ${e.numGraduados}`);
-  if(e.costoBoleto) extras.push(`Expected ticket price: $${e.costoBoleto} MXN`);
+  if(e.costoBoleto) extras.push(`Expected ticket price: $${e.costoBoleto} ${e.currency||'MXN'}`);
   if(extras.length) ctx+=`\nAdditional details: ${extras.join(' | ')}`;
   return {outLang,ctx};
 }
@@ -2367,23 +2833,42 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 // hint de edición, y botones de acción) — así estas nunca dependen de que la IA
 // las copie perfecto. Antes todo esto se le pedía a la IA junto con la tarjeta,
 // y a veces truncaba el ícono de WhatsApp o se saltaba el botón de descargar imagen.
+// Sugiere uno de los 4 temas con patrón según palabras clave de la temática
+// que el usuario eligió/escribió en el formulario — conecta lo que pidió ahí
+// con el diseño visual del Save the Date / invitación.
+function suggestVisualTheme(themeText){
+  if(!themeText) return null;
+  const t=themeText.toLowerCase();
+  if(/natural|hoja|rama|jard|tropical|animal|conejit|osit|palm|piñ/.test(t)) return 'theme-waves'; // Naturaleza
+  if(/flor|glamor|corona|tiara|princesa/.test(t)) return 'theme-confetti'; // Floral
+  if(/vintage|acuarela|clásic|clasic|retro|foto|papel/.test(t)) return 'theme-paper'; // Papel
+  if(/brillo|glitter|destell|dorado|neon|estrella|luna|mágic|magic|glam/.test(t)) return 'theme-sparkle'; // Destellos
+  return null;
+}
+
 function wrapSTDCard(cardHtml){
-  const p=plan;
+  const p=plan,e=p.extra||{};
+  const suggestedTheme=suggestVisualTheme(e.theme)||'theme-teal';
   // Por si la IA agrega code fences a pesar de la instrucción de no hacerlo
   const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
+  const isSug=cls=>suggestedTheme===cls?' active':'';
   const themePicker=`<div class="std-theme-picker">
-<span class="theme-swatch sw-teal active" onclick="setSTDTheme('theme-teal',this)" title="Teal"></span>
+<span class="theme-swatch sw-teal${isSug('theme-teal')}" onclick="setSTDTheme('theme-teal',this)" title="Teal"></span>
 <span class="theme-swatch sw-blush" onclick="setSTDTheme('theme-blush',this)" title="Blush"></span>
 <span class="theme-swatch sw-gold" onclick="setSTDTheme('theme-gold',this)" title="Gold"></span>
 <span class="theme-swatch sw-sage" onclick="setSTDTheme('theme-sage',this)" title="Sage"></span>
 <span class="theme-swatch sw-night" onclick="setSTDTheme('theme-night',this)" title="Night"></span>
 <span class="theme-swatch sw-blanco" onclick="setSTDTheme('theme-blanco',this)" title="Blanco"></span>
-<span class="theme-swatch sw-confetti" onclick="setSTDTheme('theme-confetti',this)" title="Confeti"></span>
-<span class="theme-swatch sw-waves" onclick="setSTDTheme('theme-waves',this)" title="Ondas"></span>
-<span class="theme-swatch sw-paper" onclick="setSTDTheme('theme-paper',this)" title="Papel"></span>
-<span class="theme-swatch sw-sparkle" onclick="setSTDTheme('theme-sparkle',this)" title="Destellos"></span>
-<span class="theme-swatch sw-upload" onclick="document.getElementById('std-photo-input').click()" title="${p.lang==='es'?'Subir tu foto':'Upload your photo'}">📷</span>
+<span class="theme-swatch sw-confetti${isSug('theme-confetti')}" onclick="setSTDTheme('theme-confetti',this)" title="Floral"></span>
+<span class="theme-swatch sw-waves${isSug('theme-waves')}" onclick="setSTDTheme('theme-waves',this)" title="Naturaleza"></span>
+<span class="theme-swatch sw-paper${isSug('theme-paper')}" onclick="setSTDTheme('theme-paper',this)" title="Papel"></span>
+<span class="theme-swatch sw-sparkle${isSug('theme-sparkle')}" onclick="setSTDTheme('theme-sparkle',this)" title="Destellos"></span>
+</div>
+${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;color:var(--violet-dark);margin:-.3rem 0 .5rem">${p.lang==='es'?'✨ Elegimos este fondo según tu temática — cámbialo si prefieres otro':'✨ We picked this background based on your theme — change it if you prefer another'}</p>`:''}
+<div style="text-align:center;margin:-.5rem 0 1rem">
+<button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
+<p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0">${p.lang==='es'?'Ideal: foto vertical, buena luz, sin texto — menos de 5 MB':'Ideal: portrait photo, good lighting, no text — under 5 MB'}</p>
 </div>`;
   const editHint=`<div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>`;
   const actions=`<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
@@ -2822,7 +3307,7 @@ function renderProposalSummary(){
 <div><div class="ps-label">${p.lang==='es'?'Cliente':'Client'}</div><div class="ps-val">${esc(clientName)}</div></div>
 <div><div class="ps-label">${p.lang==='es'?'Evento':'Event'}</div><div class="ps-val">${esc(p.typeName)}</div></div>
 <div><div class="ps-label">${p.lang==='es'?'Fecha':'Date'}</div><div class="ps-val">${esc(p.date)}</div></div>
-<div><div class="ps-label">${p.lang==='es'?'Inversión':'Investment'}</div><div class="ps-val">$${parseInt(p.budget).toLocaleString()} MXN</div></div>
+<div><div class="ps-label">${p.lang==='es'?'Inversión':'Investment'}</div><div class="ps-val">$${parseInt(p.budget).toLocaleString()} ${(p.extra&&p.extra.currency)||'MXN'}</div></div>
 </div>
 </div>
 <p style="font-size:12px;color:var(--text-3);margin-top:.5rem">${p.lang==='es'?'Preparado por':'Prepared by'}: ${esc(p.name||'')}</p>`;
@@ -3265,7 +3750,7 @@ async function exportSpreadsheet(){
     [L?'Lugar':'Venue',plan.location],
     [L?'Tema / estilo':'Theme / vibe',plan.vibe],
     [L?'Invitados esperados':'Expected guests',plan.guests],
-    [L?'Moneda':'Currency','MXN'],
+    [L?'Moneda':'Currency',e.currency||'MXN'],
     [L?'Presupuesto total':'Total budget',parseInt(plan.budget)||0]
   ];
   if(e.kids>0) resumen.push([L?'Niños entre invitados':'Children among guests',e.kids]);
@@ -3284,7 +3769,7 @@ async function exportSpreadsheet(){
   if(e.motivo) resumen.push([L?'Motivo del evento':'Event purpose',e.motivo]);
   if(e.edadFestejado) resumen.push([L?'Edad del festejado/a':'Guest of honor\'s age',e.edadFestejado]);
   if(e.numGraduados) resumen.push([L?'Número de graduados':'Number of graduates',e.numGraduados]);
-  if(e.costoBoleto) resumen.push([L?'Costo esperado por boleto':'Expected ticket price',`$${e.costoBoleto} MXN`]);
+  if(e.costoBoleto) resumen.push([L?'Costo esperado por boleto':'Expected ticket price',`$${e.costoBoleto} ${e.currency||'MXN'}`]);
 
   const wsResumen=wb.addWorksheet(L?'Overview':'Overview',{properties:{tabColor:{argb:XL_VIOLET}}});
   wsResumen.columns=[{width:22},{width:16},{width:16},{width:16},{width:16},{width:16}];
@@ -3454,12 +3939,13 @@ async function exportGuestListExcel(){
       L?'Nombre':'Name',
       L?'Grupo / Familia (opcional)':'Group / Family (optional)',
       L?'Acompañantes permitidos (opcional)':'Allowed companions (optional)',
+      L?'Correo (opcional, para recordatorios)':'Email (optional, for reminders)',
       'RSVP',
       L?'Número de mesa':'Table number',
       L?'Restricción alimentaria':'Dietary'
     ],
-    Array.from({length:guestCount},()=>['','','','','','']),
-    [24,26,20,12,14,20]);
+    Array.from({length:guestCount},()=>['','','','','','','']),
+    [24,26,20,28,12,14,20]);
 
   const filename=`DragonflAI_Invitados_${(plan.typeName||'evento').replace(/[^\w]+/g,'_')}.xlsx`;
   const buffer=await wb.xlsx.writeBuffer();
@@ -3490,13 +3976,16 @@ async function onGuestExcelFileSelected(event){
 
     const groups={};  // nombre de grupo -> [nombres]
     const solos=[];   // líneas individuales ya formateadas
+    pubGuestEmails={}; // nombre exacto -> correo (para poder mandar recordatorios después)
 
     ws.eachRow((row,rowNumber)=>{
       if(rowNumber===1) return; // encabezado
       const name=String(row.getCell(1).text||'').trim();
       const group=String(row.getCell(2).text||'').trim();
       const companions=String(row.getCell(3).text||'').trim();
+      const email=String(row.getCell(4).text||'').trim();
       if(!name) return;
+      if(email) pubGuestEmails[name]=email;
       if(group){
         if(!groups[group]) groups[group]=[];
         groups[group].push(name);
@@ -3552,7 +4041,7 @@ function shareWhatsApp(){
 Fecha: ${p.date}
 Lugar: ${p.location}
 Invitados: ${p.guests}
-Presupuesto: $${parseInt(p.budget).toLocaleString()} MXN
+Presupuesto: $${parseInt(p.budget).toLocaleString()} ${(p.extra&&p.extra.currency)||'MXN'}
 Estilo: ${p.vibe}
 
 GeneRe mi plan completo con IA: cronograma, presupuesto, checklist y Save the Date.
@@ -3563,7 +4052,7 @@ Quieres el tuyo? -> dragonflaievents.com`
 Date: ${p.date}
 Location: ${p.location}
 Guests: ${p.guests}
-Budget: $${parseInt(p.budget).toLocaleString()} MXN
+Budget: $${parseInt(p.budget).toLocaleString()} ${(p.extra&&p.extra.currency)||'MXN'}
 Vibe: ${p.vibe}
 
 I created my complete event plan with AI: timeline, budget, checklist and Save the Date.
@@ -3651,9 +4140,54 @@ async function uploadSTDBackground(event){
   card.classList.add('theme-custom-photo');
   card.style.backgroundImage=`url('${publicUrl}')`;
   document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
-  const uploadSwatch=document.querySelector('.theme-swatch.sw-upload');
-  if(uploadSwatch) uploadSwatch.classList.add('active');
   showToast(L?'✅ Foto aplicada como fondo':'✅ Photo applied as background');
+}
+
+// ── Galería de fotos de la invitación (varias imágenes) ──
+let pubGalleryUrls=[];
+
+function renderGalleryPreview(){
+  const box=document.getElementById('pub-gallery-preview');
+  if(!box) return;
+  box.innerHTML=pubGalleryUrls.map((url,i)=>`
+    <div style="position:relative;width:64px;height:64px">
+      <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border-gray)">
+      <button type="button" onclick="removeGalleryImage(${i})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#E8637A;color:#fff;border:2px solid #fff;font-size:11px;cursor:pointer;line-height:1">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeGalleryImage(i){
+  pubGalleryUrls.splice(i,1);
+  renderGalleryPreview();
+}
+
+async function onGalleryFilesSelected(event){
+  const files=Array.from(event.target.files||[]);
+  event.target.value='';
+  if(!files.length) return;
+  const L=lang==='es';
+
+  if(!sb){ showToast(L?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!currentUser){ openAuthModal(); showToast(L?'Inicia sesión para subir fotos':'Log in to upload photos',true); return; }
+
+  for(const file of files){
+    if(!file.type.startsWith('image/')){ showToast((L?'Se omitió un archivo que no es imagen: ':'Skipped a non-image file: ')+file.name,true); continue; }
+    if(file.size>5*1024*1024){ showToast((L?'Se omitió por pesar más de 5 MB: ':'Skipped for being over 5 MB: ')+file.name,true); continue; }
+
+    showToast((L?'Subiendo ':'Uploading ')+file.name+'…');
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=`${currentUser.id}/gallery-${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
+
+    const {error:upErr}=await sb.storage.from('user-backgrounds').upload(path,file,{upsert:false});
+    if(upErr){ showToast((L?'No se pudo subir: ':'Could not upload: ')+file.name,true); console.error(upErr); continue; }
+
+    const {data:urlData}=sb.storage.from('user-backgrounds').getPublicUrl(path);
+    if(urlData?.publicUrl) pubGalleryUrls.push(urlData.publicUrl);
+  }
+
+  renderGalleryPreview();
+  showToast(L?`✅ ${pubGalleryUrls.length} foto(s) en la galería`:`✅ ${pubGalleryUrls.length} photo(s) in gallery`);
 }
 
 function makeSTDEditable(){

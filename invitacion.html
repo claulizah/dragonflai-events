@@ -34,6 +34,47 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .card.theme-sage .eyebrow,.card.theme-sage .hashtag{color:#5A7C52}
 .card.theme-night .eyebrow,.card.theme-night .hashtag{color:#1A2332}
 .card.theme-blanco .eyebrow,.card.theme-blanco .hashtag{color:var(--text-3)}
+/* ── Fondos con detalle decorativo — mismos 4 que en el Save the Date de la app ── */
+.card.theme-confetti{background-color:#FFFEFC!important;background-image:
+  radial-gradient(circle at 8% 10%, rgba(232,99,122,.55) 5px, transparent 5.5px),
+  radial-gradient(circle at 13% 6%, rgba(212,151,42,.5) 4px, transparent 4.5px),
+  radial-gradient(circle at 5% 18%, rgba(123,47,190,.4) 4px, transparent 4.5px),
+  radial-gradient(circle at 16% 15%, rgba(46,196,182,.4) 3.5px, transparent 4px),
+  radial-gradient(circle at 92% 90%, rgba(232,99,122,.55) 5px, transparent 5.5px),
+  radial-gradient(circle at 87% 94%, rgba(212,151,42,.5) 4px, transparent 4.5px),
+  radial-gradient(circle at 95% 82%, rgba(123,47,190,.4) 4px, transparent 4.5px),
+  radial-gradient(circle at 84% 85%, rgba(46,196,182,.4) 3.5px, transparent 4px)!important;
+  background-repeat:no-repeat!important}
+.card.theme-confetti .eyebrow,.card.theme-confetti .hashtag{color:#C14A5E}
+.card.theme-waves{background-color:#FFFEFB!important;background-image:
+  radial-gradient(ellipse 34px 14px at 6% 8%, rgba(90,124,82,.5), transparent 70%),
+  radial-gradient(ellipse 26px 12px at 11% 14%, rgba(90,124,82,.4), transparent 70%),
+  radial-gradient(ellipse 20px 10px at 4% 20%, rgba(46,196,182,.35), transparent 70%),
+  radial-gradient(ellipse 34px 14px at 94% 92%, rgba(90,124,82,.5), transparent 70%),
+  radial-gradient(ellipse 26px 12px at 89% 86%, rgba(90,124,82,.4), transparent 70%),
+  radial-gradient(ellipse 20px 10px at 96% 80%, rgba(46,196,182,.35), transparent 70%)!important;
+  background-repeat:no-repeat!important}
+.card.theme-waves .eyebrow,.card.theme-waves .hashtag{color:#5A7C52}
+.card.theme-paper{background:
+  repeating-linear-gradient(135deg, rgba(0,0,0,.022) 0px, rgba(0,0,0,.022) 1px, transparent 1px, transparent 3px),
+  radial-gradient(ellipse at center, #FFFFFF 50%, #F2E9D8 100%)!important}
+.card.theme-paper .eyebrow,.card.theme-paper .hashtag{color:#8B7355}
+.card.theme-sparkle{background-color:#FFFEFA!important;background-image:
+  radial-gradient(circle at 7% 9%, rgba(212,151,42,.8) 2.5px, transparent 3px),
+  radial-gradient(circle at 14% 6%, rgba(212,151,42,.6) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 4% 16%, rgba(123,47,190,.5) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 18% 13%, rgba(212,151,42,.5) 1.5px, transparent 2px),
+  radial-gradient(circle at 93% 91%, rgba(212,151,42,.8) 2.5px, transparent 3px),
+  radial-gradient(circle at 86% 94%, rgba(212,151,42,.6) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 96% 84%, rgba(123,47,190,.5) 1.8px, transparent 2.2px),
+  radial-gradient(circle at 82% 87%, rgba(212,151,42,.5) 1.5px, transparent 2px)!important;
+  background-repeat:no-repeat!important}
+.card.theme-sparkle .eyebrow,.card.theme-sparkle .hashtag{color:#B8860B}
+/* ── Foto de fondo personalizada — con overlay claro para que el texto se lea ── */
+.card.theme-custom-photo{background-size:cover!important;background-position:center!important;position:relative}
+.card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0;border-radius:inherit}
+.card.theme-custom-photo>*{position:relative;z-index:1}
+.card.theme-custom-photo .eyebrow,.card.theme-custom-photo .hashtag{color:var(--violet)}
 .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
 .names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--text)}
 .divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
@@ -47,6 +88,25 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 
 /* ── RSVP ── */
 .rsvp-card{background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-md)}
+
+/* ── Secciones extra: historia, itinerario, hospedaje, galería, regalos, FAQ ── */
+.extra-card{background:var(--white);border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow-md);margin-bottom:1.25rem}
+.extra-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:1rem;text-align:center}
+.extra-story{font-size:14px;line-height:1.7;color:var(--text-2);text-align:center}
+.schedule-item{padding:12px 0;border-top:1px solid var(--border-gray)}
+.schedule-item:first-of-type{border-top:none}
+.schedule-name{font-weight:600;font-size:14.5px;color:var(--text);margin-bottom:3px}
+.schedule-meta{font-size:12.5px;color:var(--text-2);margin-bottom:2px}
+.schedule-desc{font-size:12.5px;color:var(--text-3);font-style:italic;margin-top:4px}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.gallery-img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
+.extra-links-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.extra-link-btn{display:inline-block;padding:10px 18px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark);font-size:13px;font-weight:600;text-decoration:none;transition:all .2s}
+.extra-link-btn:hover{background:var(--teal);color:#fff}
+.faq-item{padding:10px 0;border-top:1px solid var(--border-gray)}
+.faq-item:first-of-type{border-top:none}
+.faq-q{font-weight:600;font-size:13.5px;color:var(--text);margin-bottom:3px}
+.faq-a{font-size:13px;color:var(--text-2);line-height:1.5}
 .rsvp-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;text-align:center;margin-bottom:1.5rem}
 .field{margin-bottom:1rem}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:.4rem}
@@ -170,7 +230,26 @@ const T={
     searchAreYouThisPerson:'¿Eres tú?',
     changeNameLink:'No soy yo, buscar otro nombre',
     alreadyResponded:'Ya confirmaste tu asistencia anteriormente — ¡gracias!',
-    maxCompanionsNote:'Puedes traer hasta {n} acompañante(s).'
+    editMyResponse:'✏️ Editar mi respuesta',
+    eventPhotosTitle:'Fotos del evento',
+    eventPhotosHint:'Sube tus fotos y descarga las de los demás invitados',
+    uploadPhotoBtn:'Subir foto(s)',
+    noPhotosYet:'Todavía no hay fotos — ¡sé el primero en subir una!',
+    photoUploaded:'✅ Foto(s) agregada(s) a la galería',
+
+    yourResponseWas:'Tu respuesta actual:',
+    respondingYes:'Sí asistes',
+    respondingNo:'No asistes',
+    editSaved:'✅ Tu respuesta se actualizó',
+
+    maxCompanionsNote:'Puedes traer hasta {n} acompañante(s).',
+    ourStoryTitle:'Nuestra historia',
+    scheduleTitle:'Itinerario',
+    lodgingTitle:'Hospedaje y cómo llegar',
+    seeOnMap:'Ver en el mapa',
+    galleryTitle:'Galería',
+    registryTitle:'Mesa de regalos',
+    faqTitle:'Preguntas frecuentes'
   },
   en:{
     loading:'Loading…',
@@ -211,7 +290,26 @@ const T={
     searchAreYouThisPerson:'Is this you?',
     changeNameLink:"That's not me, search another name",
     alreadyResponded:'You already confirmed your attendance — thank you!',
-    maxCompanionsNote:'You can bring up to {n} guest(s).'
+    editMyResponse:'✏️ Edit my response',
+    eventPhotosTitle:'Event Photos',
+    eventPhotosHint:'Upload your photos and download photos from other guests',
+    uploadPhotoBtn:'Upload photo(s)',
+    noPhotosYet:'No photos yet — be the first to upload one!',
+    photoUploaded:'✅ Photo(s) added to the gallery',
+
+    yourResponseWas:'Your current response:',
+    respondingYes:'Attending',
+    respondingNo:'Not attending',
+    editSaved:'✅ Your response was updated',
+
+    maxCompanionsNote:'You can bring up to {n} guest(s).',
+    ourStoryTitle:'Our Story',
+    scheduleTitle:'Schedule',
+    lodgingTitle:'Lodging & Directions',
+    seeOnMap:'See on map',
+    galleryTitle:'Gallery',
+    registryTitle:'Gift Registry',
+    faqTitle:'FAQ'
   }
 };
 
@@ -296,12 +394,75 @@ let selectedGuest=null;
 let lastSearchResults=[];
 let guestSearchTimer=null;
 
+function renderExtraSections(inv,t){
+  const sections=[];
+
+  if(inv.couple_story){
+    sections.push(`<div class="extra-card">
+      <div class="extra-title">💌 ${t.ourStoryTitle}</div>
+      <p class="extra-story">${esc(inv.couple_story).replace(/\n/g,'<br>')}</p>
+    </div>`);
+  }
+
+  if(Array.isArray(inv.events_schedule)&&inv.events_schedule.length){
+    const rows=inv.events_schedule.map(ev=>`
+      <div class="schedule-item">
+        <div class="schedule-name">${esc(ev.name)}</div>
+        ${ev.time?`<div class="schedule-meta">🕐 ${esc(ev.time)}</div>`:''}
+        ${ev.location?`<div class="schedule-meta">📍 ${esc(ev.location)}</div>`:''}
+        ${ev.description?`<div class="schedule-desc">${esc(ev.description)}</div>`:''}
+      </div>`).join('');
+    sections.push(`<div class="extra-card">
+      <div class="extra-title">🗓️ ${t.scheduleTitle}</div>
+      ${rows}
+    </div>`);
+  }
+
+  if(Array.isArray(inv.gallery_urls)&&inv.gallery_urls.length){
+    const imgs=inv.gallery_urls.map(url=>`<img src="${esc(url)}" class="gallery-img" loading="lazy">`).join('');
+    sections.push(`<div class="extra-card">
+      <div class="extra-title">📸 ${t.galleryTitle}</div>
+      <div class="gallery-grid">${imgs}</div>
+    </div>`);
+  }
+
+  if(inv.lodging_info||inv.map_url){
+    sections.push(`<div class="extra-card">
+      <div class="extra-title">🏨 ${t.lodgingTitle}</div>
+      ${inv.lodging_info?`<p class="extra-story">${esc(inv.lodging_info).replace(/\n/g,'<br>')}</p>`:''}
+      ${inv.map_url?`<a href="${esc(inv.map_url)}" target="_blank" rel="noopener" class="extra-link-btn">🗺️ ${t.seeOnMap}</a>`:''}
+    </div>`);
+  }
+
+  if(Array.isArray(inv.registry_links)&&inv.registry_links.length){
+    const links=inv.registry_links.map(r=>`<a href="${esc(r.url)}" target="_blank" rel="noopener" class="extra-link-btn">🎁 ${esc(r.name)}</a>`).join('');
+    sections.push(`<div class="extra-card">
+      <div class="extra-title">🎁 ${t.registryTitle}</div>
+      <div class="extra-links-row">${links}</div>
+    </div>`);
+  }
+
+  if(Array.isArray(inv.faq)&&inv.faq.length){
+    const items=inv.faq.map(f=>`
+      <div class="faq-item">
+        <div class="faq-q">${esc(f.question)}</div>
+        <div class="faq-a">${esc(f.answer)}</div>
+      </div>`).join('');
+    sections.push(`<div class="extra-card">
+      <div class="extra-title">❓ ${t.faqTitle}</div>
+      ${items}
+    </div>`);
+  }
+
+  return sections.join('');
+}
+
 function renderInvitation(inv){
   const days=daysUntil(inv.event_date_raw);
   const t=T[lang];
   const restricted=!!inv.restrict_to_guest_list;
   document.getElementById('content').innerHTML=`
-    <div class="card ${esc(inv.theme||'theme-teal')}">
+    <div class="card ${esc(inv.theme||'theme-teal')}"${inv.background_image_url?` style="background-image:url('${esc(inv.background_image_url)}')"`:''}>
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
       <div class="names">${esc(inv.host_names)}</div>
       <div class="divider"></div>
@@ -318,6 +479,19 @@ function renderInvitation(inv){
       ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
     </div>
 
+    ${renderExtraSections(inv,t)}
+
+    <div class="extra-card">
+      <div class="extra-title">📸 ${t.eventPhotosTitle}</div>
+      <p style="font-size:12.5px;color:var(--text-2);text-align:center;margin-bottom:1rem">${t.eventPhotosHint}</p>
+      <div style="text-align:center;margin-bottom:1rem">
+        <button type="button" class="btn-submit" style="width:auto;padding:10px 24px" onclick="document.getElementById('event-photo-input').click()">📷 ${t.uploadPhotoBtn}</button>
+        <input type="file" id="event-photo-input" accept="image/*" multiple style="display:none" onchange="uploadEventPhotos(event)">
+      </div>
+      <div id="event-photos-gallery" class="gallery-grid"></div>
+      <p id="event-photos-empty" style="font-size:12.5px;color:var(--text-3);text-align:center;display:none">${t.noPhotosYet}</p>
+    </div>
+
     <div class="rsvp-card">
       <div class="rsvp-title">${t.rsvpTitle}</div>
       <form id="rsvp-form">
@@ -330,6 +504,7 @@ function renderInvitation(inv){
         </div>
         <div class="field" id="field-name-selected" style="display:none">
           <div id="selected-guest-display" style="padding:11px;border-radius:var(--radius);background:var(--teal-light);border:1.5px solid var(--teal);font-weight:600;font-size:14px"></div>
+          <button type="button" id="btn-edit-rsvp" class="btn-submit" style="display:none;margin-top:.6rem" onclick="startEditingRSVP()"></button>
           <a href="#" onclick="resetGuestSearch();return false" style="font-size:11.5px;color:var(--text-3);display:inline-block;margin-top:.5rem">${t.changeNameLink}</a>
         </div>
         `:`
@@ -431,18 +606,26 @@ async function selectGuestMatch(i){
   }
 }
 
+let editingGuestListId=null;
+let lastSelectedGuest=null;
+
 function showSelectedGuest(g){
   const t=T[lang];
+  lastSelectedGuest=g;
+  editingGuestListId=null;
   document.getElementById('field-name-search').style.display='none';
   document.getElementById('field-name-selected').style.display='block';
   document.getElementById('field-attending-single').style.display='block';
+  const editBtn=document.getElementById('btn-edit-rsvp');
 
   if(g.already_responded){
-    document.getElementById('selected-guest-display').innerHTML=`${esc(g.guest_name)}<br><span style="font-weight:400;font-size:12px">${t.alreadyResponded}</span>`;
+    document.getElementById('selected-guest-display').innerHTML=`${esc(g.guest_name)}<br><span style="font-weight:400;font-size:12px">${t.alreadyResponded}</span><br><span style="font-weight:400;font-size:12px">${t.yourResponseWas} <strong>${g.prev_attending?t.respondingYes:t.respondingNo}</strong></span>`;
     document.getElementById('rsvp-rest').style.display='none';
+    if(editBtn){ editBtn.textContent=t.editMyResponse; editBtn.style.display='block'; }
     return;
   }
 
+  if(editBtn) editBtn.style.display='none';
   document.getElementById('selected-guest-display').textContent=`${t.searchAreYouThisPerson} ${g.guest_name}`;
   document.getElementById('rsvp-rest').style.display='block';
 
@@ -452,6 +635,24 @@ function showSelectedGuest(g){
     const note=document.getElementById('max-companions-note');
     if(note) note.textContent=t.maxCompanionsNote.replace('{n}',g.max_companions);
   }
+}
+
+function startEditingRSVP(){
+  if(!lastSelectedGuest) return;
+  const g=lastSelectedGuest;
+  editingGuestListId=g.id;
+
+  document.getElementById('rsvp-rest').style.display='block';
+  document.getElementById('btn-edit-rsvp').style.display='none';
+
+  setAttending(g.prev_attending);
+  const emailEl=document.getElementById('r-email'); if(emailEl) emailEl.value=g.prev_email||'';
+  const guestsEl=document.getElementById('r-guests'); if(guestsEl) guestsEl.value=g.prev_guest_count||0;
+  const dietaryEl=document.getElementById('r-dietary'); if(dietaryEl) dietaryEl.value=g.prev_dietary||'';
+  const songEl=document.getElementById('r-song'); if(songEl) songEl.value=g.prev_song_request||'';
+  if(g.prev_lodging_needed!==null&&g.prev_lodging_needed!==undefined) setLodging(g.prev_lodging_needed);
+  const messageEl=document.getElementById('r-message'); if(messageEl) messageEl.value=g.prev_message||'';
+  const customEl=document.getElementById('r-custom'); if(customEl) customEl.value=g.prev_custom_answer||'';
 }
 
 function showGuestGroup(){
@@ -494,12 +695,16 @@ function setGroupMemberAttending(i,val){
 function resetGuestSearch(){
   selectedGuest=null;
   groupMembers=null;
+  editingGuestListId=null;
+  lastSelectedGuest=null;
   document.getElementById('field-name-search').style.display='block';
   document.getElementById('field-name-selected').style.display='none';
   document.getElementById('field-attending-single').style.display='block';
   document.getElementById('rsvp-rest').style.display='none';
   document.getElementById('r-name-search').value='';
   document.getElementById('guest-search-results').innerHTML='';
+  const editBtn=document.getElementById('btn-edit-rsvp');
+  if(editBtn) editBtn.style.display='none';
 }
 
 let attending=null;
@@ -585,6 +790,30 @@ async function submitRSVP(e){
 
   btn.disabled=true; btn.textContent=t.sendingBtn;
 
+  // ── Editando una respuesta ya existente — vía la función segura, no un insert nuevo ──
+  if(editingGuestListId){
+    const {data,error}=await sb.rpc('update_my_rsvp',{
+      p_guest_list_id: editingGuestListId,
+      p_attending: attending,
+      p_guest_email: document.getElementById('r-email').value.trim()||null,
+      p_guest_count: document.getElementById('r-guests')?parseInt(document.getElementById('r-guests').value)||0:null,
+      p_dietary: document.getElementById('r-dietary')?document.getElementById('r-dietary').value.trim():null,
+      p_song_request: document.getElementById('r-song')?document.getElementById('r-song').value.trim():null,
+      p_lodging_needed: document.getElementById('field-lodging')?lodgingNeeded:null,
+      p_message: document.getElementById('r-message')?document.getElementById('r-message').value.trim():null,
+      p_custom_answer: document.getElementById('r-custom')?document.getElementById('r-custom').value.trim():null
+    });
+    if(error||!data?.success){
+      showToast(t.toastError);
+      btn.disabled=false; btn.textContent=t.confirmBtn;
+      return;
+    }
+    if(document.activeElement) document.activeElement.blur();
+    showToast(t.editSaved);
+    renderThanksScreen(attending);
+    return;
+  }
+
   const payload={
     invitation_id: invitation.id,
     guest_list_id: restricted&&selectedGuest?selectedGuest.id:null,
@@ -610,6 +839,53 @@ async function submitRSVP(e){
   renderThanksScreen(attending);
 }
 
+// ── Galería de fotos del evento (subida por los invitados) ──
+async function loadEventPhotos(){
+  if(!invitation) return;
+  const {data,error}=await sb.from('event_photos').select('photo_url,uploaded_by_name').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
+  const gallery=document.getElementById('event-photos-gallery');
+  const emptyMsg=document.getElementById('event-photos-empty');
+  if(!gallery) return;
+  if(error||!data||!data.length){
+    gallery.innerHTML='';
+    if(emptyMsg) emptyMsg.style.display='block';
+    return;
+  }
+  if(emptyMsg) emptyMsg.style.display='none';
+  gallery.innerHTML=data.map(p=>`
+    <div style="position:relative">
+      <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="window.open('${esc(p.photo_url)}','_blank')" style="cursor:pointer">
+      <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
+    </div>
+  `).join('');
+}
+
+async function uploadEventPhotos(event){
+  const files=Array.from(event.target.files||[]);
+  event.target.value='';
+  if(!files.length||!invitation) return;
+  const t=T[lang];
+
+  let uploaded=0;
+  for(const file of files){
+    if(!file.type.startsWith('image/')) continue;
+    if(file.size>8*1024*1024) continue; // máximo 8 MB por foto
+
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+    const path=`${invitation.id}/${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
+    const {error:upErr}=await sb.storage.from('event-photos').upload(path,file,{upsert:false});
+    if(upErr){ console.error(upErr); continue; }
+
+    const {data:urlData}=sb.storage.from('event-photos').getPublicUrl(path);
+    if(!urlData?.publicUrl) continue;
+
+    const {error:insErr}=await sb.from('event_photos').insert({invitation_id:invitation.id,photo_url:urlData.publicUrl});
+    if(!insErr) uploaded++;
+  }
+
+  if(uploaded>0){ showToast(t.photoUploaded); loadEventPhotos(); }
+}
+
 async function init(){
   if(!sb){ renderNotFound(); return; }
   const slug=getSlug();
@@ -620,6 +896,7 @@ async function init(){
 
   invitation=data;
   renderInvitation(data);
+  loadEventPhotos();
 }
 
 init();
