@@ -668,9 +668,17 @@ refreshPaidStatus().then(() => {
 });
 
 if (sb) {
-  sb.auth.onAuthStateChange((_event, session) => {
+  sb.auth.onAuthStateChange((event, session) => {
     currentUser = session ? session.user : null;
-    refreshPaidStatus();
+    refreshPaidStatus().then(() => {
+      // Si la persona ACABA de iniciar sesión (ej. dio clic al link mágico
+      // del correo), mándala directo a su cuenta — no tiene sentido dejarla
+      // viendo la página de marketing justo después de loguearse, tenga o
+      // no créditos todavía.
+      if (event === 'SIGNED_IN' && currentUser) {
+        window.location.href = 'dragonflai-v2.html';
+      }
+    });
   });
 }
 

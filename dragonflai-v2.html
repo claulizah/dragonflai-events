@@ -662,13 +662,17 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <div class="budget-num">
             <span class="budget-cur">$</span>
             <span class="budget-val" id="bval">15,000</span>
-            <select id="f-currency" style="border:none;background:none;font:inherit;color:inherit;cursor:pointer;padding:0 0 0 4px">
-              <option value="MXN">MXN</option>
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="NOK">NOK</option>
-            </select>
+            <span style="display:inline-flex;align-items:center;gap:2px;border-bottom:1.5px dashed var(--teal-dark);cursor:pointer" onclick="document.getElementById('f-currency').focus()">
+              <select id="f-currency" style="border:none;background:none;font:inherit;color:inherit;cursor:pointer;padding:0">
+                <option value="MXN">MXN</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="NOK">NOK</option>
+              </select>
+              <span style="font-size:11px;color:var(--teal-dark)">▾</span>
+            </span>
           </div>
+          <p style="font-size:11px;color:var(--text-3);margin:2px 0 0" data-es="Elige tu tipo de moneda" data-en="Choose your currency">Elige tu tipo de moneda</p>
           <input type="range" id="f-budget" min="5000" max="500000" step="5000" value="15000" oninput="updateBudget(this.value)">
           <div class="budget-ticks"><span>$5K</span><span>$100K</span><span>$250K</span><span>$500K</span></div>
         </div>
