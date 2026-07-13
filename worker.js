@@ -14,6 +14,8 @@
 //  - SUPABASE_URL               (Supabase dashboard → Settings → API → Project URL)
 //  - SUPABASE_SERVICE_ROLE_KEY  (Supabase dashboard → Settings → API → service_role secret
 //                                 — NUNCA la pongas en el frontend, solo aquí en el Worker)
+//  - RESEND_API_KEY             (NUEVA — Resend dashboard → API Keys. Se usa para mandar
+//                                 los correos de recordatorio. NUNCA la pongas en el frontend.)
 //
 // CÓMO IDENTIFICA CADA COMPRA: cada producto en Stripe debe tener esta metadata
 // (Stripe → Catálogo de productos → tu producto → Metadata):
@@ -28,6 +30,8 @@
 //  POST /stripe-webhook   → Stripe llama aquí cuando se confirma un pago;
 //                            este Worker lee qué producto se compró y aplica
 //                            los créditos o el acceso anual correspondiente en Supabase
+//  POST /send-reminders   → NUEVO. Lo llama el botón "Enviar recordatorio" en
+//                            Mis invitaciones. Body: { invitation_id }
 //
 // ══════════════════════════════════════════════════════════════
 
@@ -74,6 +78,21 @@ export default {
       }
 
       return new Response('ok', { status: 200, headers: CORS });
+    }
+
+    // ── ENVIAR RECORDATORIOS (lo llama el botón "Enviar recordatorio" en Mis invitaciones) ──
+    if (url.pathname === '/send-reminders' && request.method === 'POST') {
+      try {
+        const { invitation_id } = await request.json();
+        if (!invitation_id) {
+          return new Response(JSON.stringify({ success: false, reason: 'missing_invitation_id' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
+        }
+        const result = await sendReminderEmails(env, invitation_id);
+        return new Response(JSON.stringify(result), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (err) {
+        console.error('Error enviando recordatorios:', err);
+        return new Response(JSON.stringify({ success: false, reason: 'server_error' }), { status: 500, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      }
     }
 
     // ── PROXY A CLAUDE (tu funcionalidad actual) ──
@@ -201,6 +220,80 @@ async function applyPurchase(env, userId, sessionId) {
   if (!patchRes.ok) {
     throw new Error('Error actualizando Supabase: ' + await patchRes.text());
   }
+}
+
+// Busca a quién le falta responder (y sí dejó su correo), y le manda un
+// recordatorio a cada quien vía Resend. Se llama desde /send-reminders.
+async function sendReminderEmails(env, invitationId) {
+  // 1) Traer los datos de la invitación (para armar el mensaje y el link)
+  const invRes = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/invitations?id=eq.${invitationId}&select=host_names,slug,event_date,location`,
+    { headers: { 'apikey': env.SUPABASE_SERVICE_ROLE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
+  );
+  const invData = await invRes.json();
+  const inv = Array.isArray(invData) && invData[0];
+  if (!inv) return { success: false, reason: 'invitation_not_found' };
+
+  // 2) Traer a quién le falta responder y tiene correo (vía la función segura,
+  //    con la service_role key que sí puede saltarse RLS)
+  const pendingRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/get_pending_guests_for_reminder`, {
+    method: 'POST',
+    headers: {
+      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ p_invitation_id: invitationId })
+  });
+  const pending = await pendingRes.json();
+  if (!Array.isArray(pending) || !pending.length) {
+    return { success: true, sent: 0, reason: 'no_pending_with_email' };
+  }
+
+  const invitationUrl = `https://dragonflaievents.com/i/${inv.slug}`;
+  let sent = 0;
+  const failed = [];
+
+  for (const guest of pending) {
+    const emailHtml = buildReminderEmailHtml(guest.guest_name, inv.host_names, inv.event_date, inv.location, invitationUrl);
+    const resendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'DragonflAI Events <hola@dragonflaievents.com>',
+        to: guest.guest_email,
+        subject: `Recordatorio: confirma tu asistencia — ${inv.host_names}`,
+        html: emailHtml
+      })
+    });
+    if (resendRes.ok) { sent++; } else { failed.push(guest.guest_email); }
+  }
+
+  return { success: true, sent, total_pending: pending.length, failed };
+}
+
+function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invitationUrl) {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF9F7;padding:32px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<tr><td align="center">
+<table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+<tr><td style="height:6px;background-color:#2EC4B6;font-size:0;line-height:0">&nbsp;</td></tr>
+<tr><td style="padding:36px 40px 8px;text-align:center">
+<h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1A2332;margin:0 0 16px">¡Hola${guestName ? ', ' + guestName : ''}! 👋</h1>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px">Todavía no hemos recibido tu confirmación para el evento de <strong>${hostNames}</strong>${eventDate ? ' el ' + eventDate : ''}${location ? ' en ' + location : ''}.</p>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 28px">Nos encantaría saber si nos acompañas — solo toma un minuto.</p>
+</td></tr>
+<tr><td align="center" style="padding:0 40px 32px">
+<a href="${invitationUrl}" target="_blank" style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:100px;background-color:#2EC4B6">Confirmar mi asistencia →</a>
+</td></tr>
+<tr><td align="center" style="padding:0 40px 32px">
+<p style="font-size:12px;color:#8A94A6;margin:0">DragonflAI Events</p>
+</td></tr>
+</table>
+</td></tr>
+</table>`;
 }
 
 // Verificación manual de la firma de Stripe usando Web Crypto API
