@@ -27,12 +27,13 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
 
 /* ── TARJETA (mismos temas que el Save the Date de la app) ── */
-.card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:#FFFFFF;border:1px solid var(--border-gray);box-shadow:var(--shadow-md);margin-bottom:1.5rem}
+.card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:var(--cream);border:1px solid var(--border-gray);box-shadow:var(--shadow-md);margin-bottom:1.5rem}
 .card.theme-teal .eyebrow,.card.theme-teal .hashtag{color:var(--teal-dark)}
 .card.theme-blush .eyebrow,.card.theme-blush .hashtag{color:#C14A5E}
 .card.theme-gold .eyebrow,.card.theme-gold .hashtag{color:#B8860B}
 .card.theme-sage .eyebrow,.card.theme-sage .hashtag{color:#5A7C52}
 .card.theme-night .eyebrow,.card.theme-night .hashtag{color:#1A2332}
+.card.theme-blanco{background-color:#FFFFFF!important}
 .card.theme-blanco .eyebrow,.card.theme-blanco .hashtag{color:var(--text-3)}
 /* ── Fondos con detalle decorativo — mismos 4 que en el Save the Date de la app ── */
 .card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
@@ -128,7 +129,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .thanks-card h2{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--text);margin-bottom:.6rem}
 .thanks-card p{font-size:15px;color:var(--text-2)}
 .thanks-brand{margin-top:1.5rem;font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--teal-dark);letter-spacing:.03em}
-.planner-watermark{margin-top:1.2rem;font-size:10px;color:var(--text-3);letter-spacing:.03em;opacity:.6}
+.planner-watermark{margin-top:1.2rem;margin-bottom:1rem;font-size:10px;color:var(--text-3);letter-spacing:.03em;opacity:.6;text-align:center}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--night);color:#fff;padding:12px 20px;border-radius:100px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s;z-index:100}
 .toast.show{opacity:1}
 .lang-toggle{display:flex;justify-content:center;gap:6px;margin-bottom:1rem}
@@ -572,8 +573,8 @@ function renderInvitation(inv){
       ${inv.message?`<div class="msg">${esc(inv.message)}</div>`:''}
       ${inv.hashtag?`<div class="hashtag">${esc(inv.hashtag)}</div>`:''}
       ${days!==null?`<div class="countdown"><div><div class="cd-num">${days}</div><div class="cd-lbl">${t.daysLabel}</div></div></div>`:''}
-      ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
     </div>
+    ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
 
     ${renderExtraSections(inv,t)}
 
@@ -936,6 +937,8 @@ async function submitRSVP(e){
 }
 
 // ── Galería de fotos del evento (subida por los invitados) ──
+let eventPhotosList=[];
+
 async function loadEventPhotos(){
   if(!invitation) return;
   const {data,error}=await sb.from('event_photos').select('id,photo_url,uploaded_by_name').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
@@ -943,36 +946,79 @@ async function loadEventPhotos(){
   const emptyMsg=document.getElementById('event-photos-empty');
   if(!gallery) return;
   if(error||!data||!data.length){
+    eventPhotosList=[];
     gallery.innerHTML='';
     if(emptyMsg) emptyMsg.style.display='block';
     return;
   }
   if(emptyMsg) emptyMsg.style.display='none';
-  gallery.innerHTML=data.map(p=>`
+  eventPhotosList=data;
+  gallery.innerHTML=data.map((p,i)=>`
     <div style="position:relative">
-      <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="openPhotoLightbox('${esc(p.photo_url)}')" style="cursor:pointer">
+      <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="openPhotoLightbox(${i})" style="cursor:pointer">
       <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:26px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
       <button type="button" onclick="deleteEventPhoto('${p.id}')" style="position:absolute;bottom:4px;right:4px;background:rgba(200,50,50,.75);color:#fff;border:none;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">✕</button>
     </div>
   `).join('');
 }
 
-function openPhotoLightbox(url){
-  const overlay=document.createElement('div');
-  overlay.id='photo-lightbox-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px';
-  overlay.onclick=()=>overlay.remove();
-  overlay.innerHTML=`<img src="${esc(url)}" style="max-width:100%;max-height:100%;border-radius:8px;object-fit:contain">`;
-  document.body.appendChild(overlay);
+let lightboxIndex=0;
+function openPhotoLightbox(index){
+  lightboxIndex=index;
+  renderLightbox();
+  document.addEventListener('keydown',lightboxKeyHandler);
+}
+
+function lightboxKeyHandler(e){
+  if(e.key==='Escape') closePhotoLightbox();
+  if(e.key==='ArrowRight') navLightbox(1);
+  if(e.key==='ArrowLeft') navLightbox(-1);
+}
+
+function navLightbox(delta){
+  const n=eventPhotosList.length;
+  if(!n) return;
+  lightboxIndex=(lightboxIndex+delta+n)%n;
+  renderLightbox();
+}
+
+function closePhotoLightbox(){
+  const overlay=document.getElementById('photo-lightbox-overlay');
+  if(overlay) overlay.remove();
+  document.removeEventListener('keydown',lightboxKeyHandler);
+}
+
+function renderLightbox(){
+  const n=eventPhotosList.length;
+  if(!n) return;
+  const p=eventPhotosList[lightboxIndex];
+  let overlay=document.getElementById('photo-lightbox-overlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='photo-lightbox-overlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.onclick=(e)=>{ if(e.target===overlay) closePhotoLightbox(); };
+    document.body.appendChild(overlay);
+  }
+  const navBtn=(dir,label)=>`<button type="button" onclick="event.stopPropagation();navLightbox(${dir})" style="position:absolute;top:50%;${dir<0?'left':'right'}:16px;transform:translateY(-50%);background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">${label}</button>`;
+  overlay.innerHTML=`
+    <button type="button" onclick="event.stopPropagation();closePhotoLightbox()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer">✕</button>
+    ${n>1?navBtn(-1,'‹'):''}
+    <img src="${esc(p.photo_url)}" style="max-width:100%;max-height:85vh;border-radius:8px;object-fit:contain" onclick="event.stopPropagation()">
+    ${n>1?navBtn(1,'›'):''}
+    ${n>1?`<div style="position:absolute;bottom:16px;left:0;right:0;text-align:center;color:#fff;font-size:12px;opacity:.8">${lightboxIndex+1} / ${n}</div>`:''}
+  `;
 }
 
 async function deleteEventPhoto(photoId){
   const t=T[lang];
   if(!confirm(lang==='es'?'¿Borrar esta foto? No se puede deshacer.':'Delete this photo? This cannot be undone.')) return;
-  const {error}=await sb.from('event_photos').delete().eq('id',photoId);
+  const {error,count}=await sb.from('event_photos').delete().eq('id',photoId).select('id');
   if(error){
-    console.error(error);
-    showToast(lang==='es'?'No se pudo borrar la foto':'Could not delete the photo');
+    console.error('deleteEventPhoto error:',error);
+    // Un error 42501/PGRST301 aquí normalmente significa que falta una
+    // política RLS de DELETE para invitados anónimos en event_photos.
+    showToast(lang==='es'?'No se pudo borrar la foto (permiso denegado)':'Could not delete the photo (permission denied)');
     return;
   }
   loadEventPhotos();
