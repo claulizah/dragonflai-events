@@ -235,7 +235,7 @@ const T={
     alreadyResponded:'Ya confirmaste tu asistencia anteriormente — ¡gracias!',
     editMyResponse:'✏️ Editar mi respuesta',
     eventPhotosTitle:'Fotos del evento',
-    eventPhotosHint:'Sube tus fotos y descarga las de los demás invitados',
+    eventPhotosHint:'Cuéntanos con fotos tus preparativos, el previo y el día del evento — sube las tuyas y descarga las de los demás invitados',
     uploadPhotoBtn:'Subir foto(s)',
     noPhotosYet:'Todavía no hay fotos — ¡sé el primero en subir una!',
     photoUploaded:'✅ Foto(s) agregada(s) a la galería',
@@ -295,7 +295,7 @@ const T={
     alreadyResponded:'You already confirmed your attendance — thank you!',
     editMyResponse:'✏️ Edit my response',
     eventPhotosTitle:'Event Photos',
-    eventPhotosHint:'Upload your photos and download photos from other guests',
+    eventPhotosHint:'Share photos of the preparations, the lead-up, and the day of the event — upload yours and download photos from other guests',
     uploadPhotoBtn:'Upload photo(s)',
     noPhotosYet:'No photos yet — be the first to upload one!',
     photoUploaded:'✅ Photo(s) added to the gallery',
@@ -938,7 +938,7 @@ async function submitRSVP(e){
 // ── Galería de fotos del evento (subida por los invitados) ──
 async function loadEventPhotos(){
   if(!invitation) return;
-  const {data,error}=await sb.from('event_photos').select('photo_url,uploaded_by_name').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
+  const {data,error}=await sb.from('event_photos').select('id,photo_url,uploaded_by_name').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
   const gallery=document.getElementById('event-photos-gallery');
   const emptyMsg=document.getElementById('event-photos-empty');
   if(!gallery) return;
@@ -950,10 +950,32 @@ async function loadEventPhotos(){
   if(emptyMsg) emptyMsg.style.display='none';
   gallery.innerHTML=data.map(p=>`
     <div style="position:relative">
-      <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="window.open('${esc(p.photo_url)}','_blank')" style="cursor:pointer">
-      <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
+      <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="openPhotoLightbox('${esc(p.photo_url)}')" style="cursor:pointer">
+      <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:26px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
+      <button type="button" onclick="deleteEventPhoto('${p.id}')" style="position:absolute;bottom:4px;right:4px;background:rgba(200,50,50,.75);color:#fff;border:none;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">✕</button>
     </div>
   `).join('');
+}
+
+function openPhotoLightbox(url){
+  const overlay=document.createElement('div');
+  overlay.id='photo-lightbox-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.onclick=()=>overlay.remove();
+  overlay.innerHTML=`<img src="${esc(url)}" style="max-width:100%;max-height:100%;border-radius:8px;object-fit:contain">`;
+  document.body.appendChild(overlay);
+}
+
+async function deleteEventPhoto(photoId){
+  const t=T[lang];
+  if(!confirm(lang==='es'?'¿Borrar esta foto? No se puede deshacer.':'Delete this photo? This cannot be undone.')) return;
+  const {error}=await sb.from('event_photos').delete().eq('id',photoId);
+  if(error){
+    console.error(error);
+    showToast(lang==='es'?'No se pudo borrar la foto':'Could not delete the photo');
+    return;
+  }
+  loadEventPhotos();
 }
 
 async function uploadEventPhotos(event){

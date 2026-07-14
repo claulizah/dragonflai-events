@@ -289,7 +289,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 /* Floral — ideal para bodas/aniversarios: ramas de flores en 2 esquinas */
 .std-card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
 .std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:#C14A5E}
-.std-floral-corner{display:none;position:absolute;width:82px;height:82px;pointer-events:none;z-index:2}
+.std-floral-corner{display:none;position:absolute;width:130px;height:130px;pointer-events:none;z-index:2}
 .std-card.theme-confetti .std-floral-corner{display:block}
 .std-floral-corner.fc-tl{top:0;left:0}
 .std-floral-corner.fc-br{bottom:0;right:0;transform:rotate(180deg)}
@@ -333,7 +333,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 /* ── Esquinas ilustradas — un solo SVG por tema, mostrado/ocultado por CSS
       según qué clase de tema tenga la tarjeta en ese momento. Así cambiar
       de tema es instantáneo, sin tener que regenerar el HTML. ── */
-.std-leaf-corner,.std-flourish-corner,.std-sparkle-corner,.std-balloon-corner,.std-cloud-corner,.std-geo-corner,.std-grad-corner,.std-heart-corner,.std-animal-corner{display:none;position:absolute;width:82px;height:82px;pointer-events:none;z-index:2}
+.std-leaf-corner,.std-flourish-corner,.std-sparkle-corner,.std-balloon-corner,.std-cloud-corner,.std-geo-corner,.std-grad-corner,.std-heart-corner,.std-animal-corner{display:none;position:absolute;width:130px;height:130px;pointer-events:none;z-index:2}
 .std-card.theme-waves .std-leaf-corner{display:block}
 .std-card.theme-paper .std-flourish-corner{display:block}
 .std-card.theme-sparkle .std-sparkle-corner{display:block}
@@ -358,6 +358,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-card.theme-custom-photo .std-content,.std-card.theme-custom-photo .std-bg-dragonfly,.std-card.theme-custom-photo .std-logo-mark{position:relative;z-index:1}
 .std-card.theme-custom-photo .std-eyebrow,.std-card.theme-custom-photo .std-divider-icon,.std-card.theme-custom-photo .std-hashtag{color:var(--violet)}
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+
+/* Modal de publicar — formulario a la izquierda, vista previa en vivo a
+   la derecha (en pantallas angostas, se acomodan uno debajo del otro). */
+.publish-layout{display:flex;gap:1.5rem;align-items:flex-start}
+.publish-form-col{flex:1.4 1 400px;min-width:0}
+.publish-preview-col{flex:0 0 340px;min-width:280px;max-width:340px}
+@media (max-width:760px){
+  .publish-layout{flex-direction:column}
+  .publish-preview-col{order:-1;max-width:none;flex-basis:auto}
+  .publish-preview-col #publish-live-preview-container{position:static!important}
+}
 .theme-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
 .color-swatch.active{border-color:var(--text)!important;transform:scale(1.15)}
@@ -1109,11 +1120,12 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <!-- PUBLICAR / EDITAR INVITACIÓN -->
 <div class="excel-modal-overlay" id="publish-modal" onclick="if(event.target===this) closePublishModal()">
-  <div class="excel-modal" style="max-width:480px;text-align:left;max-height:85vh;overflow-y:auto">
+  <div class="excel-modal" style="max-width:920px;text-align:left;max-height:88vh;overflow-y:auto">
     <h3 style="text-align:center" id="publish-modal-title" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
     <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" id="publish-modal-sub" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
 
-    <div id="publish-form">
+    <div class="publish-layout">
+    <div id="publish-form" class="publish-form-col">
       <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:.4rem">
         <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/i/</span>
@@ -1122,24 +1134,28 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem;display:none" id="pub-slug-locked-note" data-es="El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste." data-en="The link can't change once published — avoids breaking links you already shared.">El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste.</p>
 
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
-      <div class="std-theme-picker" id="pub-theme-picker" style="margin-bottom:.75rem">
-        <span class="theme-swatch sw-teal" onclick="setPublishTheme('theme-teal',this)" title="Teal"></span>
-        <span class="theme-swatch sw-blush" onclick="setPublishTheme('theme-blush',this)" title="Blush"></span>
-        <span class="theme-swatch sw-gold" onclick="setPublishTheme('theme-gold',this)" title="Gold"></span>
-        <span class="theme-swatch sw-sage" onclick="setPublishTheme('theme-sage',this)" title="Sage"></span>
-        <span class="theme-swatch sw-night" onclick="setPublishTheme('theme-night',this)" title="Night"></span>
-        <span class="theme-swatch sw-blanco" onclick="setPublishTheme('theme-blanco',this)" title="Blanco"></span>
-        <span class="theme-swatch sw-confetti" onclick="setPublishTheme('theme-confetti',this)" title="Floral"></span>
-        <span class="theme-swatch sw-waves" onclick="setPublishTheme('theme-waves',this)" title="Naturaleza"></span>
-        <span class="theme-swatch sw-paper" onclick="setPublishTheme('theme-paper',this)" title="Papel"></span>
-        <span class="theme-swatch sw-sparkle" onclick="setPublishTheme('theme-sparkle',this)" title="Destellos"></span>
-        <span class="theme-swatch sw-balloons" onclick="setPublishTheme('theme-balloons',this)" title="Globos"></span>
-        <span class="theme-swatch sw-clouds" onclick="setPublishTheme('theme-clouds',this)" title="Nubes"></span>
-        <span class="theme-swatch sw-geometric" onclick="setPublishTheme('theme-geometric',this)" title="Geométrico"></span>
-        <span class="theme-swatch sw-graduation" onclick="setPublishTheme('theme-graduation',this)" title="Birrete"></span>
-        <span class="theme-swatch sw-hearts" onclick="setPublishTheme('theme-hearts',this)" title="Corazones"></span>
-        <span class="theme-swatch sw-animals" onclick="setPublishTheme('theme-animals',this)" title="Animalitos"></span>
+      <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .5rem"></p>
+      <div id="pub-more-patterns" style="display:none;margin-bottom:.4rem">
+        <div class="std-theme-picker" id="pub-theme-picker">
+          <span class="theme-swatch sw-teal" onclick="setPublishTheme('theme-teal',this)" title="Teal"></span>
+          <span class="theme-swatch sw-blush" onclick="setPublishTheme('theme-blush',this)" title="Blush"></span>
+          <span class="theme-swatch sw-gold" onclick="setPublishTheme('theme-gold',this)" title="Gold"></span>
+          <span class="theme-swatch sw-sage" onclick="setPublishTheme('theme-sage',this)" title="Sage"></span>
+          <span class="theme-swatch sw-night" onclick="setPublishTheme('theme-night',this)" title="Night"></span>
+          <span class="theme-swatch sw-blanco" onclick="setPublishTheme('theme-blanco',this)" title="Blanco"></span>
+          <span class="theme-swatch sw-confetti" onclick="setPublishTheme('theme-confetti',this)" title="Floral"></span>
+          <span class="theme-swatch sw-waves" onclick="setPublishTheme('theme-waves',this)" title="Naturaleza"></span>
+          <span class="theme-swatch sw-paper" onclick="setPublishTheme('theme-paper',this)" title="Papel"></span>
+          <span class="theme-swatch sw-sparkle" onclick="setPublishTheme('theme-sparkle',this)" title="Destellos"></span>
+          <span class="theme-swatch sw-balloons" onclick="setPublishTheme('theme-balloons',this)" title="Globos"></span>
+          <span class="theme-swatch sw-clouds" onclick="setPublishTheme('theme-clouds',this)" title="Nubes"></span>
+          <span class="theme-swatch sw-geometric" onclick="setPublishTheme('theme-geometric',this)" title="Geométrico"></span>
+          <span class="theme-swatch sw-graduation" onclick="setPublishTheme('theme-graduation',this)" title="Birrete"></span>
+          <span class="theme-swatch sw-hearts" onclick="setPublishTheme('theme-hearts',this)" title="Corazones"></span>
+          <span class="theme-swatch sw-animals" onclick="setPublishTheme('theme-animals',this)" title="Animalitos"></span>
+        </div>
       </div>
+      <p style="text-align:center;margin:0 0 .6rem"><a href="#" onclick="togglePublishPatterns(this);return false" id="pub-patterns-toggle" style="font-size:11px;color:var(--text-3)">Ver más diseños ▾</a></p>
       <div id="pub-color-swatches" style="margin-bottom:.75rem"></div>
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
@@ -1190,30 +1206,35 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
       <div class="profile-section-divider" data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">Itinerario de eventos (opcional)</div>
       <p style="font-size:11px;color:var(--text-3);margin-bottom:.5rem" data-es="Uno por línea: Nombre | Fecha y hora | Lugar | Descripción" data-en="One per line: Name | Date and time | Location | Description">Uno por línea: Nombre | Fecha y hora | Lugar | Descripción</p>
-      <textarea id="pub-events" class="profile-input" style="min-height:80px;resize:vertical" placeholder="Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia&#10;Ceremonia | Sábado 4:00 PM | Iglesia San Miguel&#10;Recepción | Sábado 6:00 PM | Salón Las Rosas"></textarea>
+      <textarea id="pub-events" class="profile-input" style="min-height:80px;resize:vertical" oninput="debouncedLivePreview()" placeholder="Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia&#10;Ceremonia | Sábado 4:00 PM | Iglesia San Miguel&#10;Recepción | Sábado 6:00 PM | Salón Las Rosas"></textarea>
 
       <div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</div>
-      <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
-      <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" placeholder="Link de Google Maps (opcional)">
+      <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="debouncedLivePreview()" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
+      <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" oninput="debouncedLivePreview()" placeholder="Link de Google Maps (opcional)">
 
       <div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</div>
       <p style="font-size:11px;color:var(--text-3);margin-bottom:.5rem" data-es="Uno por línea: Nombre de la tienda | Link" data-en="One per line: Store name | Link">Uno por línea: Nombre de la tienda | Link</p>
-      <textarea id="pub-registry" class="profile-input" style="min-height:60px;resize:vertical" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
+      <textarea id="pub-registry" class="profile-input" style="min-height:60px;resize:vertical" oninput="debouncedLivePreview()" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
 
       <div class="profile-section-divider" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">Nuestra historia (opcional)</div>
-      <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" placeholder="Nos conocimos hace 10 años..."></textarea>
+      <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
 
       <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
       <p style="font-size:11px;color:var(--text-3);margin-bottom:.5rem" data-es="Uno por línea: Pregunta | Respuesta" data-en="One per line: Question | Answer">Uno por línea: Pregunta | Respuesta</p>
-      <textarea id="pub-faq" class="profile-input" style="min-height:70px;resize:vertical" placeholder="¿Qué me pongo? | Formal, colores neutros&#10;¿Puedo llevar niños? | Sí, hay área de juegos"></textarea>
+      <textarea id="pub-faq" class="profile-input" style="min-height:70px;resize:vertical" oninput="debouncedLivePreview()" placeholder="¿Qué me pongo? | Formal, colores neutros&#10;¿Puedo llevar niños? | Sí, hay área de juegos"></textarea>
 
       <div class="profile-section-divider" data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">Galería de fotos (opcional)</div>
       <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-gallery-input').click()" data-es="📷 Agregar fotos" data-en="📷 Add photos">📷 Agregar fotos</button>
       <input type="file" id="pub-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
       <div id="pub-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
 
-      <button type="button" class="btn-excel-close" onclick="showInvitationPreview()" style="margin-bottom:.5rem" data-es="👁️ Vista previa" data-en="👁️ Preview">👁️ Vista previa</button>
-      <a class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:1rem">Publicar →</a>
+      <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:1rem">Publicar →</button>
+    </div>
+
+    <div class="publish-preview-col">
+      <p style="font-size:11px;color:var(--text-3);text-align:center;margin-bottom:.5rem" data-es="Vista previa — se actualiza sola mientras editas" data-en="Live preview — updates automatically as you edit">Vista previa — se actualiza sola mientras editas</p>
+      <div id="publish-live-preview-container" style="position:sticky;top:0"></div>
+    </div>
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
@@ -1547,6 +1568,11 @@ async function openPublishModal(){
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
   });
+  updatePubThemeLabel();
+  const morePatternsBox=document.getElementById('pub-more-patterns');
+  const patternsToggle=document.getElementById('pub-patterns-toggle');
+  if(morePatternsBox) morePatternsBox.style.display='none';
+  if(patternsToggle) patternsToggle.textContent=lang==='es'?'Ver más diseños ▾':'See more designs ▾';
 
   // Llenar los 5 colores sugeridos según el tipo de evento actual
   const colorSwatchesBox=document.getElementById('pub-color-swatches');
@@ -1565,11 +1591,36 @@ async function openPublishModal(){
 
   document.getElementById('publish-modal').classList.add('open');
   document.body.style.overflow='hidden';
+  showInvitationPreview();
 }
 
 let pubBackgroundImageUrl=null;
 let pubGuestEmails={};
 let pubCustomColorHex=null;
+
+const THEME_DISPLAY_NAMES={
+  'theme-teal':'Teal','theme-blush':'Blush','theme-gold':'Gold','theme-sage':'Sage','theme-night':'Night','theme-blanco':'Blanco',
+  'theme-confetti':'Floral','theme-waves':'Naturaleza','theme-paper':'Papel','theme-sparkle':'Destellos',
+  'theme-balloons':'Globos','theme-clouds':'Nubes','theme-geometric':'Geométrico','theme-graduation':'Birrete',
+  'theme-hearts':'Corazones','theme-animals':'Animalitos','theme-custom-color':'Color personalizado','theme-custom-photo':'Tu foto'
+};
+
+function updatePubThemeLabel(){
+  const label=document.getElementById('pub-current-theme-label');
+  if(!label) return;
+  const name=THEME_DISPLAY_NAMES[pubSelectedTheme]||pubSelectedTheme;
+  label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+name;
+}
+
+function togglePublishPatterns(linkEl){
+  const box=document.getElementById('pub-more-patterns');
+  if(!box) return;
+  const isHidden=box.style.display==='none';
+  box.style.display=isHidden?'block':'none';
+  linkEl.textContent=isHidden
+    ? (lang==='es'?'Ver menos ▴':'See less ▴')
+    : (lang==='es'?'Ver más diseños ▾':'See more designs ▾');
+}
 
 function setPublishTheme(theme,el){
   pubSelectedTheme=theme;
@@ -1579,6 +1630,8 @@ function setPublishTheme(theme,el){
   if(preview) preview.innerHTML='';
   document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-color-swatches .color-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
+  updatePubThemeLabel();
+  showInvitationPreview();
 }
 
 function setPublishCustomColor(colorName,el){
@@ -1591,6 +1644,8 @@ function setPublishCustomColor(colorName,el){
   if(preview) preview.innerHTML='';
   document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-color-swatches .color-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
+  updatePubThemeLabel();
+  showInvitationPreview();
 }
 
 async function uploadPublishBackground(event){
@@ -1619,14 +1674,22 @@ async function uploadPublishBackground(event){
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML=`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`;
+  updatePubThemeLabel();
+  showInvitationPreview();
   showToast(L?'✅ Foto lista para tu invitación':'✅ Photo ready for your invitation');
 }
 
+let livePreviewDebounceTimer=null;
+function debouncedLivePreview(){
+  clearTimeout(livePreviewDebounceTimer);
+  livePreviewDebounceTimer=setTimeout(showInvitationPreview,400);
+}
+
 function showInvitationPreview(){
+  if(!plan||!plan.name) return; // aún no hay plan generado, nada que mostrar
   const p=plan,e=p.extra||{};
   const L=lang==='es';
   const theme=pubSelectedTheme||'theme-teal';
-  document.getElementById('preview-modal-hint').style.display='block';
 
   // Leer las 6 secciones extra directo de los campos del modal de publicar
   const events=parseEventsSchedule(document.getElementById('pub-events').value);
@@ -1663,7 +1726,8 @@ function showInvitationPreview(){
     extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">❓ ${L?'Preguntas frecuentes':'FAQ'}</div>${items}</div>`;
   }
 
-  const container=document.getElementById('preview-card-container');
+  const container=document.getElementById('publish-live-preview-container');
+  if(!container) return;
   const cardStyle=pubBackgroundImageUrl
     ? ` style="background-image:url('${pubBackgroundImageUrl}')"`
     : (theme==='theme-custom-color'&&pubCustomColorHex
@@ -1694,18 +1758,78 @@ function closeInvitationPreview(){
   document.getElementById('preview-modal').classList.remove('open');
 }
 
-function showQRModal(slug){
+// Combina el código QR (que viene de un servicio externo, solo blanco y
+// negro) con los nombres, el hashtag y el logo, en una sola imagen bonita
+// lista para imprimir — usando Canvas para juntarlo todo.
+async function buildBrandedQRDataURL(hostNames,hashtag,invUrl){
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(invUrl)}`;
+  const qrImg=new Image();
+  qrImg.crossOrigin='anonymous';
+  await new Promise((resolve,reject)=>{
+    qrImg.onload=resolve;
+    qrImg.onerror=reject;
+    qrImg.src=qrUrl;
+  });
+
+  const canvas=document.createElement('canvas');
+  canvas.width=560; canvas.height=760;
+  const ctx=canvas.getContext('2d');
+
+  // Fondo
+  ctx.fillStyle='#FFFEFC';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle='#E5E1D8';
+  ctx.lineWidth=2;
+  ctx.strokeRect(10,10,canvas.width-20,canvas.height-20);
+
+  // Nombres del anfitrión
+  ctx.fillStyle='#1A2332';
+  ctx.textAlign='center';
+  ctx.font='italic 42px Georgia, serif';
+  ctx.fillText(hostNames||'',canvas.width/2,110);
+
+  ctx.font='16px Arial, sans-serif';
+  ctx.fillStyle='#4A5568';
+  ctx.fillText(lang==='es'?'Escanea para subir y ver fotos del evento':'Scan to upload and see event photos',canvas.width/2,150);
+
+  // El QR, centrado
+  const qrSize=400;
+  ctx.drawImage(qrImg,(canvas.width-qrSize)/2,190,qrSize,qrSize);
+
+  // Hashtag
+  if(hashtag){
+    ctx.font='bold 22px Arial, sans-serif';
+    ctx.fillStyle='#2EC4B6';
+    ctx.fillText(hashtag,canvas.width/2,630);
+  }
+
+  // Logo
+  ctx.font='14px Arial, sans-serif';
+  ctx.fillStyle='#8A94A6';
+  ctx.fillText('DragonflAI Events',canvas.width/2,700);
+
+  return canvas.toDataURL('image/png');
+}
+
+async function showQRModal(slug,hostNames,hashtag){
   const L=lang==='es';
   const invUrl=`${location.origin}/i/${slug}`;
-  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(invUrl)}`;
   document.getElementById('preview-modal-hint').style.display='none';
-  document.getElementById('preview-card-container').innerHTML=`
-    <div style="text-align:center">
-      <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.75rem">${L?'Imprime este código para el plan de fotos del evento':'Print this code for the event photo plan'}</p>
-      <img src="${qrUrl}" alt="QR" style="width:220px;height:220px;border-radius:8px;border:1px solid var(--border-gray)">
-      <a href="${qrUrl}" download="qr-fotos-evento.png" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none;margin-top:.75rem">${L?'⬇️ Descargar QR':'⬇️ Download QR'}</a>
-    </div>`;
+  document.getElementById('preview-card-container').innerHTML=`<p style="text-align:center;font-size:12.5px;color:var(--text-3)">${L?'Generando tu QR…':'Generating your QR…'}</p>`;
   document.getElementById('preview-modal').classList.add('open');
+
+  try{
+    const dataUrl=await buildBrandedQRDataURL(hostNames||'',hashtag||'',invUrl);
+    document.getElementById('preview-card-container').innerHTML=`
+      <div style="text-align:center">
+        <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.75rem">${L?'Imprime este código para el plan de fotos del evento':'Print this code for the event photo plan'}</p>
+        <img src="${dataUrl}" alt="QR" style="width:100%;max-width:280px;border-radius:8px;border:1px solid var(--border-gray)">
+        <a href="${dataUrl}" download="qr-fotos-evento.png" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none;margin-top:.75rem">${L?'⬇️ Descargar QR':'⬇️ Download QR'}</a>
+      </div>`;
+  }catch(err){
+    console.error('Error generando el QR con diseño:',err);
+    document.getElementById('preview-card-container').innerHTML=`<p style="text-align:center;font-size:12.5px;color:var(--text-3)">${L?'No se pudo generar el QR, intenta de nuevo':'Could not generate the QR, try again'}</p>`;
+  }
 }
 
 function closePublishModal(){
@@ -1770,6 +1894,11 @@ async function openEditInvitationModal(invId){
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
   });
+  updatePubThemeLabel();
+  const morePatternsBoxEdit=document.getElementById('pub-more-patterns');
+  const patternsToggleEdit=document.getElementById('pub-patterns-toggle');
+  if(morePatternsBoxEdit) morePatternsBoxEdit.style.display='none';
+  if(patternsToggleEdit) patternsToggleEdit.textContent=lang==='es'?'Ver más diseños ▾':'See more designs ▾';
   const colorSwatchesBoxEdit=document.getElementById('pub-color-swatches');
   const suggestionEdit=THEME_SUGGESTIONS[plan.eventTypeRaw];
   if(colorSwatchesBoxEdit&&suggestionEdit){
@@ -1810,6 +1939,7 @@ async function openEditInvitationModal(invId){
   document.getElementById('publish-success').style.display='none';
   document.getElementById('publish-modal').classList.add('open');
   document.body.style.overflow='hidden';
+  showInvitationPreview();
 }
 
 function parseGuestList(text){
@@ -1995,9 +2125,13 @@ async function publishInvitation(){
 
   lastPublishedUrl=`${location.origin}/i/${slug}`;
   document.getElementById('publish-url').textContent=lastPublishedUrl;
-  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(lastPublishedUrl)}`;
-  document.getElementById('publish-qr-img').src=qrUrl;
-  document.getElementById('publish-qr-download').href=qrUrl;
+  try{
+    const dataUrl=await buildBrandedQRDataURL(plan.name||'',(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
+    document.getElementById('publish-qr-img').src=dataUrl;
+    document.getElementById('publish-qr-download').href=dataUrl;
+  }catch(err){
+    console.error('Error generando el QR con diseño:',err);
+  }
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
   if(guestListFailed){
@@ -2062,7 +2196,7 @@ async function loadMyInvitations(){
           <button class="btn-account" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
           <button class="btn-account" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
           <button class="btn-account" onclick="sendReminders('${inv.id}')">📧</button>
-          <button class="btn-account" onclick="showQRModal('${esc(inv.slug)}')">▦</button>
+          <button class="btn-account" onclick="showQRModal('${esc(inv.slug)}','${esc(inv.host_names).replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦</button>
         </div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
@@ -2968,7 +3102,6 @@ You are an elegant wedding stationer and copywriter. Create a beautiful Save the
 ${ctx}
 Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure (do not change or omit the dress-code/hashtag lines below — use them exactly as given, they contain real user data). Return ONLY this single block below, nothing before or after it — no buttons, no theme picker, no extra wrapper:
 <div class="std-card theme-teal">
-<div class="std-bg-dragonfly" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);opacity:.06;pointer-events:none"><svg width="180" height="180" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg></div>
 <div class="std-content">
 <div class="std-eyebrow">${p.lang==='es'?'— Aparta la Fecha —':'— Save the Date —'}</div>
 <div class="std-names" data-field="names">[Host name or couple's names elegantly — do NOT include any HTML tags like <em>, just plain text]</div>
@@ -3112,24 +3245,28 @@ function wrapSTDCard(cardHtml){
   // Por si la IA agrega code fences a pesar de la instrucción de no hacerlo
   const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
   const isSug=cls=>suggestedTheme===cls?' active':'';
-  const themePicker=`<div class="std-theme-picker">
-<span class="theme-swatch sw-teal${isSug('theme-teal')}" onclick="setSTDTheme('theme-teal',this)" title="Teal"></span>
-<span class="theme-swatch sw-blush" onclick="setSTDTheme('theme-blush',this)" title="Blush"></span>
-<span class="theme-swatch sw-gold" onclick="setSTDTheme('theme-gold',this)" title="Gold"></span>
-<span class="theme-swatch sw-sage" onclick="setSTDTheme('theme-sage',this)" title="Sage"></span>
-<span class="theme-swatch sw-night" onclick="setSTDTheme('theme-night',this)" title="Night"></span>
-<span class="theme-swatch sw-blanco" onclick="setSTDTheme('theme-blanco',this)" title="Blanco"></span>
-<span class="theme-swatch sw-confetti${isSug('theme-confetti')}" onclick="setSTDTheme('theme-confetti',this)" title="Floral"></span>
-<span class="theme-swatch sw-waves${isSug('theme-waves')}" onclick="setSTDTheme('theme-waves',this)" title="Naturaleza"></span>
-<span class="theme-swatch sw-paper${isSug('theme-paper')}" onclick="setSTDTheme('theme-paper',this)" title="Papel"></span>
-<span class="theme-swatch sw-sparkle${isSug('theme-sparkle')}" onclick="setSTDTheme('theme-sparkle',this)" title="Destellos"></span>
-<span class="theme-swatch sw-balloons${isSug('theme-balloons')}" onclick="setSTDTheme('theme-balloons',this)" title="Globos"></span>
-<span class="theme-swatch sw-clouds${isSug('theme-clouds')}" onclick="setSTDTheme('theme-clouds',this)" title="Nubes"></span>
-<span class="theme-swatch sw-geometric${isSug('theme-geometric')}" onclick="setSTDTheme('theme-geometric',this)" title="Geométrico"></span>
-<span class="theme-swatch sw-graduation${isSug('theme-graduation')}" onclick="setSTDTheme('theme-graduation',this)" title="Birrete"></span>
-<span class="theme-swatch sw-hearts${isSug('theme-hearts')}" onclick="setSTDTheme('theme-hearts',this)" title="Corazones"></span>
-<span class="theme-swatch sw-animals${isSug('theme-animals')}" onclick="setSTDTheme('theme-animals',this)" title="Animalitos"></span>
+
+  // Los 16 temas de patrón/color plano — cada uno con su título para
+  // identificarlo al filtrar cuál es "el sugerido" vs "los demás".
+  const allSwatches=[
+    ['theme-teal','sw-teal','Teal'],['theme-blush','sw-blush','Blush'],['theme-gold','sw-gold','Gold'],
+    ['theme-sage','sw-sage','Sage'],['theme-night','sw-night','Night'],['theme-blanco','sw-blanco','Blanco'],
+    ['theme-confetti','sw-confetti','Floral'],['theme-waves','sw-waves','Naturaleza'],['theme-paper','sw-paper','Papel'],
+    ['theme-sparkle','sw-sparkle','Destellos'],['theme-balloons','sw-balloons','Globos'],['theme-clouds','sw-clouds','Nubes'],
+    ['theme-geometric','sw-geometric','Geométrico'],['theme-graduation','sw-graduation','Birrete'],
+    ['theme-hearts','sw-hearts','Corazones'],['theme-animals','sw-animals','Animalitos']
+  ];
+  const swatchHtml=(cls,swcls,title)=>`<span class="theme-swatch ${swcls}${isSug(cls)}" onclick="setSTDTheme('${cls}',this)" title="${title}"></span>`;
+  const suggestedSwatchHtml=swatchHtml(...allSwatches.find(s=>s[0]===suggestedTheme));
+  const restSwatchesHtml=allSwatches.filter(s=>s[0]!==suggestedTheme).map(s=>swatchHtml(...s)).join('');
+
+  const themePicker=`<div class="std-theme-picker" style="margin-bottom:.4rem">
+${suggestedSwatchHtml}
 </div>
+<div id="std-more-patterns" style="display:none;margin-bottom:.4rem">
+<div class="std-theme-picker">${restSwatchesHtml}</div>
+</div>
+<p style="text-align:center;margin:.2rem 0 .5rem"><a href="#" onclick="toggleMorePatterns(this);return false" id="std-more-toggle" style="font-size:11px;color:var(--text-3)">${p.lang==='es'?'Ver más diseños ▾':'See more designs ▾'}</a></p>
 ${(()=>{
   const suggestion=THEME_SUGGESTIONS[p.eventTypeRaw];
   if(!suggestion) return '';
@@ -3140,13 +3277,17 @@ ${(()=>{
   }).join('');
   return `<div style="text-align:center;margin-bottom:.4rem"><p style="font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Colores sugeridos para tu evento':'Suggested colors for your event'}</p><div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">${swatches}</div></div>`;
 })()}
-${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;color:var(--violet-dark);margin:-.3rem 0 .5rem">${p.lang==='es'?'✨ Elegimos este fondo según tu temática — cámbialo si prefieres otro':'✨ We picked this background based on your theme — change it if you prefer another'}</p>`:''}
-<div style="text-align:center;margin:-.5rem 0 1rem">
+${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;color:var(--violet-dark);margin:0 0 .6rem">${p.lang==='es'?'✨ Elegimos este fondo según tu temática — cámbialo si prefieres otro':'✨ We picked this background based on your theme — change it if you prefer another'}</p>`:''}
+<div style="text-align:center;margin:.4rem 0 1rem">
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
 <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0">${p.lang==='es'?'Ideal: foto vertical, buena luz, sin texto — menos de 5 MB':'Ideal: portrait photo, good lighting, no text — under 5 MB'}</p>
 </div>`;
-  const cleanWithFlorals=clean.replace(/(<div class="std-card[^>]*>)/, `$1${getFloralCornerSVG()}`);
+  // Por si la IA agrega su propio "style" con algún gradiente de fondo al
+  // div raíz (a pesar de que el prompt no se lo pide) — lo quitamos, para
+  // que el fondo SIEMPRE lo controle nuestro CSS del tema, nunca la IA.
+  const cleanNoInlineStyle=clean.replace(/(<div class="std-card[^"]*")\s+style="[^"]*"/, '$1');
+  const cleanWithFlorals=cleanNoInlineStyle.replace(/(<div class="std-card[^>]*>)/, `$1${getFloralCornerSVG()}`);
   const editHint=`<div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>`;
   const actions=`<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
 <div class="std-actions">
@@ -4375,6 +4516,16 @@ function shareSTDWA(){
   if(!txt) return;
   const full=txt+'\n\n— DragonflAI Events';
   window.open('https://wa.me/?text='+encodeURIComponent(full),'_blank');
+}
+
+function toggleMorePatterns(linkEl){
+  const box=document.getElementById('std-more-patterns');
+  if(!box) return;
+  const isHidden=box.style.display==='none';
+  box.style.display=isHidden?'block':'none';
+  linkEl.textContent=isHidden
+    ? (lang==='es'?'Ver menos ▴':'See less ▴')
+    : (lang==='es'?'Ver más diseños ▾':'See more designs ▾');
 }
 
 function setSTDTheme(theme,el){

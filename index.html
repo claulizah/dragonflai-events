@@ -143,6 +143,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .price-card.featured .featured-badge{position:absolute;top:16px;right:-24px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:10px;font-weight:600;padding:4px 32px;transform:rotate(35deg);letter-spacing:.05em}
 .price-name{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:.75rem}
 .price-amount{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:var(--text);line-height:1;margin-bottom:.25rem}
+.price-usd-hint{display:block;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--text-3);margin-top:2px}
 .price-amount span{font-size:18px;color:var(--text-2);font-family:'Inter',sans-serif;font-weight:400}
 .price-desc{font-size:13px;color:var(--text-2);margin-bottom:1.5rem;line-height:1.5}
 .price-features{list-style:none;margin-bottom:1.75rem;display:flex;flex-direction:column;gap:8px}
@@ -407,7 +408,7 @@ footer a:hover{color:var(--teal-dark)}
     <div class="price-card featured">
       <span class="featured-badge" data-es="Más popular" data-en="Most popular">Más popular</span>
       <div class="price-name" data-es="1 evento" data-en="1 event">1 evento</div>
-      <div class="price-amount">$179 <span>MXN</span></div>
+      <div class="price-amount">$179 <span>MXN</span><span class="price-usd-hint" data-mxn="179"></span></div>
       <div class="price-desc" data-es="Acceso completo para un solo evento. Perfecto si vas a planear solo el tuyo." data-en="Full access for a single event. Perfect if you're only planning your own.">Acceso completo para un solo evento. Perfecto si vas a planear solo el tuyo.</div>
       <ul class="price-features">
         <li data-es="Ese evento, sin límite de regeneraciones" data-en="That event, unlimited regenerations">Ese evento, sin límite de regeneraciones</li>
@@ -420,7 +421,7 @@ footer a:hover{color:var(--teal-dark)}
 
     <div class="price-card">
       <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
-      <div class="price-amount">$299 <span>MXN</span></div>
+      <div class="price-amount">$299 <span>MXN</span><span class="price-usd-hint" data-mxn="299"></span></div>
       <div class="price-desc" data-es="Acceso completo ilimitado por 365 días. Ideal si planeas más de un evento este año." data-en="Unlimited full access for 365 days. Ideal if you'll plan more than one event this year.">Acceso completo ilimitado por 365 días. Ideal si planeas más de un evento este año.</div>
       <ul class="price-features">
         <li data-es="Eventos ilimitados por 365 días" data-en="Unlimited events for 365 days">Eventos ilimitados por 365 días</li>
@@ -438,7 +439,7 @@ footer a:hover{color:var(--teal-dark)}
 
     <div class="price-card">
       <div class="price-name" data-es="3 eventos" data-en="3 events">3 eventos</div>
-      <div class="price-amount">$249 <span>MXN</span></div>
+      <div class="price-amount">$249 <span>MXN</span><span class="price-usd-hint" data-mxn="249"></span></div>
       <div class="price-desc" data-es="Ideal para probar el modo Planner con tus primeros clientes." data-en="Perfect for trying Planner mode with your first clients.">Ideal para probar el modo Planner con tus primeros clientes.</div>
       <ul class="price-features">
         <li data-es="3 eventos de cliente" data-en="3 client events">3 eventos de cliente</li>
@@ -451,7 +452,7 @@ footer a:hover{color:var(--teal-dark)}
     <div class="price-card featured">
       <span class="featured-badge" data-es="Mejor valor" data-en="Best value">Mejor valor</span>
       <div class="price-name" data-es="10 eventos" data-en="10 events">10 eventos</div>
-      <div class="price-amount">$399 <span>MXN</span></div>
+      <div class="price-amount">$399 <span>MXN</span><span class="price-usd-hint" data-mxn="399"></span></div>
       <div class="price-desc" data-es="El mejor precio por evento si ya tienes varios clientes en fila." data-en="The best price per event if you already have several clients lined up.">El mejor precio por evento si ya tienes varios clientes en fila.</div>
       <ul class="price-features">
         <li data-es="10 eventos de cliente" data-en="10 client events">10 eventos de cliente</li>
@@ -463,7 +464,7 @@ footer a:hover{color:var(--teal-dark)}
 
     <div class="price-card">
       <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
-      <div class="price-amount">$599 <span>MXN</span></div>
+      <div class="price-amount">$599 <span>MXN</span><span class="price-usd-hint" data-mxn="599"></span></div>
       <div class="price-desc" data-es="Eventos de cliente ilimitados por 365 días, más Excel para tus propuestas." data-en="Unlimited client events for 365 days, plus Excel for your proposals.">Eventos de cliente ilimitados por 365 días, más Excel para tus propuestas.</div>
       <ul class="price-features">
         <li data-es="Eventos de cliente ilimitados por 365 días" data-en="Unlimited client events for 365 days">Eventos de cliente ilimitados por 365 días</li>
@@ -607,6 +608,24 @@ function setLang(l){
   });
   updateNavLogin();
   updateUnlockBannerText();
+  updatePriceUSDHints();
+}
+
+// Tipo de cambio aproximado (referencia informativa) — Stripe siempre cobra
+// en pesos mexicanos sin importar el idioma; esto solo ayuda a que alguien
+// viendo el sitio en inglés tenga una idea del monto en dólares.
+const MXN_TO_USD_RATE=17.5;
+function updatePriceUSDHints(){
+  document.querySelectorAll('.price-usd-hint').forEach(el=>{
+    const mxn=parseFloat(el.getAttribute('data-mxn'));
+    if(!mxn) return;
+    if(lang==='en'){
+      const usd=Math.round(mxn/MXN_TO_USD_RATE);
+      el.textContent=`(~$${usd} USD, charged in MXN)`;
+    } else {
+      el.textContent='';
+    }
+  });
 }
 
 function updateUnlockBannerText(){
