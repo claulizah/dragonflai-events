@@ -287,15 +287,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       con elementos naturales/festivos hechos 100% con CSS, sin fotos reales ── */
 
 /* Floral — ideal para bodas/aniversarios: ramas de flores en 2 esquinas */
-.std-card.theme-confetti{background-color:#FFFEFC!important;background-image:
-  radial-gradient(circle at 8% 10%, rgba(232,99,122,.55) 5px, transparent 5.5px),
-  radial-gradient(circle at 13% 6%, rgba(212,151,42,.5) 4px, transparent 4.5px),
-  radial-gradient(circle at 5% 18%, rgba(123,47,190,.4) 4px, transparent 4.5px),
-  radial-gradient(circle at 16% 15%, rgba(46,196,182,.4) 3.5px, transparent 4px),
-  radial-gradient(circle at 92% 90%, rgba(232,99,122,.55) 5px, transparent 5.5px),
-  radial-gradient(circle at 87% 94%, rgba(212,151,42,.5) 4px, transparent 4.5px),
-  radial-gradient(circle at 95% 82%, rgba(123,47,190,.4) 4px, transparent 4.5px),
-  radial-gradient(circle at 84% 85%, rgba(46,196,182,.4) 3.5px, transparent 4px)!important;
+.std-card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.45)!important;background-image:
+  /* Esquina superior izquierda */
+  radial-gradient(circle at 6% 8%, rgba(232,99,122,.65) 7px, transparent 7.5px),
+  radial-gradient(circle at 12% 5%, rgba(232,99,122,.55) 6px, transparent 6.5px),
+  radial-gradient(circle at 4% 15%, rgba(90,124,82,.5) 5px, transparent 5.5px),
+  radial-gradient(circle at 15% 13%, rgba(212,151,42,.6) 4px, transparent 4.5px),
+  radial-gradient(circle at 9% 20%, rgba(90,124,82,.45) 4px, transparent 4.5px),
+  /* Esquina superior derecha */
+  radial-gradient(circle at 94% 8%, rgba(232,99,122,.6) 6px, transparent 6.5px),
+  radial-gradient(circle at 88% 12%, rgba(212,151,42,.55) 4.5px, transparent 5px),
+  radial-gradient(circle at 96% 17%, rgba(90,124,82,.45) 4px, transparent 4.5px),
+  /* Esquina inferior izquierda */
+  radial-gradient(circle at 6% 92%, rgba(232,99,122,.6) 6px, transparent 6.5px),
+  radial-gradient(circle at 12% 88%, rgba(212,151,42,.55) 4.5px, transparent 5px),
+  radial-gradient(circle at 4% 83%, rgba(90,124,82,.45) 4px, transparent 4.5px),
+  /* Esquina inferior derecha */
+  radial-gradient(circle at 94% 92%, rgba(232,99,122,.65) 7px, transparent 7.5px),
+  radial-gradient(circle at 88% 95%, rgba(232,99,122,.55) 6px, transparent 6.5px),
+  radial-gradient(circle at 96% 85%, rgba(90,124,82,.5) 5px, transparent 5.5px),
+  radial-gradient(circle at 85% 87%, rgba(212,151,42,.6) 4px, transparent 4.5px),
+  radial-gradient(circle at 91% 80%, rgba(90,124,82,.45) 4px, transparent 4.5px)!important;
   background-repeat:no-repeat!important}
 .std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:#C14A5E}
 
@@ -1497,7 +1509,7 @@ async function openPublishModal(){
 
   // Precargar con el mismo tema que ya tiene el Save the Date, si existe
   pubSelectedTheme='theme-teal';
-  const stdCard=document.querySelector('.std-card');
+  const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
     const themeClass=[...stdCard.classList].find(c=>c.startsWith('theme-'));
     if(themeClass) pubSelectedTheme=themeClass;
@@ -1557,12 +1569,47 @@ function showInvitationPreview(){
   const theme=pubSelectedTheme||'theme-teal';
   document.getElementById('preview-modal-hint').style.display='block';
 
+  // Leer las 6 secciones extra directo de los campos del modal de publicar
+  const events=parseEventsSchedule(document.getElementById('pub-events').value);
+  const lodging=document.getElementById('pub-lodging').value.trim();
+  const mapUrl=document.getElementById('pub-map-url').value.trim();
+  const registry=parseRegistryLinks(document.getElementById('pub-registry').value);
+  const story=document.getElementById('pub-story').value.trim();
+  const faq=parseFAQ(document.getElementById('pub-faq').value);
+
+  const extraCardStyle='background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-top:12px';
+  const extraTitleStyle='font-family:Georgia,serif;font-size:16px;font-weight:600;color:var(--text);margin-bottom:10px;text-align:center';
+  let extraSections='';
+
+  if(story){
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">💌 ${L?'Nuestra historia':'Our Story'}</div><p style="font-size:13px;color:var(--text-2);text-align:center;white-space:pre-wrap">${esc(story)}</p></div>`;
+  }
+  if(events.length){
+    const rows=events.map(ev=>`<div style="padding:8px 0;border-top:1px solid var(--border-gray)"><div style="font-weight:600;font-size:13.5px">${esc(ev.name)}</div>${ev.time?`<div style="font-size:12px;color:var(--text-2)">🕐 ${esc(ev.time)}</div>`:''}${ev.location?`<div style="font-size:12px;color:var(--text-2)">📍 ${esc(ev.location)}</div>`:''}${ev.description?`<div style="font-size:12px;color:var(--text-3);font-style:italic">${esc(ev.description)}</div>`:''}</div>`).join('');
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">🗓️ ${L?'Itinerario':'Schedule'}</div>${rows}</div>`;
+  }
+  if(pubGalleryUrls.length){
+    const imgs=pubGalleryUrls.map(u=>`<img src="${u}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px">`).join('');
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">📸 ${L?'Galería':'Gallery'}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${imgs}</div></div>`;
+  }
+  if(lodging||mapUrl){
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">🏨 ${L?'Hospedaje y cómo llegar':'Lodging & Directions'}</div>${lodging?`<p style="font-size:13px;color:var(--text-2);text-align:center;white-space:pre-wrap">${esc(lodging)}</p>`:''}${mapUrl?`<div style="text-align:center;margin-top:8px"><span style="display:inline-block;padding:8px 16px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark);font-size:12.5px;font-weight:600">🗺️ ${L?'Ver en el mapa':'See on map'}</span></div>`:''}</div>`;
+  }
+  if(registry.length){
+    const links=registry.map(r=>`<span style="display:inline-block;padding:8px 16px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark);font-size:12.5px;font-weight:600;margin:2px">🎁 ${esc(r.name)}</span>`).join('');
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">🎁 ${L?'Mesa de regalos':'Gift Registry'}</div><div style="text-align:center">${links}</div></div>`;
+  }
+  if(faq.length){
+    const items=faq.map(f=>`<div style="padding:7px 0;border-top:1px solid var(--border-gray)"><div style="font-weight:600;font-size:13px">${esc(f.question)}</div><div style="font-size:12.5px;color:var(--text-2)">${esc(f.answer)}</div></div>`).join('');
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">❓ ${L?'Preguntas frecuentes':'FAQ'}</div>${items}</div>`;
+  }
+
   const container=document.getElementById('preview-card-container');
   container.innerHTML=`
     <div class="std-card ${theme}"${pubBackgroundImageUrl?` style="background-image:url('${pubBackgroundImageUrl}')"`:''}>
       <div class="std-content">
         <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
-        <div class="std-names">${esc(p.name||'')}</div>
+        <div class="std-names">${esc(toTitleCase(p.name||''))}</div>
         <div class="std-divider"><span class="std-divider-icon">◆</span></div>
         <div class="std-details">
           ${p.date?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(p.date)}</span></div>`:''}
@@ -1573,7 +1620,8 @@ function showInvitationPreview(){
         ${e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:''}
       </div>
       <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
-    </div>`;
+    </div>
+    ${extraSections}`;
 
   document.getElementById('preview-modal').classList.add('open');
 }
@@ -4066,7 +4114,7 @@ Get yours -> dragonflaievents.com`;
 }
 
 function getSTDText(){
-  const card=document.querySelector('.std-card');
+  const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return '';
   const get=sel=>{ const el=card.querySelector(sel); return el?el.textContent.trim():''; };
   const names=get('.std-names');
@@ -4105,7 +4153,7 @@ function shareSTDWA(){
 }
 
 function setSTDTheme(theme,el){
-  const card=document.querySelector('.std-card');
+  const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
   card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-custom-photo');
   card.classList.add(theme);
@@ -4138,7 +4186,7 @@ async function uploadSTDBackground(event){
   const publicUrl=urlData?.publicUrl;
   if(!publicUrl){ showToast(L?'No se pudo obtener el link de la imagen':'Could not get the image link',true); return; }
 
-  const card=document.querySelector('.std-card');
+  const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
   card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle');
   card.classList.add('theme-custom-photo');
@@ -4195,7 +4243,7 @@ async function onGalleryFilesSelected(event){
 }
 
 function makeSTDEditable(){
-  const card=document.querySelector('.std-card');
+  const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
   card.querySelectorAll('.std-names,.std-field,.std-footer,.std-hashtag').forEach(el=>{
     el.setAttribute('contenteditable','true');
@@ -4204,7 +4252,7 @@ function makeSTDEditable(){
 }
 
 async function downloadSTDImage(){
-  const card=document.querySelector('.std-card');
+  const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
   if(typeof html2canvas==='undefined'){showToast(lang==='es'?'No se pudo cargar el generador de imagen':'Could not load image generator',true);return;}
   showToast(lang==='es'?'Generando imagen…':'Generating image…');
