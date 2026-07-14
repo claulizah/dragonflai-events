@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <meta name="description" content="Estás invitado — confirma tu asistencia aquí.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
@@ -80,7 +80,10 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .card.theme-custom-photo>*{position:relative;z-index:1}
 .card.theme-custom-photo .eyebrow,.card.theme-custom-photo .hashtag{color:var(--violet)}
 .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
-.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--text)}
+.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
+.names.font-classic{font-family:'Playfair Display',serif}
+.names.font-modern{font-family:'Montserrat',sans-serif;letter-spacing:.02em}
+.names.font-script{font-family:'Dancing Script',cursive;font-weight:700}
 .divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
 .details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px;color:var(--text-2)}
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
@@ -561,7 +564,7 @@ function renderInvitation(inv){
   document.getElementById('content').innerHTML=`
     <div class="card ${esc(inv.theme||'theme-teal')}"${inv.background_image_url?` style="background-image:url('${esc(inv.background_image_url)}')"`:(inv.theme==='theme-custom-color'&&inv.custom_color_hex?` style="--custom-accent-color:${esc(inv.custom_color_hex)};--custom-accent-border:${esc(inv.custom_color_hex)}40"`:'')}>${getFloralCornerSVG()}
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
-      <div class="names">${esc(inv.host_names)}</div>
+      <div class="names${inv.font_family?' '+esc(inv.font_family):''}"${inv.text_color?` style="--custom-text-color:${esc(inv.text_color)}"`:''}>${esc(inv.host_names)}</div>
       <div class="divider"></div>
       <div class="details">
         ${inv.event_date?`<div class="detail-item">📅 ${esc(inv.event_date)}</div>`:''}
