@@ -287,67 +287,80 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       con elementos naturales/festivos hechos 100% con CSS, sin fotos reales ── */
 
 /* Floral — ideal para bodas/aniversarios: ramas de flores en 2 esquinas */
-.std-card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.45)!important;background-image:
-  /* Esquina superior izquierda */
-  radial-gradient(circle at 6% 8%, rgba(232,99,122,.65) 7px, transparent 7.5px),
-  radial-gradient(circle at 12% 5%, rgba(232,99,122,.55) 6px, transparent 6.5px),
-  radial-gradient(circle at 4% 15%, rgba(90,124,82,.5) 5px, transparent 5.5px),
-  radial-gradient(circle at 15% 13%, rgba(212,151,42,.6) 4px, transparent 4.5px),
-  radial-gradient(circle at 9% 20%, rgba(90,124,82,.45) 4px, transparent 4.5px),
-  /* Esquina superior derecha */
-  radial-gradient(circle at 94% 8%, rgba(232,99,122,.6) 6px, transparent 6.5px),
-  radial-gradient(circle at 88% 12%, rgba(212,151,42,.55) 4.5px, transparent 5px),
-  radial-gradient(circle at 96% 17%, rgba(90,124,82,.45) 4px, transparent 4.5px),
-  /* Esquina inferior izquierda */
-  radial-gradient(circle at 6% 92%, rgba(232,99,122,.6) 6px, transparent 6.5px),
-  radial-gradient(circle at 12% 88%, rgba(212,151,42,.55) 4.5px, transparent 5px),
-  radial-gradient(circle at 4% 83%, rgba(90,124,82,.45) 4px, transparent 4.5px),
-  /* Esquina inferior derecha */
-  radial-gradient(circle at 94% 92%, rgba(232,99,122,.65) 7px, transparent 7.5px),
-  radial-gradient(circle at 88% 95%, rgba(232,99,122,.55) 6px, transparent 6.5px),
-  radial-gradient(circle at 96% 85%, rgba(90,124,82,.5) 5px, transparent 5.5px),
-  radial-gradient(circle at 85% 87%, rgba(212,151,42,.6) 4px, transparent 4.5px),
-  radial-gradient(circle at 91% 80%, rgba(90,124,82,.45) 4px, transparent 4.5px)!important;
-  background-repeat:no-repeat!important}
+.std-card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
 .std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:#C14A5E}
+.std-floral-corner{display:none;position:absolute;width:82px;height:82px;pointer-events:none;z-index:2}
+.std-card.theme-confetti .std-floral-corner{display:block}
+.std-floral-corner.fc-tl{top:0;left:0}
+.std-floral-corner.fc-br{bottom:0;right:0;transform:rotate(180deg)}
 
-/* Naturaleza — ideal para baby shower/eventos al aire libre: hojas en 2 esquinas */
-.std-card.theme-waves{background-color:#FFFEFB!important;background-image:
-  radial-gradient(ellipse 34px 14px at 6% 8%, rgba(90,124,82,.5), transparent 70%),
-  radial-gradient(ellipse 26px 12px at 11% 14%, rgba(90,124,82,.4), transparent 70%),
-  radial-gradient(ellipse 20px 10px at 4% 20%, rgba(46,196,182,.35), transparent 70%),
-  radial-gradient(ellipse 34px 14px at 94% 92%, rgba(90,124,82,.5), transparent 70%),
-  radial-gradient(ellipse 26px 12px at 89% 86%, rgba(90,124,82,.4), transparent 70%),
-  radial-gradient(ellipse 20px 10px at 96% 80%, rgba(46,196,182,.35), transparent 70%)!important;
-  background-repeat:no-repeat!important}
+/* Naturaleza — ideal para baby shower/eventos al aire libre: rama de hojas en 2 esquinas */
+.std-card.theme-waves{background-color:#FFFEFB!important;border:1.5px solid rgba(90,124,82,.35)!important}
 .std-card.theme-waves .std-eyebrow,.std-card.theme-waves .std-divider-icon,.std-card.theme-waves .std-hashtag{color:#5A7C52}
 
-/* Papel elegante — textura fina, discreta y formal */
-.std-card.theme-paper{background:
-  repeating-linear-gradient(135deg, rgba(0,0,0,.022) 0px, rgba(0,0,0,.022) 1px, transparent 1px, transparent 3px),
-  radial-gradient(ellipse at center, #FFFFFF 50%, #F2E9D8 100%)!important}
+/* Papel elegante — filigrana caligráfica fina y formal en 2 esquinas */
+.std-card.theme-paper{background-color:#FFFEFC!important;border:1.5px solid rgba(139,115,85,.35)!important}
 .std-card.theme-paper .std-eyebrow,.std-card.theme-paper .std-divider-icon,.std-card.theme-paper .std-hashtag{color:#8B7355}
 
 /* Destellos dorados — ideal para quinceañera/corporativo elegante: chispas en 2 esquinas */
-.std-card.theme-sparkle{background-color:#FFFEFA!important;background-image:
-  radial-gradient(circle at 7% 9%, rgba(212,151,42,.8) 2.5px, transparent 3px),
-  radial-gradient(circle at 14% 6%, rgba(212,151,42,.6) 1.8px, transparent 2.2px),
-  radial-gradient(circle at 4% 16%, rgba(123,47,190,.5) 1.8px, transparent 2.2px),
-  radial-gradient(circle at 18% 13%, rgba(212,151,42,.5) 1.5px, transparent 2px),
-  radial-gradient(circle at 93% 91%, rgba(212,151,42,.8) 2.5px, transparent 3px),
-  radial-gradient(circle at 86% 94%, rgba(212,151,42,.6) 1.8px, transparent 2.2px),
-  radial-gradient(circle at 96% 84%, rgba(123,47,190,.5) 1.8px, transparent 2.2px),
-  radial-gradient(circle at 82% 87%, rgba(212,151,42,.5) 1.5px, transparent 2px)!important;
-  background-repeat:no-repeat!important}
+.std-card.theme-sparkle{background-color:#FFFEFA!important;border:1.5px solid rgba(212,151,42,.4)!important}
 .std-card.theme-sparkle .std-eyebrow,.std-card.theme-sparkle .std-divider-icon,.std-card.theme-sparkle .std-hashtag{color:#B8860B}
+
+/* Globos — ideal para cumpleaños */
+.std-card.theme-balloons{background-color:#FFFEFC!important;border:1.5px solid rgba(232,99,122,.3)!important}
+.std-card.theme-balloons .std-eyebrow,.std-card.theme-balloons .std-divider-icon,.std-card.theme-balloons .std-hashtag{color:#C14A5E}
+
+/* Nubes — ideal para baby shower */
+.std-card.theme-clouds{background-color:#FDFEFF!important;border:1.5px solid rgba(184,212,234,.5)!important}
+.std-card.theme-clouds .std-eyebrow,.std-card.theme-clouds .std-divider-icon,.std-card.theme-clouds .std-hashtag{color:#5A8FBE}
+
+/* Geométrico — ideal para eventos corporativos */
+.std-card.theme-geometric{background-color:#FFFFFF!important;border:1.5px solid rgba(13,27,42,.25)!important}
+.std-card.theme-geometric .std-eyebrow,.std-card.theme-geometric .std-divider-icon,.std-card.theme-geometric .std-hashtag{color:#0D1B2A}
+
+/* Birrete — ideal para graduación */
+.std-card.theme-graduation{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
+.std-card.theme-graduation .std-eyebrow,.std-card.theme-graduation .std-divider-icon,.std-card.theme-graduation .std-hashtag{color:#1A2332}
+
+/* Corazones — ideal para aniversarios */
+.std-card.theme-hearts{background-color:#FFFCFC!important;border:1.5px solid rgba(232,99,122,.35)!important}
+.std-card.theme-hearts .std-eyebrow,.std-card.theme-hearts .std-divider-icon,.std-card.theme-hearts .std-hashtag{color:#C14A5E}
+
+/* Animalitos — ideal para fiestas infantiles */
+.std-card.theme-animals{background-color:#FFFEFB!important;border:1.5px solid rgba(212,151,42,.35)!important}
+.std-card.theme-animals .std-eyebrow,.std-card.theme-animals .std-divider-icon,.std-card.theme-animals .std-hashtag{color:#B8860B}
+
+/* ── Esquinas ilustradas — un solo SVG por tema, mostrado/ocultado por CSS
+      según qué clase de tema tenga la tarjeta en ese momento. Así cambiar
+      de tema es instantáneo, sin tener que regenerar el HTML. ── */
+.std-leaf-corner,.std-flourish-corner,.std-sparkle-corner,.std-balloon-corner,.std-cloud-corner,.std-geo-corner,.std-grad-corner,.std-heart-corner,.std-animal-corner{display:none;position:absolute;width:82px;height:82px;pointer-events:none;z-index:2}
+.std-card.theme-waves .std-leaf-corner{display:block}
+.std-card.theme-paper .std-flourish-corner{display:block}
+.std-card.theme-sparkle .std-sparkle-corner{display:block}
+.std-card.theme-balloons .std-balloon-corner{display:block}
+.std-card.theme-clouds .std-cloud-corner{display:block}
+.std-card.theme-geometric .std-geo-corner{display:block}
+.std-card.theme-graduation .std-grad-corner{display:block}
+.std-card.theme-hearts .std-heart-corner{display:block}
+.std-card.theme-animals .std-animal-corner{display:block}
+.std-leaf-corner.fc-tl,.std-flourish-corner.fc-tl,.std-sparkle-corner.fc-tl,.std-balloon-corner.fc-tl,.std-cloud-corner.fc-tl,.std-geo-corner.fc-tl,.std-grad-corner.fc-tl,.std-heart-corner.fc-tl,.std-animal-corner.fc-tl{top:0;left:0}
+.std-leaf-corner.fc-br,.std-flourish-corner.fc-br,.std-sparkle-corner.fc-br,.std-balloon-corner.fc-br,.std-cloud-corner.fc-br,.std-geo-corner.fc-br,.std-grad-corner.fc-br,.std-heart-corner.fc-br,.std-animal-corner.fc-br{bottom:0;right:0;transform:rotate(180deg)}
+
 /* ── Fondo con foto propia — la imagen se pone inline vía JS, aquí solo el overlay para que el texto se lea ── */
+/* Color dinámico — para las 40 paletas sugeridas por tipo de evento.
+   En vez de 40 clases fijas, usamos UNA sola que lee el color desde una
+   variable CSS que el JS setea al elegirlo (setCustomColorTheme). */
+.std-card.theme-custom-color{background-color:#FFFEFC!important;border:1.5px solid var(--custom-accent-border,rgba(0,0,0,.15))!important}
+.std-card.theme-custom-color .std-eyebrow,.std-card.theme-custom-color .std-divider-icon,.std-card.theme-custom-color .std-hashtag{color:var(--custom-accent-color,#1A2332)}
+
 .std-card.theme-custom-photo{background-size:cover!important;background-position:center!important}
 .std-card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0}
 .std-card.theme-custom-photo .std-content,.std-card.theme-custom-photo .std-bg-dragonfly,.std-card.theme-custom-photo .std-logo-mark{position:relative;z-index:1}
 .std-card.theme-custom-photo .std-eyebrow,.std-card.theme-custom-photo .std-divider-icon,.std-card.theme-custom-photo .std-hashtag{color:var(--violet)}
-.std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem}
+.std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
 .theme-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
+.color-swatch.active{border-color:var(--text)!important;transform:scale(1.15)}
 .theme-swatch.sw-teal{background:var(--teal-dark)}
 .theme-swatch.sw-blush{background:#C14A5E}
 .theme-swatch.sw-gold{background:#B8860B}
@@ -358,6 +371,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .theme-swatch.sw-waves{background:radial-gradient(ellipse 10px 5px at 40% 45%,rgba(90,124,82,.7),transparent 70%),radial-gradient(ellipse 7px 4px at 60% 60%,rgba(90,124,82,.6),transparent 70%),#FFFEFB}
 .theme-swatch.sw-paper{background:radial-gradient(ellipse at center,#FFFFFF 50%,#E9DFC8 100%)}
 .theme-swatch.sw-sparkle{background:radial-gradient(circle,rgba(212,151,42,.7) 1px,transparent 1.5px),#FFFCF5;background-size:8px 8px}
+.theme-swatch.sw-balloons{background:radial-gradient(ellipse 6px 8px at 35% 35%,#E8637A 90%,transparent),radial-gradient(ellipse 5px 6px at 65% 60%,#4A7FBE 90%,transparent),#FFFEFC}
+.theme-swatch.sw-clouds{background:radial-gradient(ellipse 9px 5px at 45% 40%,#B8D4EA 85%,transparent),#FDFEFF}
+.theme-swatch.sw-geometric{background:linear-gradient(135deg,transparent 45%,rgba(13,27,42,.35) 45%,rgba(13,27,42,.35) 50%,transparent 50%),#FFFFFF}
+.theme-swatch.sw-graduation{background:radial-gradient(ellipse 7px 4px at 50% 40%,#1A2332 80%,transparent),#FFFEFC}
+.theme-swatch.sw-hearts{background:radial-gradient(circle at 40% 45%,#E8637A 45%,transparent 50%),#FFFCFC}
+.theme-swatch.sw-animals{background:radial-gradient(circle at 50% 55%,#FFF6E8 55%,transparent 60%),radial-gradient(ellipse 3px 6px at 38% 25%,#F4C2CE 90%,transparent),radial-gradient(ellipse 3px 6px at 62% 25%,#F4C2CE 90%,transparent),#FFFEFB}
 .btn-std-upload-photo{padding:9px 18px;border-radius:100px;border:1.5px dashed var(--violet);background:var(--violet-light);color:var(--violet-dark);font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
 .btn-std-upload-photo:hover{background:var(--violet);color:#fff;border-style:solid}
 .std-logo-mark{position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:4px;opacity:.55}
@@ -1114,7 +1133,14 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span class="theme-swatch sw-waves" onclick="setPublishTheme('theme-waves',this)" title="Naturaleza"></span>
         <span class="theme-swatch sw-paper" onclick="setPublishTheme('theme-paper',this)" title="Papel"></span>
         <span class="theme-swatch sw-sparkle" onclick="setPublishTheme('theme-sparkle',this)" title="Destellos"></span>
+        <span class="theme-swatch sw-balloons" onclick="setPublishTheme('theme-balloons',this)" title="Globos"></span>
+        <span class="theme-swatch sw-clouds" onclick="setPublishTheme('theme-clouds',this)" title="Nubes"></span>
+        <span class="theme-swatch sw-geometric" onclick="setPublishTheme('theme-geometric',this)" title="Geométrico"></span>
+        <span class="theme-swatch sw-graduation" onclick="setPublishTheme('theme-graduation',this)" title="Birrete"></span>
+        <span class="theme-swatch sw-hearts" onclick="setPublishTheme('theme-hearts',this)" title="Corazones"></span>
+        <span class="theme-swatch sw-animals" onclick="setPublishTheme('theme-animals',this)" title="Animalitos"></span>
       </div>
+      <div id="pub-color-swatches" style="margin-bottom:.75rem"></div>
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
         <input type="file" id="pub-bg-photo-input" accept="image/*" style="display:none" onchange="uploadPublishBackground(event)">
@@ -1509,14 +1535,33 @@ async function openPublishModal(){
 
   // Precargar con el mismo tema que ya tiene el Save the Date, si existe
   pubSelectedTheme='theme-teal';
+  pubCustomColorHex=null;
   const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
     const themeClass=[...stdCard.classList].find(c=>c.startsWith('theme-'));
     if(themeClass) pubSelectedTheme=themeClass;
+    if(pubSelectedTheme==='theme-custom-color'){
+      pubCustomColorHex=stdCard.style.getPropertyValue('--custom-accent-color')||null;
+    }
   }
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
   });
+
+  // Llenar los 5 colores sugeridos según el tipo de evento actual
+  const colorSwatchesBox=document.getElementById('pub-color-swatches');
+  const suggestion=THEME_SUGGESTIONS[plan.eventTypeRaw];
+  if(colorSwatchesBox&&suggestion){
+    const colorOpts=suggestion.colors[plan.lang]||suggestion.colors.es;
+    const swatches=colorOpts.map(name=>{
+      const hex=EVENT_COLOR_HEX[name]||'#8A94A6';
+      const isActive=pubSelectedTheme==='theme-custom-color'&&pubCustomColorHex===hex;
+      return `<span class="color-swatch${isActive?' active':''}" style="width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;background:${hex};display:inline-block" title="${esc(name)}" onclick="setPublishCustomColor('${name.replace(/'/g,"\\'")}',this)"></span>`;
+    }).join('');
+    colorSwatchesBox.innerHTML=`<p style="font-size:11px;color:var(--text-3);text-align:center;margin-bottom:.4rem">${plan.lang==='es'?'Colores sugeridos para tu evento':'Suggested colors for your event'}</p><div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">${swatches}</div>`;
+  } else if(colorSwatchesBox){
+    colorSwatchesBox.innerHTML='';
+  }
 
   document.getElementById('publish-modal').classList.add('open');
   document.body.style.overflow='hidden';
@@ -1524,13 +1569,27 @@ async function openPublishModal(){
 
 let pubBackgroundImageUrl=null;
 let pubGuestEmails={};
+let pubCustomColorHex=null;
 
 function setPublishTheme(theme,el){
   pubSelectedTheme=theme;
   pubBackgroundImageUrl=null; // elegir un tema de color/patrón cancela la foto subida
+  pubCustomColorHex=null;
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML='';
-  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-color-swatches .color-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+function setPublishCustomColor(colorName,el){
+  const hex=EVENT_COLOR_HEX[colorName];
+  if(!hex) return;
+  pubSelectedTheme='theme-custom-color';
+  pubCustomColorHex=hex;
+  pubBackgroundImageUrl=null;
+  const preview=document.getElementById('pub-bg-photo-preview');
+  if(preview) preview.innerHTML='';
+  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-color-swatches .color-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
 }
 
@@ -1605,8 +1664,13 @@ function showInvitationPreview(){
   }
 
   const container=document.getElementById('preview-card-container');
+  const cardStyle=pubBackgroundImageUrl
+    ? ` style="background-image:url('${pubBackgroundImageUrl}')"`
+    : (theme==='theme-custom-color'&&pubCustomColorHex
+      ? ` style="--custom-accent-color:${pubCustomColorHex};--custom-accent-border:${pubCustomColorHex}40"`
+      : '');
   container.innerHTML=`
-    <div class="std-card ${theme}"${pubBackgroundImageUrl?` style="background-image:url('${pubBackgroundImageUrl}')"`:''}>
+    <div class="std-card ${theme}"${cardStyle}>${getFloralCornerSVG()}
       <div class="std-content">
         <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
         <div class="std-names">${esc(toTitleCase(p.name||''))}</div>
@@ -1670,6 +1734,9 @@ function closePublishModal(){
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML='';
   pubGuestEmails={};
+  pubCustomColorHex=null;
+  const colorBox=document.getElementById('pub-color-swatches');
+  if(colorBox) colorBox.innerHTML='';
 }
 
 let lastPublishedUrl='';
@@ -1699,9 +1766,23 @@ async function openEditInvitationModal(invId){
 
   // Pre-llenar el resto de los campos con lo que ya tiene guardado
   pubSelectedTheme=inv.theme||'theme-teal';
+  pubCustomColorHex=inv.custom_color_hex||null;
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
   });
+  const colorSwatchesBoxEdit=document.getElementById('pub-color-swatches');
+  const suggestionEdit=THEME_SUGGESTIONS[plan.eventTypeRaw];
+  if(colorSwatchesBoxEdit&&suggestionEdit){
+    const colorOptsEdit=suggestionEdit.colors[plan.lang]||suggestionEdit.colors.es;
+    const swatchesEdit=colorOptsEdit.map(name=>{
+      const hex=EVENT_COLOR_HEX[name]||'#8A94A6';
+      const isActive=pubSelectedTheme==='theme-custom-color'&&pubCustomColorHex===hex;
+      return `<span class="color-swatch${isActive?' active':''}" style="width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;background:${hex};display:inline-block" title="${esc(name)}" onclick="setPublishCustomColor('${name.replace(/'/g,"\\'")}',this)"></span>`;
+    }).join('');
+    colorSwatchesBoxEdit.innerHTML=`<p style="font-size:11px;color:var(--text-3);text-align:center;margin-bottom:.4rem">${plan.lang==='es'?'Colores sugeridos para tu evento':'Suggested colors for your event'}</p><div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">${swatchesEdit}</div>`;
+  } else if(colorSwatchesBoxEdit){
+    colorSwatchesBoxEdit.innerHTML='';
+  }
   document.getElementById('pub-ask-guests').checked=!!inv.ask_guest_count;
   document.getElementById('pub-ask-dietary').checked=!!inv.ask_dietary;
   document.getElementById('pub-ask-message').checked=!!inv.ask_message;
@@ -1816,7 +1897,8 @@ async function publishInvitation(){
       couple_story: document.getElementById('pub-story').value.trim()||null,
       faq: parseFAQ(document.getElementById('pub-faq').value),
       gallery_urls: pubGalleryUrls,
-      background_image_url: pubBackgroundImageUrl
+      background_image_url: pubBackgroundImageUrl,
+      custom_color_hex: pubCustomColorHex
     };
 
     const {error}=await sb.from('invitations').update(updatePayload).eq('id',editingInvitationId).eq('user_id',currentUser.id);
@@ -1888,7 +1970,8 @@ async function publishInvitation(){
     couple_story: document.getElementById('pub-story').value.trim()||null,
     faq: parseFAQ(document.getElementById('pub-faq').value),
     gallery_urls: pubGalleryUrls,
-    background_image_url: pubBackgroundImageUrl
+    background_image_url: pubBackgroundImageUrl,
+    custom_color_hex: pubCustomColorHex
   };
 
   const {data:newInv,error}=await sb.from('invitations').insert(payload).select().single();
@@ -2227,6 +2310,28 @@ const THEME_SUGGESTIONS={
     colors:{es:['Amarillo','Azul cielo','Verde limón','Naranja','Rosa brillante'],
             en:['Yellow','Sky blue','Lime green','Orange','Bright pink']}
   }
+};
+
+// Cada nombre de color sugerido → un tono legible como texto de acento
+// (los colores muy claros como "Blanco perla" se oscurecen un poco, igual
+// que ya hacíamos con la opción "Blanco" de los 6 temas originales — un
+// texto literalmente blanco sobre fondo blanco no se vería).
+const EVENT_COLOR_HEX={
+  'Blanco perla':'#A89A8A','Dorado suave':'#B8860B','Verde olivo':'#6B7A3D','Rosa empolvado':'#B8697A','Beige cálido':'#9C8060',
+  'Amarillo brillante':'#C9A227','Azul turquesa':'#1A9E92','Fucsia':'#C2185B','Naranja vibrante':'#D2691E','Morado eléctrico':'#7B2FBE',
+  'Celeste':'#4A90C2','Rosa pastel':'#D48CA0','Gris claro':'#8A94A6','Amarillo mantequilla':'#C9A857','Verde menta':'#5CA88A',
+  'Azul marino':'#1A2332','Gris oscuro':'#4A4A4A','Blanco':'#8A94A6','Negro':'#1A1A1A','Plateado':'#8C8C8C',
+  'Rosa fucsia':'#C14A5E','Dorado':'#B8860B','Lila':'#9370A8','Plata brillante':'#A8A8A8','Azul cielo':'#5B9BD5',
+  'Verde esmeralda':'#1E7A5C','Rojo pasión':'#B22234','Plata':'#A8A8A8','Champagne':'#A8916B','Rosa suave':'#C97B8C',
+  'Verde limón':'#6B9E3A','Naranja':'#D2691E','Rosa brillante':'#D65A8C','Amarillo':'#C9A227',
+  // Traducciones al inglés (mismos valores hex)
+  'Pearl white':'#A89A8A','Soft gold':'#B8860B','Olive green':'#6B7A3D','Dusty pink':'#B8697A','Warm beige':'#9C8060',
+  'Bright yellow':'#C9A227','Turquoise blue':'#1A9E92','Vibrant orange':'#D2691E','Electric purple':'#7B2FBE','Fuchsia':'#C2185B',
+  'Sky blue':'#5B9BD5','Pastel pink':'#D48CA0','Light gray':'#8A94A6','Butter yellow':'#C9A857','Mint green':'#5CA88A',
+  'Navy blue':'#1A2332','Dark gray':'#4A4A4A','White':'#8A94A6','Black':'#1A1A1A','Silver':'#8C8C8C',
+  'Fuchsia pink':'#C14A5E','Gold':'#B8860B','Lilac':'#9370A8','Bright silver':'#A8A8A8',
+  'Emerald green':'#1E7A5C','Passion red':'#B22234','Champagne':'#A8916B','Soft pink':'#C97B8C',
+  'Lime green':'#6B9E3A','Orange':'#D2691E','Bright pink':'#D65A8C','Yellow':'#C9A227'
 };
 
 const T={
@@ -2891,11 +2996,114 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 function suggestVisualTheme(themeText){
   if(!themeText) return null;
   const t=themeText.toLowerCase();
-  if(/natural|hoja|rama|jard|tropical|animal|conejit|osit|palm|piñ/.test(t)) return 'theme-waves'; // Naturaleza
-  if(/flor|glamor|corona|tiara|princesa/.test(t)) return 'theme-confetti'; // Floral
-  if(/vintage|acuarela|clásic|clasic|retro|foto|papel/.test(t)) return 'theme-paper'; // Papel
-  if(/brillo|glitter|destell|dorado|neon|estrella|luna|mágic|magic|glam/.test(t)) return 'theme-sparkle'; // Destellos
+  // Orden cuidadoso: lo más específico primero, para no perderlo contra
+  // palabras genéricas que también aparecen en otras temáticas (ej. "estrella"
+  // aparece tanto en "estrellas de logro" como en "luna mágica").
+  if(/birrete|diploma|graduad|académic|academic|logro/.test(t)) return 'theme-graduation';
+  if(/corazon|corazón|vino y copas|iniciales|viaje romántico|viaje romantico/.test(t)) return 'theme-hearts';
+  if(/geométric|geometric|networking|tecnología|tecnologia|metálic|metalic|corporativ|éxito|exito/.test(t)) return 'theme-geometric';
+  if(/caricatur|superhéroe|superheroe|circo|payaso|dinosaurio|unicornio|castillo|mundo mágico|mundo magico/.test(t)) return 'theme-animals';
+  if(/globo|confeti|pastel con vela|fiesta retro|retro|neon/.test(t)) return 'theme-balloons';
+  if(/nube|carrito de bebé|carrito de bebe|vintage pastel|arcoíris|arcoiris|conejit|osit|tiern/.test(t)) return 'theme-clouds';
+  if(/corona|tiara|princesa|brillo|glitter|destell/.test(t)) return 'theme-sparkle';
+  if(/flor|argolla|paloma|acuarela/.test(t)) return 'theme-confetti'; // Floral
+  if(/natural|hoja|rama|jard|tropical|animal|palm|piñ/.test(t)) return 'theme-waves'; // Naturaleza
+  if(/vintage|clásic|clasic|foto|papel/.test(t)) return 'theme-paper';
+  if(/mágic|magic|luna|estrella/.test(t)) return 'theme-sparkle';
   return null;
+}
+
+function getFloralCornerSVG(){
+  const floral=`
+    <path d="M4,60 Q4,10 10,6 Q40,2 60,4" stroke="#D4972A" stroke-width="1" fill="none" opacity=".5"/>
+    <circle cx="10" cy="6" r="1.4" fill="#D4972A" opacity=".7"/>
+    <circle cx="35" cy="3" r="1.1" fill="#D4972A" opacity=".6"/>
+    <circle cx="55" cy="4.5" r="1" fill="#D4972A" opacity=".5"/>
+    <ellipse cx="22" cy="18" rx="12" ry="4.5" fill="#7A9B6E" opacity=".65" transform="rotate(-35 22 18)"/>
+    <ellipse cx="12" cy="28" rx="10" ry="4" fill="#8FAE7F" opacity=".55" transform="rotate(25 12 28)"/>
+    <ellipse cx="30" cy="10" rx="9" ry="3.5" fill="#7A9B6E" opacity=".5" transform="rotate(-10 30 10)"/>
+    <g transform="translate(26,22)">
+      <circle r="9" fill="#F4C2CE"/>
+      <circle cx="-3" cy="-2" r="7" fill="#EDA3B5"/>
+      <circle cx="2" cy="-4" r="5.2" fill="#E8899C"/>
+      <circle cx="-1" cy="-1" r="3.2" fill="#D96E85"/>
+    </g>
+    <g transform="translate(11,10)">
+      <circle r="5" fill="#F4C2CE" opacity=".9"/>
+      <circle cx="-1.5" cy="-1" r="3.6" fill="#EDA3B5"/>
+      <circle cx="0.5" cy="-1.5" r="2" fill="#D96E85"/>
+    </g>`;
+  const leaf=`
+    <path d="M5,58 Q8,26 15,10" stroke="#5A7C52" stroke-width="1.2" fill="none" opacity=".5"/>
+    <ellipse cx="14" cy="14" rx="9" ry="3.5" fill="#7A9B6E" opacity=".75" transform="rotate(-40 14 14)"/>
+    <ellipse cx="10" cy="25" rx="8" ry="3.2" fill="#8FAE7F" opacity=".65" transform="rotate(35 10 25)"/>
+    <ellipse cx="19" cy="8" rx="7" ry="2.8" fill="#6B8F5F" opacity=".6" transform="rotate(-15 19 8)"/>
+    <ellipse cx="7" cy="37" rx="7" ry="3" fill="#7A9B6E" opacity=".5" transform="rotate(50 7 37)"/>
+    <ellipse cx="24" cy="17" rx="6" ry="2.5" fill="#8FAE7F" opacity=".55" transform="rotate(-5 24 17)"/>
+    <ellipse cx="16" cy="30" rx="6.5" ry="2.6" fill="#6B8F5F" opacity=".5" transform="rotate(60 16 30)"/>`;
+  const flourish=`
+    <path d="M4,48 Q4,16 22,8 Q38,2 55,6" stroke="#8B7355" stroke-width="1" fill="none" opacity=".55"/>
+    <path d="M8,42 Q11,22 24,15" stroke="#8B7355" stroke-width=".7" fill="none" opacity=".4"/>
+    <circle cx="22" cy="8" r="1.3" fill="#8B7355" opacity=".6"/>
+    <circle cx="4" cy="48" r="1" fill="#8B7355" opacity=".5"/>
+    <circle cx="24" cy="15" r=".8" fill="#D4972A" opacity=".55"/>`;
+  const sparkle=`
+    <path d="M18,2 L21,15 L34,18 L21,21 L18,34 L15,21 L2,18 L15,15 Z" fill="#D4972A" opacity=".8"/>
+    <path d="M42,22 L43,27 L48,28 L43,29 L42,34 L41,29 L36,28 L41,27 Z" fill="#D4972A" opacity=".6"/>
+    <circle cx="10" cy="40" r="1.5" fill="#D4972A" opacity=".55"/>
+    <circle cx="47" cy="10" r="1.2" fill="#7B2FBE" opacity=".45"/>
+    <circle cx="30" cy="42" r="1" fill="#D4972A" opacity=".4"/>`;
+
+  const balloons=`
+    <ellipse cx="15" cy="18" rx="8" ry="10" fill="#E8637A" opacity=".7"/>
+    <path d="M15,28 Q17,34 15,42" stroke="#E8637A" stroke-width=".8" fill="none" opacity=".5"/>
+    <ellipse cx="29" cy="11" rx="6" ry="7.5" fill="#4A7FBE" opacity=".65"/>
+    <path d="M29,18.5 Q31,24 29,32" stroke="#4A7FBE" stroke-width=".7" fill="none" opacity=".45"/>
+    <ellipse cx="7" cy="32" rx="5" ry="6.2" fill="#D4972A" opacity=".6"/>
+    <path d="M7,38 Q9,42 7,47" stroke="#D4972A" stroke-width=".6" fill="none" opacity=".4"/>
+    <circle cx="36" cy="26" r="1.5" fill="#E8637A" opacity=".45"/>
+    <rect x="20" y="36" width="2.5" height="2.5" fill="#4A7FBE" opacity=".45" transform="rotate(20 21 37)"/>
+    <circle cx="5" cy="10" r="1.2" fill="#D4972A" opacity=".4"/>`;
+  const clouds=`
+    <ellipse cx="15" cy="16" rx="10" ry="6" fill="#B8D4EA" opacity=".65"/>
+    <ellipse cx="23" cy="14" rx="7" ry="5" fill="#B8D4EA" opacity=".6"/>
+    <ellipse cx="8" cy="14" rx="6" ry="4.5" fill="#CBE0F0" opacity=".55"/>
+    <ellipse cx="12" cy="31" rx="7" ry="4.5" fill="#F4C2CE" opacity=".5"/>
+    <ellipse cx="20" cy="30" rx="5" ry="3.5" fill="#F4C2CE" opacity=".45"/>
+    <path d="M33,9 L34,12 L37,13 L34,14 L33,17 L32,14 L29,13 L32,12 Z" fill="#D4972A" opacity=".45"/>
+    <circle cx="6" cy="24" r="1" fill="#D4972A" opacity=".4"/>`;
+  const geo=`
+    <polygon points="10,5 25,5 32,20 25,35 10,35 3,20" fill="none" stroke="#0D1B2A" stroke-width="1" opacity=".35"/>
+    <line x1="8" y1="8" x2="20" y2="8" stroke="#4A7FBE" stroke-width=".8" opacity=".4"/>
+    <line x1="8" y1="14" x2="16" y2="14" stroke="#4A7FBE" stroke-width=".8" opacity=".3"/>
+    <circle cx="31" cy="31" r="2" fill="none" stroke="#0D1B2A" stroke-width=".8" opacity=".35"/>
+    <circle cx="36" cy="16" r="1.3" fill="#4A7FBE" opacity=".4"/>`;
+  const grad=`
+    <g transform="translate(15,15)">
+      <polygon points="0,-10 13,-3 0,4 -13,-3" fill="#1A2332" opacity=".75"/>
+      <rect x="-3" y="-1" width="6" height="7" fill="#1A2332" opacity=".7"/>
+      <path d="M13,-3 L16,11" stroke="#D4972A" stroke-width="1" opacity=".55"/>
+      <circle cx="16" cy="12" r="1.8" fill="#D4972A" opacity=".6"/>
+    </g>
+    <path d="M30,5 L31,8 L34,9 L31,10 L30,13 L29,10 L26,9 L29,8 Z" fill="#D4972A" opacity=".45"/>
+    <circle cx="6" cy="32" r="1.2" fill="#D4972A" opacity=".4"/>`;
+  const hearts=`
+    <path d="M15,15 C12,9 4,11 4,18 C4,25 15,33 15,33 C15,33 26,25 26,18 C26,11 18,9 15,15 Z" fill="#E8637A" opacity=".65"/>
+    <path d="M33,9 C31,6 26,7 26,11.5 C26,16 33,21 33,21 C33,21 40,16 40,11.5 C40,7 35,6 33,9 Z" fill="#E8637A" opacity=".45"/>
+    <circle cx="10" cy="38" r="1.2" fill="#D4972A" opacity=".4"/>`;
+  const animals=`
+    <ellipse cx="10" cy="9" rx="3" ry="8" fill="#F4C2CE" opacity=".7" transform="rotate(-15 10 9)"/>
+    <ellipse cx="20" cy="9" rx="3" ry="8" fill="#F4C2CE" opacity=".7" transform="rotate(15 20 9)"/>
+    <circle cx="15" cy="23" r="9" fill="#FFF6E8" opacity=".75"/>
+    <circle cx="11" cy="21" r="1.3" fill="#1A2332" opacity=".65"/>
+    <circle cx="19" cy="21" r="1.3" fill="#1A2332" opacity=".65"/>
+    <ellipse cx="15" cy="25" rx="1.5" ry="1" fill="#E8899C" opacity=".55"/>
+    <circle cx="35" cy="32" r="4" fill="#D4972A" opacity=".3"/>`;
+
+  const wrap=(cls,content)=>`<svg class="${cls} fc-tl" viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg">${content}</svg><svg class="${cls} fc-br" viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg">${content}</svg>`;
+
+  return wrap('std-floral-corner',floral)+wrap('std-leaf-corner',leaf)+wrap('std-flourish-corner',flourish)+wrap('std-sparkle-corner',sparkle)
+    +wrap('std-balloon-corner',balloons)+wrap('std-cloud-corner',clouds)+wrap('std-geo-corner',geo)+wrap('std-grad-corner',grad)+wrap('std-heart-corner',hearts)+wrap('std-animal-corner',animals);
 }
 
 function wrapSTDCard(cardHtml){
@@ -2915,13 +3123,30 @@ function wrapSTDCard(cardHtml){
 <span class="theme-swatch sw-waves${isSug('theme-waves')}" onclick="setSTDTheme('theme-waves',this)" title="Naturaleza"></span>
 <span class="theme-swatch sw-paper${isSug('theme-paper')}" onclick="setSTDTheme('theme-paper',this)" title="Papel"></span>
 <span class="theme-swatch sw-sparkle${isSug('theme-sparkle')}" onclick="setSTDTheme('theme-sparkle',this)" title="Destellos"></span>
+<span class="theme-swatch sw-balloons${isSug('theme-balloons')}" onclick="setSTDTheme('theme-balloons',this)" title="Globos"></span>
+<span class="theme-swatch sw-clouds${isSug('theme-clouds')}" onclick="setSTDTheme('theme-clouds',this)" title="Nubes"></span>
+<span class="theme-swatch sw-geometric${isSug('theme-geometric')}" onclick="setSTDTheme('theme-geometric',this)" title="Geométrico"></span>
+<span class="theme-swatch sw-graduation${isSug('theme-graduation')}" onclick="setSTDTheme('theme-graduation',this)" title="Birrete"></span>
+<span class="theme-swatch sw-hearts${isSug('theme-hearts')}" onclick="setSTDTheme('theme-hearts',this)" title="Corazones"></span>
+<span class="theme-swatch sw-animals${isSug('theme-animals')}" onclick="setSTDTheme('theme-animals',this)" title="Animalitos"></span>
 </div>
+${(()=>{
+  const suggestion=THEME_SUGGESTIONS[p.eventTypeRaw];
+  if(!suggestion) return '';
+  const colorOpts=suggestion.colors[p.lang]||suggestion.colors.es;
+  const swatches=colorOpts.map(name=>{
+    const hex=EVENT_COLOR_HEX[name]||'#8A94A6';
+    return `<span class="color-swatch" style="width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;background:${hex};transition:all .15s" title="${esc(name)}" onclick="setCustomColorTheme('${name.replace(/'/g,"\\'")}',this)"></span>`;
+  }).join('');
+  return `<div style="text-align:center;margin-bottom:.4rem"><p style="font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Colores sugeridos para tu evento':'Suggested colors for your event'}</p><div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">${swatches}</div></div>`;
+})()}
 ${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;color:var(--violet-dark);margin:-.3rem 0 .5rem">${p.lang==='es'?'✨ Elegimos este fondo según tu temática — cámbialo si prefieres otro':'✨ We picked this background based on your theme — change it if you prefer another'}</p>`:''}
 <div style="text-align:center;margin:-.5rem 0 1rem">
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
 <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0">${p.lang==='es'?'Ideal: foto vertical, buena luz, sin texto — menos de 5 MB':'Ideal: portrait photo, good lighting, no text — under 5 MB'}</p>
 </div>`;
+  const cleanWithFlorals=clean.replace(/(<div class="std-card[^>]*>)/, `$1${getFloralCornerSVG()}`);
   const editHint=`<div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>`;
   const actions=`<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
 <div class="std-actions">
@@ -2929,7 +3154,7 @@ ${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;colo
 <button class="btn-std-wa" onclick="shareSTDWA()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.108.549 4.09 1.51 5.814L.057 23.997l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.889 9.889 0 01-5.042-1.379l-.361-.214-3.741.981.999-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/></svg>${p.lang==='es'?'Enviar por WhatsApp':'Send via WhatsApp'}</button>
 <button class="btn-std-img" onclick="downloadSTDImage()">🖼️ ${p.lang==='es'?'Descargar imagen':'Download image'}</button>
 </div>`;
-  return themePicker+editHint+clean+actions;
+  return themePicker+editHint+cleanWithFlorals+actions;
 }
 
 // ══════════════════════════════
@@ -4155,10 +4380,26 @@ function shareSTDWA(){
 function setSTDTheme(theme,el){
   const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
-  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-custom-photo');
+  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-balloons','theme-clouds','theme-geometric','theme-graduation','theme-hearts','theme-animals','theme-custom-photo','theme-custom-color');
   card.classList.add(theme);
   if(theme!=='theme-custom-photo') card.style.backgroundImage=''; // quitar cualquier foto que hubiera quedado puesta
   document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+// Aplica uno de los 40 colores sugeridos por tipo de evento — un solo
+// mecanismo genérico (variable CSS) en vez de 40 clases fijas.
+function setCustomColorTheme(colorName,el){
+  const hex=EVENT_COLOR_HEX[colorName];
+  if(!hex) return;
+  const card=document.querySelector('#content-savethedate .std-card');
+  if(!card) return;
+  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-balloons','theme-clouds','theme-geometric','theme-graduation','theme-hearts','theme-animals','theme-custom-photo');
+  card.classList.add('theme-custom-color');
+  card.style.backgroundImage='';
+  card.style.setProperty('--custom-accent-color',hex);
+  card.style.setProperty('--custom-accent-border',hex+'40'); // el mismo color con transparencia, para el borde
+  document.querySelectorAll('.theme-swatch,.color-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
 }
 
@@ -4188,7 +4429,7 @@ async function uploadSTDBackground(event){
 
   const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
-  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle');
+  card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-balloons','theme-clouds','theme-geometric','theme-graduation','theme-hearts','theme-animals');
   card.classList.add('theme-custom-photo');
   card.style.backgroundImage=`url('${publicUrl}')`;
   document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
