@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -275,7 +275,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .bcard.bcard-real{border-color:var(--teal)}
 
 /* ── SAVE THE DATE ── */
-.std-card{container-type:inline-size;position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:1.25rem;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2.5rem 2rem;background:var(--cream);border:1px solid var(--border-gray)}
+.std-card{container-type:inline-size;position:relative;overflow:hidden;border-radius:var(--radius-lg);margin-bottom:1.25rem;min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 2.25rem;background:var(--cream);border:1px solid var(--border-gray)}
 /* Los temas SOLO cambian el color de los detalles (encabezado, ícono del divisor, hashtag) — la tarjeta siempre es blanca */
 .std-card.theme-teal .std-eyebrow,.std-card.theme-teal .std-divider-icon,.std-card.theme-teal .std-hashtag{color:var(--teal-dark)}
 .std-card.theme-blush .std-eyebrow,.std-card.theme-blush .std-divider-icon,.std-card.theme-blush .std-hashtag{color:#C14A5E}
@@ -369,13 +369,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
    la derecha (en pantallas angostas, se acomodan uno debajo del otro). */
 .publish-layout{display:flex;gap:1.5rem;align-items:flex-start}
 .publish-form-col{flex:1.4 1 400px;min-width:0}
-.publish-preview-col{flex:0 0 340px;min-width:280px;max-width:340px}
+.publish-preview-col{flex:0 0 390px;min-width:320px;max-width:390px}
 @media (max-width:760px){
   .publish-layout{flex-direction:column}
   .publish-preview-col{order:-1;max-width:none;flex-basis:auto}
   .publish-preview-col #publish-live-preview-container{position:static!important}
 }
-.theme-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.theme-swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
 .color-swatch.active{border-color:var(--text)!important;transform:scale(1.15)}
 .theme-swatch.sw-teal{background:var(--teal-dark)}
@@ -396,7 +396,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .theme-swatch.sw-animals{background:radial-gradient(circle at 50% 55%,#FFF6E8 55%,transparent 60%),radial-gradient(ellipse 3px 6px at 38% 25%,#F4C2CE 90%,transparent),radial-gradient(ellipse 3px 6px at 62% 25%,#F4C2CE 90%,transparent),#FFFEFB}
 .btn-std-upload-photo{padding:9px 18px;border-radius:100px;border:1.5px dashed var(--violet);background:var(--violet-light);color:var(--violet-dark);font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
 .btn-std-upload-photo:hover{background:var(--violet);color:#fff;border-style:solid}
-.std-logo-mark{position:absolute;bottom:10px;right:12px;display:flex;align-items:center;gap:4px;opacity:.55}
+.std-logo-mark{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;opacity:.55;z-index:3}
 .std-logo-mark span{font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--text-3)}
 .std-editable{outline:1.5px dashed transparent;border-radius:6px;cursor:text;transition:outline-color .15s;padding:2px 4px;display:inline-block}
 .std-editable:hover{outline-color:rgba(46,196,182,.4)}
@@ -407,12 +407,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-bg-dragonfly{position:absolute;font-size:180px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-55%);z-index:0;pointer-events:none;line-height:1}
 .std-content{position:relative;z-index:1;width:100%}
 .std-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
-.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,9cqw,3rem);font-weight:600;color:var(--text);line-height:1.1;margin-bottom:.75rem;word-break:break-word}
+.std-names{font-family:'Cormorant Garamond',serif;font-size:clamp(1.7rem,10cqw,3.4rem);font-weight:600;color:var(--custom-text-color,var(--text));line-height:1.1;margin-bottom:.75rem;word-break:break-word}
+.std-names.font-classic{font-family:'Playfair Display',serif}
+.std-names.font-modern{font-family:'Montserrat',sans-serif;letter-spacing:.02em}
+.std-names.font-script{font-family:'Dancing Script',cursive;font-weight:700}
+.font-picker{display:flex;justify-content:center;gap:8px;margin-bottom:.6rem;flex-wrap:wrap}
+.font-swatch{padding:8px 14px;border-radius:100px;border:1.5px solid var(--border-gray);background:var(--cream-2);color:var(--text-2);font-size:14px;cursor:pointer;transition:all .15s}
+.font-swatch.active{border-color:var(--violet);background:var(--violet-light,#EDE7F6);color:var(--violet-dark,var(--violet))}
+.text-color-picker{display:flex;justify-content:center;gap:8px;margin-bottom:.4rem;flex-wrap:wrap}
+.text-color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent}
+.text-color-swatch.active{border-color:var(--violet);transform:scale(1.15)}
 .std-names em{font-style:italic;color:var(--teal)}
 .std-divider{display:flex;align-items:center;gap:12px;margin:1rem auto;width:min(200px,60%)}
 .std-divider::before,.std-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(46,196,182,.4),transparent)}
 .std-divider-icon{color:var(--teal);font-size:12px}
-.std-details{font-size:14px;color:var(--text-2);line-height:2}
+.std-details{font-size:15px;color:var(--text-2);line-height:2.1}
 .std-detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
 .std-icon{flex-shrink:0}
 .std-footer{font-size:12px;color:var(--text-3);margin-top:1.25rem;font-style:italic}
@@ -1172,6 +1181,22 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <div id="pub-bg-photo-preview" style="margin-top:.5rem"></div>
       </div>
 
+      <div class="profile-section-divider" data-es="Letra y color del texto (opcional)" data-en="Font & text color (optional)">Letra y color del texto (opcional)</div>
+      <div class="font-picker" id="pub-font-picker">
+        <span class="font-swatch active" style="font-family:'Cormorant Garamond',serif" onclick="setPublishFont('',this)" data-es="Elegante" data-en="Elegant">Elegante</span>
+        <span class="font-swatch" style="font-family:'Playfair Display',serif" onclick="setPublishFont('font-classic',this)" data-es="Clásica" data-en="Classic">Clásica</span>
+        <span class="font-swatch" style="font-family:'Montserrat',sans-serif" onclick="setPublishFont('font-modern',this)" data-es="Moderna" data-en="Modern">Moderna</span>
+        <span class="font-swatch" style="font-family:'Dancing Script',cursive;font-weight:700" onclick="setPublishFont('font-script',this)" data-es="Script" data-en="Script">Script</span>
+      </div>
+      <div class="text-color-picker" id="pub-text-color-picker">
+        <span class="text-color-swatch active" style="background:#1A2332" title="Carbón (por defecto)" onclick="setPublishTextColor(null,this)"></span>
+        <span class="text-color-swatch" style="background:#3C2A1E" title="Café oscuro" onclick="setPublishTextColor('#3C2A1E',this)"></span>
+        <span class="text-color-swatch" style="background:#1B3B2F" title="Verde bosque" onclick="setPublishTextColor('#1B3B2F',this)"></span>
+        <span class="text-color-swatch" style="background:#1A2E4A" title="Azul marino" onclick="setPublishTextColor('#1A2E4A',this)"></span>
+        <span class="text-color-swatch" style="background:#6E1E2E" title="Vino" onclick="setPublishTextColor('#6E1E2E',this)"></span>
+        <span class="text-color-swatch" style="background:#8A6B1E" title="Dorado oscuro" onclick="setPublishTextColor('#8A6B1E',this)"></span>
+      </div>
+
       <div class="profile-section-divider" data-es="¿Qué pedirle al invitado en el RSVP?" data-en="What to ask guests in the RSVP?">¿Qué pedirle al invitado en el RSVP?</div>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;font-size:13px;color:var(--text-2);cursor:pointer">
         <input type="checkbox" id="pub-ask-guests" checked style="width:16px;height:16px;cursor:pointer">
@@ -1628,6 +1653,22 @@ async function openPublishModal(){
 let pubBackgroundImageUrl=null;
 let pubGuestEmails={};
 let pubCustomColorHex=null;
+let pubFontClass='';
+let pubTextColor=null;
+
+function setPublishFont(fontClass,el){
+  pubFontClass=fontClass;
+  document.querySelectorAll('#pub-font-picker .font-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  showInvitationPreview();
+}
+
+function setPublishTextColor(hex,el){
+  pubTextColor=hex;
+  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  showInvitationPreview();
+}
 
 const THEME_DISPLAY_NAMES={
   'theme-teal':'Teal','theme-blush':'Blush','theme-gold':'Gold','theme-sage':'Sage','theme-night':'Night','theme-blanco':'Blanco',
@@ -1663,7 +1704,6 @@ function setPublishTheme(theme,el){
   if(el) el.classList.add('active');
   updatePubThemeLabel();
   showInvitationPreview();
-  showToast(lang==='es'?'✅ Diseño seleccionado':'✅ Design selected');
 }
 
 function setPublishCustomColor(colorName,el){
@@ -1678,7 +1718,6 @@ function setPublishCustomColor(colorName,el){
   if(el) el.classList.add('active');
   updatePubThemeLabel();
   showInvitationPreview();
-  showToast(lang==='es'?`✅ Color ${colorName} seleccionado`:`✅ ${colorName} color selected`);
 }
 
 async function uploadPublishBackground(event){
@@ -1770,7 +1809,7 @@ function showInvitationPreview(){
     <div class="std-card ${theme}"${cardStyle}>${getFloralCornerSVG()}
       <div class="std-content">
         <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
-        <div class="std-names">${esc(toTitleCase(p.name||''))}</div>
+        <div class="std-names${pubFontClass?' '+pubFontClass:''}"${pubTextColor?` style="--custom-text-color:${pubTextColor}"`:''}>${esc(toTitleCase(p.name||''))}</div>
         <div class="std-divider"><span class="std-divider-icon">◆</span></div>
         <div class="std-details">
           ${p.date?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(p.date)}</span></div>`:''}
@@ -1783,8 +1822,6 @@ function showInvitationPreview(){
       <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
     </div>
     ${extraSections}`;
-
-  document.getElementById('preview-modal').classList.add('open');
 }
 
 function closeInvitationPreview(){
@@ -1888,6 +1925,10 @@ function closePublishModal(){
   pubGalleryUrls=[];
   const galleryPreview=document.getElementById('pub-gallery-preview');
   if(galleryPreview) galleryPreview.innerHTML='';
+  pubFontClass='';
+  pubTextColor=null;
+  document.querySelectorAll('#pub-font-picker .font-swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
+  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
   pubBackgroundImageUrl=null;
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML='';
@@ -1966,6 +2007,16 @@ async function openEditInvitationModal(invId){
   renderAllLineEditors();
   pubGalleryUrls=Array.isArray(inv.gallery_urls)?[...inv.gallery_urls]:[];
   renderGalleryPreview();
+  pubFontClass=inv.font_family||'';
+  pubTextColor=inv.text_color||null;
+  document.querySelectorAll('#pub-font-picker .font-swatch').forEach(s=>s.classList.remove('active'));
+  const fontIdx=['','font-classic','font-modern','font-script'].indexOf(pubFontClass);
+  const fontSwatches=document.querySelectorAll('#pub-font-picker .font-swatch');
+  if(fontSwatches[fontIdx>=0?fontIdx:0]) fontSwatches[fontIdx>=0?fontIdx:0].classList.add('active');
+  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>{
+    const swatchColors=[null,'#3C2A1E','#1B3B2F','#1A2E4A','#6E1E2E','#8A6B1E'];
+    s.classList.toggle('active', swatchColors[i]===pubTextColor);
+  });
   pubBackgroundImageUrl=inv.background_image_url||null;
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
@@ -2137,7 +2188,9 @@ async function publishInvitation(){
       faq: parseFAQ(document.getElementById('pub-faq').value),
       gallery_urls: pubGalleryUrls,
       background_image_url: pubBackgroundImageUrl,
-      custom_color_hex: pubCustomColorHex
+      custom_color_hex: pubCustomColorHex,
+      font_family: pubFontClass||null,
+      text_color: pubTextColor
     };
 
     const {error}=await sb.from('invitations').update(updatePayload).eq('id',editingInvitationId).eq('user_id',currentUser.id);
@@ -2210,7 +2263,9 @@ async function publishInvitation(){
     faq: parseFAQ(document.getElementById('pub-faq').value),
     gallery_urls: pubGalleryUrls,
     background_image_url: pubBackgroundImageUrl,
-    custom_color_hex: pubCustomColorHex
+    custom_color_hex: pubCustomColorHex,
+    font_family: pubFontClass||null,
+    text_color: pubTextColor
   };
 
   const {data:newInv,error}=await sb.from('invitations').insert(payload).select().single();
@@ -2300,12 +2355,13 @@ async function loadMyInvitations(){
           <div style="font-size:11.5px;color:var(--text-3)">/i/${esc(inv.slug)}</div>
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn-account" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
-          <button class="btn-account" onclick="openEditInvitationModal('${inv.id}')">✏️</button>
-          <button class="btn-account" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
-          <button class="btn-account" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
-          <button class="btn-account" onclick="sendReminders('${inv.id}')">📧</button>
-          <button class="btn-account" onclick="showQRModal('${esc(inv.slug)}','${esc(inv.host_names).replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦</button>
+          <button class="btn-account" title="${L?'Ver invitación pública':'View public invitation'}" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
+          <button class="btn-account" title="${L?'Editar invitación':'Edit invitation'}" onclick="openEditInvitationModal('${inv.id}')">✏️</button>
+          <button class="btn-account" title="${L?'Ver/ocultar lista de RSVPs':'Show/hide RSVP list'}" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
+          <button class="btn-account" title="${L?'Descargar RSVPs en Excel':'Download RSVPs as Excel'}" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
+          <button class="btn-account" title="${L?'Enviar correo recordatorio a invitados':'Send reminder email to guests'}" onclick="sendReminders('${inv.id}')">📧</button>
+          <button class="btn-account" title="${L?'Ver código QR':'View QR code'}" onclick="showQRModal('${esc(inv.slug)}','${esc(inv.host_names).replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦</button>
+          <button class="btn-account" title="${L?'Eliminar invitación':'Delete invitation'}" style="color:#C14A5E" onclick="deleteInvitation('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">🗑️</button>
         </div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
@@ -2337,6 +2393,19 @@ async function toggleRsvpList(invId){
       ${r.message?`<br>💬 ${esc(r.message)}`:''}
     </div>
   `).join('');
+}
+
+async function deleteInvitation(invId,hostNames){
+  const L=lang==='es';
+  if(!confirm(L?`¿Eliminar la invitación de "${hostNames}"? Esto borra el link, las respuestas de RSVP y las fotos del evento. No se puede deshacer.`:`Delete the invitation for "${hostNames}"? This removes the link, RSVP responses, and event photos. This cannot be undone.`)) return;
+  const {error}=await sb.from('invitations').delete().eq('id',invId).eq('user_id',currentUser.id);
+  if(error){
+    console.error('deleteInvitation error:',error);
+    showToast(L?'No se pudo eliminar la invitación':'Could not delete the invitation',true);
+    return;
+  }
+  showToast(L?'🗑️ Invitación eliminada':'🗑️ Invitation deleted');
+  loadMyInvitations();
 }
 
 async function sendReminders(invId){
@@ -4640,6 +4709,7 @@ function toggleMorePatterns(linkEl){
 function setSTDTheme(theme,el){
   const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
+  if(document.activeElement&&document.activeElement.isContentEditable) document.activeElement.blur();
   card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-balloons','theme-clouds','theme-geometric','theme-graduation','theme-hearts','theme-animals','theme-custom-photo','theme-custom-color');
   card.classList.add(theme);
   if(theme!=='theme-custom-photo') card.style.backgroundImage=''; // quitar cualquier foto que hubiera quedado puesta
@@ -4654,6 +4724,7 @@ function setCustomColorTheme(colorName,el){
   if(!hex) return;
   const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
+  if(document.activeElement&&document.activeElement.isContentEditable) document.activeElement.blur();
   card.classList.remove('theme-teal','theme-blush','theme-gold','theme-sage','theme-night','theme-blanco','theme-confetti','theme-waves','theme-paper','theme-sparkle','theme-balloons','theme-clouds','theme-geometric','theme-graduation','theme-hearts','theme-animals','theme-custom-photo');
   card.classList.add('theme-custom-color');
   card.style.backgroundImage='';
