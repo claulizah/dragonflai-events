@@ -22,7 +22,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
-.wrap{max-width:680px;width:100%}
+.wrap{max-width:820px;width:100%}
 .brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2rem;opacity:.7}
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
 
@@ -594,6 +594,9 @@ function renderInvitation(inv){
       </div>
       <div id="event-photos-gallery" class="gallery-grid"></div>
       <p id="event-photos-empty" style="font-size:12.5px;color:var(--text-3);text-align:center;display:none">${t.noPhotosYet}</p>
+      <div style="text-align:center;margin-top:1rem">
+        <button type="button" id="event-photos-viewall" class="extra-link-btn" style="display:none;border:none;cursor:pointer;font-family:'Inter',sans-serif" onclick="openFullGalleryView()"></button>
+      </div>
     </div>
 
     <div class="rsvp-card">
@@ -945,28 +948,73 @@ async function submitRSVP(e){
 
 // ── Galería de fotos del evento (subida por los invitados) ──
 let eventPhotosList=[];
+const GALLERY_PREVIEW_COUNT=6; // cuántas miniaturas se muestran en la tarjeta principal
 
 async function loadEventPhotos(){
   if(!invitation) return;
   const {data,error}=await sb.from('event_photos').select('id,photo_url,uploaded_by_name').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
   const gallery=document.getElementById('event-photos-gallery');
   const emptyMsg=document.getElementById('event-photos-empty');
+  const viewAllBtn=document.getElementById('event-photos-viewall');
   if(!gallery) return;
   if(error||!data||!data.length){
     eventPhotosList=[];
     gallery.innerHTML='';
     if(emptyMsg) emptyMsg.style.display='block';
+    if(viewAllBtn) viewAllBtn.style.display='none';
     return;
   }
   if(emptyMsg) emptyMsg.style.display='none';
   eventPhotosList=data;
-  gallery.innerHTML=data.map((p,i)=>`
+  const preview=data.slice(0,GALLERY_PREVIEW_COUNT);
+  gallery.innerHTML=preview.map((p,i)=>galleryThumbHTML(p,i)).join('');
+  if(viewAllBtn){
+    const L=lang==='es';
+    if(data.length>0){
+      viewAllBtn.style.display='inline-block';
+      viewAllBtn.textContent=L?`🖼️ Ver todas las fotos (${data.length})`:`🖼️ View all photos (${data.length})`;
+    } else {
+      viewAllBtn.style.display='none';
+    }
+  }
+}
+
+function galleryThumbHTML(p,i){
+  return `
     <div style="position:relative">
       <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="openPhotoLightbox(${i})" style="cursor:pointer">
       <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:26px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
       <button type="button" onclick="deleteEventPhoto('${p.id}')" style="position:absolute;bottom:4px;right:4px;background:rgba(200,50,50,.75);color:#fff;border:none;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">✕</button>
     </div>
-  `).join('');
+  `;
+}
+
+function openFullGalleryView(){
+  const L=lang==='es';
+  let overlay=document.getElementById('full-gallery-overlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='full-gallery-overlay';
+    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:250;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.onclick=(e)=>{ if(e.target===overlay) closeFullGalleryView(); };
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML=`
+    <div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:900px;width:100%;max-height:88vh;overflow-y:auto;box-sizing:border-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin:0">${L?'Todas las fotos':'All photos'} (${eventPhotosList.length})</h3>
+        <button type="button" onclick="closeFullGalleryView()" style="background:var(--cream-2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer">✕</button>
+      </div>
+      <div class="gallery-grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr))">
+        ${eventPhotosList.map((p,i)=>galleryThumbHTML(p,i)).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function closeFullGalleryView(){
+  const overlay=document.getElementById('full-gallery-overlay');
+  if(overlay) overlay.remove();
 }
 
 let lightboxIndex=0;

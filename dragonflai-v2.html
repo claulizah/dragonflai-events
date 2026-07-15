@@ -360,8 +360,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-card.theme-custom-photo .std-eyebrow,.std-card.theme-custom-photo .std-divider-icon,.std-card.theme-custom-photo .std-hashtag{color:var(--violet)}
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
 .line-editor{margin-bottom:.6rem}
-.line-editor-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
-.line-editor-row input{flex:1;min-width:0;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--cream)}
+.line-editor-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.line-editor-row input{flex:1;min-width:120px;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--cream)}
+.line-editor-row input.le-date,.line-editor-row input.le-time{min-width:105px}
 .line-editor-row .le-remove{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border-gray);background:var(--cream-2);color:var(--text-3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
 .line-editor-add{font-size:12px;color:var(--violet);background:none;border:none;cursor:pointer;padding:2px 0;font-family:'Inter',sans-serif;font-weight:600}
 
@@ -2101,7 +2102,7 @@ function addLineEditorRow(editor,textareaId,fields,values,dateTimeIndex){
   fields.forEach((f,i)=>{
     if(i===dateTimeIndex){
       const wrap=document.createElement('div');
-      wrap.style.cssText='display:flex;gap:6px;flex:1;min-width:0';
+      wrap.style.cssText='display:flex;gap:6px;flex:1 1 230px;min-width:230px';
       const dateInput=document.createElement('input');
       dateInput.type='date';
       dateInput.className='le-date';
@@ -3552,28 +3553,6 @@ ${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;colo
 <span class="text-color-swatch" style="background:#6E1E2E" title="${p.lang==='es'?'Vino':'Wine'}" onclick="setSTDTextColor('#6E1E2E',this)"></span>
 <span class="text-color-swatch" style="background:#8A6B1E" title="${p.lang==='es'?'Dorado oscuro':'Dark gold'}" onclick="setSTDTextColor('#8A6B1E',this)"></span>
 </div>
-
-<div class="profile-section-divider" style="margin-top:1.5rem" data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">${p.lang==='es'?'Itinerario de eventos (opcional)':'Event schedule (optional)'}</div>
-<div id="std-events-editor" class="line-editor"></div>
-
-<div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">${p.lang==='es'?'Hospedaje y cómo llegar (opcional)':'Lodging & directions (optional)'}</div>
-<textarea id="std-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="mirrorToSTD('std-lodging','pub-lodging');debouncedLivePreview()" placeholder="${p.lang==='es'?"Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial.":'Recommended hotel: mention your event name for a special rate.'}"></textarea>
-<input type="text" id="std-map-url" class="profile-input" style="margin-top:.5rem" oninput="mirrorToSTD('std-map-url','pub-map-url');debouncedLivePreview()" placeholder="${p.lang==='es'?'Link de Google Maps (opcional)':'Google Maps link (optional)'}">
-
-<div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">${p.lang==='es'?'Mesa de regalos (opcional)':'Gift registry (optional)'}</div>
-<div id="std-registry-editor" class="line-editor"></div>
-
-<div class="profile-section-divider" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">${p.lang==='es'?'Nuestra historia (opcional)':'Our story (optional)'}</div>
-<textarea id="std-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('std-story','pub-story');debouncedLivePreview()" placeholder="${p.lang==='es'?'Nos conocimos hace 10 años...':'We met 10 years ago...'}"></textarea>
-
-<div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">${p.lang==='es'?'Preguntas frecuentes (opcional)':'FAQ (optional)'}</div>
-<div id="std-faq-editor" class="line-editor"></div>
-
-<div class="profile-section-divider" data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">${p.lang==='es'?'Galería de fotos (opcional)':'Photo gallery (optional)'}</div>
-<button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-gallery-input').click()">📷 ${p.lang==='es'?'Agregar fotos':'Add photos'}</button>
-<input type="file" id="std-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
-<div class="gallery-preview-mount" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
-<p style="font-size:11px;color:var(--text-3);margin:.5rem 0 0">${p.lang==='es'?'Estos detalles se incluyen automáticamente al publicar tu invitación — no necesitas volver a escribirlos.':"These details are included automatically when you publish your invitation — no need to re-enter them."}</p>
 `;
   // Por si la IA agrega su propio "style" con algún gradiente de fondo al
   // div raíz (a pesar de que el prompt no se lo pide) — lo quitamos, para
@@ -4975,6 +4954,25 @@ function makeSTDEditable(){
   card.querySelectorAll('.std-names,.std-field,.std-footer,.std-hashtag').forEach(el=>{
     el.setAttribute('contenteditable','true');
     el.classList.add('std-editable');
+  });
+  attachSTDBlurGuard();
+}
+
+// El cursor de texto de un campo editable (nombre, hashtag, etc.) a veces
+// se queda "vivo" mientras el usuario ya está interactuando con los
+// colores/diseños/fuentes de abajo. Esto suelta el foco ANTES de que se
+// registre el clic (mousedown, no click) en cualquier parte de esa zona,
+// sin importar qué control específico se use.
+function attachSTDBlurGuard(){
+  const tab=document.getElementById('content-savethedate');
+  if(!tab||tab.dataset.blurGuardAttached) return;
+  tab.dataset.blurGuardAttached='1';
+  tab.addEventListener('mousedown',e=>{
+    const isEditableField=e.target.closest('.std-editable');
+    if(isEditableField) return; // dejar que el propio campo reciba el foco normalmente
+    if(document.activeElement && document.activeElement.isContentEditable){
+      document.activeElement.blur();
+    }
   });
 }
 
