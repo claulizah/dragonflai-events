@@ -20,7 +20,7 @@ export default async (request, context) => {
   if (!expected || password !== expected) {
     return new Response(JSON.stringify({ error: 'No autorizado' }), {
       status: 401,
-      headers: { 'content-type': 'application/json' }
+      headers: { 'content-type': 'application/json', 'cache-control': 'no-store' }
     });
   }
 
@@ -123,7 +123,10 @@ export default async (request, context) => {
   }
 
   return new Response(JSON.stringify(results), {
-    headers: { 'content-type': 'application/json' }
+    headers: {
+      'content-type': 'application/json',
+      'cache-control': 'no-store, no-cache, must-revalidate'
+    }
   });
 };
 

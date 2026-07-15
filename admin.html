@@ -259,9 +259,17 @@ async function loadUsage(){
   const content = document.getElementById('dashboard-content');
   content.innerHTML = '<p class="loading">Cargando…</p>';
   try{
-    const resp = await fetch('/api/admin-usage', { headers: { 'x-admin-password': savedPassword } });
+    const resp = await fetch('/api/admin-usage', {
+      headers: { 'x-admin-password': savedPassword },
+      cache: 'no-store'
+    });
     if(resp.status===401){
       document.getElementById('login-error').textContent = 'Contraseña incorrecta.';
+      document.getElementById('login-error').style.display='block';
+      return false;
+    }
+    if(!resp.ok){
+      document.getElementById('login-error').textContent = `Error del servidor (status ${resp.status}). Revisa que subiste netlify/edge-functions/admin-usage.js y volviste a desplegar.`;
       document.getElementById('login-error').style.display='block';
       return false;
     }
@@ -269,6 +277,8 @@ async function loadUsage(){
     renderDashboard(data);
     return true;
   }catch(err){
+    document.getElementById('login-error').textContent = `No se pudo conectar: ${err.message}`;
+    document.getElementById('login-error').style.display='block';
     content.innerHTML = `<div class="err-msg">No se pudo cargar el uso: ${err.message}</div>`;
     return false;
   }
