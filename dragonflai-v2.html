@@ -290,7 +290,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 /* Floral — ideal para bodas/aniversarios: ramas de flores en 2 esquinas */
 .std-card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
 .std-card.theme-confetti .std-eyebrow,.std-card.theme-confetti .std-divider-icon,.std-card.theme-confetti .std-hashtag{color:#C14A5E}
-.std-floral-corner{display:none;position:absolute;width:clamp(60px,32%,130px);height:clamp(60px,32%,130px);pointer-events:none;z-index:2}
+.std-floral-corner{display:none;position:absolute;width:clamp(75px,40%,180px);height:clamp(75px,40%,180px);pointer-events:none;z-index:2}
 .std-card.theme-confetti .std-floral-corner{display:block}
 .std-floral-corner.fc-tl{top:0;left:0}
 .std-floral-corner.fc-br{bottom:0;right:0;transform:rotate(180deg)}
@@ -334,7 +334,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 /* ── Esquinas ilustradas — un solo SVG por tema, mostrado/ocultado por CSS
       según qué clase de tema tenga la tarjeta en ese momento. Así cambiar
       de tema es instantáneo, sin tener que regenerar el HTML. ── */
-.std-leaf-corner,.std-flourish-corner,.std-sparkle-corner,.std-balloon-corner,.std-cloud-corner,.std-geo-corner,.std-grad-corner,.std-heart-corner,.std-animal-corner{display:none;position:absolute;width:clamp(60px,32%,130px);height:clamp(60px,32%,130px);pointer-events:none;z-index:2}
+.std-leaf-corner,.std-flourish-corner,.std-sparkle-corner,.std-balloon-corner,.std-cloud-corner,.std-geo-corner,.std-grad-corner,.std-heart-corner,.std-animal-corner{display:none;position:absolute;width:clamp(75px,40%,180px);height:clamp(75px,40%,180px);pointer-events:none;z-index:2}
 .std-card.theme-waves .std-leaf-corner{display:block}
 .std-card.theme-paper .std-flourish-corner{display:block}
 .std-card.theme-sparkle .std-sparkle-corner{display:block}
@@ -402,8 +402,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-editable:hover{outline-color:rgba(46,196,182,.4)}
 .std-editable:focus{outline:1.5px dashed var(--teal);background:rgba(46,196,182,.06)}
 .std-edit-hint{display:block;width:fit-content;font-size:11.5px;font-weight:600;color:var(--teal-dark);background:var(--teal-light);border:1px solid rgba(46,196,182,.3);padding:5px 12px;border-radius:100px;margin:0 auto .9rem;text-align:center}
-.std-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(46,196,182,.06),rgba(123,47,190,.06),rgba(244,196,48,.04));z-index:0}
-.std-card::after{content:'';position:absolute;inset:0;border:2px solid rgba(46,196,182,.2);border-radius:var(--radius-lg);z-index:0}
 .std-bg-dragonfly{position:absolute;font-size:180px;opacity:.04;top:50%;left:50%;transform:translate(-50%,-55%);z-index:0;pointer-events:none;line-height:1}
 .std-content{position:relative;z-index:1;width:100%}
 .std-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
@@ -1143,7 +1141,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <div id="publish-form" class="publish-form-col">
       <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:.4rem">
-        <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/i/</span>
+        <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/</span>
         <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
       </div>
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem;display:none" id="pub-slug-locked-note" data-es="El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste." data-en="The link can't change once published — avoids breaking links you already shared.">El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste.</p>
@@ -1242,15 +1240,15 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <textarea id="pub-events" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia&#10;Ceremonia | Sábado 4:00 PM | Iglesia San Miguel&#10;Recepción | Sábado 6:00 PM | Salón Las Rosas"></textarea>
 
       <div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</div>
-      <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="debouncedLivePreview()" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
-      <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" oninput="debouncedLivePreview()" placeholder="Link de Google Maps (opcional)">
+      <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="mirrorToSTD('pub-lodging','std-lodging');debouncedLivePreview()" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
+      <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" oninput="mirrorToSTD('pub-map-url','std-map-url');debouncedLivePreview()" placeholder="Link de Google Maps (opcional)">
 
       <div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</div>
       <div id="pub-registry-editor" class="line-editor"></div>
       <textarea id="pub-registry" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
 
       <div class="profile-section-divider" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">Nuestra historia (opcional)</div>
-      <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
+      <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('pub-story','std-story');debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
 
       <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
       <div id="pub-faq-editor" class="line-editor"></div>
@@ -1298,7 +1296,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <!-- MIS INVITACIONES -->
 <div class="excel-modal-overlay" id="invitations-modal" onclick="if(event.target===this) closeMyInvitations()">
-  <div class="excel-modal" style="max-width:520px;text-align:left">
+  <div class="excel-modal" style="max-width:640px;text-align:left">
     <h3 style="text-align:center" data-es="Mis invitaciones" data-en="My invitations">Mis invitaciones</h3>
     <div id="invitations-list" style="max-height:400px;overflow-y:auto;margin:1rem 0"></div>
     <button class="btn-excel-close" onclick="closeMyInvitations()" data-es="Cerrar" data-en="Close">Cerrar</button>
@@ -1584,12 +1582,16 @@ async function openPublishModal(){
   if(!hasAnyAccess){ openExcelPaywall('publish'); return; }
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
-  document.getElementById('pub-domain-label').textContent=location.host+'/i/';
+  document.getElementById('pub-domain-label').textContent=location.host+'/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
+  const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
+  if(bgPreviewInit) bgPreviewInit.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
 
   // Precargar con el mismo tema que ya tiene el Save the Date, si existe
   pubSelectedTheme='theme-teal';
   pubCustomColorHex=null;
+  pubFontClass='';
+  pubTextColor=null;
   const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
     const themeClass=[...stdCard.classList].find(c=>c.startsWith('theme-'));
@@ -1597,37 +1599,29 @@ async function openPublishModal(){
     if(pubSelectedTheme==='theme-custom-color'){
       pubCustomColorHex=stdCard.style.getPropertyValue('--custom-accent-color')||null;
     }
+    const stdNames=stdCard.querySelector('.std-names');
+    if(stdNames){
+      const fc=['font-classic','font-modern','font-script'].find(c=>stdNames.classList.contains(c));
+      pubFontClass=fc||'';
+      pubTextColor=stdNames.style.getPropertyValue('--custom-text-color')||null;
+    }
   }
+  document.querySelectorAll('#pub-font-picker .font-swatch').forEach((s,i)=>{
+    s.classList.toggle('active', (['','font-classic','font-modern','font-script'][i]===pubFontClass));
+  });
+  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>{
+    const swatchColors=[null,'#3C2A1E','#1B3B2F','#1A2E4A','#6E1E2E','#8A6B1E'];
+    s.classList.toggle('active', swatchColors[i]===pubTextColor);
+  });
   document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
     s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
   });
   updatePubThemeLabel();
-  const morePatternsBox=document.getElementById('pub-more-patterns');
-  const patternsToggle=document.getElementById('pub-patterns-toggle');
-  if(morePatternsBox) morePatternsBox.style.display='none';
-  if(patternsToggle) patternsToggle.textContent=lang==='es'?'Ver más diseños ▾':'See more designs ▾';
 
   // Mostrar primero el diseño sugerido según el tipo de evento; el resto
   // queda oculto detrás de "Ver más diseños" (antes se mostraban todos
   // igual, sin priorizar el que aplica al evento actual).
-  const suggestedTheme=suggestVisualTheme((plan.extra&&plan.extra.theme)||'')||'theme-teal';
-  const suggestedBox=document.getElementById('pub-suggested-theme');
-  const suggestedHint=document.getElementById('pub-suggested-hint');
-  const allPickerSwatches=document.querySelectorAll('#pub-theme-picker .theme-swatch');
-  let suggestedSwatchEl=null;
-  allPickerSwatches.forEach(s=>{
-    const isSuggested=s.className.includes('sw-'+suggestedTheme.replace('theme-',''));
-    s.style.display=isSuggested?'none':'';
-    if(isSuggested) suggestedSwatchEl=s;
-  });
-  if(suggestedBox&&suggestedSwatchEl){
-    const clone=suggestedSwatchEl.cloneNode(true);
-    clone.style.display='';
-    clone.classList.toggle('active', pubSelectedTheme===suggestedTheme);
-    suggestedBox.innerHTML='';
-    suggestedBox.appendChild(clone);
-  }
-  if(suggestedHint) suggestedHint.style.display=(suggestedTheme!=='theme-teal')?'block':'none';
+  renderThemePicker();
 
   // Llenar los 5 colores sugeridos según el tipo de evento actual
   const colorSwatchesBox=document.getElementById('pub-color-swatches');
@@ -1883,7 +1877,7 @@ async function buildBrandedQRDataURL(hostNames,hashtag,invUrl){
 
 async function showQRModal(slug,hostNames,hashtag){
   const L=lang==='es';
-  const invUrl=`${location.origin}/i/${slug}`;
+  const invUrl=`${location.origin}/${slug}`;
   document.getElementById('preview-modal-hint').style.display='none';
   document.getElementById('preview-card-container').innerHTML=`<p style="text-align:center;font-size:12.5px;color:var(--text-3)">${L?'Generando tu QR…':'Generating your QR…'}</p>`;
   document.getElementById('preview-modal').classList.add('open');
@@ -1915,31 +1909,48 @@ function closePublishModal(){
   document.getElementById('pub-slug-locked-note').style.display='none';
   document.getElementById('pub-slug').disabled=false;
   document.getElementById('pub-restrict-list-label').style.opacity='1';
-  document.getElementById('pub-events').value='';
-  document.getElementById('pub-lodging').value='';
-  document.getElementById('pub-map-url').value='';
-  document.getElementById('pub-registry').value='';
-  document.getElementById('pub-story').value='';
-  document.getElementById('pub-faq').value='';
   renderAllLineEditors();
-  pubGalleryUrls=[];
-  const galleryPreview=document.getElementById('pub-gallery-preview');
-  if(galleryPreview) galleryPreview.innerHTML='';
-  pubFontClass='';
-  pubTextColor=null;
-  document.querySelectorAll('#pub-font-picker .font-swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
-  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>s.classList.toggle('active',i===0));
-  pubBackgroundImageUrl=null;
-  const bgPreview=document.getElementById('pub-bg-photo-preview');
-  if(bgPreview) bgPreview.innerHTML='';
-  pubGuestEmails={};
-  pubCustomColorHex=null;
-  const colorBox=document.getElementById('pub-color-swatches');
-  if(colorBox) colorBox.innerHTML='';
+  document.querySelectorAll('#pub-font-picker .font-swatch').forEach((s,i)=>{
+    s.classList.toggle('active', (['','font-classic','font-modern','font-script'][i]===pubFontClass));
+  });
+  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>{
+    const swatchColors=[null,'#3C2A1E','#1B3B2F','#1A2E4A','#6E1E2E','#8A6B1E'];
+    s.classList.toggle('active', swatchColors[i]===pubTextColor);
+  });
 }
 
 let lastPublishedUrl='';
 let editingInvitationId=null;
+
+function renderThemePicker(){
+  const suggestedTheme=suggestVisualTheme((plan.extra&&plan.extra.theme)||'')||'theme-teal';
+  const suggestedBox=document.getElementById('pub-suggested-theme');
+  const suggestedHint=document.getElementById('pub-suggested-hint');
+  const morePatternsBox=document.getElementById('pub-more-patterns');
+  const patternsToggle=document.getElementById('pub-patterns-toggle');
+  const allPickerSwatches=document.querySelectorAll('#pub-theme-picker .theme-swatch');
+  let suggestedSwatchEl=null;
+  allPickerSwatches.forEach(s=>{
+    const isSuggested=s.className.includes('sw-'+suggestedTheme.replace('theme-',''));
+    s.style.display=isSuggested?'none':'';
+    s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
+    if(isSuggested) suggestedSwatchEl=s;
+  });
+  if(suggestedBox&&suggestedSwatchEl){
+    const clone=suggestedSwatchEl.cloneNode(true);
+    clone.style.display='';
+    clone.classList.toggle('active', pubSelectedTheme===suggestedTheme);
+    suggestedBox.innerHTML='';
+    suggestedBox.appendChild(clone);
+  }
+  if(suggestedHint) suggestedHint.style.display=(suggestedTheme!=='theme-teal')?'block':'none';
+  // Si el tema ya seleccionado (al editar) NO es el sugerido, expandimos
+  // "Ver más diseños" automáticamente para que se vea cuál está realmente
+  // activo, en vez de dejarlo oculto y solo mostrar el sugerido sin marcar.
+  const selectedIsHiddenPattern=pubSelectedTheme!==suggestedTheme&&pubSelectedTheme!=='theme-custom-color'&&pubSelectedTheme!=='theme-custom-photo';
+  if(morePatternsBox) morePatternsBox.style.display=selectedIsHiddenPattern?'block':'none';
+  if(patternsToggle) patternsToggle.textContent=selectedIsHiddenPattern?(lang==='es'?'Ver menos ▴':'See less ▴'):(lang==='es'?'Ver más diseños ▾':'See more designs ▾');
+}
 
 async function openEditInvitationModal(invId){
   if(!sb||!currentUser) return;
@@ -1959,21 +1970,15 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-slug-locked-note').style.display='block';
 
   // Slug de solo lectura — no se puede romper un link ya compartido
-  document.getElementById('pub-domain-label').textContent=location.host+'/i/';
+  document.getElementById('pub-domain-label').textContent=location.host+'/';
   document.getElementById('pub-slug').value=inv.slug;
   document.getElementById('pub-slug').disabled=true;
 
   // Pre-llenar el resto de los campos con lo que ya tiene guardado
   pubSelectedTheme=inv.theme||'theme-teal';
   pubCustomColorHex=inv.custom_color_hex||null;
-  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
-    s.classList.toggle('active', s.className.includes('sw-'+pubSelectedTheme.replace('theme-','')));
-  });
+  renderThemePicker();
   updatePubThemeLabel();
-  const morePatternsBoxEdit=document.getElementById('pub-more-patterns');
-  const patternsToggleEdit=document.getElementById('pub-patterns-toggle');
-  if(morePatternsBoxEdit) morePatternsBoxEdit.style.display='none';
-  if(patternsToggleEdit) patternsToggleEdit.textContent=lang==='es'?'Ver más diseños ▾':'See more designs ▾';
   const colorSwatchesBoxEdit=document.getElementById('pub-color-swatches');
   const suggestionEdit=THEME_SUGGESTIONS[plan.eventTypeRaw];
   if(colorSwatchesBoxEdit&&suggestionEdit){
@@ -2053,50 +2058,101 @@ function parseGuestList(text){
 // Sincroniza con el textarea oculto correspondiente para no tocar el
 // resto de la lógica de parseo/guardado, que sigue leyendo/escribiendo
 // el textarea igual que antes.
-function renderLineEditor(textareaId,editorId,fields){
+function renderLineEditor(textareaId,editorId,fields,dateTimeIndex){
+  dateTimeIndex=(dateTimeIndex===undefined)?-1:dateTimeIndex;
   const textarea=document.getElementById(textareaId);
   const editor=document.getElementById(editorId);
   if(!textarea||!editor) return;
   const lines=textarea.value.split('\n').map(l=>l.trim()).filter(Boolean);
   const rows=lines.length?lines.map(line=>line.split('|').map(p=>p.trim())):[[]];
   editor.innerHTML='';
-  rows.forEach(cols=>addLineEditorRow(editor,textareaId,fields,cols));
+  rows.forEach(cols=>addLineEditorRow(editor,textareaId,fields,cols,dateTimeIndex));
   const addBtn=document.createElement('button');
   addBtn.type='button';
   addBtn.className='line-editor-add';
   addBtn.textContent=(lang==='es'?'+ Agregar':'+ Add');
-  addBtn.onclick=()=>{ addLineEditorRow(editor,textareaId,fields,[]); syncLineEditor(editor,textareaId,fields); };
+  addBtn.onclick=()=>{ addLineEditorRow(editor,textareaId,fields,[],dateTimeIndex); syncLineEditor(editor,textareaId,fields,dateTimeIndex); };
   editor.appendChild(addBtn);
 }
 
-function addLineEditorRow(editor,textareaId,fields,values){
+function formatEventDateTime(dateVal,timeVal){
+  if(!dateVal&&!timeVal) return '';
+  const L=lang==='es';
+  let datePart='';
+  if(dateVal){
+    const d=new Date(dateVal+'T00:00:00');
+    datePart=d.toLocaleDateString(L?'es-MX':'en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    datePart=datePart.charAt(0).toUpperCase()+datePart.slice(1);
+  }
+  let timePart='';
+  if(timeVal){
+    const [h,m]=timeVal.split(':').map(Number);
+    const d=new Date(); d.setHours(h,m,0,0);
+    timePart=d.toLocaleTimeString(L?'es-MX':'en-US',{hour:'numeric',minute:'2-digit'});
+  }
+  return [datePart,timePart].filter(Boolean).join(', ');
+}
+
+function addLineEditorRow(editor,textareaId,fields,values,dateTimeIndex){
+  dateTimeIndex=(dateTimeIndex===undefined)?-1:dateTimeIndex;
   const addBtn=editor.querySelector('.line-editor-add');
   const row=document.createElement('div');
   row.className='line-editor-row';
   fields.forEach((f,i)=>{
-    const input=document.createElement('input');
-    input.type='text';
-    input.placeholder=f;
-    input.value=values[i]||'';
-    input.oninput=()=>{ syncLineEditor(editor,textareaId,fields); debouncedLivePreview(); };
-    row.appendChild(input);
+    if(i===dateTimeIndex){
+      const wrap=document.createElement('div');
+      wrap.style.cssText='display:flex;gap:6px;flex:1;min-width:0';
+      const dateInput=document.createElement('input');
+      dateInput.type='date';
+      dateInput.className='le-date';
+      dateInput.style.flex='1.2';
+      const timeInput=document.createElement('input');
+      timeInput.type='time';
+      timeInput.className='le-time';
+      timeInput.style.flex='1';
+      const onDT=()=>{ syncLineEditor(editor,textareaId,fields,dateTimeIndex); debouncedLivePreview(); };
+      dateInput.oninput=onDT; timeInput.oninput=onDT;
+      wrap.appendChild(dateInput); wrap.appendChild(timeInput);
+      row.appendChild(wrap);
+      row.dataset.hasDatetime='1';
+    } else {
+      const input=document.createElement('input');
+      input.type='text';
+      input.placeholder=f;
+      input.value=values[i]||'';
+      input.oninput=()=>{ syncLineEditor(editor,textareaId,fields,dateTimeIndex); debouncedLivePreview(); };
+      row.appendChild(input);
+    }
   });
   const removeBtn=document.createElement('button');
   removeBtn.type='button';
   removeBtn.className='le-remove';
   removeBtn.textContent='✕';
   removeBtn.title=lang==='es'?'Quitar':'Remove';
-  removeBtn.onclick=()=>{ row.remove(); syncLineEditor(editor,textareaId,fields); debouncedLivePreview(); };
+  removeBtn.onclick=()=>{ row.remove(); syncLineEditor(editor,textareaId,fields,dateTimeIndex); debouncedLivePreview(); };
   row.appendChild(removeBtn);
   if(addBtn) editor.insertBefore(row,addBtn); else editor.appendChild(row);
 }
 
-function syncLineEditor(editor,textareaId,fields){
+function syncLineEditor(editor,textareaId,fields,dateTimeIndex){
+  dateTimeIndex=(dateTimeIndex===undefined)?-1:dateTimeIndex;
   const textarea=document.getElementById(textareaId);
   if(!textarea) return;
   const rows=[...editor.querySelectorAll('.line-editor-row')];
   const lines=rows.map(row=>{
-    const vals=[...row.querySelectorAll('input')].map(inp=>inp.value.trim());
+    const vals=[];
+    let inputIdx=0;
+    fields.forEach((f,i)=>{
+      if(i===dateTimeIndex){
+        const dateInput=row.querySelector('.le-date');
+        const timeInput=row.querySelector('.le-time');
+        vals.push(formatEventDateTime(dateInput?dateInput.value:'',timeInput?timeInput.value:''));
+      } else {
+        const plainInputs=[...row.querySelectorAll('input:not(.le-date):not(.le-time)')];
+        vals.push((plainInputs[inputIdx]?plainInputs[inputIdx].value:'').trim());
+        inputIdx++;
+      }
+    });
     return vals.join(' | ');
   }).filter(line=>line.replace(/\|/g,'').trim()); // descarta filas totalmente vacías
   textarea.value=lines.join('\n');
@@ -2118,7 +2174,7 @@ function PUB_FAQ_FIELDS(){return [
 ];}
 
 function renderAllLineEditors(){
-  renderLineEditor('pub-events','pub-events-editor',PUB_EVENTS_FIELDS());
+  renderLineEditor('pub-events','pub-events-editor',PUB_EVENTS_FIELDS(),1);
   renderLineEditor('pub-registry','pub-registry-editor',PUB_REGISTRY_FIELDS());
   renderLineEditor('pub-faq','pub-faq-editor',PUB_FAQ_FIELDS());
 }
@@ -2287,7 +2343,7 @@ async function publishInvitation(){
     }
   }
 
-  lastPublishedUrl=`${location.origin}/i/${slug}`;
+  lastPublishedUrl=`${location.origin}/${slug}`;
   document.getElementById('publish-url').textContent=lastPublishedUrl;
   try{
     const dataUrl=await buildBrandedQRDataURL(plan.name||'',(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
@@ -2347,22 +2403,20 @@ async function loadMyInvitations(){
     const pending=guestListTotal?Math.max(0,guestListTotal-(yesCount||0)-(noCount||0)):null;
 
     const div=document.createElement('div');
-    div.style.cssText='padding:12px 0;border-bottom:1px solid var(--border-gray)';
+    div.style.cssText='padding:14px 0;border-bottom:1px solid var(--border-gray)';
     div.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px">
-        <div style="min-width:0">
-          <div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(inv.host_names)}</div>
-          <div style="font-size:11.5px;color:var(--text-3)">/i/${esc(inv.slug)}</div>
-        </div>
-        <div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="btn-account" title="${L?'Ver invitación pública':'View public invitation'}" onclick="window.open('${location.origin}/i/${esc(inv.slug)}','_blank')">${L?'Ver':'View'}</button>
-          <button class="btn-account" title="${L?'Editar invitación':'Edit invitation'}" onclick="openEditInvitationModal('${inv.id}')">✏️</button>
-          <button class="btn-account" title="${L?'Ver/ocultar lista de RSVPs':'Show/hide RSVP list'}" onclick="toggleRsvpList('${inv.id}')">RSVPs</button>
-          <button class="btn-account" title="${L?'Descargar RSVPs en Excel':'Download RSVPs as Excel'}" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊</button>
-          <button class="btn-account" title="${L?'Enviar correo recordatorio a invitados':'Send reminder email to guests'}" onclick="sendReminders('${inv.id}')">📧</button>
-          <button class="btn-account" title="${L?'Ver código QR':'View QR code'}" onclick="showQRModal('${esc(inv.slug)}','${esc(inv.host_names).replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦</button>
-          <button class="btn-account" title="${L?'Eliminar invitación':'Delete invitation'}" style="color:#C14A5E" onclick="deleteInvitation('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">🗑️</button>
-        </div>
+      <div style="margin-bottom:8px">
+        <div style="font-weight:600;font-size:15px;word-break:break-word">${esc(toTitleCase(inv.host_names))}</div>
+        <div style="font-size:11.5px;color:var(--text-3);word-break:break-all">${location.host}/${esc(inv.slug)}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <button class="btn-account" title="${L?'Ver invitación pública':'View public invitation'}" onclick="window.open('${location.origin}/${esc(inv.slug)}','_blank')">👁️ ${L?'Ver':'View'}</button>
+        <button class="btn-account" title="${L?'Editar invitación':'Edit invitation'}" onclick="openEditInvitationModal('${inv.id}')">✏️ ${L?'Editar':'Edit'}</button>
+        <button class="btn-account" title="${L?'Ver/ocultar lista de RSVPs':'Show/hide RSVP list'}" onclick="toggleRsvpList('${inv.id}')">📋 RSVPs</button>
+        <button class="btn-account" title="${L?'Descargar RSVPs en Excel':'Download RSVPs as Excel'}" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊 Excel</button>
+        <button class="btn-account" title="${L?'Enviar correo recordatorio a invitados':'Send reminder email to guests'}" onclick="sendReminders('${inv.id}')">📧 ${L?'Recordatorio':'Remind'}</button>
+        <button class="btn-account" title="${L?'Ver código QR':'View QR code'}" onclick="showQRModal('${esc(inv.slug)}','${esc(inv.host_names).replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ QR</button>
+        <button class="btn-account" title="${L?'Eliminar invitación':'Delete invitation'}" style="color:#C14A5E" onclick="deleteInvitation('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">🗑️ ${L?'Eliminar':'Delete'}</button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
         <span style="font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark)">✅ ${yesCount||0} ${L?'confirmados':'attending'}</span>
@@ -3019,6 +3073,27 @@ let plannerCreditSpentThisSession=false;
 async function generate(){
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
 
+  // Nuevo plan = nuevos detalles extra. Antes esto se limpiaba solo al
+  // cerrar el modal de Publicar, lo que borraba por accidente lo que el
+  // usuario ya había llenado en el tab Save the Date sin haber publicado.
+  const pubEventsEl=document.getElementById('pub-events');
+  if(pubEventsEl) pubEventsEl.value='';
+  const pubLodgingEl=document.getElementById('pub-lodging');
+  if(pubLodgingEl) pubLodgingEl.value='';
+  const pubMapUrlEl=document.getElementById('pub-map-url');
+  if(pubMapUrlEl) pubMapUrlEl.value='';
+  const pubRegistryEl=document.getElementById('pub-registry');
+  if(pubRegistryEl) pubRegistryEl.value='';
+  const pubStoryEl=document.getElementById('pub-story');
+  if(pubStoryEl) pubStoryEl.value='';
+  const pubFaqEl=document.getElementById('pub-faq');
+  if(pubFaqEl) pubFaqEl.value='';
+  pubGalleryUrls=[];
+  pubFontClass='';
+  pubTextColor=null;
+  pubBackgroundImageUrl=null;
+  pubCustomColorHex=null;
+
   if(mode==='pro'){
     if(!sb){showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true);return;}
     if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para generar propuestas de cliente':'Log in to generate client proposals',true); return; }
@@ -3172,6 +3247,7 @@ async function generate(){
     } else if(v.id==='savethedate'){
       setTabHTML('savethedate',wrapSTDCard(v.h));
       makeSTDEditable();
+      initSTDExtrasEditor();
     } else if(v.id==='proposal'){
       setTabHTML('proposal',renderProposalSummary()+v.h);
     }
@@ -3460,7 +3536,45 @@ ${suggestedTheme!=='theme-teal'?`<p style="text-align:center;font-size:11px;colo
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
 <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0">${p.lang==='es'?'Ideal: foto vertical, buena luz, sin texto — menos de 5 MB':'Ideal: portrait photo, good lighting, no text — under 5 MB'}</p>
-</div>`;
+</div>
+<div style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Letra y color del texto':'Font & text color'}</div>
+<div class="font-picker">
+<span class="font-swatch active" style="font-family:'Cormorant Garamond',serif" onclick="setSTDFont('',this)">${p.lang==='es'?'Elegante':'Elegant'}</span>
+<span class="font-swatch" style="font-family:'Playfair Display',serif" onclick="setSTDFont('font-classic',this)">${p.lang==='es'?'Clásica':'Classic'}</span>
+<span class="font-swatch" style="font-family:'Montserrat',sans-serif" onclick="setSTDFont('font-modern',this)">${p.lang==='es'?'Moderna':'Modern'}</span>
+<span class="font-swatch" style="font-family:'Dancing Script',cursive;font-weight:700" onclick="setSTDFont('font-script',this)">Script</span>
+</div>
+<div class="text-color-picker" style="margin-bottom:1rem">
+<span class="text-color-swatch active" style="background:#1A2332" title="${p.lang==='es'?'Carbón (por defecto)':'Charcoal (default)'}" onclick="setSTDTextColor(null,this)"></span>
+<span class="text-color-swatch" style="background:#3C2A1E" title="${p.lang==='es'?'Café oscuro':'Dark brown'}" onclick="setSTDTextColor('#3C2A1E',this)"></span>
+<span class="text-color-swatch" style="background:#1B3B2F" title="${p.lang==='es'?'Verde bosque':'Forest green'}" onclick="setSTDTextColor('#1B3B2F',this)"></span>
+<span class="text-color-swatch" style="background:#1A2E4A" title="${p.lang==='es'?'Azul marino':'Navy blue'}" onclick="setSTDTextColor('#1A2E4A',this)"></span>
+<span class="text-color-swatch" style="background:#6E1E2E" title="${p.lang==='es'?'Vino':'Wine'}" onclick="setSTDTextColor('#6E1E2E',this)"></span>
+<span class="text-color-swatch" style="background:#8A6B1E" title="${p.lang==='es'?'Dorado oscuro':'Dark gold'}" onclick="setSTDTextColor('#8A6B1E',this)"></span>
+</div>
+
+<div class="profile-section-divider" style="margin-top:1.5rem" data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">${p.lang==='es'?'Itinerario de eventos (opcional)':'Event schedule (optional)'}</div>
+<div id="std-events-editor" class="line-editor"></div>
+
+<div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">${p.lang==='es'?'Hospedaje y cómo llegar (opcional)':'Lodging & directions (optional)'}</div>
+<textarea id="std-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="mirrorToSTD('std-lodging','pub-lodging');debouncedLivePreview()" placeholder="${p.lang==='es'?"Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial.":'Recommended hotel: mention your event name for a special rate.'}"></textarea>
+<input type="text" id="std-map-url" class="profile-input" style="margin-top:.5rem" oninput="mirrorToSTD('std-map-url','pub-map-url');debouncedLivePreview()" placeholder="${p.lang==='es'?'Link de Google Maps (opcional)':'Google Maps link (optional)'}">
+
+<div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">${p.lang==='es'?'Mesa de regalos (opcional)':'Gift registry (optional)'}</div>
+<div id="std-registry-editor" class="line-editor"></div>
+
+<div class="profile-section-divider" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">${p.lang==='es'?'Nuestra historia (opcional)':'Our story (optional)'}</div>
+<textarea id="std-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('std-story','pub-story');debouncedLivePreview()" placeholder="${p.lang==='es'?'Nos conocimos hace 10 años...':'We met 10 years ago...'}"></textarea>
+
+<div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">${p.lang==='es'?'Preguntas frecuentes (opcional)':'FAQ (optional)'}</div>
+<div id="std-faq-editor" class="line-editor"></div>
+
+<div class="profile-section-divider" data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">${p.lang==='es'?'Galería de fotos (opcional)':'Photo gallery (optional)'}</div>
+<button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-gallery-input').click()">📷 ${p.lang==='es'?'Agregar fotos':'Add photos'}</button>
+<input type="file" id="std-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
+<div class="gallery-preview-mount" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
+<p style="font-size:11px;color:var(--text-3);margin:.5rem 0 0">${p.lang==='es'?'Estos detalles se incluyen automáticamente al publicar tu invitación — no necesitas volver a escribirlos.':"These details are included automatically when you publish your invitation — no need to re-enter them."}</p>
+`;
   // Por si la IA agrega su propio "style" con algún gradiente de fondo al
   // div raíz (a pesar de que el prompt no se lo pide) — lo quitamos, para
   // que el fondo SIEMPRE lo controle nuestro CSS del tema, nunca la IA.
@@ -4771,14 +4885,37 @@ async function uploadSTDBackground(event){
 let pubGalleryUrls=[];
 
 function renderGalleryPreview(){
-  const box=document.getElementById('pub-gallery-preview');
-  if(!box) return;
-  box.innerHTML=pubGalleryUrls.map((url,i)=>`
+  const html=pubGalleryUrls.map((url,i)=>`
     <div style="position:relative;width:64px;height:64px">
       <img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border-gray)">
       <button type="button" onclick="removeGalleryImage(${i})" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#E8637A;color:#fff;border:2px solid #fff;font-size:11px;cursor:pointer;line-height:1">✕</button>
     </div>
   `).join('');
+  document.querySelectorAll('.gallery-preview-mount, #pub-gallery-preview').forEach(box=>{ box.innerHTML=html; });
+}
+
+// Copia el valor de un campo (hospedaje/mapa/historia) a su contraparte
+// en la otra vista (modal de Publicar ↔ tab Save the Date), para que
+// ambos editen exactamente los mismos datos sin duplicar el estado.
+function mirrorToSTD(fromId,toId){
+  const from=document.getElementById(fromId);
+  const to=document.getElementById(toId);
+  if(from&&to) to.value=from.value;
+}
+
+// Renderiza en el tab Save the Date los mismos editores de itinerario,
+// mesa de regalos y FAQ que usa el modal de Publicar — leyendo/escribiendo
+// las MISMAS textareas ocultas (pub-events, pub-registry, pub-faq), así
+// que lo que se llena aquí aparece igual al abrir "Publicar invitación".
+function initSTDExtrasEditor(){
+  if(!document.getElementById('std-events-editor')) return;
+  renderLineEditor('pub-events','std-events-editor',PUB_EVENTS_FIELDS(),1);
+  renderLineEditor('pub-registry','std-registry-editor',PUB_REGISTRY_FIELDS());
+  renderLineEditor('pub-faq','std-faq-editor',PUB_FAQ_FIELDS());
+  mirrorToSTD('pub-lodging','std-lodging');
+  mirrorToSTD('pub-map-url','std-map-url');
+  mirrorToSTD('pub-story','std-story');
+  renderGalleryPreview();
 }
 
 function removeGalleryImage(i){
@@ -4812,6 +4949,24 @@ async function onGalleryFilesSelected(event){
 
   renderGalleryPreview();
   showToast(L?`✅ ${pubGalleryUrls.length} foto(s) en la galería`:`✅ ${pubGalleryUrls.length} photo(s) in gallery`);
+}
+
+function setSTDFont(fontClass,el){
+  const names=document.querySelector('#content-savethedate .std-card .std-names');
+  if(!names) return;
+  names.classList.remove('font-classic','font-modern','font-script');
+  if(fontClass) names.classList.add(fontClass);
+  document.querySelectorAll('#content-savethedate .font-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+function setSTDTextColor(hex,el){
+  const names=document.querySelector('#content-savethedate .std-card .std-names');
+  if(!names) return;
+  if(hex) names.style.setProperty('--custom-text-color',hex);
+  else names.style.removeProperty('--custom-text-color');
+  document.querySelectorAll('#content-savethedate .text-color-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
 }
 
 function makeSTDEditable(){

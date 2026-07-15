@@ -22,7 +22,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
-.wrap{max-width:560px;width:100%}
+.wrap{max-width:680px;width:100%}
 .brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2rem;opacity:.7}
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
 
@@ -338,6 +338,7 @@ function setLang(l){
 }
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toTitleCase(s){ return String(s??'').toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase()); }
 
 function getFloralCornerSVG(){
   const floral=`
@@ -465,11 +466,14 @@ async function submitBugReport(){
 }
 
 function getSlug(){
-  // Soporta tanto /i/mi-slug (URL bonita vía _redirects) como ?slug=mi-slug (respaldo)
+  // Soporta: /nombre-evento (dominio propio, link corto), /i/nombre-evento
+  // (compatibilidad con links viejos ya compartidos), y ?slug=nombre-evento (respaldo)
   const path=location.pathname.replace(/\/+$/,'');
   const parts=path.split('/').filter(Boolean);
   const idxI=parts.indexOf('i');
   if(idxI!==-1 && parts[idxI+1]) return decodeURIComponent(parts[idxI+1]);
+  const knownPages=['index.html','terminos.html','aviso-de-privacidad.html','dragonflai-v2.html','invitacion.html','invitation-og.js','worker.js'];
+  if(parts.length===1 && !knownPages.includes(parts[0])) return decodeURIComponent(parts[0]);
   const qs=new URLSearchParams(location.search);
   return qs.get('slug')||qs.get('i')||'';
 }
@@ -564,7 +568,7 @@ function renderInvitation(inv){
   document.getElementById('content').innerHTML=`
     <div class="card ${esc(inv.theme||'theme-teal')}"${inv.background_image_url?` style="background-image:url('${esc(inv.background_image_url)}')"`:(inv.theme==='theme-custom-color'&&inv.custom_color_hex?` style="--custom-accent-color:${esc(inv.custom_color_hex)};--custom-accent-border:${esc(inv.custom_color_hex)}40"`:'')}>${getFloralCornerSVG()}
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
-      <div class="names${inv.font_family?' '+esc(inv.font_family):''}"${inv.text_color?` style="--custom-text-color:${esc(inv.text_color)}"`:''}>${esc(inv.host_names)}</div>
+      <div class="names${inv.font_family?' '+esc(inv.font_family):''}"${inv.text_color?` style="--custom-text-color:${esc(inv.text_color)}"`:''}>${esc(toTitleCase(inv.host_names))}</div>
       <div class="divider"></div>
       <div class="details">
         ${inv.event_date?`<div class="detail-item">📅 ${esc(inv.event_date)}</div>`:''}

@@ -34,10 +34,17 @@ export default async (request, context) => {
     return context.next();
   }
 
-  // Es un robot de vista previa → extraer el slug de la URL (/i/mi-slug)
+  // Es un robot de vista previa → extraer el slug de la URL.
+  // Soporta /i/mi-slug (links viejos) y /mi-slug (link corto con dominio propio).
   const parts = url.pathname.split('/').filter(Boolean);
-  const slug = parts[1] || '';
-  const pageUrl = `${url.origin}/i/${slug}`;
+  const knownPages = ['terminos.html', 'aviso-de-privacidad.html', 'dragonflai-v2.html', 'invitacion.html', 'invitation-og.js', 'worker.js', 'index.html'];
+  let slug = '';
+  if (parts[0] === 'i' && parts[1]) {
+    slug = parts[1];
+  } else if (parts.length === 1 && !knownPages.includes(parts[0])) {
+    slug = parts[0];
+  }
+  const pageUrl = `${url.origin}${url.pathname}`;
 
   let inv = null;
   try {
@@ -86,4 +93,4 @@ export default async (request, context) => {
   });
 };
 
-export const config = { path: '/i/*' };
+export const config = { path: ['/i/*', '/*'] };
