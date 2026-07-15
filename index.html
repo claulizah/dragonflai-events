@@ -718,7 +718,7 @@ if (sb) {
       // del correo), mándala directo a su cuenta — no tiene sentido dejarla
       // viendo la página de marketing justo después de loguearse, tenga o
       // no créditos todavía.
-      if (event === 'SIGNED_IN' && currentUser) {
+      if (event === 'SIGNED_IN' && currentUser && !window.location.hash) {
         window.location.href = '/app';
       }
     });
