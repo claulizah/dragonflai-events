@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <meta name="description" content="Estás invitado — confirma tu asistencia aquí.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
@@ -27,24 +27,30 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
 
 /* ── TARJETA (mismos colores que el Save the Date de la app) ── */
-.card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:var(--cream);border:1px solid var(--border-gray);box-shadow:var(--shadow-md);margin-bottom:1.5rem}
+.card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:var(--cream);border:1px solid var(--border-gray);box-shadow:var(--shadow-md);margin-bottom:1.5rem;font-family:'Cormorant Garamond',serif}
+.card.font-classic{font-family:'Playfair Display',serif}
+.card.font-modern{font-family:'Montserrat',sans-serif}
+.card.font-script{font-family:'Dancing Script',cursive}
+.card.font-soft{font-family:'Libre Baskerville',serif}
+.card.font-round{font-family:'Poppins',sans-serif}
+.card.font-editorial{font-family:'Cinzel',serif}
+.card.font-fun{font-family:'Fredoka',sans-serif}
+.card.font-comic{font-family:'Comic Neue',cursive}
+.card.font-playful{font-family:'Chewy',cursive}
 /* Fondo con foto propia — con overlay claro para que el texto se lea */
 .card.theme-custom-photo{background-size:cover!important;background-position:center!important;position:relative}
 .card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0;border-radius:inherit}
 .card.theme-custom-photo>*{position:relative;z-index:1}
 .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--custom-text-color,var(--teal-dark));margin-bottom:1rem;font-weight:600}
-.names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
-.names.font-classic{font-family:'Playfair Display',serif}
-.names.font-modern{font-family:'Montserrat',sans-serif;letter-spacing:.02em}
-.names.font-script{font-family:'Dancing Script',cursive;font-weight:700}
-.names.font-soft{font-family:'Libre Baskerville',serif}
-.names.font-round{font-family:'Poppins',sans-serif}
-.names.font-editorial{font-family:'Cinzel',serif}
+.names{font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
+.card.font-script .names{font-weight:700}
+.card.font-fun .names{font-weight:600}
+.card.font-comic .names{font-weight:700}
 .divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
 .details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px;color:var(--text-2)}
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
 .msg{font-size:13px;color:var(--text-2);font-style:italic;margin-top:.5rem}
-.hashtag{font-size:13px;color:var(--custom-text-color,var(--teal-dark));font-weight:600;margin-top:.6rem}
+.hashtag{font-size:13px;color:var(--custom-text-color,var(--teal-dark));font-weight:700;margin-top:.6rem}
 .countdown{display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem}
 .cd-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--teal-dark)}
 .cd-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
@@ -431,12 +437,12 @@ function renderInvitation(inv){
   const bgColor=inv.custom_color_hex||'#FAF9F7'; // si es de antes de simplificar fondos, cae al crema por defecto
   const cardStyleParts=[];
   if(inv.background_image_url) cardStyleParts.push(`background-image:url('${esc(inv.background_image_url)}')`);
-  else cardStyleParts.push(`background-color:${esc(bgColor)}`);
+  else cardStyleParts.push(`background:${esc(bgColor)}`);
   if(inv.text_color) cardStyleParts.push(`--custom-text-color:${esc(inv.text_color)}`);
   document.getElementById('content').innerHTML=`
-    <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}" style="${cardStyleParts.join(';')}">
+    <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
-      <div class="names${inv.font_family?' '+esc(inv.font_family):''}">${esc(toTitleCase(inv.host_names))}</div>
+      <div class="names">${esc(toTitleCase(inv.host_names))}</div>
       <div class="divider"></div>
       <div class="details">
         ${inv.event_date?`<div class="detail-item">📅 ${esc(inv.event_date)}</div>`:''}
