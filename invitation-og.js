@@ -26,6 +26,12 @@ function esc(s) {
 
 export default async (request, context) => {
   const url = new URL(request.url);
+
+  // Nunca interceptar rutas /api/* — esas las maneja su propia edge function
+  if (url.pathname.startsWith('/api/')) {
+    return context.next();
+  }
+
   const userAgent = request.headers.get('user-agent') || '';
   const isBot = BOT_PATTERN.test(userAgent);
 

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel de uso — DragonflAI Events</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#2EC4B6; --teal-dark:#0D6E65; --violet:#7B2FBE;
+  --text:#1A2332; --text-2:#4A5568; --text-3:#8A94A6;
+  --cream:#FAF9F7; --cream-2:#F3F1EE; --border-gray:#E5E1D8; --radius:14px;
+  --amber:#D4972A; --red:#C14A5E;
+}
+*{box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);margin:0;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:2rem;text-decoration:none}
+.brand span{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)}
+.brand span em{font-style:normal;color:var(--teal)}
+h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-bottom:1.5rem}
+.login-box{background:#fff;border:1px solid var(--border-gray);border-radius:var(--radius);padding:1.75rem;max-width:360px}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.9rem}
+.login-box button{width:100%;padding:12px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer}
+.error{color:var(--red);font-size:13px;margin-top:.6rem}
+.card{background:#fff;border:1px solid var(--border-gray);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
+.card h2{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;margin:0 0 1rem;display:flex;align-items:center;gap:8px}
+.metric{margin-bottom:1rem}
+.metric-label{display:flex;justify-content:space-between;font-size:13px;color:var(--text-2);margin-bottom:5px}
+.metric-label b{color:var(--text)}
+.bar-track{height:8px;background:var(--cream-2);border-radius:100px;overflow:hidden}
+.bar-fill{height:100%;border-radius:100px;transition:width .4s}
+.bar-fill.ok{background:var(--teal)}
+.bar-fill.warn{background:var(--amber)}
+.bar-fill.danger{background:var(--red)}
+.stat-row{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:.5rem}
+.stat{font-size:12.5px;color:var(--text-3)}
+.stat b{display:block;font-size:18px;color:var(--text);font-family:'Cormorant Garamond',serif}
+.err-msg{font-size:13px;color:var(--red);background:#FBE0E5;padding:10px 12px;border-radius:8px}
+.loading{color:var(--text-3);font-size:13px}
+.refresh-btn{font-size:12.5px;color:var(--teal-dark);background:none;border:1px solid var(--border-gray);border-radius:100px;padding:6px 14px;cursor:pointer;margin-bottom:1.5rem}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;border-bottom:2px solid var(--border-gray);padding-bottom:0}
+.tab-btn{padding:9px 16px;border:none;background:none;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab-btn.active{color:var(--teal-dark);border-bottom-color:var(--teal)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.doc-card{background:#fff;border:1px solid var(--border-gray);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem}
+.doc-card h2{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;margin:0 0 .9rem;display:flex;align-items:center;gap:8px}
+.doc-card h3{font-size:13px;font-weight:600;color:var(--teal-dark);margin:1.1rem 0 .5rem;text-transform:uppercase;letter-spacing:.03em}
+.doc-card p, .doc-card li{font-size:13.5px;color:var(--text-2);margin-bottom:.4rem}
+.doc-card ul{padding-left:1.2rem;margin:.3rem 0}
+.doc-card code{background:var(--cream-2);padding:1px 6px;border-radius:4px;font-size:12.5px;color:var(--text)}
+.cred-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:.4rem}
+.cred-table th{text-align:left;color:var(--text-3);font-weight:600;font-size:11.5px;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border-gray)}
+.cred-table td{padding:8px;border-bottom:1px solid var(--border-gray);color:var(--text-2);vertical-align:top}
+.cred-table td:first-child{font-weight:600;color:var(--text);white-space:nowrap}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:100px}
+.pill.public{background:var(--teal-light,#E6F7F5);color:var(--teal-dark)}
+.pill.secret{background:#FBE0E5;color:var(--red)}
+.timeline-item{border-left:2px solid var(--border-gray);padding:0 0 1.1rem 16px;position:relative;margin-left:4px}
+.timeline-item::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.timeline-item h4{font-size:14px;font-weight:600;margin:0 0 .3rem;color:var(--text)}
+.timeline-item p{font-size:13px;color:var(--text-2);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/" class="brand">
+    <svg width="22" height="22" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/></svg>
+    <span>Dragonfl<em>AI</em> Events</span>
+  </a>
+
+  <h1>Panel de uso</h1>
+
+  <div id="login-view">
+    <div class="login-box">
+      <input type="password" id="pw-input" placeholder="Contraseña de administrador">
+      <button onclick="tryLogin()">Ver uso</button>
+      <div class="error" id="login-error" style="display:none"></div>
+    </div>
+  </div>
+
+  <div id="dashboard-view" style="display:none">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('usage',this)">📊 Uso</button>
+      <button class="tab-btn" onclick="showTab('arch',this)">🏗️ Arquitectura</button>
+      <button class="tab-btn" onclick="showTab('creds',this)">🔑 Credenciales</button>
+      <button class="tab-btn" onclick="showTab('workflow',this)">⚙️ Flujo de trabajo</button>
+      <button class="tab-btn" onclick="showTab('changelog',this)">🗓️ Bitácora</button>
+    </div>
+
+    <div id="tab-usage" class="tab-panel active">
+      <button class="refresh-btn" onclick="loadUsage()">↻ Actualizar</button>
+      <div id="dashboard-content"><p class="loading">Cargando…</p></div>
+    </div>
+
+    <div id="tab-arch" class="tab-panel">
+      <div class="doc-card">
+        <h2>🏗️ Arquitectura técnica</h2>
+        <p>DragonflAI Events es un sitio de 3 capas, sin servidor propio ni framework — todo en HTML/CSS/JS plano.</p>
+
+        <h3>1. Frontend — archivos HTML</h3>
+        <ul>
+          <li><code>dragonflai-v2.html</code> — el generador: formulario, planes con IA, Save the Date, publicar invitación</li>
+          <li><code>invitacion.html</code> — la página pública que ve cada invitado (RSVP, galería, itinerario)</li>
+          <li><code>index.html</code> — landing/precios · <code>terminos.html</code> / <code>aviso-de-privacidad.html</code> — legales</li>
+          <li><code>admin.html</code> — este panel</li>
+        </ul>
+
+        <h3>2. Backend</h3>
+        <ul>
+          <li><b>Supabase</b> — Postgres (invitaciones, RSVPs, planes, perfiles), Auth, y Storage (fotos)</li>
+          <li><b>Cloudflare Worker</b> (<code>dragonflai-worker-v2</code>) — proxy que oculta la API key de Anthropic y resuelve CORS</li>
+          <li><b>Netlify Edge Functions</b> — <code>invitation-og.js</code> (vista previa al compartir en WhatsApp) y <code>admin-usage.js</code> (este panel)</li>
+        </ul>
+
+        <h3>3. IA</h3>
+        <p>Claude Sonnet 4.5 vía API de Anthropic — genera el plan de evento y el Save the Date en llamadas paralelas.</p>
+
+        <h3>Hosting y dominio</h3>
+        <p><code>dragonflaievents.com</code> en Netlify (Netlify DNS + SSL automático vía Let's Encrypt). Links de invitación: <code>dragonflaievents.com/nombre-evento</code> (los viejos <code>/i/nombre-evento</code> siguen funcionando).</p>
+      </div>
+    </div>
+
+    <div id="tab-creds" class="tab-panel">
+      <div class="doc-card">
+        <h2>🔑 Dónde vive cada credencial</h2>
+        <p>Ninguna llave secreta vive en el código público del sitio — las que son sensibles están como variables de entorno en Netlify o Cloudflare. Los valores reales NO se muestran aquí, solo dónde encontrarlas/rotarlas.</p>
+        <table class="cred-table">
+          <tr><th>Credencial</th><th>Tipo</th><th>Dónde vive</th></tr>
+          <tr><td>Supabase URL + anon key</td><td><span class="pill public">Pública</span></td><td>Hardcodeada en dragonflai-v2.html / invitacion.html — segura de exponer, la protección real es RLS en Supabase</td></tr>
+          <tr><td>Supabase service_role key</td><td><span class="pill secret">Secreta</span></td><td>Netlify env var <code>SUPABASE_SERVICE_ROLE_KEY</code> · rotar en Supabase → Settings → API</td></tr>
+          <tr><td>Anthropic API key</td><td><span class="pill secret">Secreta</span></td><td>Cloudflare Worker <code>dragonflai-worker-v2</code> → Settings → Variables · rotar en console.anthropic.com</td></tr>
+          <tr><td>Anthropic Admin key</td><td><span class="pill secret">Secreta</span></td><td>Netlify env var <code>ANTHROPIC_ADMIN_KEY</code> · Claude Console → Settings → Admin API keys</td></tr>
+          <tr><td>Netlify API token</td><td><span class="pill secret">Secreta</span></td><td>Netlify env var <code>NETLIFY_API_TOKEN</code> · User settings → Applications</td></tr>
+          <tr><td>Cloudflare API token</td><td><span class="pill secret">Secreta</span></td><td>Netlify env var <code>CF_API_TOKEN</code> · Cloudflare → My Profile → API Tokens</td></tr>
+          <tr><td>Contraseña de este panel</td><td><span class="pill secret">Secreta</span></td><td>Netlify env var <code>ADMIN_PASSWORD</code> — cámbiala ahí si se te olvida o quieres rotarla</td></tr>
+        </table>
+        <p style="margin-top:1rem;font-size:12px;color:var(--text-3)">Regla general: si algo necesita permisos amplios (borrar cosas, ver todo, gastar dinero), va en una variable de entorno del backend — nunca en un archivo que suba al repositorio.</p>
+      </div>
+    </div>
+
+    <div id="tab-workflow" class="tab-panel">
+      <div class="doc-card">
+        <h2>⚙️ Cómo hacer cambios</h2>
+
+        <h3>Cambios en la base de datos (tablas, políticas, columnas)</h3>
+        <ul>
+          <li>Claude te da un archivo <code>.sql</code></li>
+          <li>Tú lo corres en Supabase → proyecto <code>wpgdkfdoecohoowwoywx</code> → SQL Editor → Run</li>
+          <li>Le pasas a Claude el resultado (texto o captura) para confirmar</li>
+        </ul>
+
+        <h3>Cambios en el código del sitio (HTML/JS)</h3>
+        <ul>
+          <li>Claude edita el archivo directamente y te lo comparte para descargar</li>
+          <li>Tú lo subes a GitHub (reemplazando el archivo existente) — Netlify hace deploy automático en segundos</li>
+          <li>Verifica en Netlify → Deploys que el último build sea el correcto antes de probar</li>
+        </ul>
+
+        <h3>Cambios en el Worker de IA</h3>
+        <ul>
+          <li>Cloudflare Dashboard → Workers & Pages → <code>dragonflai-worker-v2</code></li>
+          <li>Editar código o variables de entorno ahí directamente</li>
+        </ul>
+
+        <h3>Variables de entorno nuevas</h3>
+        <ul>
+          <li>Netlify → Site settings → Environment variables → Add a variable</li>
+          <li>Marca el scope como "Functions" para que las Edge Functions puedan leerlas</li>
+          <li>Requiere un nuevo deploy para tomar efecto</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="tab-changelog" class="tab-panel">
+      <div class="doc-card">
+        <h2>🗓️ Bitácora de funciones agregadas</h2>
+
+        <div class="timeline-item">
+          <h4>Ronda 1 — Hallazgos V7 (11 puntos)</h4>
+          <p>Editor de filas amigable para itinerario/regalos/FAQ · marca de agua reposicionada · fondo crema por defecto · galería con navegación completa entre fotos · esquinas decorativas responsivas · diseño sugerido priorizado por tipo de evento · política RLS de borrado de fotos</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Ronda 2 — Fuente y color de texto</h4>
+          <p>4 fuentes (Elegante/Clásica/Moderna/Script) y 6 colores de texto, aplicables en Save the Date, vista previa e invitación pública</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Ronda 3 — Segunda vuelta de hallazgos (7 puntos)</h4>
+          <p>Bug del modal de QR abriéndose sin querer al elegir color (causa raíz real) · logo de marca centrado · opción de eliminar invitación · tooltips en iconos · degradado de color que tintaba todos los fondos (eliminado) · esquinas decorativas más grandes</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Ronda 4 — Excel de hallazgos (12 puntos)</h4>
+          <p>Rediseño de "Mis invitaciones" (nombres sin truncar, botones con texto) · selector real de fecha/hora en itinerario · capitalización automática de nombres · bug de desincronización tema-sugerido↔etiqueta (introducido y corregido en la misma sesión) · Save the Date con los mismos campos que Publicar (itinerario, regalos, historia, FAQ, galería, fuente/color) · dominio propio con links cortos</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Ronda 5 — Panel de administración</h4>
+          <p>Este panel: uso agregado de Supabase + Netlify + Cloudflare + Anthropic, protegido con contraseña, más esta documentación</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(id, btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<script>
+// Ajusta estos límites según tu plan real de cada plataforma.
+const LIMITS = {
+  supabase_db_bytes: 8 * 1024 * 1024 * 1024,      // 8 GB — Supabase Pro
+  supabase_storage_bytes: 100 * 1024 * 1024 * 1024, // 100 GB — Supabase Pro
+  cloudflare_requests_soft_limit: 100000 * 30      // referencia: 100k/día * 30 días
+};
+
+let savedPassword='';
+
+function fmtBytes(bytes){
+  if(bytes==null) return '—';
+  const gb = bytes / (1024**3);
+  if(gb >= 1) return gb.toFixed(2)+' GB';
+  return (bytes/(1024**2)).toFixed(1)+' MB';
+}
+
+function barClass(pct){
+  if(pct>=90) return 'danger';
+  if(pct>=70) return 'warn';
+  return 'ok';
+}
+
+function metricBar(label, used, total, usedLabel){
+  const pct = total ? Math.min(100,(used/total)*100) : 0;
+  return `<div class="metric">
+    <div class="metric-label"><span>${label}</span><b>${usedLabel} de ${fmtBytes(total)} (${pct.toFixed(1)}%)</b></div>
+    <div class="bar-track"><div class="bar-fill ${barClass(pct)}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+async function tryLogin(){
+  const pw = document.getElementById('pw-input').value;
+  savedPassword = pw;
+  document.getElementById('login-error').style.display='none';
+  const ok = await loadUsage();
+  if(ok){
+    document.getElementById('login-view').style.display='none';
+    document.getElementById('dashboard-view').style.display='block';
+  }
+}
+
+async function loadUsage(){
+  const content = document.getElementById('dashboard-content');
+  content.innerHTML = '<p class="loading">Cargando…</p>';
+  try{
+    const resp = await fetch('/api/admin-usage', { headers: { 'x-admin-password': savedPassword } });
+    if(resp.status===401){
+      document.getElementById('login-error').textContent = 'Contraseña incorrecta.';
+      document.getElementById('login-error').style.display='block';
+      return false;
+    }
+    const data = await resp.json();
+    renderDashboard(data);
+    return true;
+  }catch(err){
+    content.innerHTML = `<div class="err-msg">No se pudo cargar el uso: ${err.message}</div>`;
+    return false;
+  }
+}
+
+function renderDashboard(data){
+  const content = document.getElementById('dashboard-content');
+  let html = '';
+
+  // ── Supabase ──
+  html += '<div class="card"><h2>🗄️ Supabase</h2>';
+  if(data.supabase && !data.supabase.error){
+    const s = data.supabase;
+    html += metricBar('Base de datos', s.db_size_bytes, LIMITS.supabase_db_bytes, fmtBytes(s.db_size_bytes));
+    html += metricBar('Storage (fotos)', s.storage_size_bytes, LIMITS.supabase_storage_bytes, fmtBytes(s.storage_size_bytes));
+    html += `<div class="stat-row">
+      <div class="stat"><b>${s.invitations_count ?? '—'}</b>Invitaciones</div>
+      <div class="stat"><b>${s.rsvps_count ?? '—'}</b>RSVPs</div>
+      <div class="stat"><b>${s.event_photos_count ?? '—'}</b>Fotos de eventos</div>
+    </div>`;
+  } else {
+    html += `<div class="err-msg">${data.supabase?.error || 'Sin datos'}</div>`;
+  }
+  html += '</div>';
+
+  // ── Netlify ──
+  html += '<div class="card"><h2>🌐 Netlify</h2>';
+  if(data.netlify && !data.netlify.error){
+    const n = data.netlify;
+    html += metricBar('Ancho de banda (mes actual)', n.used, n.included, fmtBytes(n.used));
+    html += `<p style="font-size:11.5px;color:var(--text-3);margin:.5rem 0 0">Periodo: ${new Date(n.period_start_date).toLocaleDateString('es-MX')} – ${new Date(n.period_end_date).toLocaleDateString('es-MX')}</p>`;
+  } else {
+    html += `<div class="err-msg">${data.netlify?.error || 'Sin datos'}</div>`;
+  }
+  html += '</div>';
+
+  // ── Cloudflare ──
+  html += '<div class="card"><h2>⚡ Cloudflare Worker (IA)</h2>';
+  if(data.cloudflare && !data.cloudflare.error){
+    const c = data.cloudflare;
+    const pct = Math.min(100, (c.requests_last_30d / LIMITS.cloudflare_requests_soft_limit) * 100);
+    html += `<div class="stat-row">
+      <div class="stat"><b>${(c.requests_last_30d||0).toLocaleString('es-MX')}</b>Llamadas (últimos 30 días)</div>
+      <div class="stat"><b>${(c.errors_last_30d||0).toLocaleString('es-MX')}</b>Errores</div>
+    </div>
+    <div class="metric" style="margin-top:1rem">
+      <div class="metric-label"><span>Referencia vs. plan gratuito (100k/día)</span><b>${pct.toFixed(1)}%</b></div>
+      <div class="bar-track"><div class="bar-fill ${barClass(pct)}" style="width:${pct}%"></div></div>
+    </div>`;
+  } else {
+    html += `<div class="err-msg">${data.cloudflare?.error || 'Sin datos'}</div>`;
+  }
+  html += '</div>';
+
+  // ── Anthropic ──
+  html += '<div class="card"><h2>🤖 Anthropic (generación de planes)</h2>';
+  if(data.anthropic && !data.anthropic.error){
+    html += `<div class="stat-row"><div class="stat"><b>$${(data.anthropic.cost_last_30d_usd||0).toFixed(2)} USD</b>Gasto (últimos 30 días)</div></div>`;
+  } else {
+    html += `<div class="err-msg">${data.anthropic?.error || 'Sin datos'}</div>`;
+  }
+  html += '</div>';
+
+  content.innerHTML = html;
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+</script>
+</body>
+</html>
