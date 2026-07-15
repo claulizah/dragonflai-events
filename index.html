@@ -494,6 +494,14 @@ footer a:hover{color:var(--teal-dark)}
   </div>
 
   <p class="pricing-note" data-es="💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español" data-en="💳 Secure payment · Card, OXXO, wire transfer · Support in English &amp; Spanish">💳 Pago seguro · Tarjeta, OXXO, transferencia · Soporte en español</p>
+
+  <div id="redeem-code-toggle" style="text-align:center;margin-top:1rem">
+    <a href="#" onclick="toggleRedeemBox();return false" style="font-size:12.5px;color:var(--text-3)" data-es="¿Tienes un código de acceso?" data-en="Have an access code?">¿Tienes un código de acceso?</a>
+  </div>
+  <div id="redeem-code-box" style="display:none;margin-top:.75rem;max-width:280px;margin-left:auto;margin-right:auto">
+    <input type="text" id="redeem-code-input" class="profile-input" placeholder="ej. BETA2026" style="text-align:center;text-transform:uppercase;width:100%;box-sizing:border-box">
+    <button class="btn-price" style="margin-top:.5rem;width:100%;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;border:none" onclick="redeemAccessCode()" data-es="Canjear código" data-en="Redeem code">Canjear código</button>
+  </div>
 </section>
 
 <!-- FAQ -->
@@ -691,6 +699,36 @@ function updateNavLogin() {
 function handleNavLogin() {
   if (currentUser) { window.location.href = '/app'; }
   else { openAuthModal(); }
+}
+
+function toggleRedeemBox(){
+  document.getElementById('redeem-code-toggle').style.display='none';
+  document.getElementById('redeem-code-box').style.display='block';
+}
+
+async function redeemAccessCode(){
+  if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+  if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión primero para canjear tu código':'Log in first to redeem your code',true); return; }
+  const code=document.getElementById('redeem-code-input').value.trim();
+  if(!code){ showToast(lang==='es'?'Escribe tu código':'Enter your code',true); return; }
+
+  const {data,error}=await sb.rpc('redeem_code',{p_code:code});
+  if(error||!data){ showToast(lang==='es'?'No se pudo canjear el código':'Could not redeem code',true); return; }
+
+  if(!data.success){
+    const L=lang==='es';
+    const messages={
+      code_not_found:L?'Ese código no existe':'That code does not exist',
+      code_expired:L?'Ese código ya venció':'That code has expired',
+      code_exhausted:L?'Ese código ya alcanzó su límite de usos':'That code has reached its usage limit',
+      already_used_by_you:L?'Ya usaste ese código antes':'You already used that code'
+    };
+    showToast(messages[data.reason]||(L?'No se pudo canjear el código':'Could not redeem code'),true);
+    return;
+  }
+
+  showToast(lang==='es'?'✅ ¡Código canjeado! Te llevamos a tu cuenta…':'✅ Code redeemed! Taking you to your account…');
+  setTimeout(()=>{ window.location.href='/app'; },1200);
 }
 
 refreshPaidStatus().then(() => {
