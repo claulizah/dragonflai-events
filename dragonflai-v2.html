@@ -3214,7 +3214,7 @@ async function generate(){
   // regenerar — si no, cada clic en "Generar" crearía una fila nueva en
   // vez de reusar el acceso ya desbloqueado, rompiendo la promesa de
   // "sin límite de regeneraciones" para quien ya pagó/canjeó un código.
-  const _previousSavedId=plan._savedId;
+  const _previousSavedId=plan._savedId||localStorage.getItem('dflai_last_plan_id')||null;
 
   plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,priorityList,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
   if(_previousSavedId) plan._savedId=_previousSavedId;
@@ -4090,6 +4090,7 @@ async function ensurePlanSaved(){
       title, event_type:plan.typeName, plan_data:{plan,tabsHtml,mode}
     }).eq('id',plan._savedId);
     if(error) console.error('No se pudo actualizar el plan guardado:',error);
+    localStorage.setItem('dflai_last_plan_id',plan._savedId);
     return plan._savedId;
   }
 
@@ -4101,6 +4102,7 @@ async function ensurePlanSaved(){
   }).select().single();
   if(error){ showToast(lang==='es'?'No se pudo guardar tu plan':'Could not save your plan',true); return null; }
   plan._savedId=data.id;
+  localStorage.setItem('dflai_last_plan_id',data.id);
   return data.id;
 }
 
