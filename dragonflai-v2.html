@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -334,6 +334,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-names.font-classic{font-family:'Playfair Display',serif}
 .std-names.font-modern{font-family:'Montserrat',sans-serif;letter-spacing:.02em}
 .std-names.font-script{font-family:'Dancing Script',cursive;font-weight:700}
+.std-names.font-soft{font-family:'Libre Baskerville',serif}
+.std-names.font-round{font-family:'Poppins',sans-serif}
+.std-names.font-editorial{font-family:'Cinzel',serif}
+.std-names.font-fun{font-family:'Fredoka',sans-serif;font-weight:600}
+.std-names.font-comic{font-family:'Comic Neue',cursive;font-weight:700}
+.std-names.font-playful{font-family:'Chewy',cursive}
 .font-picker{display:flex;justify-content:center;gap:8px;margin-bottom:.6rem;flex-wrap:wrap}
 .font-swatch{padding:8px 14px;border-radius:100px;border:1.5px solid var(--border-gray);background:var(--cream-2);color:var(--text-2);font-size:14px;cursor:pointer;transition:all .15s}
 .font-swatch.active{border-color:var(--violet);background:var(--violet-light,#EDE7F6);color:var(--violet-dark,var(--violet))}
@@ -1074,16 +1080,29 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .5rem"></p>
       <div class="std-theme-picker" id="pub-theme-picker">
-        <span class="theme-swatch" style="background:#FAF9F7" onclick="setPublishBgColor('#FAF9F7',this)" title="Crema"></span>
-        <span class="theme-swatch" style="background:#FFFFFF" onclick="setPublishBgColor('#FFFFFF',this)" title="Blanco"></span>
-        <span class="theme-swatch" style="background:#F7E8E8" onclick="setPublishBgColor('#F7E8E8',this)" title="Rosa empolvado"></span>
-        <span class="theme-swatch" style="background:#EDF2E9" onclick="setPublishBgColor('#EDF2E9',this)" title="Verde salvia"></span>
-        <span class="theme-swatch" style="background:#E8F0F7" onclick="setPublishBgColor('#E8F0F7',this)" title="Azul cielo"></span>
-        <span class="theme-swatch" style="background:#F0EAF7" onclick="setPublishBgColor('#F0EAF7',this)" title="Lavanda"></span>
-        <span class="theme-swatch" style="background:#FAEDE3" onclick="setPublishBgColor('#FAEDE3',this)" title="Durazno"></span>
-        <span class="theme-swatch" style="background:#F0EFEC" onclick="setPublishBgColor('#F0EFEC',this)" title="Gris piedra"></span>
-        <span class="theme-swatch" style="background:#E6F5F0" onclick="setPublishBgColor('#E6F5F0',this)" title="Menta"></span>
-        <span class="theme-swatch" style="background:#F7F1E3" onclick="setPublishBgColor('#F7F1E3',this)" title="Champagne"></span>
+        <span class="theme-swatch" style="background:#FAF9F7" data-bg-value="#FAF9F7" onclick="setPublishBgColor('#FAF9F7',this)" title="Crema"></span>
+        <span class="theme-swatch" style="background:#FFFFFF" data-bg-value="#FFFFFF" onclick="setPublishBgColor('#FFFFFF',this)" title="Blanco"></span>
+        <span class="theme-swatch" style="background:#F7E8E8" data-bg-value="#F7E8E8" onclick="setPublishBgColor('#F7E8E8',this)" title="Rosa empolvado"></span>
+        <span class="theme-swatch" style="background:#EDF2E9" data-bg-value="#EDF2E9" onclick="setPublishBgColor('#EDF2E9',this)" title="Verde salvia"></span>
+        <span class="theme-swatch" style="background:#E8F0F7" data-bg-value="#E8F0F7" onclick="setPublishBgColor('#E8F0F7',this)" title="Azul cielo"></span>
+        <span class="theme-swatch" style="background:#F0EAF7" data-bg-value="#F0EAF7" onclick="setPublishBgColor('#F0EAF7',this)" title="Lavanda"></span>
+        <span class="theme-swatch" style="background:#FAEDE3" data-bg-value="#FAEDE3" onclick="setPublishBgColor('#FAEDE3',this)" title="Durazno"></span>
+        <span class="theme-swatch" style="background:#F0EFEC" data-bg-value="#F0EFEC" onclick="setPublishBgColor('#F0EFEC',this)" title="Gris piedra"></span>
+        <span class="theme-swatch" style="background:#E6F5F0" data-bg-value="#E6F5F0" onclick="setPublishBgColor('#E6F5F0',this)" title="Menta"></span>
+        <span class="theme-swatch" style="background:#F7F1E3" data-bg-value="#F7F1E3" onclick="setPublishBgColor('#F7F1E3',this)" title="Champagne"></span>
+        <span class="theme-swatch" style="background:#FF6FA5" data-bg-value="#FF6FA5" onclick="setPublishBgColor('#FF6FA5',this)" title="Rosa chicle"></span>
+        <span class="theme-swatch" style="background:#3B9EFF" data-bg-value="#3B9EFF" onclick="setPublishBgColor('#3B9EFF',this)" title="Azul brillante"></span>
+        <span class="theme-swatch" style="background:#FFD23F" data-bg-value="#FFD23F" onclick="setPublishBgColor('#FFD23F',this)" title="Amarillo sol"></span>
+        <span class="theme-swatch" style="background:#00C9A7" data-bg-value="#00C9A7" onclick="setPublishBgColor('#00C9A7',this)" title="Turquesa vivo"></span>
+        <span class="theme-swatch" style="background:#FF8C42" data-bg-value="#FF8C42" onclick="setPublishBgColor('#FF8C42',this)" title="Naranja vivo"></span>
+      </div>
+      <p style="text-align:center;font-size:12px;color:var(--text-2);margin-bottom:.4rem" data-es="Fondos degradados" data-en="Gradient backgrounds">Fondos degradados</p>
+      <div class="std-theme-picker" id="pub-gradient-picker">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#FFD3E0,#FFF3C4,#C8F4DE,#C4E1FF)" data-bg-value="linear-gradient(135deg,#FFD3E0,#FFF3C4,#C8F4DE,#C4E1FF)" onclick="setPublishBgColor('linear-gradient(135deg,#FFD3E0,#FFF3C4,#C8F4DE,#C4E1FF)',this)" title="Arcoíris pastel"></span>
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)" data-bg-value="linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)" onclick="setPublishBgColor('linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)',this)" title="Atardecer"></span>
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#A1C4FD,#C2E9FB)" data-bg-value="linear-gradient(135deg,#A1C4FD,#C2E9FB)" onclick="setPublishBgColor('linear-gradient(135deg,#A1C4FD,#C2E9FB)',this)" title="Cielo"></span>
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#FBC2EB,#A6C1EE)" data-bg-value="linear-gradient(135deg,#FBC2EB,#A6C1EE)" onclick="setPublishBgColor('linear-gradient(135deg,#FBC2EB,#A6C1EE)',this)" title="Dulce"></span>
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#D4FC79,#96E6A1)" data-bg-value="linear-gradient(135deg,#D4FC79,#96E6A1)" onclick="setPublishBgColor('linear-gradient(135deg,#D4FC79,#96E6A1)',this)" title="Menta-limón"></span>
       </div>
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
@@ -1101,6 +1120,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span class="font-swatch" style="font-family:'Libre Baskerville',serif" onclick="setPublishFont('font-soft',this)" data-es="Serif suave" data-en="Soft serif">Serif suave</span>
         <span class="font-swatch" style="font-family:'Poppins',sans-serif" onclick="setPublishFont('font-round',this)" data-es="Redondeada" data-en="Rounded">Redondeada</span>
         <span class="font-swatch" style="font-family:'Cinzel',serif" onclick="setPublishFont('font-editorial',this)" data-es="Editorial" data-en="Editorial">Editorial</span>
+        <span class="font-swatch" style="font-family:'Fredoka',sans-serif;font-weight:600" onclick="setPublishFont('font-fun',this)" data-es="Divertida" data-en="Fun">Divertida</span>
+        <span class="font-swatch" style="font-family:'Comic Neue',cursive;font-weight:700" onclick="setPublishFont('font-comic',this)" data-es="Amigable" data-en="Friendly">Amigable</span>
+        <span class="font-swatch" style="font-family:'Chewy',cursive" onclick="setPublishFont('font-playful',this)" data-es="Juguetona" data-en="Playful">Juguetona</span>
       </div>
       <div class="text-color-picker" id="pub-text-color-picker">
         <span class="text-color-swatch active" style="background:#1A2332" title="Carbón (por defecto)" onclick="setPublishTextColor(null,this)"></span>
@@ -1243,6 +1265,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <span onclick="toggleHelpChat()" style="cursor:pointer;font-size:18px;line-height:1">✕</span>
   </div>
   <div id="help-chat-messages" style="flex:1;overflow-y:auto;padding:14px;font-size:13.5px"></div>
+  <div id="help-chat-quick" style="padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px"></div>
   <div style="padding:10px;border-top:1px solid var(--border-gray);display:flex;gap:8px">
     <input type="text" id="help-chat-input" placeholder="Escribe tu pregunta…" style="flex:1;padding:9px 12px;border-radius:100px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif" onkeydown="if(event.key==='Enter')sendHelpChatMessage()">
     <button onclick="sendHelpChatMessage()" style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;border:none;cursor:pointer;font-size:14px">➤</button>
@@ -1513,7 +1536,7 @@ async function openPublishModal(){
   pubTextColor=null;
   const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
-    if(stdCard.style.backgroundColor) pubBgColor=rgbToHex(stdCard.style.backgroundColor)||pubBgColor;
+    if(stdCard.dataset.bgValue) pubBgColor=stdCard.dataset.bgValue;
     pubTextColor=stdCard.style.getPropertyValue('--custom-text-color')||null;
     const stdNames=stdCard.querySelector('.std-names');
     if(stdNames){
@@ -1528,8 +1551,8 @@ async function openPublishModal(){
     const swatchColors=TEXT_COLOR_OPTIONS.map((c,i)=>i===0?null:c.hex);
     s.classList.toggle('active', swatchColors[i]===pubTextColor);
   });
-  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
-    s.classList.toggle('active', s.style.backgroundColor && rgbToHex(s.style.backgroundColor)===pubBgColor);
+  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-gradient-picker .theme-swatch').forEach(s=>{
+    s.classList.toggle('active', s.dataset.bgValue===pubBgColor);
   });
   updatePubThemeLabel();
 
@@ -1546,12 +1569,6 @@ let pubTextColor=null;
 
 // Convierte "rgb(250, 249, 247)" (lo que el navegador reporta) de vuelta
 // a "#faf9f7" para poder comparar contra nuestros hex de BG_COLORS.
-function rgbToHex(rgb){
-  const m=rgb.match(/\d+/g);
-  if(!m||m.length<3) return null;
-  return '#'+m.slice(0,3).map(n=>parseInt(n).toString(16).padStart(2,'0')).join('');
-}
-
 function setPublishFont(fontClass,el){
   pubFontClass=fontClass;
   document.querySelectorAll('#pub-font-picker .font-swatch').forEach(s=>s.classList.remove('active'));
@@ -1573,17 +1590,19 @@ function updatePubThemeLabel(){
     label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+(lang==='es'?'Tu foto':'Your photo');
     return;
   }
-  const match=BG_COLORS.find(c=>c.hex.toLowerCase()===pubBgColor.toLowerCase());
+  const matchColor=BG_COLORS.find(c=>c.hex.toLowerCase()===pubBgColor.toLowerCase());
+  const matchGradient=BG_GRADIENTS.find(g=>g.value===pubBgColor);
+  const match=matchColor||matchGradient;
   const name=match?(lang==='es'?match.name.es:match.name.en):pubBgColor;
   label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+name;
 }
 
-function setPublishBgColor(hex,el){
-  pubBgColor=hex;
-  pubBackgroundImageUrl=null; // elegir un color cancela la foto subida
+function setPublishBgColor(value,el){
+  pubBgColor=value;
+  pubBackgroundImageUrl=null; // elegir un color/degradado cancela la foto subida
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML='';
-  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-gradient-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
   updatePubThemeLabel();
   showInvitationPreview();
@@ -1669,7 +1688,7 @@ function showInvitationPreview(){
   if(!container) return;
   const cardStyle=pubBackgroundImageUrl
     ? ` style="background-image:url('${pubBackgroundImageUrl}')${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`
-    : ` style="background-color:${pubBgColor}${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`;
+    : ` style="background:${pubBgColor}${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`;
   const photoClass=pubBackgroundImageUrl?' theme-custom-photo':'';
   container.innerHTML=`
     <div class="std-card${photoClass}"${cardStyle}>
@@ -1820,8 +1839,8 @@ async function openEditInvitationModal(invId){
   // Si la invitación es de antes de simplificar los fondos (temas con
   // dibujos que ya no existen), cae de vuelta al crema por defecto.
   pubBgColor=(inv.theme==='theme-custom-color'&&inv.custom_color_hex)?inv.custom_color_hex:'#FAF9F7';
-  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>{
-    s.classList.toggle('active', s.style.backgroundColor && rgbToHex(s.style.backgroundColor)===pubBgColor);
+  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-gradient-picker .theme-swatch').forEach(s=>{
+    s.classList.toggle('active', s.dataset.bgValue===pubBgColor);
   });
   updatePubThemeLabel();
   document.getElementById('pub-ask-guests').checked=!!inv.ask_guest_count;
@@ -2338,6 +2357,32 @@ You can help with two kinds of questions:
 
 If asked something you're not sure about regarding the product, say so honestly rather than guessing, and suggest using the 🐞 feedback button to ask the team directly.`;
 
+// Preguntas rápidas con respuesta fija (escrita por el equipo, no por la IA)
+// — se usan tanto como botones sugeridos al abrir el chat, como respuesta
+// instantánea si el usuario escribe algo muy parecido a una de estas.
+const HELP_CHAT_QUICK_QUESTIONS=[
+  {
+    es:'¿Cuánto cuesta?', en:'How much does it cost?',
+    answerEs:'Puedes probarlo gratis con 2 planes completos, sin tarjeta ni compromiso 🙂 Si quieres publicar tu invitación con RSVP o bajar el Excel, desde $179 MXN por evento (o $299 MXN al año si vas a planear más de uno). Si eres planner profesional, los paquetes empiezan en $249 MXN. Todos los detalles están en Precios, en la página principal.',
+    answerEn:"You can try it free with 2 complete plans, no card or commitment needed 🙂 To publish your invitation with RSVP or download the Excel, it starts at $179 MXN per event (or $299 MXN/year if you'll plan more than one). For professional planners, packages start at $249 MXN. Full details are in the Pricing section on the homepage."
+  },
+  {
+    es:'¿Cómo publico mi invitación?', en:'How do I publish my invitation?',
+    answerEs:"¡Fácil! Ve al tab 'Save the Date', ponle tu toque (color, degradado, foto o fuente — tienes hasta divertidas y juguetonas 🎨) y dale clic a 'Publicar invitación' arriba. Ahí puedes agregar itinerario, mesa de regalos, tu historia, FAQ y fotos antes de generar tu link.",
+    answerEn:"Easy! Go to the 'Save the Date' tab, make it yours (color, gradient, photo, or font — even fun and playful ones 🎨) and click 'Publish invitation' up top. There you can add a schedule, gift registry, your story, FAQ, and photos before generating your link."
+  },
+  {
+    es:'¿Puedo editar el Save the Date?', en:'Can I edit the Save the Date?',
+    answerEs:'Sí, todo — haz clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, etc.) para cambiarlo. Y justo arriba tienes los selectores de fondo (15 colores + 5 degradados), tu propia foto, y 10 fuentes distintas para elegir el estilo que más te guste.',
+    answerEn:"Yes, everything — click directly on any text on the card (names, date, location, etc.) to change it. And right above you'll find background pickers (15 colors + 5 gradients), your own photo, and 10 different fonts to match your style."
+  },
+  {
+    es:'¿Qué pasa si ya usé mis 2 planes gratis?', en:"What happens after my 2 free plans?",
+    answerEs:'Tranquilo, no se pierde nada — tus planes generados siguen ahí. Solo que para generar uno nuevo, o para publicar tu invitación y bajar el Excel, necesitas desbloquear acceso desde Precios. Es pago único, no suscripción.',
+    answerEn:"No worries, nothing is lost — your generated plans are still there. You just need to unlock access from Pricing to generate a new one, or to publish your invitation and download the Excel. It's a one-time payment, not a subscription."
+  }
+];
+
 let helpChatMessages=[];
 let helpChatOpen=false;
 
@@ -2350,7 +2395,41 @@ function toggleHelpChat(){
       ?'¡Hola! 👋 Puedo ayudarte con dudas sobre cómo usar DragonflAI Events (precios, cómo publicar tu invitación, etc.) o con dudas generales de planeación de tu evento. ¿En qué te ayudo?'
       :"Hi! 👋 I can help with questions about how DragonflAI Events works (pricing, publishing your invitation, etc.) or general event-planning questions. What can I help with?";
     addHelpChatBubble('assistant',welcome);
+    renderHelpChatQuickQuestions();
   }
+}
+
+function renderHelpChatQuickQuestions(){
+  const box=document.getElementById('help-chat-quick');
+  if(!box) return;
+  box.innerHTML=HELP_CHAT_QUICK_QUESTIONS.map((q,i)=>
+    `<button type="button" onclick="sendQuickQuestion(${i})" style="font-size:12px;padding:6px 12px;border-radius:100px;border:1.5px solid var(--border-gray);background:var(--cream-2);color:var(--text-2);cursor:pointer;font-family:'Inter',sans-serif">${esc(lang==='es'?q.es:q.en)}</button>`
+  ).join('');
+}
+
+// Preguntas sugeridas: respuesta instantánea y fija (sin llamar a la IA),
+// para que estas respuestas siempre sean exactas y consistentes.
+function sendQuickQuestion(index){
+  const q=HELP_CHAT_QUICK_QUESTIONS[index];
+  if(!q) return;
+  const questionText=lang==='es'?q.es:q.en;
+  const answerText=lang==='es'?q.answerEs:q.answerEn;
+  addHelpChatBubble('user',questionText);
+  helpChatMessages.push({role:'user',content:questionText});
+  addHelpChatBubble('assistant',answerText);
+  helpChatMessages.push({role:'assistant',content:answerText});
+}
+
+// Si lo que el usuario escribió a mano se parece mucho a una pregunta
+// rápida ya definida, usamos esa respuesta fija en vez de llamar a la IA
+// — más rápido y siempre exacto para las preguntas más comunes.
+function findMatchingQuickAnswer(text){
+  const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿?¡!]/g,'').trim();
+  const userNorm=norm(text);
+  for(const q of HELP_CHAT_QUICK_QUESTIONS){
+    if(norm(q.es)===userNorm||norm(q.en)===userNorm) return q;
+  }
+  return null;
 }
 
 function addHelpChatBubble(role,text){
@@ -2369,6 +2448,16 @@ async function sendHelpChatMessage(){
   input.value='';
   addHelpChatBubble('user',text);
   helpChatMessages.push({role:'user',content:text});
+
+  // ¿Es casi idéntico a una de las preguntas rápidas? Responder al
+  // instante con la respuesta fija, sin gastar una llamada a la IA.
+  const quickMatch=findMatchingQuickAnswer(text);
+  if(quickMatch){
+    const answerText=lang==='es'?quickMatch.answerEs:quickMatch.answerEn;
+    addHelpChatBubble('assistant',answerText);
+    helpChatMessages.push({role:'assistant',content:answerText});
+    return;
+  }
 
   const thinkingId='thinking-'+Date.now();
   const box=document.getElementById('help-chat-messages');
@@ -2472,10 +2561,25 @@ const BG_COLORS=[
   {hex:'#FAEDE3',name:{es:'Durazno',en:'Peach'}},
   {hex:'#F0EFEC',name:{es:'Gris piedra',en:'Stone gray'}},
   {hex:'#E6F5F0',name:{es:'Menta',en:'Mint'}},
-  {hex:'#F7F1E3',name:{es:'Champagne',en:'Champagne'}}
+  {hex:'#F7F1E3',name:{es:'Champagne',en:'Champagne'}},
+  {hex:'#FF6FA5',name:{es:'Rosa chicle',en:'Bubblegum pink'}},
+  {hex:'#3B9EFF',name:{es:'Azul brillante',en:'Bright blue'}},
+  {hex:'#FFD23F',name:{es:'Amarillo sol',en:'Sunshine yellow'}},
+  {hex:'#00C9A7',name:{es:'Turquesa vivo',en:'Bright turquoise'}},
+  {hex:'#FF8C42',name:{es:'Naranja vivo',en:'Bright orange'}}
 ];
 
-// 7 fuentes para el nombre de los anfitriones
+// 5 fondos degradados de colores — usan background (no background-color),
+// así que su valor se guarda tal cual (no es un hex simple).
+const BG_GRADIENTS=[
+  {value:'linear-gradient(135deg,#FFD3E0,#FFF3C4,#C8F4DE,#C4E1FF)',name:{es:'Arcoíris pastel',en:'Pastel rainbow'}},
+  {value:'linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)',name:{es:'Atardecer',en:'Sunset'}},
+  {value:'linear-gradient(135deg,#A1C4FD,#C2E9FB)',name:{es:'Cielo',en:'Sky'}},
+  {value:'linear-gradient(135deg,#FBC2EB,#A6C1EE)',name:{es:'Dulce',en:'Candy'}},
+  {value:'linear-gradient(135deg,#D4FC79,#96E6A1)',name:{es:'Menta-limón',en:'Mint-lemon'}}
+];
+
+// 10 fuentes para el nombre de los anfitriones (7 originales + 3 divertidas)
 const FONT_OPTIONS=[
   {cls:'',family:"'Cormorant Garamond',serif",label:{es:'Elegante',en:'Elegant'}},
   {cls:'font-classic',family:"'Playfair Display',serif",label:{es:'Clásica',en:'Classic'}},
@@ -2483,7 +2587,10 @@ const FONT_OPTIONS=[
   {cls:'font-script',family:"'Dancing Script',cursive",weight:700,label:{es:'Script',en:'Script'}},
   {cls:'font-soft',family:"'Libre Baskerville',serif",label:{es:'Serif suave',en:'Soft serif'}},
   {cls:'font-round',family:"'Poppins',sans-serif",label:{es:'Redondeada',en:'Rounded'}},
-  {cls:'font-editorial',family:"'Cinzel',serif",label:{es:'Editorial',en:'Editorial'}}
+  {cls:'font-editorial',family:"'Cinzel',serif",label:{es:'Editorial',en:'Editorial'}},
+  {cls:'font-fun',family:"'Fredoka',sans-serif",weight:600,label:{es:'Divertida',en:'Fun'}},
+  {cls:'font-comic',family:"'Comic Neue',cursive",weight:700,label:{es:'Amigable',en:'Friendly'}},
+  {cls:'font-playful',family:"'Chewy',cursive",label:{es:'Juguetona',en:'Playful'}}
 ];
 
 // 10 colores de texto/detalles
@@ -2713,11 +2820,35 @@ function init(){
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   updateAccountUI();
-  refreshPaidStatus(); // confirma sesión y pago contra Supabase, no solo el caché local
+  refreshPaidStatus().then(checkReturnFromPayment); // confirma sesión y pago contra Supabase, no solo el caché local
   const d=new Date(); d.setMonth(d.getMonth()+6);
   document.getElementById('f-date').value=d.toISOString().split('T')[0];
   document.getElementById('f-date').min=new Date().toISOString().split('T')[0];
   ['f-name','f-name-1','f-name-2','f-location','f-notes'].forEach(id=>document.getElementById(id).addEventListener('input',updateProgress));
+}
+
+// Si el usuario acaba de volver de pagar en Stripe (Payment Link con
+// redirect a ?session_id=...), le confirmamos qué pasó — sin esto, alguien
+// que pagó con OXXO/SPEI (que tarda en confirmarse) regresa y no ve
+// ningún crédito todavía, lo cual parece que algo falló cuando en
+// realidad solo está pendiente de que se confirme el pago.
+function checkReturnFromPayment(){
+  const params=new URLSearchParams(location.search);
+  const sessionId=params.get('session_id');
+  if(!sessionId) return;
+  const L=lang==='es';
+  const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+  if(hasAnyAccess){
+    showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
+  } else {
+    showToast(L
+      ?'🕐 Recibimos tu pago. Si fue con tarjeta, actualiza en unos segundos; si fue OXXO o transferencia, puede tardar unas horas en confirmarse.'
+      :"🕐 We received your payment. If it was by card, refresh in a few seconds; if it was OXXO or a bank transfer, it may take a few hours to confirm.");
+  }
+  // Limpiar el parámetro de la URL para que no se repita el aviso al recargar
+  params.delete('session_id');
+  const cleanUrl=location.pathname+(params.toString()?'?'+params.toString():'');
+  history.replaceState({},'',cleanUrl);
 }
 
 function setLang(l){
@@ -2735,6 +2866,7 @@ function setLang(l){
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
   renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
+  if(helpChatOpen) renderHelpChatQuickQuestions();
   if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_lang:l});
 }
 
@@ -3260,11 +3392,16 @@ function wrapSTDCard(cardHtml){
   const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
 
   const bgSwatchHtml=BG_COLORS.map((c,i)=>
-    `<span class="theme-swatch" style="background:${c.hex}" onclick="setSTDBgColor('${c.hex}',this)" title="${esc(c.name[p.lang]||c.name.es)}"></span>`
+    `<span class="theme-swatch" style="background:${c.hex}" data-bg-value="${c.hex}" onclick="setSTDBgColor('${c.hex}',this)" title="${esc(c.name[p.lang]||c.name.es)}"></span>`
+  ).join('');
+  const gradientSwatchHtml=BG_GRADIENTS.map((g,i)=>
+    `<span class="theme-swatch" style="background:${g.value}" data-bg-value="${esc(g.value)}" onclick="setSTDBgColor('${g.value}',this)" title="${esc(g.name[p.lang]||g.name.es)}"></span>`
   ).join('');
 
   const themePicker=`<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Color de fondo':'Background color'}</p>
 <div class="std-theme-picker" style="margin-bottom:.6rem">${bgSwatchHtml}</div>
+<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Fondos degradados':'Gradient backgrounds'}</p>
+<div class="std-theme-picker" style="margin-bottom:.6rem">${gradientSwatchHtml}</div>
 <div style="text-align:center;margin:.4rem 0 1rem">
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
@@ -4514,13 +4651,14 @@ function shareSTDWA(){
 
 // Un solo mecanismo simple: fondo de color sólido, aplicado directo como
 // background-color (ya no hay clases de tema con patrones/dibujos).
-function setSTDBgColor(hex,el){
+function setSTDBgColor(value,el){
   const card=document.querySelector('#content-savethedate .std-card');
   if(!card) return;
   if(document.activeElement&&document.activeElement.isContentEditable) document.activeElement.blur();
   card.classList.remove('theme-custom-photo');
   card.style.backgroundImage='';
-  card.style.backgroundColor=hex;
+  card.style.background=value;
+  card.dataset.bgValue=value;
   document.querySelectorAll('#content-savethedate .theme-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
 }
@@ -4630,7 +4768,7 @@ async function onGalleryFilesSelected(event){
 function setSTDFont(fontClass,el){
   const names=document.querySelector('#content-savethedate .std-card .std-names');
   if(!names) return;
-  names.classList.remove('font-classic','font-modern','font-script','font-soft','font-round','font-editorial');
+  names.classList.remove('font-classic','font-modern','font-script','font-soft','font-round','font-editorial','font-fun','font-comic','font-playful');
   if(fontClass) names.classList.add(fontClass);
   document.querySelectorAll('#content-savethedate .font-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
