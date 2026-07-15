@@ -1282,6 +1282,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   </div>
 </div>
 
+<div class="excel-modal-overlay" id="testimonial-modal" onclick="if(event.target===this) closeTestimonialModal()">
+  <div class="excel-modal">
+    <h3 style="text-align:center" data-es="💌 ¿Nos regalas tu opinión?" data-en="💌 Mind sharing your thoughts?">💌 ¿Nos regalas tu opinión?</h3>
+    <p style="font-size:13px;color:var(--text-2);text-align:center;margin-bottom:1rem" data-es="Eres de los primeros en probar DragonflAI Events — tu opinión nos ayuda muchísimo, y con tu permiso, nos encantaría compartirla en la página principal." data-en="You're one of the first to try DragonflAI Events — your feedback helps a lot, and with your permission, we'd love to feature it on the homepage.">Eres de los primeros en probar DragonflAI Events — tu opinión nos ayuda muchísimo, y con tu permiso, nos encantaría compartirla en la página principal.</p>
+    <textarea id="testimonial-message" class="profile-input" style="min-height:110px;resize:vertical" placeholder="ej. Lo que más me sorprendió fue..."></textarea>
+    <button class="btn-excel-unlock" style="margin-top:.75rem" onclick="submitTestimonial()" data-es="Enviar mi opinión" data-en="Send my feedback">Enviar mi opinión</button>
+    <button class="btn-excel-close" onclick="closeTestimonialModal()" data-es="Ahora no" data-en="Not now">Ahora no</button>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════
 //  CONFIG
@@ -3260,6 +3270,7 @@ async function generate(){
 
   gensUsed++; localStorage.setItem('dflai_gens',gensUsed); updateGenBadge();
   startCountdown();
+  maybeAskForTestimonial();
 }
 
 function setTabHTML(id,html){
@@ -4905,6 +4916,40 @@ async function submitBugReport(){
   if(error){ showToast(lang==='es'?'No se pudo enviar el reporte, intenta de nuevo':'Could not send the report, try again',true); return; }
   closeBugReportModal();
   showToast(lang==='es'?'✅ ¡Gracias! Ya lo tenemos anotado':'✅ Thanks! We\'ve got it noted');
+}
+
+function openTestimonialModal(){
+  document.getElementById('testimonial-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function closeTestimonialModal(){
+  document.getElementById('testimonial-modal').classList.remove('open');
+  document.body.style.overflow='';
+  document.getElementById('testimonial-message').value='';
+}
+
+async function submitTestimonial(){
+  if(!sb||!currentUser) return;
+  const L=lang==='es';
+  const message=document.getElementById('testimonial-message').value.trim();
+  if(!message){ showToast(L?'Escribe tu opinión primero':'Write your feedback first',true); return; }
+
+  const {data,error}=await sb.rpc('submit_testimonial',{p_message:message,p_event_type:plan.typeName||null});
+  if(error||!data?.success){ showToast(L?'No se pudo enviar, intenta de nuevo':'Could not send, try again',true); return; }
+  closeTestimonialModal();
+  showToast(L?'💌 ¡Gracias por tu tiempo!':'💌 Thanks for your time!');
+}
+
+// Se llama después de generar un plan exitosamente — si esta persona
+// usó el código de beta y todavía no ha mandado su testimonio, se lo
+// pedimos (sin ser invasivos: puede decir "Ahora no" y seguir usando la app).
+async function maybeAskForTestimonial(){
+  if(!sb||!currentUser) return;
+  try{
+    const {data,error}=await sb.rpc('needs_beta_testimonial');
+    if(!error&&data===true) openTestimonialModal();
+  }catch(err){ console.error('Error revisando si pedir testimonio:',err); }
 }
 
 function showToast(msg,isErr=false){

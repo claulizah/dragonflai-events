@@ -85,6 +85,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
   <div id="dashboard-view" style="display:none">
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('usage',this)">📊 Uso</button>
+      <button class="tab-btn" onclick="showTab('beta',this)">🧪 Beta</button>
       <button class="tab-btn" onclick="showTab('arch',this)">🏗️ Arquitectura</button>
       <button class="tab-btn" onclick="showTab('creds',this)">🔑 Credenciales</button>
       <button class="tab-btn" onclick="showTab('workflow',this)">⚙️ Flujo de trabajo</button>
@@ -94,6 +95,11 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
     <div id="tab-usage" class="tab-panel active">
       <button class="refresh-btn" onclick="loadUsage()">↻ Actualizar</button>
       <div id="dashboard-content"><p class="loading">Cargando…</p></div>
+    </div>
+
+    <div id="tab-beta" class="tab-panel">
+      <button class="refresh-btn" onclick="loadUsage()">↻ Actualizar</button>
+      <div id="beta-content"><p class="loading">Cargando…</p></div>
     </div>
 
     <div id="tab-arch" class="tab-panel">
@@ -339,6 +345,68 @@ function renderDashboard(data){
     html += `<div class="stat-row"><div class="stat"><b>$${(data.anthropic.cost_last_30d_usd||0).toFixed(2)} USD</b>Gasto (últimos 30 días)</div></div>`;
   } else {
     html += `<div class="err-msg">${data.anthropic?.error || 'Sin datos'}</div>`;
+  }
+  html += '</div>';
+
+  content.innerHTML = html;
+  renderBetaContent(data.beta);
+}
+
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtDate(d){ return d ? new Date(d).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'}) : '—'; }
+
+function renderBetaContent(beta){
+  const content = document.getElementById('beta-content');
+  if(!content) return;
+  if(!beta || beta.error){
+    content.innerHTML = `<div class="err-msg">${beta?.error || 'Sin datos'}</div>`;
+    return;
+  }
+
+  let html = '';
+
+  // ── Beta testers (quién ha canjeado un código) ──
+  html += '<div class="card"><h2>🧪 Quién ha probado (canjeó un código)</h2>';
+  const testers = beta.beta_testers || [];
+  if(testers.length){
+    html += `<p style="font-size:12.5px;color:var(--text-3);margin-bottom:.6rem">${testers.length} canje(s) registrados</p>`;
+    html += '<table class="cred-table"><tr><th>Correo</th><th>Código</th><th>Cuándo</th></tr>';
+    testers.forEach(t=>{
+      html += `<tr><td>${esc(t.user_email||'—')}</td><td>${esc(t.code||'—')}</td><td>${fmtDate(t.redeemed_at)}</td></tr>`;
+    });
+    html += '</table>';
+  } else {
+    html += '<p style="font-size:13px;color:var(--text-3)">Todavía nadie ha canjeado un código.</p>';
+  }
+  html += '</div>';
+
+  // ── Testimonios recibidos ──
+  html += '<div class="card"><h2>💌 Testimonios recibidos</h2>';
+  const testimonials = beta.testimonials || [];
+  if(testimonials.length){
+    testimonials.forEach(t=>{
+      html += `<div style="padding:10px 0;border-top:1px solid var(--border-gray)">
+        <p style="font-style:italic;font-size:13.5px;color:var(--text);margin-bottom:.3rem">"${esc(t.message)}"</p>
+        <p style="font-size:11.5px;color:var(--text-3)">${esc(t.user_email||'—')} · ${esc(t.event_type||'')} · ${fmtDate(t.created_at)} ${t.is_published?'· <span style="color:var(--teal-dark);font-weight:600">✓ Publicado</span>':''}</p>
+      </div>`;
+    });
+  } else {
+    html += '<p style="font-size:13px;color:var(--text-3)">Todavía no hay testimonios — se piden automáticamente a quien canjee BETA2026 después de generar su plan.</p>';
+  }
+  html += '</div>';
+
+  // ── Reportes de bugs ──
+  html += '<div class="card"><h2>🐞 Reportes de bugs</h2>';
+  const bugs = beta.bug_reports || [];
+  if(bugs.length){
+    bugs.forEach(b=>{
+      html += `<div style="padding:10px 0;border-top:1px solid var(--border-gray)">
+        <p style="font-size:13.5px;color:var(--text);margin-bottom:.3rem">${esc(b.message)}</p>
+        <p style="font-size:11.5px;color:var(--text-3)">${esc(b.user_email||'anónimo')} · página: ${esc(b.page||'—')} · ${fmtDate(b.created_at)}</p>
+      </div>`;
+    });
+  } else {
+    html += '<p style="font-size:13px;color:var(--text-3)">Sin reportes de bugs todavía 🎉</p>';
   }
   html += '</div>';
 

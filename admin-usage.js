@@ -106,12 +106,20 @@ export default async (request, context) => {
     const since = new Date(until.getTime() - 30 * 24 * 60 * 60 * 1000);
     const params = new URLSearchParams({
       starting_at: since.toISOString().slice(0, 10) + 'T00:00:00Z',
-      ending_at: until.toISOString().slice(0, 10) + 'T00:00:00Z'
+      ending_at: until.toISOString().slice(0, 10) + 'T00:00:00Z',
+      bucket_width: '1d',
+      limit: '31'
     });
     const resp = await fetch(`https://api.anthropic.com/v1/organizations/cost_report?${params}`, {
       headers: { 'anthropic-version': '2023-06-01', 'x-api-key': adminKey }
     });
-    if (!resp.ok) throw new Error(`Anthropic respondió ${resp.status}`);
+    if (!resp.ok) {
+      const bodyText = await resp.text().catch(() => '');
+      if (resp.status === 401) {
+        throw new Error('No disponible: la Admin API de Anthropic requiere un plan Team/Enterprise de Console — no existe para cuentas individuales. Puedes ver tu gasto manualmente en console.anthropic.com → Settings → Billing.');
+      }
+      throw new Error(`Anthropic respondió ${resp.status}: ${bodyText.slice(0, 200)}`);
+    }
     const data = await resp.json();
     let totalCents = 0;
     (data.data || []).forEach(bucket => {
@@ -120,6 +128,25 @@ export default async (request, context) => {
     results.anthropic = { cost_last_30d_usd: totalCents / 100 };
   } catch (err) {
     results.anthropic = { error: String(err.message || err) };
+  }
+
+  // ── Beta: bugs reportados, testimonios, y quién ha probado ──
+  try {
+    const serviceKey = Netlify.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!serviceKey) throw new Error('Falta SUPABASE_SERVICE_ROLE_KEY');
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_beta_dashboard`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: '{}'
+    });
+    if (!resp.ok) throw new Error(`Supabase respondió ${resp.status}`);
+    results.beta = await resp.json();
+  } catch (err) {
+    results.beta = { error: String(err.message || err) };
   }
 
   return new Response(JSON.stringify(results), {
