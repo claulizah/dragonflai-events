@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <meta name="description" content="Estás invitado — confirma tu asistencia aquí.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
@@ -26,69 +26,25 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2rem;opacity:.7}
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
 
-/* ── TARJETA (mismos temas que el Save the Date de la app) ── */
+/* ── TARJETA (mismos colores que el Save the Date de la app) ── */
 .card{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:3rem 2rem;text-align:center;background:var(--cream);border:1px solid var(--border-gray);box-shadow:var(--shadow-md);margin-bottom:1.5rem}
-.card.theme-teal .eyebrow,.card.theme-teal .hashtag{color:var(--teal-dark)}
-.card.theme-blush .eyebrow,.card.theme-blush .hashtag{color:#C14A5E}
-.card.theme-gold .eyebrow,.card.theme-gold .hashtag{color:#B8860B}
-.card.theme-sage .eyebrow,.card.theme-sage .hashtag{color:#5A7C52}
-.card.theme-night .eyebrow,.card.theme-night .hashtag{color:#1A2332}
-.card.theme-blanco{background-color:#FFFFFF!important}
-.card.theme-blanco .eyebrow,.card.theme-blanco .hashtag{color:var(--text-3)}
-/* ── Fondos con detalle decorativo — mismos 4 que en el Save the Date de la app ── */
-.card.theme-confetti{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
-.card.theme-confetti .eyebrow,.card.theme-confetti .hashtag{color:#C14A5E}
-.floral-corner{display:none;position:absolute;width:82px;height:82px;pointer-events:none;z-index:2}
-.card.theme-confetti .floral-corner{display:block}
-.floral-corner.fc-tl{top:0;left:0}
-.floral-corner.fc-br{bottom:0;right:0;transform:rotate(180deg)}
-.card.theme-waves{background-color:#FFFEFB!important;border:1.5px solid rgba(90,124,82,.35)!important}
-.card.theme-waves .eyebrow,.card.theme-waves .hashtag{color:#5A7C52}
-.card.theme-paper{background-color:#FFFEFC!important;border:1.5px solid rgba(139,115,85,.35)!important}
-.card.theme-paper .eyebrow,.card.theme-paper .hashtag{color:#8B7355}
-.card.theme-sparkle{background-color:#FFFEFA!important;border:1.5px solid rgba(212,151,42,.4)!important}
-.card.theme-sparkle .eyebrow,.card.theme-sparkle .hashtag{color:#B8860B}
-.card.theme-balloons{background-color:#FFFEFC!important;border:1.5px solid rgba(232,99,122,.3)!important}
-.card.theme-balloons .eyebrow,.card.theme-balloons .hashtag{color:#C14A5E}
-.card.theme-clouds{background-color:#FDFEFF!important;border:1.5px solid rgba(184,212,234,.5)!important}
-.card.theme-clouds .eyebrow,.card.theme-clouds .hashtag{color:#5A8FBE}
-.card.theme-geometric{background-color:#FFFFFF!important;border:1.5px solid rgba(13,27,42,.25)!important}
-.card.theme-geometric .eyebrow,.card.theme-geometric .hashtag{color:#0D1B2A}
-.card.theme-graduation{background-color:#FFFEFC!important;border:1.5px solid rgba(212,151,42,.4)!important}
-.card.theme-graduation .eyebrow,.card.theme-graduation .hashtag{color:#1A2332}
-.card.theme-hearts{background-color:#FFFCFC!important;border:1.5px solid rgba(232,99,122,.35)!important}
-.card.theme-hearts .eyebrow,.card.theme-hearts .hashtag{color:#C14A5E}
-.card.theme-animals{background-color:#FFFEFB!important;border:1.5px solid rgba(212,151,42,.35)!important}
-.card.theme-animals .eyebrow,.card.theme-animals .hashtag{color:#B8860B}
-.leaf-corner,.flourish-corner,.sparkle-corner,.balloon-corner,.cloud-corner,.geo-corner,.grad-corner,.heart-corner,.animal-corner{display:none;position:absolute;width:82px;height:82px;pointer-events:none;z-index:2}
-.card.theme-waves .leaf-corner{display:block}
-.card.theme-paper .flourish-corner{display:block}
-.card.theme-sparkle .sparkle-corner{display:block}
-.card.theme-balloons .balloon-corner{display:block}
-.card.theme-clouds .cloud-corner{display:block}
-.card.theme-geometric .geo-corner{display:block}
-.card.theme-graduation .grad-corner{display:block}
-.card.theme-hearts .heart-corner{display:block}
-.card.theme-animals .animal-corner{display:block}
-.leaf-corner.fc-tl,.flourish-corner.fc-tl,.sparkle-corner.fc-tl,.balloon-corner.fc-tl,.cloud-corner.fc-tl,.geo-corner.fc-tl,.grad-corner.fc-tl,.heart-corner.fc-tl,.animal-corner.fc-tl{top:0;left:0}
-.leaf-corner.fc-br,.flourish-corner.fc-br,.sparkle-corner.fc-br,.balloon-corner.fc-br,.cloud-corner.fc-br,.geo-corner.fc-br,.grad-corner.fc-br,.heart-corner.fc-br,.animal-corner.fc-br{bottom:0;right:0;transform:rotate(180deg)}
-/* ── Foto de fondo personalizada — con overlay claro para que el texto se lea ── */
-.card.theme-custom-color{background-color:#FFFEFC!important;border:1.5px solid var(--custom-accent-border,rgba(0,0,0,.15))!important}
-.card.theme-custom-color .eyebrow,.card.theme-custom-color .hashtag{color:var(--custom-accent-color,#1A2332)}
+/* Fondo con foto propia — con overlay claro para que el texto se lea */
 .card.theme-custom-photo{background-size:cover!important;background-position:center!important;position:relative}
 .card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0;border-radius:inherit}
 .card.theme-custom-photo>*{position:relative;z-index:1}
-.card.theme-custom-photo .eyebrow,.card.theme-custom-photo .hashtag{color:var(--violet)}
-.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:1rem;font-weight:600}
+.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--custom-text-color,var(--teal-dark));margin-bottom:1rem;font-weight:600}
 .names{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
 .names.font-classic{font-family:'Playfair Display',serif}
 .names.font-modern{font-family:'Montserrat',sans-serif;letter-spacing:.02em}
 .names.font-script{font-family:'Dancing Script',cursive;font-weight:700}
+.names.font-soft{font-family:'Libre Baskerville',serif}
+.names.font-round{font-family:'Poppins',sans-serif}
+.names.font-editorial{font-family:'Cinzel',serif}
 .divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
 .details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px;color:var(--text-2)}
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
 .msg{font-size:13px;color:var(--text-2);font-style:italic;margin-top:.5rem}
-.hashtag{font-size:13px;color:var(--teal-dark);font-weight:600;margin-top:.6rem}
+.hashtag{font-size:13px;color:var(--custom-text-color,var(--teal-dark));font-weight:600;margin-top:.6rem}
 .countdown{display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem}
 .cd-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--teal-dark)}
 .cd-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
@@ -340,99 +296,6 @@ function setLang(l){
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toTitleCase(s){ return String(s??'').toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase()); }
 
-function getFloralCornerSVG(){
-  const floral=`
-    <path d="M4,60 Q4,10 10,6 Q40,2 60,4" stroke="#D4972A" stroke-width="1" fill="none" opacity=".5"/>
-    <circle cx="10" cy="6" r="1.4" fill="#D4972A" opacity=".7"/>
-    <circle cx="35" cy="3" r="1.1" fill="#D4972A" opacity=".6"/>
-    <circle cx="55" cy="4.5" r="1" fill="#D4972A" opacity=".5"/>
-    <ellipse cx="22" cy="18" rx="12" ry="4.5" fill="#7A9B6E" opacity=".65" transform="rotate(-35 22 18)"/>
-    <ellipse cx="12" cy="28" rx="10" ry="4" fill="#8FAE7F" opacity=".55" transform="rotate(25 12 28)"/>
-    <ellipse cx="30" cy="10" rx="9" ry="3.5" fill="#7A9B6E" opacity=".5" transform="rotate(-10 30 10)"/>
-    <g transform="translate(26,22)">
-      <circle r="9" fill="#F4C2CE"/>
-      <circle cx="-3" cy="-2" r="7" fill="#EDA3B5"/>
-      <circle cx="2" cy="-4" r="5.2" fill="#E8899C"/>
-      <circle cx="-1" cy="-1" r="3.2" fill="#D96E85"/>
-    </g>
-    <g transform="translate(11,10)">
-      <circle r="5" fill="#F4C2CE" opacity=".9"/>
-      <circle cx="-1.5" cy="-1" r="3.6" fill="#EDA3B5"/>
-      <circle cx="0.5" cy="-1.5" r="2" fill="#D96E85"/>
-    </g>`;
-  const leaf=`
-    <path d="M5,58 Q8,26 15,10" stroke="#5A7C52" stroke-width="1.2" fill="none" opacity=".5"/>
-    <ellipse cx="14" cy="14" rx="9" ry="3.5" fill="#7A9B6E" opacity=".75" transform="rotate(-40 14 14)"/>
-    <ellipse cx="10" cy="25" rx="8" ry="3.2" fill="#8FAE7F" opacity=".65" transform="rotate(35 10 25)"/>
-    <ellipse cx="19" cy="8" rx="7" ry="2.8" fill="#6B8F5F" opacity=".6" transform="rotate(-15 19 8)"/>
-    <ellipse cx="7" cy="37" rx="7" ry="3" fill="#7A9B6E" opacity=".5" transform="rotate(50 7 37)"/>
-    <ellipse cx="24" cy="17" rx="6" ry="2.5" fill="#8FAE7F" opacity=".55" transform="rotate(-5 24 17)"/>
-    <ellipse cx="16" cy="30" rx="6.5" ry="2.6" fill="#6B8F5F" opacity=".5" transform="rotate(60 16 30)"/>`;
-  const flourish=`
-    <path d="M4,48 Q4,16 22,8 Q38,2 55,6" stroke="#8B7355" stroke-width="1" fill="none" opacity=".55"/>
-    <path d="M8,42 Q11,22 24,15" stroke="#8B7355" stroke-width=".7" fill="none" opacity=".4"/>
-    <circle cx="22" cy="8" r="1.3" fill="#8B7355" opacity=".6"/>
-    <circle cx="4" cy="48" r="1" fill="#8B7355" opacity=".5"/>
-    <circle cx="24" cy="15" r=".8" fill="#D4972A" opacity=".55"/>`;
-  const sparkle=`
-    <path d="M18,2 L21,15 L34,18 L21,21 L18,34 L15,21 L2,18 L15,15 Z" fill="#D4972A" opacity=".8"/>
-    <path d="M42,22 L43,27 L48,28 L43,29 L42,34 L41,29 L36,28 L41,27 Z" fill="#D4972A" opacity=".6"/>
-    <circle cx="10" cy="40" r="1.5" fill="#D4972A" opacity=".55"/>
-    <circle cx="47" cy="10" r="1.2" fill="#7B2FBE" opacity=".45"/>
-    <circle cx="30" cy="42" r="1" fill="#D4972A" opacity=".4"/>`;
-
-  const balloons=`
-    <ellipse cx="15" cy="18" rx="8" ry="10" fill="#E8637A" opacity=".7"/>
-    <path d="M15,28 Q17,34 15,42" stroke="#E8637A" stroke-width=".8" fill="none" opacity=".5"/>
-    <ellipse cx="29" cy="11" rx="6" ry="7.5" fill="#4A7FBE" opacity=".65"/>
-    <path d="M29,18.5 Q31,24 29,32" stroke="#4A7FBE" stroke-width=".7" fill="none" opacity=".45"/>
-    <ellipse cx="7" cy="32" rx="5" ry="6.2" fill="#D4972A" opacity=".6"/>
-    <path d="M7,38 Q9,42 7,47" stroke="#D4972A" stroke-width=".6" fill="none" opacity=".4"/>
-    <circle cx="36" cy="26" r="1.5" fill="#E8637A" opacity=".45"/>
-    <rect x="20" y="36" width="2.5" height="2.5" fill="#4A7FBE" opacity=".45" transform="rotate(20 21 37)"/>
-    <circle cx="5" cy="10" r="1.2" fill="#D4972A" opacity=".4"/>`;
-  const clouds=`
-    <ellipse cx="15" cy="16" rx="10" ry="6" fill="#B8D4EA" opacity=".65"/>
-    <ellipse cx="23" cy="14" rx="7" ry="5" fill="#B8D4EA" opacity=".6"/>
-    <ellipse cx="8" cy="14" rx="6" ry="4.5" fill="#CBE0F0" opacity=".55"/>
-    <ellipse cx="12" cy="31" rx="7" ry="4.5" fill="#F4C2CE" opacity=".5"/>
-    <ellipse cx="20" cy="30" rx="5" ry="3.5" fill="#F4C2CE" opacity=".45"/>
-    <path d="M33,9 L34,12 L37,13 L34,14 L33,17 L32,14 L29,13 L32,12 Z" fill="#D4972A" opacity=".45"/>
-    <circle cx="6" cy="24" r="1" fill="#D4972A" opacity=".4"/>`;
-  const geo=`
-    <polygon points="10,5 25,5 32,20 25,35 10,35 3,20" fill="none" stroke="#0D1B2A" stroke-width="1" opacity=".35"/>
-    <line x1="8" y1="8" x2="20" y2="8" stroke="#4A7FBE" stroke-width=".8" opacity=".4"/>
-    <line x1="8" y1="14" x2="16" y2="14" stroke="#4A7FBE" stroke-width=".8" opacity=".3"/>
-    <circle cx="31" cy="31" r="2" fill="none" stroke="#0D1B2A" stroke-width=".8" opacity=".35"/>
-    <circle cx="36" cy="16" r="1.3" fill="#4A7FBE" opacity=".4"/>`;
-  const grad=`
-    <g transform="translate(15,15)">
-      <polygon points="0,-10 13,-3 0,4 -13,-3" fill="#1A2332" opacity=".75"/>
-      <rect x="-3" y="-1" width="6" height="7" fill="#1A2332" opacity=".7"/>
-      <path d="M13,-3 L16,11" stroke="#D4972A" stroke-width="1" opacity=".55"/>
-      <circle cx="16" cy="12" r="1.8" fill="#D4972A" opacity=".6"/>
-    </g>
-    <path d="M30,5 L31,8 L34,9 L31,10 L30,13 L29,10 L26,9 L29,8 Z" fill="#D4972A" opacity=".45"/>
-    <circle cx="6" cy="32" r="1.2" fill="#D4972A" opacity=".4"/>`;
-  const hearts=`
-    <path d="M15,15 C12,9 4,11 4,18 C4,25 15,33 15,33 C15,33 26,25 26,18 C26,11 18,9 15,15 Z" fill="#E8637A" opacity=".65"/>
-    <path d="M33,9 C31,6 26,7 26,11.5 C26,16 33,21 33,21 C33,21 40,16 40,11.5 C40,7 35,6 33,9 Z" fill="#E8637A" opacity=".45"/>
-    <circle cx="10" cy="38" r="1.2" fill="#D4972A" opacity=".4"/>`;
-  const animals=`
-    <ellipse cx="10" cy="9" rx="3" ry="8" fill="#F4C2CE" opacity=".7" transform="rotate(-15 10 9)"/>
-    <ellipse cx="20" cy="9" rx="3" ry="8" fill="#F4C2CE" opacity=".7" transform="rotate(15 20 9)"/>
-    <circle cx="15" cy="23" r="9" fill="#FFF6E8" opacity=".75"/>
-    <circle cx="11" cy="21" r="1.3" fill="#1A2332" opacity=".65"/>
-    <circle cx="19" cy="21" r="1.3" fill="#1A2332" opacity=".65"/>
-    <ellipse cx="15" cy="25" rx="1.5" ry="1" fill="#E8899C" opacity=".55"/>
-    <circle cx="35" cy="32" r="4" fill="#D4972A" opacity=".3"/>`;
-
-  const wrap=(cls,content)=>`<svg class="${cls} fc-tl" viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg">${content}</svg><svg class="${cls} fc-br" viewBox="0 0 82 82" xmlns="http://www.w3.org/2000/svg">${content}</svg>`;
-
-  return wrap('floral-corner',floral)+wrap('leaf-corner',leaf)+wrap('flourish-corner',flourish)+wrap('sparkle-corner',sparkle)
-    +wrap('balloon-corner',balloons)+wrap('cloud-corner',clouds)+wrap('geo-corner',geo)+wrap('grad-corner',grad)+wrap('heart-corner',hearts)+wrap('animal-corner',animals);
-}
-
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
@@ -472,7 +335,7 @@ function getSlug(){
   const parts=path.split('/').filter(Boolean);
   const idxI=parts.indexOf('i');
   if(idxI!==-1 && parts[idxI+1]) return decodeURIComponent(parts[idxI+1]);
-  const knownPages=['index.html','terminos.html','aviso-de-privacidad.html','dragonflai-v2.html','invitacion.html','invitation-og.js','worker.js'];
+  const knownPages=['index.html','terminos.html','aviso-de-privacidad.html','dragonflai-v2.html','invitacion.html','invitation-og.js','worker.js','app'];
   if(parts.length===1 && !knownPages.includes(parts[0])) return decodeURIComponent(parts[0]);
   const qs=new URLSearchParams(location.search);
   return qs.get('slug')||qs.get('i')||'';
@@ -565,10 +428,15 @@ function renderInvitation(inv){
   const days=daysUntil(inv.event_date_raw);
   const t=T[lang];
   const restricted=!!inv.restrict_to_guest_list;
+  const bgColor=inv.custom_color_hex||'#FAF9F7'; // si es de antes de simplificar fondos, cae al crema por defecto
+  const cardStyleParts=[];
+  if(inv.background_image_url) cardStyleParts.push(`background-image:url('${esc(inv.background_image_url)}')`);
+  else cardStyleParts.push(`background-color:${esc(bgColor)}`);
+  if(inv.text_color) cardStyleParts.push(`--custom-text-color:${esc(inv.text_color)}`);
   document.getElementById('content').innerHTML=`
-    <div class="card ${esc(inv.theme||'theme-teal')}"${inv.background_image_url?` style="background-image:url('${esc(inv.background_image_url)}')"`:(inv.theme==='theme-custom-color'&&inv.custom_color_hex?` style="--custom-accent-color:${esc(inv.custom_color_hex)};--custom-accent-border:${esc(inv.custom_color_hex)}40"`:'')}>${getFloralCornerSVG()}
+    <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}" style="${cardStyleParts.join(';')}">
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
-      <div class="names${inv.font_family?' '+esc(inv.font_family):''}"${inv.text_color?` style="--custom-text-color:${esc(inv.text_color)}"`:''}>${esc(toTitleCase(inv.host_names))}</div>
+      <div class="names${inv.font_family?' '+esc(inv.font_family):''}">${esc(toTitleCase(inv.host_names))}</div>
       <div class="divider"></div>
       <div class="details">
         ${inv.event_date?`<div class="detail-item">📅 ${esc(inv.event_date)}</div>`:''}
