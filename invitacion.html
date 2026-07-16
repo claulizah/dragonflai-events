@@ -41,16 +41,16 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .card.theme-custom-photo{background-size:cover!important;background-position:center!important;position:relative}
 .card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0;border-radius:inherit}
 .card.theme-custom-photo>*{position:relative;z-index:1}
-.eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--custom-text-color,var(--teal-dark));margin-bottom:1rem;font-weight:600}
-.names{font-size:clamp(2rem,7vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--custom-text-color,var(--teal-dark));margin-bottom:1rem;font-weight:600}
+.names{font-size:clamp(2.2rem,7.5vw,3.5rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
 .card.font-script .names{font-weight:700}
 .card.font-fun .names{font-weight:600}
 .card.font-comic .names{font-weight:700}
 .divider{width:60px;height:1px;background:var(--border-gray);margin:0 auto 1.2rem}
-.details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:14.5px;color:var(--text-2)}
+.details{display:flex;flex-direction:column;gap:8px;margin-bottom:1.2rem;font-size:16px;color:var(--text-2)}
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
-.msg{font-size:13px;color:var(--text-2);font-style:italic;margin-top:.5rem}
-.hashtag{font-size:13px;color:var(--custom-text-color,var(--teal-dark));font-weight:700;margin-top:.6rem}
+.msg{font-size:14.5px;color:var(--text-2);font-style:italic;margin-top:.5rem}
+.hashtag{font-size:14.5px;color:var(--custom-text-color,var(--teal-dark));font-weight:700;margin-top:.6rem}
 .countdown{display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem}
 .cd-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--teal-dark)}
 .cd-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
@@ -403,7 +403,7 @@ function renderExtraSections(inv,t){
     sections.push(`<div class="extra-card">
       <div class="extra-title">🏨 ${t.lodgingTitle}</div>
       ${inv.lodging_info?`<p class="extra-story">${esc(inv.lodging_info).replace(/\n/g,'<br>')}</p>`:''}
-      ${inv.map_url?`<a href="${esc(inv.map_url)}" target="_blank" rel="noopener" class="extra-link-btn">🗺️ ${t.seeOnMap}</a>`:''}
+      ${inv.map_url?`<div class="extra-links-row"><a href="${esc(inv.map_url)}" target="_blank" rel="noopener" class="extra-link-btn">🗺️ ${t.seeOnMap}</a></div>`:''}
     </div>`);
   }
 
