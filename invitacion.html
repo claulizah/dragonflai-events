@@ -21,7 +21,7 @@
   --shadow-md:0 8px 30px rgba(0,0,0,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page-wash-color,transparent) 0%,transparent 480px),var(--cream);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
 .wrap{max-width:820px;width:100%}
 .brand{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:2rem;opacity:.7}
 .brand span{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text-2)}
@@ -59,24 +59,25 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .rsvp-card{background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-md)}
 
 /* ── Secciones extra: historia, itinerario, hospedaje, galería, regalos, FAQ ── */
-.extra-card{background:var(--extra-card-bg,var(--white));border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow-md);margin-bottom:1.25rem}
-.extra-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:1rem;text-align:center}
-.extra-story{font-size:14px;line-height:1.7;color:var(--text-2);text-align:center}
+.extra-card{background:var(--white);border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow-md);margin-bottom:1.25rem}
+.extra-title{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--text);margin-bottom:1rem;text-align:center}
+.extra-story{font-size:15.5px;line-height:1.7;color:var(--text-2);text-align:center}
 .schedule-item{padding:12px 0;border-top:1px solid var(--border-gray)}
 .schedule-item:first-of-type{border-top:none}
-.schedule-name{font-weight:600;font-size:14.5px;color:var(--text);margin-bottom:3px}
-.schedule-meta{font-size:12.5px;color:var(--text-2);margin-bottom:2px}
+.schedule-name{font-weight:600;font-size:16px;color:var(--text);margin-bottom:3px}
+.schedule-meta{font-size:14px;color:var(--text-2);margin-bottom:2px}
 .schedule-desc{font-size:12.5px;color:var(--text-3);font-style:italic;margin-top:4px}
 .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .gallery-img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}
 .extra-links-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-.extra-link-btn{display:inline-block;padding:10px 18px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark);font-size:13px;font-weight:600;text-decoration:none;transition:all .2s}
+.extra-link-btn{display:inline-block;padding:10px 18px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark);font-size:14.5px;font-weight:600;text-decoration:none;transition:all .2s}
 .extra-link-btn:hover{background:var(--teal);color:#fff}
 .faq-item{padding:10px 0;border-top:1px solid var(--border-gray)}
 .faq-item:first-of-type{border-top:none}
-.faq-q{font-weight:600;font-size:13.5px;color:var(--text);margin-bottom:3px}
-.faq-a{font-size:13px;color:var(--text-2);line-height:1.5}
+.faq-q{font-weight:600;font-size:15px;color:var(--text);margin-bottom:3px}
+.faq-a{font-size:14.5px;color:var(--text-2);line-height:1.5}
 .rsvp-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;text-align:center;margin-bottom:1.5rem}
+.rsvp-trigger-btn{display:block;width:100%;background:var(--white);color:var(--custom-text-color,var(--teal-dark));border:1.5px solid var(--custom-text-color,var(--teal-dark));border-radius:100px;padding:14px;font-size:15px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:1.5rem;box-shadow:var(--shadow-md)}
 .field{margin-bottom:1rem}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:.4rem}
 .field input[type=text],.field input[type=number],.field textarea{width:100%;padding:11px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;background:var(--cream-2)}
@@ -454,15 +455,17 @@ function renderInvitation(inv){
   if(inv.background_image_url) cardStyleParts.push(`background-image:url('${esc(inv.background_image_url)}')`);
   else cardStyleParts.push(`background:${esc(bgColor)}`);
   if(inv.text_color) cardStyleParts.push(`--custom-text-color:${esc(inv.text_color)}`);
+  document.documentElement.style.setProperty('--custom-text-color',inv.text_color||'#0D6E65');
 
-  // Las tarjetas de "Nuestra historia", "Hospedaje", etc. usan un tono
-  // clarito del mismo color de fondo de la invitación, en vez de blanco
-  // liso — así se sienten parte del mismo diseño.
+  // Opción B: en vez de tintar cada tarjeta individual, el fondo de TODA
+  // la página lleva un "lavado" suave del color elegido — las tarjetas
+  // (Hospedaje, Mesa de regalos, etc.) quedan blancas puras, flotando
+  // encima de esa atmósfera de color.
   if(inv.background_image_url){
-    document.documentElement.style.setProperty('--extra-card-bg','rgba(255,255,255,.92)');
+    document.documentElement.style.setProperty('--page-wash-color','rgba(255,255,255,0)');
   } else {
     const repColor=extractRepresentativeColor(bgColor);
-    document.documentElement.style.setProperty('--extra-card-bg',hexToRgba(repColor,.08));
+    document.documentElement.style.setProperty('--page-wash-color',hexToRgba(repColor,.22));
   }
 
   document.getElementById('content').innerHTML=`
@@ -483,6 +486,8 @@ function renderInvitation(inv){
     </div>
     ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
 
+    <button type="button" class="rsvp-trigger-btn" onclick="openRsvpModal()">${t.rsvpTitle} →</button>
+
     ${renderExtraSections(inv,t)}
 
     <div class="extra-card">
@@ -499,9 +504,12 @@ function renderInvitation(inv){
       </div>
     </div>
 
-    <div class="rsvp-card">
-      <div class="rsvp-title">${t.rsvpTitle}</div>
-      <form id="rsvp-form">
+    <div class="modal-overlay" id="rsvp-modal-overlay" onclick="if(event.target===this) closeRsvpModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:210;padding:20px">
+     <div style="max-height:88vh;overflow-y:auto;width:100%;max-width:480px">
+      <div class="rsvp-card" style="position:relative">
+        <button type="button" onclick="closeRsvpModal()" style="position:absolute;top:14px;right:14px;background:var(--cream-2);border:none;border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer">✕</button>
+        <div class="rsvp-title">${t.rsvpTitle}</div>
+        <form id="rsvp-form">
         ${restricted?`
         <div class="field" id="field-name-search">
           <label>${t.yourName}</label>
@@ -564,12 +572,26 @@ function renderInvitation(inv){
           <button type="submit" class="btn-submit" id="btn-submit" disabled>${t.confirmBtn}</button>
         </div>
       </form>
+      </div>
+     </div>
     </div>`;
 
   document.getElementById('rsvp-form').addEventListener('submit',submitRSVP);
   if(restricted && selectedGuest) showSelectedGuest(selectedGuest);
   if(attending!==null) setAttending(attending);
   if(lodgingNeeded!==null && document.getElementById('opt-lodging-yes')) setLodging(lodgingNeeded);
+}
+
+function openRsvpModal(){
+  const overlay=document.getElementById('rsvp-modal-overlay');
+  if(overlay) overlay.style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeRsvpModal(){
+  const overlay=document.getElementById('rsvp-modal-overlay');
+  if(overlay) overlay.style.display='none';
+  document.body.style.overflow='';
 }
 
 async function onGuestSearchInput(){
