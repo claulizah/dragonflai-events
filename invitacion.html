@@ -711,6 +711,13 @@ function showGuestGroup(){
 
   const anyPending=groupMembers.some(m=>!m.already_responded);
   document.getElementById('rsvp-rest').style.display=anyPending?'block':'none';
+  // En modo grupo estas preguntas son compartidas para todo el grupo (no
+  // por persona) — antes se quedaban escondidas para siempre porque solo
+  // setAttending() (modo individual) las revelaba.
+  ['field-dietary','field-song','field-lodging','field-custom','field-message'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=anyPending?'block':'none';
+  });
   document.getElementById('btn-submit').disabled=true; // se habilita cuando marquen al menos a alguien
 }
 
