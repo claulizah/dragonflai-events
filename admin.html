@@ -365,6 +365,36 @@ function renderBetaContent(beta){
 
   let html = '';
 
+  // ── Usuarios registrados ──
+  html += '<div class="card"><h2>👤 Quién se ha registrado</h2>';
+  const users = beta.registered_users || [];
+  if(users.length){
+    html += `<p style="font-size:12.5px;color:var(--text-3);margin-bottom:.6rem">${users.length} cuenta(s)</p>`;
+    html += '<table class="cred-table"><tr><th>Correo</th><th>Registro</th><th>Último acceso</th><th>Créditos DIY</th><th>Pagado</th></tr>';
+    users.forEach(u=>{
+      html += `<tr><td>${esc(u.email||'—')}</td><td>${fmtDate(u.created_at)}</td><td>${fmtDate(u.last_sign_in_at)}</td><td>${u.diy_event_credits??0}</td><td>${u.paid?'✅':'—'}</td></tr>`;
+    });
+    html += '</table>';
+  } else {
+    html += '<p style="font-size:13px;color:var(--text-3)">Todavía nadie se ha registrado.</p>';
+  }
+  html += '</div>';
+
+  // ── Planes generados ──
+  html += '<div class="card"><h2>📋 Quién ha generado un plan</h2>';
+  const plans = beta.plans_created || [];
+  if(plans.length){
+    html += `<p style="font-size:12.5px;color:var(--text-3);margin-bottom:.6rem">${plans.length} plan(es) generado(s)</p>`;
+    html += '<table class="cred-table"><tr><th>Correo</th><th>Título</th><th>Tipo</th><th>Desbloqueado</th><th>Cuándo</th></tr>';
+    plans.forEach(p=>{
+      html += `<tr><td>${esc(p.user_email||'—')}</td><td>${esc(p.title||'—')}</td><td>${esc(p.event_type||'—')}</td><td>${p.full_access_unlocked?'✅':'—'}</td><td>${fmtDate(p.created_at)}</td></tr>`;
+    });
+    html += '</table>';
+  } else {
+    html += '<p style="font-size:13px;color:var(--text-3)">Todavía nadie ha generado un plan.</p>';
+  }
+  html += '</div>';
+
   // ── Beta testers (quién ha canjeado un código) ──
   html += '<div class="card"><h2>🧪 Quién ha probado (canjeó un código)</h2>';
   const testers = beta.beta_testers || [];

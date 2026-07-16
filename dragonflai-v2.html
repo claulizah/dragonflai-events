@@ -2,15 +2,20 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>DragonflAI Events — Planificador Inteligente</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2EC4B6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="DragonflAI">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -61,14 +66,33 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 input,textarea,[contenteditable="true"]{cursor:text}
 
 /* ── ORBS DE FONDO ── */
-.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.15}
+/* position:fixed + filter:blur(120px) es carísimo de repintar en Android.
+   Cuando el teclado abre (foco en un input) o hay scroll, Chrome Android a
+   veces no recompone bien esta capa y deja un recuadro gris sólido encima
+   del formulario hasta el siguiente repaint — eso es el bug reportado.
+   translateZ(0)+will-change fuerza su PROPIA capa de composición para que
+   no dependa del hilo principal, y en mobile bajamos el blur para que sea
+   mucho más barato de mantener. */
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.15;transform:translateZ(0);will-change:transform;backface-visibility:hidden;isolation:isolate}
 .bg-orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-150px;right:-150px}
 .bg-orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-150px;left:-150px}
-.bg-orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(46,196,182,.3),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.bg-orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(46,196,182,.3),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%) translateZ(0)}
+@media(max-width:768px){
+  /* En mobile el blur de 120px es el más caro de mantener frame a frame;
+     bajarlo a 40px resuelve el recuadro gris y de paso ayuda con la carga
+     lenta que también reportaron. El orb-3 (el más chico y menos visible)
+     se oculta del todo en mobile: es puro adorno detrás del formulario. */
+  .bg-orb{filter:blur(40px)}
+  .bg-orb-3{display:none}
+}
+
+/* ── FAB CLUSTER (soporte/ayuda) ── */
+#fab-cluster.open #fab-main{transform:rotate(45deg)}
+#fab-cluster.open .fab-sub{opacity:1;pointer-events:auto;transform:translateZ(0) translateY(0) scale(1)}
 
 /* ── LANG BAR ── */
 .lang-bar{position:relative;z-index:10;background:var(--white);padding:7px 2rem;display:flex;justify-content:flex-end;gap:8px;border-bottom:1px solid var(--border-gray)}
-.lang-btn{padding:4px 14px;border-radius:100px;border:1px solid var(--border-gray);background:var(--cream-2);color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:.03em}
+.lang-btn{padding:9px 14px;border-radius:100px;border:1px solid var(--border-gray);background:var(--cream-2);color:var(--text-2);font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;letter-spacing:.03em;min-height:38px}
 .lang-btn.active,.lang-btn:hover{background:rgba(46,196,182,.15);color:var(--teal);border-color:var(--teal)}
 
 /* ── HEADER ── */
@@ -111,14 +135,14 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 .mode-card.sel-pro{border-color:var(--violet);background:var(--violet-light);box-shadow:0 4px 20px rgba(123,47,190,.15)}
 .mode-card.sel-pro::before{background:linear-gradient(135deg,rgba(123,47,190,.08),transparent);opacity:1}
 .mc-icon{font-size:26px;margin-bottom:10px}
-.mc-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px}
+.mc-title{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:700;color:var(--text);margin-bottom:4px}
 .mc-sub{font-size:13px;color:var(--text-2);line-height:1.4}
 .mode-card.sel-diy .mc-title{color:var(--teal-dark)}
 .mode-card.sel-pro .mc-title{color:var(--violet)}
 
 /* ── EVENT PILLS ── */
 .event-types{position:relative;z-index:1;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:1.75rem 1.5rem 0;max-width:760px;margin:0 auto}
-.epill{display:flex;align-items:center;gap:5px;padding:7px 16px;border-radius:100px;border:1.5px solid var(--border-gray);background:var(--white);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:all .2s;white-space:nowrap;font-family:'Inter',sans-serif;box-shadow:var(--shadow-sm)}
+.epill{display:flex;align-items:center;gap:5px;padding:11px 16px;border-radius:100px;border:1.5px solid var(--border-gray);background:var(--white);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:all .2s;white-space:nowrap;font-family:'Inter',sans-serif;box-shadow:var(--shadow-sm);min-height:40px}
 .epill:hover{border-color:var(--teal);color:var(--teal-dark);background:var(--teal-light)}
 .epill.active{background:var(--teal);border-color:var(--teal);color:var(--white);font-weight:600;box-shadow:var(--shadow-teal)}
 
@@ -148,7 +172,7 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 .sublabel{display:block;font-size:10.5px;color:var(--text-3);margin-bottom:4px}
 .fcol{grid-column:1/-1}
 .field label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:var(--cream);transition:all .2s;outline:none;-webkit-appearance:none;appearance:none}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:16px;color:var(--text);background:var(--cream);transition:all .2s;outline:none;-webkit-appearance:none;appearance:none}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,196,182,.12);background:var(--white)}
 .field input::placeholder,.field textarea::placeholder{color:var(--text-3)}
 .field textarea{resize:vertical;min-height:72px;line-height:1.55}
@@ -495,7 +519,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 }
 
 /* ── PAYWALL EXCEL ── */
-.excel-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s}
+.excel-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s;transform:translateZ(0);will-change:opacity}
 .excel-modal-overlay.open{opacity:1;pointer-events:all}
 .excel-modal{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-lg);padding:2rem;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center}
 .excel-modal h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:.5rem;color:var(--text)}
@@ -683,16 +707,11 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </div>
         <div class="field">
           <label data-es="Ambiente / estilo" data-en="Vibe / style">Ambiente / estilo</label>
-          <select id="f-vibe">
-            <option value="elegante y clásico" data-es="Elegante y clásico" data-en="Elegant and classic">Elegante y clásico</option>
-            <option value="rústico y bohemio" data-es="Rústico y bohemio" data-en="Rustic and bohemian">Rústico y bohemio</option>
-            <option value="moderno y minimalista" data-es="Moderno y minimalista" data-en="Modern and minimalist">Moderno y minimalista</option>
-            <option value="colorido y festivo" data-es="Colorido y festivo" data-en="Colorful and festive">Colorido y festivo</option>
-            <option value="romántico e íntimo" data-es="Romántico e íntimo" data-en="Romantic and intimate">Romántico e íntimo</option>
-            <option value="divertido y casual" data-es="Divertido y casual" data-en="Fun and casual">Divertido y casual</option>
-          </select>
+          <input type="text" id="f-vibe" placeholder="ej. Fan del fútbol / Real Madrid, azul y blanco" data-placeholder-es="ej. Fan del fútbol / Real Madrid, azul y blanco" data-placeholder-en="e.g. Football fan / Real Madrid, blue and white">
+          <div class="rgroup" id="vibe-suggestions" style="margin-top:.4rem"></div>
         </div>
       </div>
+      <p style="font-size:11.5px;color:var(--text-3);margin:-.6rem 0 0" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
 
       <div class="sdiv"><span data-es="Personaliza tu plan" data-en="Personalize your plan">Personaliza tu plan</span></div>
       <div class="fgrid">
@@ -1215,15 +1234,22 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   &nbsp;·&nbsp; <a href="/aviso-de-privacidad.html" style="color:inherit" data-es="Aviso de privacidad" data-en="Privacy notice">Aviso de privacidad</a>
 </footer>
 
-<!-- Botón flotante para reportar bugs (beta) -->
-<button id="bug-report-fab" onclick="openBugReportModal()" title="Reportar un problema" style="position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">🐞</button>
+<!-- Botones flotantes de soporte (bug/testimonio/ayuda) consolidados en un
+     solo cluster expandible — antes eran 3 botones fijos siempre visibles
+     apilados en la esquina, lo que en pantallas chicas competía con el
+     contenido del cuestionario. Ahora es un solo botón que se abre. -->
+<div id="fab-cluster" style="position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));z-index:80;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:14px">
+  <button id="fab-main" onclick="toggleFabCluster()" title="Más opciones" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.25);font-size:24px;cursor:pointer;transform:translateZ(0);-webkit-backface-visibility:hidden;will-change:transform;transition:transform .25s;color:#fff">✦</button>
 
-<button id="testimonial-fab" onclick="openTestimonialModal()" title="Compartir tu opinión" style="position:fixed;bottom:144px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#D4972A,#E8637A);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">💌</button>
+  <button id="bug-report-fab" onclick="closeFabCluster();openBugReportModal()" title="Reportar un problema" class="fab-sub" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:20px;cursor:pointer;transform:translateZ(0) translateY(8px) scale(.7);-webkit-backface-visibility:hidden;opacity:0;pointer-events:none;transition:all .2s">🐞</button>
 
-<!-- Chat de ayuda -->
-<button id="help-chat-fab" onclick="toggleHelpChat()" title="Ayuda" style="position:fixed;bottom:82px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7B2FBE,#2EC4B6);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">💬</button>
+  <button id="testimonial-fab" onclick="closeFabCluster();openTestimonialModal()" title="Compartir tu opinión" class="fab-sub" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#D4972A,#E8637A);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:20px;cursor:pointer;transform:translateZ(0) translateY(8px) scale(.7);-webkit-backface-visibility:hidden;opacity:0;pointer-events:none;transition:all .2s">💌</button>
 
-<div id="help-chat-panel" style="display:none;position:fixed;bottom:142px;right:20px;width:340px;max-width:calc(100vw - 40px);height:440px;max-height:calc(100vh - 180px);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:81;flex-direction:column;overflow:hidden">
+  <!-- Chat de ayuda -->
+  <button id="help-chat-fab" onclick="closeFabCluster();toggleHelpChat()" title="Ayuda" class="fab-sub" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7B2FBE,#2EC4B6);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:20px;cursor:pointer;transform:translateZ(0) translateY(8px) scale(.7);-webkit-backface-visibility:hidden;opacity:0;pointer-events:none;transition:all .2s">💬</button>
+</div>
+
+<div id="help-chat-panel" style="display:none;position:fixed;bottom:calc(82px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));width:340px;max-width:calc(100vw - 40px);height:440px;max-height:calc(100vh - 180px);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:81;flex-direction:column;overflow:hidden">
   <div style="background:linear-gradient(135deg,#7B2FBE,#2EC4B6);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
     <span style="font-weight:700;font-size:14px" data-es="💬 Asistente DragonflAI" data-en="💬 DragonflAI Assistant">💬 Asistente DragonflAI</span>
     <span onclick="toggleHelpChat()" style="cursor:pointer;font-size:18px;line-height:1">✕</span>
@@ -1489,6 +1515,7 @@ function slugify(str){
 let pubBgColor='#FAF9F7';
 
 async function openPublishModal(){
+  loadExtraFontsIfNeeded();
   document.getElementById('account-dropdown').style.display='none';
   if(!plan.typeName){ showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true); return; }
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
@@ -1575,6 +1602,16 @@ function updatePubThemeLabel(){
 // Llena los 4 selectores del modal de Publicar (fondo, degradados, fuente,
 // color de texto) desde los MISMOS arreglos que usa el tab Save the Date —
 // así nunca hay que sincronizar 2 listas escritas a mano otra vez.
+let extraFontsLoaded=false;
+function loadExtraFontsIfNeeded(){
+  if(extraFontsLoaded) return;
+  extraFontsLoaded=true;
+  const link=document.createElement('link');
+  link.rel='stylesheet';
+  link.href='https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&display=swap';
+  document.head.appendChild(link);
+}
+
 function renderPublishPickers(){
   const themeBox=document.getElementById('pub-theme-picker');
   if(themeBox) themeBox.innerHTML=BG_COLORS.map(c=>
@@ -1827,6 +1864,7 @@ let editingInvitationId=null;
 
 async function openEditInvitationModal(invId){
   if(!sb||!currentUser) return;
+  loadExtraFontsIfNeeded();
   const L=lang==='es';
   closeMyInvitations(); // cerrar la lista, para no dejar 2 modales encimados
   showToast(L?'Cargando invitación…':'Loading invitation…');
@@ -2694,6 +2732,76 @@ const THEME_SUGGESTIONS={
   }
 };
 
+// Sugerencias de "Ambiente / Estilo" — antes era un <select> fijo con 6
+// opciones de sabor boda, obligando a cualquiera (fan del fútbol, de un
+// equipo, de un hobby) a "acomodarse" en una opción que no representaba
+// lo que quería. Ahora son solo sugerencias de un campo de texto libre:
+// se puede tomar una, combinarla, o ignorarla y escribir exactamente lo
+// que se busca (ej. "Real Madrid, azul y blanco").
+const VIBE_SUGGESTIONS={
+  'Boda/Wedding':{es:['Elegante y clásico','Rústico y bohemio','Moderno y minimalista','Romántico e íntimo','Glamoroso y lujoso'],
+                  en:['Elegant and classic','Rustic and bohemian','Modern and minimalist','Romantic and intimate','Glamorous and luxurious']},
+  'Cumpleaños/Birthday':{es:['Divertido y colorido','Fan de un equipo o deporte','Fiesta temática (personaje/hobby)','Elegante y sofisticado','Retro / vintage'],
+                  en:['Fun and colorful','Sports fan / favorite team','Themed party (character/hobby)','Elegant and sophisticated','Retro / vintage']},
+  'Baby Shower':{es:['Tierno y delicado','Colores pastel suaves','Divertido y colorido','Elegante y minimalista'],
+                  en:['Sweet and delicate','Soft pastel colors','Fun and colorful','Elegant and minimalist']},
+  'Corporativo/Corporate':{es:['Profesional y sobrio','Moderno y tecnológico','Networking relajado/casual','Elegante ejecutivo'],
+                  en:['Professional and sober','Modern and tech-forward','Relaxed/casual networking','Executive elegant']},
+  'Quinceañera':{es:['Princesa y glamoroso','Moderno y minimalista','Bohemio y natural','Fan de un equipo o deporte','Fiesta temática (país/hobby)'],
+                  en:['Princess and glamorous','Modern and minimalist','Bohemian and natural','Sports fan / favorite team','Themed party (country/hobby)']},
+  'Graduación/Graduation':{es:['Celebración académica formal','Fiesta relajada con amigos','Moderno y elegante','Fan de un equipo o deporte'],
+                  en:['Formal academic celebration','Relaxed party with friends','Modern and elegant','Sports fan / favorite team']},
+  'Aniversario/Anniversary':{es:['Romántico e íntimo','Elegante y clásico','Divertido y desenfadado'],
+                  en:['Romantic and intimate','Elegant and classic','Fun and easygoing']},
+  'Fiesta Infantil/Kids Party':{es:['Fan de un equipo o deporte (fútbol, básquet…)','Personaje o película favorita','Superhéroes','Circo y color','Dinosaurios','Princesas y magia'],
+                  en:['Sports fan (soccer, basketball…)','Favorite character or movie','Superheroes','Circus and color','Dinosaurs','Princesses and magic']}
+};
+
+// ══════════════════════════════
+//  TEMA VISUAL POR TIPO DE EVENTO
+//  El sistema de diseño ya usa var(--teal)/var(--violet)/var(--gold) para
+//  casi todo (botón de generar, barra de progreso, pills seleccionadas,
+//  bordes de foco, los orbes de fondo…), así que solo con reasignar estas
+//  variables en :root, la pantalla entera cambia de paleta al elegir un
+//  tipo de evento — SIN tocar el logo de la marca (ese usa hex fijo a
+//  propósito, para que la identidad de DragonflAI no cambie nunca).
+// ══════════════════════════════
+const EVENT_THEMES={
+  'Boda/Wedding':{teal:'#2EC4B6',tealDark:'#1A9E92',violet:'#7B2FBE',violetDark:'#5A1F9A',gold:'#D4972A'},
+  'Cumpleaños/Birthday':{teal:'#FF6F3C',tealDark:'#E0562A',violet:'#E91E8C',violetDark:'#B8165F',gold:'#FFC107'},
+  'Baby Shower':{teal:'#5DBEDB',tealDark:'#3E9BB8',violet:'#E8A0C4',violetDark:'#C97A9E',gold:'#D9B36C'},
+  'Corporativo/Corporate':{teal:'#2C6E8A',tealDark:'#1F4F63',violet:'#34405A',violetDark:'#232B3D',gold:'#A6763E'},
+  'Quinceañera':{teal:'#E91E63',tealDark:'#B0184D',violet:'#9C27B0',violetDark:'#7B1FA2',gold:'#D4AF37'},
+  'Graduación/Graduation':{teal:'#1E6FBA',tealDark:'#154E85',violet:'#263859',violetDark:'#1A2740',gold:'#D4AF37'},
+  'Aniversario/Anniversary':{teal:'#C2185B',tealDark:'#93123F',violet:'#7B2FBE',violetDark:'#5A1F9A',gold:'#D4972A'},
+  'Fiesta Infantil/Kids Party':{teal:'#29B6F6',tealDark:'#0288D1',violet:'#FF7043',violetDark:'#E64A19',gold:'#FFC107'}
+};
+
+function hexToRgbStr(hex){
+  const h=hex.replace('#','');
+  const r=parseInt(h.substring(0,2),16),g=parseInt(h.substring(2,4),16),b=parseInt(h.substring(4,6),16);
+  return `${r},${g},${b}`;
+}
+
+function applyEventTheme(type){
+  const theme=EVENT_THEMES[type]||EVENT_THEMES['Boda/Wedding'];
+  const root=document.documentElement.style;
+  const tealRgb=hexToRgbStr(theme.teal), violetRgb=hexToRgbStr(theme.violet), goldRgb=hexToRgbStr(theme.gold);
+  root.setProperty('--teal',theme.teal);
+  root.setProperty('--teal-dark',theme.tealDark);
+  root.setProperty('--teal-light',`rgba(${tealRgb},.12)`);
+  root.setProperty('--teal-mid',`rgba(${tealRgb},.25)`);
+  root.setProperty('--violet',theme.violet);
+  root.setProperty('--violet-dark',theme.violetDark);
+  root.setProperty('--violet-light',`rgba(${violetRgb},.1)`);
+  root.setProperty('--violet-mid',`rgba(${violetRgb},.2)`);
+  root.setProperty('--gold',theme.gold);
+  root.setProperty('--gold-light',`rgba(${goldRgb},.12)`);
+  root.setProperty('--border',`rgba(${tealRgb},.2)`);
+  root.setProperty('--border-strong',`rgba(${tealRgb},.5)`);
+  root.setProperty('--shadow-teal',`0 4px 20px rgba(${tealRgb},.2)`);
+}
+
 // Cada nombre de color sugerido → un tono legible como texto de acento
 // (los colores muy claros como "Blanco perla" se oscurecen un poco, igual
 // que ya hacíamos con la opción "Blanco" de los 6 temas originales — un
@@ -2845,9 +2953,10 @@ function updateNameLabel(){
 
 function init(){
   updateBudget(15000);
+  applyEventTheme(eventType);
   renderEventTypes();
   renderRadios();
-  renderMustHaves(); renderThemeSuggestions();
+  renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions();
   renderUpsells();
   renderTabs();
   updateExtraFieldVisibility();
@@ -2901,7 +3010,9 @@ function setLang(l){
   document.querySelectorAll('option[data-'+l+']').forEach(el=>{ el.textContent=el.getAttribute('data-'+l); });
   const ta=document.getElementById('f-notes');
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
-  renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
+  const vibeInput=document.getElementById('f-vibe');
+  vibeInput.placeholder=vibeInput.getAttribute('data-placeholder-'+l)||vibeInput.placeholder;
+  renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
   renderPublishPickers();
@@ -2939,7 +3050,8 @@ function selectType(btn,idx){
   document.querySelectorAll('.epill').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   eventType=T.eventTypes.vals[idx];
-  updateFormTitle(); renderMustHaves(); renderThemeSuggestions(); updateExtraFieldVisibility(); updateNameLabel();
+  applyEventTheme(eventType);
+  updateFormTitle(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); updateExtraFieldVisibility(); updateNameLabel();
   // Mostrar campo tipo de pareja solo para bodas y aniversarios
   const coupleEvents=['Boda/Wedding','Aniversario/Anniversary'];
   const coupleRow=document.getElementById('couple-type-row');
@@ -3007,6 +3119,16 @@ function renderThemeSuggestions(){
   if(colorsBox) colorsBox.innerHTML=colorOpts.map(o=>`<span class="ropt${colorSelected.includes(o)?' sel':''}" onclick="toggleSuggestionChip(this,'f-colors')">${esc(o)}</span>`).join('');
 }
 
+function renderVibeSuggestions(){
+  const suggestions=VIBE_SUGGESTIONS[eventType];
+  const vibeBox=document.getElementById('vibe-suggestions');
+  if(!vibeBox) return;
+  if(!suggestions){ vibeBox.innerHTML=''; return; }
+  const vibeOpts=suggestions[lang]||suggestions.es;
+  const vibeSelected=(document.getElementById('f-vibe').value||'').split(' · ').map(s=>s.trim());
+  vibeBox.innerHTML=vibeOpts.map(o=>`<span class="ropt${vibeSelected.includes(o)?' sel':''}" onclick="toggleSuggestionChip(this,'f-vibe')">${esc(o)}</span>`).join('');
+}
+
 function toggleSuggestionChip(el,inputId){
   const value=el.textContent.trim();
   const input=document.getElementById(inputId);
@@ -3054,6 +3176,7 @@ function switchTab(name,btn){
   document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
   btn.classList.add('active');
+  if(name==='savethedate') loadExtraFontsIfNeeded();
 }
 
 function updateBudget(val){
@@ -3239,6 +3362,8 @@ async function generate(){
 
   plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,priorityList,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
   if(_previousSavedId) plan._savedId=_previousSavedId;
+
+  clearDraft();
 
   document.getElementById('res-title').textContent=(mode==='diy'?(lang==='es'?'Tu Plan de ':'Your '):(lang==='es'?'Propuesta — ':'Proposal — '))+typeName;
   document.getElementById('res-section').style.display='block';
@@ -3722,26 +3847,190 @@ function renderDayItinerary(items){
 
 // ── CHECKLIST ──
 const CHECKLIST_BASE={
-  es:[
-    {section:'Lugar y Logística',items:['Definir número final de invitados','Reservar el lugar y firmar contrato','Confirmar capacidad y permisos necesarios','Revisar estacionamiento y accesibilidad','Definir plan B en caso de mal clima','Coordinar horarios de montaje y desmontaje']},
-    {section:'Catering y Menu',items:['Elegir proveedor de catering','Definir menú y opciones para restricciones alimentarias','Agendar degustación','Confirmar servicio de bebidas','Definir pastel o postre principal','Coordinar horarios de servicio']},
-    {section:'Entretenimiento',items:['Contratar música o entretenimiento principal','Armar playlist con canciones especiales','Definir actividades o dinámicas','Coordinar equipo de sonido','Planear el momento principal del evento']},
-    {section:'Decoración',items:['Definir paleta de colores y estilo','Contratar decorador o floristería','Elegir centros de mesa','Definir señalización y letreros','Coordinar iluminación']},
-    {section:'Invitados e Invitaciones',items:['Armar lista de invitados','Diseñar y enviar invitaciones','Dar seguimiento a confirmaciones (RSVP)','Organizar asignación de mesas','Preparar detalles de bienvenida']},
-    {section:'Dia del Evento',items:['Confirmar horario final con todos los proveedores','Preparar kit de emergencia','Asignar responsable de coordinar el día','Revisar checklist de última hora','Confirmar transporte del día']},
-    {section:'Fotografía y Video',items:['Contratar fotógrafo y/o videógrafo','Definir lista de tomas imprescindibles','Coordinar horarios de sesión','Definir cómo se compartirán las fotos después']},
-    {section:'Detalles Finales',items:['Confirmar pagos pendientes a proveedores','Preparar agradecimientos para invitados','Revisar el presupuesto final vs. lo gastado','Hacer un último recorrido del lugar']}
+  "Boda/Wedding":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir número final de invitados","Reservar el lugar y firmar contrato","Confirmar capacidad y permisos necesarios","Revisar estacionamiento y accesibilidad","Definir plan B en caso de mal clima","Coordinar horarios de montaje y desmontaje"]},
+    {section:"Catering y Menu",items:["Elegir proveedor de catering","Definir menú y opciones para restricciones alimentarias","Agendar degustación","Confirmar servicio de bebidas y barra","Definir pastel de bodas","Coordinar horarios de servicio"]},
+    {section:"Entretenimiento",items:["Contratar DJ o banda en vivo","Armar playlist con canciones especiales (entrada, vals, primer baile)","Coordinar equipo de sonido","Planear el primer baile"]},
+    {section:"Decoración",items:["Definir paleta de colores y estilo","Contratar decorador o floristería","Elegir centros de mesa y arco floral","Definir señalización","Coordinar iluminación"]},
+    {section:"Ceremonia",items:["Confirmar oficiante (civil o religioso)","Elegir y ensayar los votos","Definir el orden del cortejo","Coordinar la entrega de anillos"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de invitados","Diseñar y enviar invitaciones (save the date + formal)","Dar seguimiento a confirmaciones (RSVP)","Organizar asignación de mesas","Coordinar hospedaje/transporte para invitados foráneos"]},
+    {section:"Dia del Evento",items:["Confirmar horario final con todos los proveedores","Preparar kit de emergencia (costurero, imperdibles, quitamanchas)","Asignar coordinador/a del día","Confirmar transporte de novios e invitados"]},
+    {section:"Fotografía y Video",items:["Contratar fotógrafo y videógrafo","Definir lista de tomas imprescindibles","Coordinar horarios de sesión de fotos","Definir cómo se compartirán las fotos después"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes a proveedores","Preparar agradecimientos para invitados","Revisar el presupuesto final vs. lo gastado","Hacer un último recorrido del lugar"]}
   ],
-  en:[
-    {section:'Venue & Logistics',items:['Set your final guest count','Book the venue and sign the contract','Confirm capacity and required permits','Check parking and accessibility','Define a backup plan for bad weather','Coordinate setup and breakdown times']},
-    {section:'Catering & Menu',items:['Choose a catering vendor','Define the menu and dietary options','Schedule a tasting','Confirm the drinks service','Decide on the cake or main dessert','Coordinate service timing']},
-    {section:'Entertainment',items:['Book your main music/entertainment','Put together a playlist of special songs','Plan any activities or games','Coordinate the sound setup','Plan the event\'s key moment']},
-    {section:'Decor',items:['Define your color palette and style','Book a decorator or florist','Choose your centerpieces','Plan signage','Coordinate lighting']},
-    {section:'Guests & Invitations',items:['Build your guest list','Design and send invitations','Follow up on RSVPs','Organize table assignments','Prepare welcome details']},
-    {section:'Event Day',items:['Confirm the final schedule with every vendor','Prepare an emergency kit','Assign someone to coordinate the day','Do a last-minute checklist review','Confirm transportation for the day']},
-    {section:'Photography & Video',items:['Book a photographer and/or videographer','Define your must-have shot list','Coordinate session timing','Decide how photos will be shared afterward']},
-    {section:'Final Details',items:['Confirm any pending vendor payments','Prepare thank-you notes for guests','Review final budget vs. actual spend','Do one last venue walkthrough']}
+    en:[
+    {section:"Venue & Logistics",items:["Set your final guest count","Book the venue and sign the contract","Confirm capacity and required permits","Check parking and accessibility","Define a backup plan for bad weather","Coordinate setup and breakdown times"]},
+    {section:"Catering & Menu",items:["Choose a catering vendor","Define the menu and dietary options","Schedule a tasting","Confirm the drinks and bar service","Decide on the wedding cake","Coordinate service timing"]},
+    {section:"Entertainment",items:["Book a DJ or live band","Put together a playlist (entrance, waltz, first dance)","Coordinate the sound setup","Plan the first dance"]},
+    {section:"Decor",items:["Define your color palette and style","Book a decorator or florist","Choose centerpieces and a floral arch","Plan signage","Coordinate lighting"]},
+    {section:"Ceremony",items:["Confirm the officiant (civil or religious)","Choose and rehearse the vows","Plan the processional order","Coordinate the ring exchange"]},
+    {section:"Guests & Invitations",items:["Build your guest list","Design and send invitations (save the date + formal)","Follow up on RSVPs","Organize table assignments","Arrange lodging/transport for out-of-town guests"]},
+    {section:"Event Day",items:["Confirm the final schedule with every vendor","Prepare an emergency kit (sewing kit, pins, stain remover)","Assign someone to coordinate the day","Confirm transportation for the couple and guests"]},
+    {section:"Photography & Video",items:["Book a photographer and videographer","Define your must-have shot list","Coordinate session timing","Decide how photos will be shared afterward"]},
+    {section:"Final Details",items:["Confirm any pending vendor payments","Prepare thank-you notes for guests","Review final budget vs. actual spend","Do one last venue walkthrough"]}
   ]
+  },
+  "Cumpleaños/Birthday":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir número final de invitados","Reservar el lugar (salón, jardín, restaurante)","Confirmar capacidad y permisos si aplica","Revisar estacionamiento y accesibilidad","Coordinar horarios de montaje y desmontaje"]},
+    {section:"Catering y Menu",items:["Elegir catering o definir menú casero","Confirmar restricciones alimentarias de invitados","Definir el pastel y sabor","Confirmar servicio de bebidas"]},
+    {section:"Entretenimiento",items:["Contratar DJ o armar playlist","Definir juegos o dinámicas para romper el hielo","Planear el momento de las mañanitas y apagar velas","Coordinar equipo de sonido"]},
+    {section:"Decoración",items:["Definir tema y paleta de colores","Contratar decorador o comprar decoración","Elegir globos, centro de mesa y backdrop","Definir señalización de bienvenida"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de invitados","Enviar invitaciones digitales o físicas","Dar seguimiento a confirmaciones","Preparar mesa de regalos si aplica"]},
+    {section:"Dia del Evento",items:["Confirmar horario final con proveedores","Asignar quién recibe a los invitados","Preparar micrófono y música para el brindis","Revisar checklist de última hora"]},
+    {section:"Fotografía y Video",items:["Definir quién tomará las fotos (profesional o photo booth)","Armar lista de momentos clave (pastel, brindis, sorpresa)","Definir cómo compartir las fotos después"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes","Preparar agradecimientos o recuerdos","Revisar presupuesto final vs. gastado","Hacer un último recorrido del lugar"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Set your final guest count","Book the venue (hall, garden, restaurant)","Confirm capacity and permits if needed","Check parking and accessibility","Coordinate setup and breakdown times"]},
+    {section:"Catering & Menu",items:["Choose catering or plan a homemade menu","Confirm guests' dietary restrictions","Decide on the cake and flavor","Confirm the drinks service"]},
+    {section:"Entertainment",items:["Book a DJ or build a playlist","Plan icebreaker games or activities","Plan the birthday song and candle moment","Coordinate the sound setup"]},
+    {section:"Decor",items:["Define the theme and color palette","Book a decorator or buy decorations","Choose balloons, centerpiece and backdrop","Plan welcome signage"]},
+    {section:"Guests & Invitations",items:["Build your guest list","Send digital or physical invitations","Follow up on RSVPs","Set up a gift table if applicable"]},
+    {section:"Event Day",items:["Confirm the final schedule with vendors","Assign someone to welcome guests","Prepare a mic and music for the toast","Do a last-minute checklist review"]},
+    {section:"Photography & Video",items:["Decide who will take photos (pro or photo booth)","List key moments to capture (cake, toast, surprise)","Decide how photos will be shared afterward"]},
+    {section:"Final Details",items:["Confirm any pending payments","Prepare thank-you notes or favors","Review final budget vs. actual spend","Do one last venue walkthrough"]}
+  ]
+  },
+  "Baby Shower":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir número de invitadas/os","Reservar el lugar (casa, salón, jardín)","Confirmar accesibilidad","Definir plan B en caso de mal clima","Coordinar horarios de montaje"]},
+    {section:"Catering y Menu",items:["Definir menú ligero (brunch, botanas, postres)","Confirmar restricciones alimentarias","Armar mesa de dulces y postres","Definir bebidas (con y sin alcohol)"]},
+    {section:"Entretenimiento",items:["Elegir 3-4 juegos clásicos de baby shower","Preparar premios para ganadoras/es","Armar playlist suave de fondo","Planear el momento de revelación de género si aplica"]},
+    {section:"Decoración",items:["Definir tema (animalitos, globos, colores neutros)","Contratar decorador o armar decoración DIY","Elegir centro de mesa y backdrop para fotos","Preparar mesa de regalos"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de invitadas/os","Enviar invitaciones con tema y horario claro","Dar seguimiento a confirmaciones","Coordinar quién organiza el registro de regalos"]},
+    {section:"Dia del Evento",items:["Confirmar horario con proveedores","Asignar quién coordina los juegos","Tomar nota de regalos para agradecer después","Revisar checklist de última hora"]},
+    {section:"Fotografía y Video",items:["Definir quién toma las fotos (amiga, familiar o profesional)","Capturar el momento de abrir regalos y la revelación","Definir cómo compartir las fotos después"]},
+    {section:"Detalles Finales",items:["Preparar recuerdos/detalles para invitadas","Revisar presupuesto final vs. gastado","Escribir agradecimientos por los regalos recibidos","Guardar la lista de regalos para las gracias"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Set the guest count","Book the venue (home, hall, garden)","Check accessibility","Define a backup plan for bad weather","Coordinate setup times"]},
+    {section:"Catering & Menu",items:["Plan a light menu (brunch, snacks, desserts)","Confirm dietary restrictions","Set up a dessert table","Decide on drinks (with and without alcohol)"]},
+    {section:"Entertainment",items:["Choose 3-4 classic baby shower games","Prepare prizes for winners","Build a soft background playlist","Plan the gender reveal moment if applicable"]},
+    {section:"Decor",items:["Define the theme (animals, balloons, neutral colors)","Book a decorator or go DIY","Choose a centerpiece and photo backdrop","Set up a gift table"]},
+    {section:"Guests & Invitations",items:["Build your guest list","Send invitations with theme and time","Follow up on RSVPs","Coordinate who manages the gift registry"]},
+    {section:"Event Day",items:["Confirm timing with vendors","Assign someone to run the games","Keep track of gifts for thank-you notes","Do a last-minute checklist review"]},
+    {section:"Photography & Video",items:["Decide who takes photos (friend, family or pro)","Capture the gift-opening and reveal moment","Decide how photos will be shared afterward"]},
+    {section:"Final Details",items:["Prepare favors for guests","Review final budget vs. actual spend","Write thank-you notes for gifts received","Keep the gift list for thank-yous"]}
+  ]
+  },
+  "Corporativo/Corporate":{
+    es:[
+    {section:"Lugar y Logística",items:["Confirmar número final de asistentes","Reservar el salón con capacidad adecuada","Confirmar permisos y seguros necesarios","Revisar estacionamiento y accesibilidad","Coordinar horarios de montaje/desmontaje con el venue"]},
+    {section:"Catering y Menu",items:["Elegir proveedor de catering o coffee break","Definir menú y opciones para restricciones alimentarias","Confirmar servicio de bebidas","Coordinar horarios de servicio entre sesiones"]},
+    {section:"Entretenimiento",items:["Definir dinámicas de networking","Contratar MC o moderador si aplica","Planear actividad de team building si aplica","Coordinar música de ambiente"]},
+    {section:"Decoración",items:["Definir decoración con identidad de marca (colores, logo)","Contratar señalética y branding del venue","Definir backdrop para fotos corporativas","Coordinar iluminación del escenario"]},
+    {section:"Registro y Material Corporativo",items:["Preparar gafetes/badges de acceso","Imprimir material corporativo (agendas, folders, presentaciones)","Configurar mesa de registro/check-in","Coordinar regalos o kit de bienvenida"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de asistentes clave","Enviar invitación formal con agenda","Dar seguimiento a confirmaciones (RSVP)","Coordinar hospedaje para invitados foráneos si aplica"]},
+    {section:"Dia del Evento",items:["Confirmar horario final con proveedores y speakers","Asignar responsable de coordinar el día","Probar equipo audiovisual con anticipación","Revisar checklist de última hora"]},
+    {section:"Fotografía y Video",items:["Contratar fotógrafo y/o servicio de streaming","Definir lista de tomas clave (speakers, logo, networking)","Coordinar entrega del material a marketing/comunicación"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes a proveedores","Enviar agradecimiento y encuesta post-evento","Revisar presupuesto final vs. gastado","Recopilar fotos/video para el reporte del evento"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Confirm the final attendee count","Book a venue with adequate capacity","Confirm required permits and insurance","Check parking and accessibility","Coordinate setup/breakdown times with the venue"]},
+    {section:"Catering & Menu",items:["Choose a catering or coffee break vendor","Define the menu and dietary options","Confirm the drinks service","Coordinate service timing between sessions"]},
+    {section:"Entertainment",items:["Plan networking activities","Book an MC or moderator if needed","Plan a team-building activity if applicable","Coordinate ambient music"]},
+    {section:"Decor",items:["Define brand-aligned decor (colors, logo)","Book signage and venue branding","Set up a backdrop for corporate photos","Coordinate stage lighting"]},
+    {section:"Registration & Corporate Materials",items:["Prepare access badges","Print corporate materials (agendas, folders, decks)","Set up the registration/check-in desk","Coordinate gifts or welcome kits"]},
+    {section:"Guests & Invitations",items:["Build your list of key attendees","Send a formal invitation with the agenda","Follow up on RSVPs","Arrange lodging for out-of-town guests if needed"]},
+    {section:"Event Day",items:["Confirm the final schedule with vendors and speakers","Assign someone to coordinate the day","Test AV equipment ahead of time","Do a last-minute checklist review"]},
+    {section:"Photography & Video",items:["Book a photographer and/or streaming service","Define key shots (speakers, logo, networking)","Coordinate delivery of assets to marketing/comms"]},
+    {section:"Final Details",items:["Confirm any pending vendor payments","Send a thank-you and post-event survey","Review final budget vs. actual spend","Collect photos/video for the event report"]}
+  ]
+  },
+  "Quinceañera":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir número final de invitados","Reservar iglesia y salón, firmar contratos","Confirmar capacidad y permisos necesarios","Revisar estacionamiento y accesibilidad","Coordinar horarios de montaje y desmontaje"]},
+    {section:"Catering y Menu",items:["Elegir proveedor de catering","Definir menú y restricciones alimentarias","Agendar degustación","Confirmar servicio de bebidas","Definir pastel de quince años"]},
+    {section:"Entretenimiento",items:["Contratar banda y/o DJ","Ensayar el vals con la corte de honor","Armar playlist de canciones especiales","Coordinar equipo de sonido para el show sorpresa"]},
+    {section:"Decoración",items:["Definir paleta de colores y estilo","Contratar decorador o floristería","Elegir centros de mesa y arco floral","Coordinar iluminación para el vals"]},
+    {section:"Ceremonia y Vals",items:["Confirmar misa o ceremonia religiosa","Ensayar coreografía del vals con chambelanes","Definir el cambio de zapatilla y última muñeca","Coordinar la entrada y presentación de la quinceañera"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de invitados","Diseñar y enviar invitaciones","Dar seguimiento a confirmaciones (RSVP)","Organizar asignación de mesas"]},
+    {section:"Dia del Evento",items:["Confirmar horario final con todos los proveedores","Preparar kit de emergencia","Asignar coordinador/a del día","Confirmar transporte y limosina"]},
+    {section:"Fotografía y Video",items:["Contratar fotógrafo y videógrafo","Definir lista de tomas imprescindibles (vestido, vals, corte)","Coordinar sesión de fotos previa","Definir cómo compartir las fotos después"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes a proveedores","Preparar agradecimientos para invitados","Revisar el presupuesto final vs. lo gastado","Hacer un último recorrido del lugar"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Set your final guest count","Book the church and hall, sign contracts","Confirm capacity and required permits","Check parking and accessibility","Coordinate setup and breakdown times"]},
+    {section:"Catering & Menu",items:["Choose a catering vendor","Define the menu and dietary options","Schedule a tasting","Confirm the drinks service","Decide on the quince cake"]},
+    {section:"Entertainment",items:["Book a band and/or DJ","Rehearse the waltz with the court of honor","Put together a playlist of special songs","Coordinate sound for the surprise show"]},
+    {section:"Decor",items:["Define your color palette and style","Book a decorator or florist","Choose centerpieces and a floral arch","Coordinate lighting for the waltz"]},
+    {section:"Ceremony & Waltz",items:["Confirm the religious ceremony","Rehearse the waltz choreography with the court","Plan the shoe-change and last-doll moment","Coordinate the entrance and presentation"]},
+    {section:"Guests & Invitations",items:["Build your guest list","Design and send invitations","Follow up on RSVPs","Organize table assignments"]},
+    {section:"Event Day",items:["Confirm the final schedule with every vendor","Prepare an emergency kit","Assign someone to coordinate the day","Confirm transportation and the limo"]},
+    {section:"Photography & Video",items:["Book a photographer and videographer","Define must-have shots (dress, waltz, court)","Coordinate a pre-event photo session","Decide how photos will be shared afterward"]},
+    {section:"Final Details",items:["Confirm any pending vendor payments","Prepare thank-you notes for guests","Review final budget vs. actual spend","Do one last venue walkthrough"]}
+  ]
+  },
+  "Graduación/Graduation":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir número final de invitados","Reservar el lugar de la ceremonia y/o fiesta","Confirmar capacidad y permisos necesarios","Revisar estacionamiento y accesibilidad","Coordinar horarios de montaje y desmontaje"]},
+    {section:"Catering y Menu",items:["Elegir proveedor de catering","Definir menú y restricciones alimentarias","Confirmar servicio de bebidas","Definir pastel o mesa de postres"]},
+    {section:"Entretenimiento",items:["Contratar DJ o música de fondo","Armar playlist para la fiesta","Planear dinámicas o juegos","Coordinar equipo de sonido"]},
+    {section:"Decoración",items:["Definir paleta de colores (colores de la escuela/generación)","Contratar decorador","Elegir backdrop para fotos con birrete","Coordinar señalización"]},
+    {section:"Diplomas y Ceremonia",items:["Confirmar toga, birrete y diploma con la institución","Revisar el orden de entrega de diplomas","Coordinar presentación de fotos/video de la generación","Preparar discurso si aplica"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de invitados","Diseñar y enviar invitaciones","Dar seguimiento a confirmaciones","Confirmar lista final de graduados si es evento grupal"]},
+    {section:"Dia del Evento",items:["Confirmar horario final con proveedores","Asignar coordinador/a del día","Revisar checklist de última hora","Confirmar transporte"]},
+    {section:"Fotografía y Video",items:["Contratar fotógrafo y/o videógrafo","Definir tomas imprescindibles (birrete al aire, diploma, familia)","Coordinar sesión de fotos previa","Definir cómo compartir las fotos"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes a proveedores","Preparar agradecimientos","Revisar presupuesto final vs. gastado","Hacer un último recorrido del lugar"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Set your final guest count","Book the venue for the ceremony and/or party","Confirm capacity and required permits","Check parking and accessibility","Coordinate setup and breakdown times"]},
+    {section:"Catering & Menu",items:["Choose a catering vendor","Define the menu and dietary options","Confirm the drinks service","Decide on a cake or dessert table"]},
+    {section:"Entertainment",items:["Book a DJ or background music","Put together a party playlist","Plan activities or games","Coordinate the sound setup"]},
+    {section:"Decor",items:["Define a color palette (school/class colors)","Book a decorator","Choose a backdrop for cap-and-gown photos","Plan signage"]},
+    {section:"Diplomas & Ceremony",items:["Confirm cap, gown and diploma with the institution","Review the order for handing out diplomas","Coordinate the class photo/video presentation","Prepare a speech if applicable"]},
+    {section:"Guests & Invitations",items:["Build your guest list","Design and send invitations","Follow up on RSVPs","Confirm the final graduate list if it is a group event"]},
+    {section:"Event Day",items:["Confirm the final schedule with vendors","Assign someone to coordinate the day","Do a last-minute checklist review","Confirm transportation"]},
+    {section:"Photography & Video",items:["Book a photographer and/or videographer","Define must-have shots (cap toss, diploma, family)","Coordinate a pre-event photo session","Decide how photos will be shared"]},
+    {section:"Final Details",items:["Confirm any pending vendor payments","Prepare thank-you notes","Review final budget vs. actual spend","Do one last venue walkthrough"]}
+  ]
+  },
+  "Aniversario/Anniversary":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir si habrá invitados o será solo en pareja","Reservar un lugar íntimo (restaurante, jardín, terraza)","Confirmar disponibilidad y reservación","Revisar accesibilidad y estacionamiento","Coordinar horarios de montaje"]},
+    {section:"Catering y Menu",items:["Elegir restaurante o catering para la cena especial","Confirmar menú y restricciones alimentarias","Definir maridaje de vinos o bebidas","Definir pastel o postre especial"]},
+    {section:"Entretenimiento",items:["Contratar música en vivo o armar playlist romántica","Planear una actividad especial (baile, video de recuerdos)","Coordinar equipo de sonido"]},
+    {section:"Decoración",items:["Definir ambiente romántico (velas, flores, luces)","Contratar decorador o hacerlo DIY","Elegir un centro de mesa especial","Coordinar iluminación cálida"]},
+    {section:"Invitados e Invitaciones",items:["Definir si es evento íntimo o con invitados","Enviar invitación a familiares cercanos si aplica","Dar seguimiento a confirmaciones","Coordinar la sorpresa con cómplices de confianza"]},
+    {section:"Dia del Evento",items:["Confirmar horario con el lugar o restaurante","Preparar el brindis o palabras especiales","Revisar checklist de última hora","Confirmar transporte si aplica"]},
+    {section:"Fotografía y Video",items:["Contratar fotógrafo o definir quién tomará las fotos","Capturar momentos clave (brindis, baile, sorpresa)","Definir cómo compartir las fotos después"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes","Preparar un detalle especial para la pareja","Revisar presupuesto final vs. gastado","Guardar fotos y recuerdos del día"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Decide if it will be just the two of you or with guests","Book an intimate venue (restaurant, garden, terrace)","Confirm availability and reservation","Check accessibility and parking","Coordinate setup times"]},
+    {section:"Catering & Menu",items:["Choose a restaurant or caterer for the special dinner","Confirm the menu and dietary options","Decide on a wine/drinks pairing","Decide on a special cake or dessert"]},
+    {section:"Entertainment",items:["Book live music or build a romantic playlist","Plan a special activity (dance, memory video)","Coordinate the sound setup"]},
+    {section:"Decor",items:["Define a romantic ambiance (candles, flowers, lights)","Book a decorator or go DIY","Choose a special centerpiece","Coordinate warm lighting"]},
+    {section:"Guests & Invitations",items:["Decide if it is an intimate event or with guests","Invite close family if applicable","Follow up on confirmations","Coordinate any surprise with trusted accomplices"]},
+    {section:"Event Day",items:["Confirm timing with the venue/restaurant","Prepare the toast or special words","Do a last-minute checklist review","Confirm transportation if applicable"]},
+    {section:"Photography & Video",items:["Book a photographer or decide who takes photos","Capture key moments (toast, dance, surprise)","Decide how photos will be shared afterward"]},
+    {section:"Final Details",items:["Confirm any pending payments","Prepare a special keepsake for the couple","Review final budget vs. actual spend","Keep the photos and memories from the day"]}
+  ]
+  },
+  "Fiesta Infantil/Kids Party":{
+    es:[
+    {section:"Lugar y Logística",items:["Definir número de niños y adultos invitados","Reservar el lugar (salón, jardín, salón de juegos)","Confirmar que sea seguro para niños","Revisar estacionamiento y accesibilidad","Coordinar horarios de montaje y desmontaje"]},
+    {section:"Catering y Menu",items:["Elegir catering ligero para niños y adultos","Confirmar alergias alimentarias de los niños","Definir pastel y dulces","Armar mesa de golosinas"]},
+    {section:"Entretenimiento",items:["Contratar animador o payaso","Rentar inflable o juegos","Planear la piñata y su contenido","Armar playlist de música infantil"]},
+    {section:"Decoración",items:["Definir tema (personaje, colores, edad)","Contratar decorador o comprar decoración temática","Elegir globos y centro de mesa","Preparar área para pintacaritas si aplica"]},
+    {section:"Invitados e Invitaciones",items:["Armar lista de niños invitados y sus papás","Enviar invitaciones con tema y horario","Dar seguimiento a confirmaciones","Preguntar por alergias al confirmar"]},
+    {section:"Dia del Evento",items:["Confirmar horario con proveedores (animador, inflable)","Asignar quién supervisa a los niños","Preparar un botiquín básico","Revisar checklist de última hora"]},
+    {section:"Fotografía y Video",items:["Definir quién toma las fotos o rentar photo booth","Capturar momentos clave (pastel, piñata, juegos)","Definir cómo compartir las fotos con los papás"]},
+    {section:"Detalles Finales",items:["Confirmar pagos pendientes a proveedores","Preparar bolsitas de recuerdos para los niños","Revisar presupuesto final vs. gastado","Recoger juguetes/inflable al terminar"]}
+  ],
+    en:[
+    {section:"Venue & Logistics",items:["Set the number of kids and adults invited","Book the venue (hall, garden, play center)","Confirm it is kid-safe","Check parking and accessibility","Coordinate setup and breakdown times"]},
+    {section:"Catering & Menu",items:["Choose a light menu for kids and adults","Confirm kids' food allergies","Decide on cake and treats","Set up a candy table"]},
+    {section:"Entertainment",items:["Book an entertainer or clown","Rent a bounce house or games","Plan the piñata and its contents","Build a kids' music playlist"]},
+    {section:"Decor",items:["Define the theme (character, colors, age)","Book a decorator or buy themed decor","Choose balloons and a centerpiece","Set up a face-painting area if applicable"]},
+    {section:"Guests & Invitations",items:["Build the list of kids and their parents","Send invitations with theme and time","Follow up on RSVPs","Ask about allergies when confirming"]},
+    {section:"Event Day",items:["Confirm timing with vendors (entertainer, bounce house)","Assign someone to supervise the kids","Prepare a basic first-aid kit","Do a last-minute checklist review"]},
+    {section:"Photography & Video",items:["Decide who takes photos or rent a photo booth","Capture key moments (cake, piñata, games)","Decide how to share photos with parents"]},
+    {section:"Final Details",items:["Confirm any pending vendor payments","Prepare goodie bags for the kids","Review final budget vs. actual spend","Collect toys/bounce house at the end"]}
+  ]
+  }
 };
 
 function guessSection(tag,lang){
@@ -3758,7 +4047,8 @@ function guessSection(tag,lang){
 
 function buildChecklist(){
   const p=plan,L=p.lang==='es',e=p.extra||{};
-  const base=CHECKLIST_BASE[p.lang].map(s=>({section:s.section,items:s.items.map(t=>({text:t,cat:s.section}))}));
+  const typeChecklist=CHECKLIST_BASE[p.eventTypeRaw]||CHECKLIST_BASE['Boda/Wedding'];
+  const base=typeChecklist[p.lang].map(s=>({section:s.section,items:s.items.map(t=>({text:t,cat:s.section}))}));
   (p.mustHaveTags||[]).forEach(tag=>{
     const sectionName=guessSection(tag,p.lang);
     const target=base.find(s=>s.section===sectionName)||base[base.length-1];
@@ -3784,89 +4074,221 @@ function buildChecklist(){
 }
 
 // ── PROVEEDORES ──
-const VENDOR_TEMPLATE={
-  es:{
-    vendors:[
-      {type:'Fotografía y Video',name:'Portafolio consistente en el estilo que buscas',tip:'Pide ver un evento completo, no solo los mejores momentos.'},
-      {type:'Música / DJ',name:'Buena reputación y equipo propio de sonido',tip:'Pregunta por su playlist de respaldo y si tiene plan B de equipo.'},
-      {type:'Catering',name:'Experiencia con el tamaño de tu evento',tip:'Siempre pide degustación antes de firmar.'},
-      {type:'Decoración y Flores',name:'Portafolio que combine con tu estilo',tip:'Pregunta si el precio incluye montaje y desmontaje.'},
-      {type:'Lugar del Evento',name:'Capacidad y permisos correctos para tus invitados',tip:'Visita en persona antes de firmar, no solo por fotos.'},
-      {type:'Transporte',name:'Flota en buen estado y seguro vigente',tip:'Confirma tiempos de traslado en horario real, no ideal.'},
-      {type:'Coordinador de Evento',name:'Referencias de eventos similares al tuyo',tip:'Pregunta cuántos eventos coordina el mismo día.'},
-      {type:'Mobiliario y Renta',name:'Variedad de estilos y buen estado del inventario',tip:'Confirma la póliza en caso de daños o faltantes.'}
+// Las preguntas para proveedores y los tips de negociación sí aplican
+// igual sin importar el tipo de evento, así que se quedan compartidos.
+// Lo que SÍ cambia por tipo de evento es la lista de proveedores en sí
+// (antes era siempre la misma lista con sabor a boda para cualquier evento).
+const VENDOR_QUESTIONS={
+  es:[
+    '¿Cuál es tu disponibilidad para mi fecha?',
+    '¿Qué incluye exactamente el precio cotizado?',
+    '¿Cuál es tu política de cancelación o cambios?',
+    '¿Tienes seguro de responsabilidad civil?',
+    '¿Puedo ver referencias o reseñas de clientes anteriores?',
+    '¿Cuánto tiempo antes necesitas la confirmación final?',
+    '¿Tienes plan B en caso de lluvia o imprevistos?',
+    '¿Quién será mi contacto directo el día del evento?',
+    '¿Ofreces pruebas o muestras (de comida, decoración, música)?',
+    '¿Cómo manejas los pagos y depósitos?',
+    '¿Qué sucede si hay retrasos en el montaje o entrega?',
+    '¿Incluyes limpieza o desmontaje al final del evento?',
+    '¿Tienes restricciones de horario o ruido en el lugar?'
+  ],
+  en:[
+    'What is your availability for my date?',
+    'What exactly does the quoted price include?',
+    'What is your cancellation or change policy?',
+    'Do you carry liability insurance?',
+    'Can I see references or reviews from past clients?',
+    'How far in advance do you need the final confirmation?',
+    'Do you have a backup plan for rain or unexpected issues?',
+    'Who will be my direct contact on the day of the event?',
+    'Do you offer tastings or samples (food, decor, music)?',
+    'How do you handle payments and deposits?',
+    'What happens if setup or delivery is delayed?',
+    'Is cleanup or breakdown included at the end of the event?',
+    'Are there time or noise restrictions at the venue?'
+  ]
+};
+const NEGOTIATION_TIPS={
+  es:[
+    'Pide todo por escrito, incluyendo lo que NO está incluido.',
+    'Compara al menos 3 cotizaciones antes de decidir.',
+    'Pregunta por descuentos en fechas de temporada baja.',
+    'Pide cláusulas claras sobre reembolsos y penalizaciones.',
+    'Negocia paquetes integrales (foto + video + dron, por ejemplo).',
+    'Pregunta si ofrecen descuentos por pago anticipado.',
+    'Revisa reseñas en redes y pide ver trabajos recientes.',
+    'Mantén una hoja de control con fechas de pago y entregables.',
+    'Usa un correo exclusivo para tu evento (facilita el seguimiento).',
+    'Si el proveedor es local, pregunta por alianzas con otros servicios.'
+  ],
+  en:[
+    'Get everything in writing, including what is NOT included.',
+    'Compare at least 3 quotes before deciding.',
+    'Ask about discounts for off-season dates.',
+    'Ask for clear clauses on refunds and penalties.',
+    'Negotiate bundled packages (photo + video + drone, for example).',
+    'Ask if they offer discounts for early payment.',
+    'Check reviews online and ask to see recent work.',
+    'Keep a tracking sheet with payment dates and deliverables.',
+    'Use a dedicated email for your event (makes follow-up easier).',
+    'If the vendor is local, ask about partnerships with other services.'
+  ]
+};
+const VENDORS_BY_TYPE={
+  "Boda/Wedding":{
+    es:[
+      {type:"Fotografía y Video",name:"Portafolio consistente en el estilo que buscas",tip:"Pide ver un evento completo, no solo los mejores momentos."},
+      {type:"Música / DJ o Banda",name:"Buena reputación y equipo propio de sonido",tip:"Pregunta por su playlist de respaldo y si tiene plan B de equipo."},
+      {type:"Catering",name:"Experiencia con el tamaño de tu boda",tip:"Siempre pide degustación antes de firmar."},
+      {type:"Decoración y Flores",name:"Portafolio que combine con tu estilo",tip:"Pregunta si el precio incluye montaje y desmontaje."},
+      {type:"Lugar del Evento",name:"Capacidad y permisos correctos para tus invitados",tip:"Visita en persona antes de firmar, no solo por fotos."},
+      {type:"Coordinador de Boda",name:"Referencias de bodas similares a la tuya",tip:"Pregunta cuántas bodas coordina el mismo día."},
+      {type:"Transporte",name:"Flota en buen estado y seguro vigente",tip:"Confirma tiempos de traslado en horario real, no ideal."},
+      {type:"Mobiliario y Renta",name:"Variedad de estilos y buen estado del inventario",tip:"Confirma la póliza en caso de daños o faltantes."}
     ],
-    vendorQuestions:[
-      '¿Cuál es tu disponibilidad para mi fecha?',
-      '¿Qué incluye exactamente el precio cotizado?',
-      '¿Cuál es tu política de cancelación o cambios?',
-      '¿Tienes seguro de responsabilidad civil?',
-      '¿Puedo ver referencias o reseñas de clientes anteriores?',
-      '¿Cuánto tiempo antes necesitas la confirmación final?',
-      '¿Tienes plan B en caso de lluvia o imprevistos?',
-      '¿Quién será mi contacto directo el día del evento?',
-      '¿Ofreces pruebas o muestras (de comida, decoración, música)?',
-      '¿Cómo manejas los pagos y depósitos?',
-      '¿Qué sucede si hay retrasos en el montaje o entrega?',
-      '¿Incluyes limpieza o desmontaje al final del evento?',
-      '¿Tienes restricciones de horario o ruido en el lugar?'
-    ],
-    negotiationTips:[
-      'Pide todo por escrito, incluyendo lo que NO está incluido.',
-      'Compara al menos 3 cotizaciones antes de decidir.',
-      'Pregunta por descuentos en fechas de temporada baja.',
-      'Pide cláusulas claras sobre reembolsos y penalizaciones.',
-      'Negocia paquetes integrales (foto + video + dron, por ejemplo).',
-      'Pregunta si ofrecen descuentos por pago anticipado.',
-      'Revisa reseñas en redes y pide ver trabajos recientes.',
-      'Mantén una hoja de control con fechas de pago y entregables.',
-      'Usa un correo exclusivo para tu evento (facilita el seguimiento).',
-      'Si el proveedor es local, pregunta por alianzas con otros servicios (floristas, banqueteros, etc.).'
+    en:[
+      {type:"Photography & Video",name:"A portfolio consistent with the style you want",tip:"Ask to see a full wedding, not just the highlight reel."},
+      {type:"Music / DJ or Band",name:"Good reputation and their own sound equipment",tip:"Ask about their backup playlist and equipment plan B."},
+      {type:"Catering",name:"Experience with your wedding size",tip:"Always request a tasting before signing."},
+      {type:"Decor & Florals",name:"A portfolio that matches your style",tip:"Ask if the price includes setup and breakdown."},
+      {type:"Venue",name:"Correct capacity and permits for your guest count",tip:"Visit in person before signing, not just from photos."},
+      {type:"Wedding Coordinator",name:"References from weddings similar to yours",tip:"Ask how many weddings they coordinate on the same day."},
+      {type:"Transportation",name:"Well-maintained fleet and current insurance",tip:"Confirm travel times at the actual time of day."},
+      {type:"Rentals & Furniture",name:"Variety of styles and inventory in good condition",tip:"Confirm the policy for damaged or missing items."}
     ]
   },
-  en:{
-    vendors:[
-      {type:'Photography & Video',name:'A portfolio consistent with the style you want',tip:'Ask to see a full event, not just the highlight reel.'},
-      {type:'Music / DJ',name:'Good reputation and their own sound equipment',tip:'Ask about their backup playlist and equipment plan B.'},
-      {type:'Catering',name:'Experience with your event size',tip:'Always request a tasting before signing.'},
-      {type:'Decor & Florals',name:'A portfolio that matches your style',tip:'Ask if the price includes setup and breakdown.'},
-      {type:'Venue',name:'Correct capacity and permits for your guest count',tip:'Visit in person before signing, not just from photos.'},
-      {type:'Transportation',name:'Well-maintained fleet and current insurance',tip:'Confirm travel times at the actual time of day, not ideal traffic.'},
-      {type:'Event Coordinator',name:'References from similar events to yours',tip:'Ask how many events they coordinate on the same day.'},
-      {type:'Rentals & Furniture',name:'Variety of styles and inventory in good condition',tip:'Confirm the policy for damaged or missing items.'}
+  "Cumpleaños/Birthday":{
+    es:[
+      {type:"Pastelería",name:"Pastel personalizado con buena reputación",tip:"Pide probar sabores antes de decidir el diseño final."},
+      {type:"Catering / Snacks",name:"Experiencia con el tamaño de tu fiesta",tip:"Pregunta si manejan alergias comunes."},
+      {type:"DJ / Animador",name:"Buen ambiente para todas las edades",tip:"Pide ver un video de un evento similar."},
+      {type:"Decoración y Globos",name:"Portafolio con el tema que buscas",tip:"Pregunta si incluyen montaje y desmontaje."},
+      {type:"Photo Booth / Fotografía",name:"Props y buena calidad de impresión",tip:"Confirma cuántas horas de servicio incluye."},
+      {type:"Lugar del Evento",name:"Capacidad y accesibilidad adecuadas",tip:"Visita en persona antes de reservar."}
     ],
-    vendorQuestions:[
-      'What is your availability for my date?',
-      'What exactly does the quoted price include?',
-      'What is your cancellation or change policy?',
-      'Do you carry liability insurance?',
-      'Can I see references or reviews from past clients?',
-      'How far in advance do you need the final confirmation?',
-      'Do you have a backup plan for rain or unexpected issues?',
-      'Who will be my direct contact on the day of the event?',
-      'Do you offer tastings or samples (food, decor, music)?',
-      'How do you handle payments and deposits?',
-      'What happens if setup or delivery is delayed?',
-      'Is cleanup or breakdown included at the end of the event?',
-      'Are there time or noise restrictions at the venue?'
+    en:[
+      {type:"Bakery / Cake",name:"Custom cakes with good reviews",tip:"Ask for a tasting before finalizing the design."},
+      {type:"Catering / Snacks",name:"Experience with your party size",tip:"Ask if they handle common allergies."},
+      {type:"DJ / Entertainer",name:"Good energy for all ages",tip:"Ask to see a video from a similar event."},
+      {type:"Decor & Balloons",name:"A portfolio matching your theme",tip:"Ask if setup and breakdown are included."},
+      {type:"Photo Booth / Photography",name:"Fun props and solid print quality",tip:"Confirm how many hours of service are included."},
+      {type:"Venue",name:"Adequate capacity and accessibility",tip:"Visit in person before booking."}
+    ]
+  },
+  "Baby Shower":{
+    es:[
+      {type:"Decorador Temático",name:"Experiencia en baby showers",tip:"Pide ver fotos de eventos anteriores con temas similares."},
+      {type:"Pastelería y Mesa de Dulces",name:"Variedad y buena presentación",tip:"Confirma tiempos de entrega el mismo día."},
+      {type:"Catering Ligero",name:"Opciones de brunch o botanas",tip:"Pregunta por opciones vegetarianas."},
+      {type:"Animador de Juegos",name:"Experiencia dirigiendo dinámicas grupales",tip:"Pide su lista de juegos para elegir los que más te gusten."},
+      {type:"Fotografía",name:"Cobertura de momentos clave",tip:"Confirma si incluye edición básica de fotos."}
     ],
-    negotiationTips:[
-      'Get everything in writing, including what is NOT included.',
-      'Compare at least 3 quotes before deciding.',
-      'Ask about discounts for off-season dates.',
-      'Ask for clear clauses on refunds and penalties.',
-      'Negotiate bundled packages (photo + video + drone, for example).',
-      'Ask if they offer discounts for early payment.',
-      'Check reviews online and ask to see recent work.',
-      'Keep a tracking sheet with payment dates and deliverables.',
-      'Use a dedicated email for your event (makes follow-up easier).',
-      'If the vendor is local, ask about partnerships with other services (florists, caterers, etc.).'
+    en:[
+      {type:"Themed Decorator",name:"Experience with baby showers",tip:"Ask to see photos from past events with similar themes."},
+      {type:"Bakery & Dessert Table",name:"Variety and nice presentation",tip:"Confirm same-day delivery times."},
+      {type:"Light Catering",name:"Brunch or appetizer options",tip:"Ask about vegetarian options."},
+      {type:"Games Host",name:"Experience running group activities",tip:"Ask for their game list so you can pick your favorites."},
+      {type:"Photography",name:"Coverage of key moments",tip:"Confirm if basic photo editing is included."}
+    ]
+  },
+  "Corporativo/Corporate":{
+    es:[
+      {type:"Venue con AV Propio",name:"Salas con equipo audiovisual integrado",tip:"Pide una prueba técnica antes del evento."},
+      {type:"Catering / Coffee Break",name:"Experiencia en eventos corporativos",tip:"Confirma tiempos de servicio entre sesiones."},
+      {type:"Audiovisual y Streaming",name:"Equipo profesional de sonido/streaming",tip:"Pregunta por su plan de contingencia técnica."},
+      {type:"Impresión y Material",name:"Gafetes, folders y señalética",tip:"Confirma tiempos de entrega con margen suficiente."},
+      {type:"Fotografía / Video Corporativo",name:"Experiencia documentando conferencias",tip:"Pide ejemplos de entregables para marketing."},
+      {type:"Regalos Corporativos",name:"Calidad y opciones de personalización",tip:"Pregunta por tiempos mínimos de producción."}
+    ],
+    en:[
+      {type:"Venue with In-House AV",name:"Rooms with integrated audiovisual equipment",tip:"Ask for a technical run-through before the event."},
+      {type:"Catering / Coffee Break",name:"Experience with corporate events",tip:"Confirm service timing between sessions."},
+      {type:"AV & Streaming",name:"Professional sound/streaming equipment",tip:"Ask about their technical contingency plan."},
+      {type:"Printing & Materials",name:"Badges, folders and signage",tip:"Confirm delivery times with enough buffer."},
+      {type:"Corporate Photography/Video",name:"Experience covering conferences",tip:"Ask for sample deliverables for marketing use."},
+      {type:"Corporate Gifts",name:"Quality and customization options",tip:"Ask about minimum production lead times."}
+    ]
+  },
+  "Quinceañera":{
+    es:[
+      {type:"Iglesia / Ceremonia",name:"Disponibilidad y requisitos claros",tip:"Confirma con anticipación los requisitos de la iglesia."},
+      {type:"Salón de Fiesta",name:"Capacidad y estilo adecuados",tip:"Visita en persona antes de firmar."},
+      {type:"Catering",name:"Experiencia con el tamaño del evento",tip:"Siempre pide degustación."},
+      {type:"Banda / DJ",name:"Buen repertorio y equipo propio",tip:"Pide ver un video de un vals reciente."},
+      {type:"Coreógrafo del Vals",name:"Experiencia con chambelanes",tip:"Pregunta cuántos ensayos incluye."},
+      {type:"Fotografía y Video",name:"Portafolio de quince años",tip:"Pide ver una sesión completa, no solo highlights."}
+    ],
+    en:[
+      {type:"Church / Ceremony",name:"Availability and clear requirements",tip:"Confirm church requirements well ahead of time."},
+      {type:"Reception Venue",name:"Adequate capacity and style",tip:"Visit in person before signing."},
+      {type:"Catering",name:"Experience with your event size",tip:"Always request a tasting."},
+      {type:"Band / DJ",name:"Solid repertoire and own equipment",tip:"Ask to see a video of a recent waltz."},
+      {type:"Waltz Choreographer",name:"Experience with the court of honor",tip:"Ask how many rehearsals are included."},
+      {type:"Photography & Video",name:"A quinceañera-specific portfolio",tip:"Ask to see a full session, not just highlights."}
+    ]
+  },
+  "Graduación/Graduation":{
+    es:[
+      {type:"Salón / Lugar de Ceremonia",name:"Capacidad para graduados e invitados",tip:"Confirma la disposición de asientos y escenario."},
+      {type:"Catering",name:"Experiencia con eventos escolares",tip:"Confirma opciones para grupos grandes."},
+      {type:"Audiovisual",name:"Proyector y sonido para la presentación de fotos",tip:"Haz una prueba técnica antes del evento."},
+      {type:"Fotografía / Video",name:"Cobertura de ceremonia y entrega de diplomas",tip:"Pide tomas grupales e individuales."},
+      {type:"Impresor de Diplomas",name:"Calidad y tiempos de entrega",tip:"Confirma nombres con anticipación para evitar errores."}
+    ],
+    en:[
+      {type:"Ceremony Venue",name:"Capacity for graduates and guests",tip:"Confirm seating layout and stage setup."},
+      {type:"Catering",name:"Experience with school events",tip:"Confirm options for large groups."},
+      {type:"Audiovisual",name:"Projector and sound for the photo presentation",tip:"Do a technical test before the event."},
+      {type:"Photography / Video",name:"Coverage of the ceremony and diploma handout",tip:"Ask for both group and individual shots."},
+      {type:"Diploma Printing",name:"Quality and delivery times",tip:"Confirm names ahead of time to avoid errors."}
+    ]
+  },
+  "Aniversario/Anniversary":{
+    es:[
+      {type:"Restaurante / Catering Íntimo",name:"Ambiente romántico adecuado",tip:"Pregunta si pueden personalizar el menú."},
+      {type:"Decorador",name:"Experiencia en ambientes románticos",tip:"Pide ver fotos de montajes similares."},
+      {type:"Músico en Vivo",name:"Repertorio romántico",tip:"Pide su playlist de referencia."},
+      {type:"Pastelería",name:"Postres personalizados",tip:"Confirma opciones para restricciones alimentarias."},
+      {type:"Fotografía",name:"Discreción y estilo íntimo",tip:"Pregunta si trabajan sesiones de pareja."}
+    ],
+    en:[
+      {type:"Restaurant / Intimate Catering",name:"A fitting romantic ambiance",tip:"Ask if they can customize the menu."},
+      {type:"Decorator",name:"Experience with romantic settings",tip:"Ask to see photos of similar setups."},
+      {type:"Live Musician",name:"A romantic repertoire",tip:"Ask for their reference playlist."},
+      {type:"Bakery",name:"Custom desserts",tip:"Confirm options for dietary restrictions."},
+      {type:"Photography",name:"Discreet, intimate style",tip:"Ask if they do couple sessions."}
+    ]
+  },
+  "Fiesta Infantil/Kids Party":{
+    es:[
+      {type:"Animador / Payaso",name:"Experiencia con la edad de los niños",tip:"Pide ver un video en acción."},
+      {type:"Inflables y Juegos",name:"Certificación de seguridad",tip:"Confirma que el inflable esté bien anclado y supervisado."},
+      {type:"Pastelería",name:"Pastel temático",tip:"Pide ver el diseño antes de confirmar."},
+      {type:"Catering Infantil",name:"Menú apto para niños",tip:"Confirma alergias comunes (nueces, lácteos)."},
+      {type:"Decorador Temático",name:"Personajes y colores del tema",tip:"Pregunta si rentan o venden la decoración."},
+      {type:"Photo Booth / Fotografía",name:"Props divertidos",tip:"Confirma cuántas horas de servicio incluye."}
+    ],
+    en:[
+      {type:"Entertainer / Clown",name:"Experience with the kids' age group",tip:"Ask to see a video of them in action."},
+      {type:"Bounce House & Games",name:"Safety certification",tip:"Confirm the bounce house is properly anchored and supervised."},
+      {type:"Bakery",name:"Themed cake",tip:"Ask to see the design before confirming."},
+      {type:"Kids Catering",name:"Kid-friendly menu",tip:"Confirm common allergies (nuts, dairy)."},
+      {type:"Themed Decorator",name:"Characters and colors matching the theme",tip:"Ask if they rent or sell the decorations."},
+      {type:"Photo Booth / Photography",name:"Fun props",tip:"Confirm how many hours of service are included."}
     ]
   }
 };
 
 function buildVendors(){
-  return VENDOR_TEMPLATE[plan.lang];
+  const p=plan;
+  const vendorsForType=VENDORS_BY_TYPE[p.eventTypeRaw]||VENDORS_BY_TYPE['Boda/Wedding'];
+  return {
+    vendors:vendorsForType[p.lang],
+    vendorQuestions:VENDOR_QUESTIONS[p.lang],
+    negotiationTips:NEGOTIATION_TIPS[p.lang]
+  };
 }
 
 // ══════════════════════════════
@@ -5006,7 +5428,90 @@ function showToast(msg,isErr=false){
   setTimeout(()=>{t.style.opacity='0';setTimeout(()=>t.remove(),300);},2500);
 }
 
+/* ══════════════════════════════
+   AUTOGUARDADO DEL CUESTIONARIO
+   Antes, si alguien daba "atrás" sin querer (botón físico/gesto de Android,
+   o el botón "<" del navegador) perdía todo lo que ya había llenado, porque
+   esta es una sola página sin historial de pasos. La solución no es pelear
+   contra el botón atrás — es asegurarnos de que lo que ya escribió nunca
+   se pierda: lo guardamos en este dispositivo mientras escribe, y si vuelve
+   a abrir la página (por accidente o no) se lo devolvemos tal cual.
+   ══════════════════════════════ */
+const DRAFT_KEY='dflai_form_draft';
+let draftSaveTimer=null;
+
+function scheduleDraftSave(){
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer=setTimeout(saveDraft,500);
+}
+
+function saveDraft(){
+  try{
+    const data={};
+    document.querySelectorAll('.fbody [id^="f-"]').forEach(el=>{ data[el.id]=el.value; });
+    data._eventType=eventType;
+    data._guests=guests;
+    data._mode=mode;
+    data._savedAt=Date.now();
+    localStorage.setItem(DRAFT_KEY,JSON.stringify(data));
+  }catch(e){ /* si localStorage falla (modo privado, cuota llena), simplemente no autoguardamos */ }
+}
+
+function clearDraft(){
+  clearTimeout(draftSaveTimer);
+  localStorage.removeItem(DRAFT_KEY);
+}
+
+function restoreDraftIfAny(){
+  let data;
+  try{ data=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); }catch(e){ return; }
+  if(!data) return;
+  // Borradores de más de 7 días ya no son relevantes — mejor no confundir
+  // con datos viejos de un evento que ya pasó o ya se generó de otra forma.
+  if(!data._savedAt||(Date.now()-data._savedAt)>7*24*60*60*1000){ localStorage.removeItem(DRAFT_KEY); return; }
+
+  let restoredSomething=false;
+  Object.keys(data).forEach(id=>{
+    if(id.startsWith('_')) return;
+    const el=document.getElementById(id);
+    if(el&&data[id]){ el.value=data[id]; restoredSomething=true; }
+  });
+  if(!restoredSomething) return;
+
+  if(typeof data._guests==='number'){ guests=data._guests; const gvalEl=document.getElementById('gval'); if(gvalEl) gvalEl.textContent=guests; }
+  if(data._mode&&data._mode!==mode) setMode(data._mode);
+  if(data._eventType){
+    const idx=T.eventTypes.vals.indexOf(data._eventType);
+    if(idx>=0){ eventType=data._eventType; applyEventTheme(eventType); renderEventTypes(); }
+  }
+  updateProgress();
+  showToast(lang==='es'?'↩️ Recuperamos lo último que estabas llenando':'↩️ We restored what you were filling out');
+}
+
+function toggleFabCluster(){
+  document.getElementById('fab-cluster').classList.toggle('open');
+}
+function closeFabCluster(){
+  document.getElementById('fab-cluster').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  const cluster=document.getElementById('fab-cluster');
+  if(cluster&&cluster.classList.contains('open')&&!cluster.contains(e.target)) closeFabCluster();
+});
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/service-worker.js').catch(()=>{ /* si falla el registro, la app sigue funcionando normal, solo sin los beneficios de PWA */ });
+  });
+}
+
 init();
+document.querySelectorAll('.fbody [id^="f-"]').forEach(el=>{
+  el.addEventListener('input',scheduleDraftSave);
+  el.addEventListener('change',scheduleDraftSave);
+});
+restoreDraftIfAny();
+
 </script>
 </body>
 </html>
