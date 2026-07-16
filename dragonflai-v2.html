@@ -1122,7 +1122,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
       <div class="profile-section-divider" data-es="Información para tus invitados" data-en="Info for your guests">Información para tus invitados</div>
       <label class="profile-label" data-es="Cómo llegar (opcional)" data-en="Directions (optional)">Cómo llegar (opcional)</label>
-      <input type="text" id="pub-directions" class="profile-input" placeholder="ej. Entrada por Av. Reforma, estacionamiento gratis">
+      <input type="text" id="pub-directions" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Entrada por Av. Reforma, estacionamiento gratis">
 
       <div class="profile-section-divider" data-es="Lista de invitados (opcional)" data-en="Guest list (optional)">Lista de invitados (opcional)</div>
       <p style="font-size:11.5px;color:var(--text-3);margin-bottom:.5rem" id="pub-guestlist-hint" data-es="Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. 'Ana Pérez, 2')." data-en="One name per line. Add a comma and a number if they can bring companions (e.g. 'Ana Pérez, 2').">Un nombre por línea. Agrega una coma y un número si puede traer acompañantes (ej. "Ana Pérez, 2").</p>
@@ -1712,6 +1712,7 @@ function showInvitationPreview(){
           ${p.location?`<div class="std-detail-item"><span class="std-icon">📍</span><span>${esc(p.location)}</span></div>`:''}
           ${p.time?`<div class="std-detail-item"><span class="std-icon">🕕</span><span>${esc(p.time)}</span></div>`:''}
           ${e.dresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(e.dresscode)}</span></div>`:''}
+          ${document.getElementById('pub-directions')&&document.getElementById('pub-directions').value.trim()?`<div class="std-detail-item"><span class="std-icon">🗺️</span><span>${esc(document.getElementById('pub-directions').value.trim())}</span></div>`:''}
         </div>
         ${e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:''}
       </div>

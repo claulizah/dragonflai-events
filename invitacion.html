@@ -59,7 +59,7 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 .rsvp-card{background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-md)}
 
 /* ── Secciones extra: historia, itinerario, hospedaje, galería, regalos, FAQ ── */
-.extra-card{background:var(--white);border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow-md);margin-bottom:1.25rem}
+.extra-card{background:var(--extra-card-bg,var(--white));border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow-md);margin-bottom:1.25rem}
 .extra-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:1rem;text-align:center}
 .extra-story{font-size:14px;line-height:1.7;color:var(--text-2);text-align:center}
 .schedule-item{padding:12px 0;border-top:1px solid var(--border-gray)}
@@ -430,6 +430,21 @@ function renderExtraSections(inv,t){
   return sections.join('');
 }
 
+function extractRepresentativeColor(bgValue){
+  // Si es un degradado, toma el primer color que aparezca en la definición
+  const match=bgValue.match(/#[0-9a-fA-F]{3,8}/);
+  return match?match[0]:'#FAF9F7';
+}
+
+function hexToRgba(hex,alpha){
+  hex=hex.replace('#','');
+  if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+  const r=parseInt(hex.substring(0,2),16);
+  const g=parseInt(hex.substring(2,4),16);
+  const b=parseInt(hex.substring(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 function renderInvitation(inv){
   const days=daysUntil(inv.event_date_raw);
   const t=T[lang];
@@ -439,6 +454,17 @@ function renderInvitation(inv){
   if(inv.background_image_url) cardStyleParts.push(`background-image:url('${esc(inv.background_image_url)}')`);
   else cardStyleParts.push(`background:${esc(bgColor)}`);
   if(inv.text_color) cardStyleParts.push(`--custom-text-color:${esc(inv.text_color)}`);
+
+  // Las tarjetas de "Nuestra historia", "Hospedaje", etc. usan un tono
+  // clarito del mismo color de fondo de la invitación, en vez de blanco
+  // liso — así se sienten parte del mismo diseño.
+  if(inv.background_image_url){
+    document.documentElement.style.setProperty('--extra-card-bg','rgba(255,255,255,.92)');
+  } else {
+    const repColor=extractRepresentativeColor(bgColor);
+    document.documentElement.style.setProperty('--extra-card-bg',hexToRgba(repColor,.08));
+  }
+
   document.getElementById('content').innerHTML=`
     <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
