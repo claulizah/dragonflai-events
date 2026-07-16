@@ -1160,7 +1160,10 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <input type="file" id="pub-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
       <div id="pub-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
 
-      <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:1rem">Publicar →</button>
+      <div style="display:flex;gap:10px;margin-top:1rem">
+        <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:0;flex:1">Publicar →</button>
+        <button class="btn-excel-close" onclick="closePublishModal()" style="flex:1" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      </div>
     </div>
 
     <div class="publish-preview-col">
@@ -1182,7 +1185,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       </div>
     </div>
 
-    <button class="btn-excel-close" onclick="closePublishModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
+    <button class="btn-excel-close" id="publish-modal-bottom-close" onclick="closePublishModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
   </div>
 </div>
 
@@ -1215,7 +1218,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <!-- Botón flotante para reportar bugs (beta) -->
 <button id="bug-report-fab" onclick="openBugReportModal()" title="Reportar un problema" style="position:fixed;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">🐞</button>
 
-<button id="testimonial-fab" onclick="openTestimonialModal()" title="Compartir tu opinión" style="display:none;position:fixed;bottom:144px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#D4972A,#E8637A);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">💌</button>
+<button id="testimonial-fab" onclick="openTestimonialModal()" title="Compartir tu opinión" style="position:fixed;bottom:144px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#D4972A,#E8637A);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">💌</button>
 
 <!-- Chat de ayuda -->
 <button id="help-chat-fab" onclick="toggleHelpChat()" title="Ayuda" style="position:fixed;bottom:82px;right:20px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#7B2FBE,#2EC4B6);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:22px;cursor:pointer;z-index:80">💬</button>
@@ -1496,6 +1499,7 @@ async function openPublishModal(){
   if(!hasAnyAccess){ openExcelPaywall('publish'); return; }
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
+  const bottomCloseEl=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl) bottomCloseEl.style.display='none';
   document.getElementById('pub-domain-label').textContent=location.host+'/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
   const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
@@ -1886,6 +1890,7 @@ async function openEditInvitationModal(invId){
 
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
+  const bottomCloseEl=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl) bottomCloseEl.style.display='none';
   document.getElementById('publish-modal').classList.add('open');
   document.body.style.overflow='hidden';
   showInvitationPreview();
@@ -2212,6 +2217,7 @@ async function publishInvitation(){
   }
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
+  const bottomCloseEl2=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl2) bottomCloseEl2.style.display='block';
   if(guestListFailed){
     showToast(lang==='es'?'⚠️ Tu invitación se publicó, pero la lista de invitados NO se pudo guardar — edítala para reintentarlo':'⚠️ Your invitation was published, but the guest list could NOT be saved — edit it to try again',true);
   } else {
@@ -2835,7 +2841,6 @@ function init(){
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   updateAccountUI();
   refreshPaidStatus().then(checkReturnFromPayment); // confirma sesión y pago contra Supabase, no solo el caché local
-  maybeAskForTestimonial();
   renderPublishPickers();
   const d=new Date(); d.setMonth(d.getMonth()+6);
   document.getElementById('f-date').value=d.toISOString().split('T')[0];
@@ -3285,7 +3290,6 @@ async function generate(){
 
   gensUsed++; localStorage.setItem('dflai_gens',gensUsed); updateGenBadge();
   startCountdown();
-  maybeAskForTestimonial();
 }
 
 function setTabHTML(id,html){
@@ -4975,22 +4979,6 @@ async function submitTestimonial(){
   if(error||!data?.success){ showToast(L?'No se pudo enviar, intenta de nuevo':'Could not send, try again',true); return; }
   closeTestimonialModal();
   showToast(L?'💌 ¡Gracias por tu tiempo!':'💌 Thanks for your time!');
-}
-
-// Se llama al cargar la app y después de generar un plan — si esta
-// persona usó el código de beta y todavía no ha mandado su testimonio,
-// le mostramos el botón flotante 💌 (sin forzar ningún popup encima).
-async function maybeAskForTestimonial(){
-  const fab=document.getElementById('testimonial-fab');
-  if(!fab) return;
-  if(!sb||!currentUser){ fab.style.display='none'; return; }
-  try{
-    const {data,error}=await sb.rpc('needs_beta_testimonial');
-    fab.style.display=(!error&&data===true)?'block':'none';
-  }catch(err){
-    console.error('Error revisando si mostrar boton de testimonio:',err);
-    fab.style.display='none';
-  }
 }
 
 function showToast(msg,isErr=false){
