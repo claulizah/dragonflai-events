@@ -1888,6 +1888,21 @@ async function openEditInvitationModal(invId){
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
 
+  // La vista previa (showInvitationPreview) lee del objeto "plan" de la
+  // sesión actual — si nunca generaste un plan en esta sesión (ej. entraste
+  // directo a "Mis invitaciones" a editar), ese objeto está vacío y la
+  // vista previa se queda en blanco. Lo llenamos con los datos reales de
+  // ESTA invitación para que la vista previa sí muestre algo.
+  plan=plan||{};
+  plan.name=inv.host_names||'';
+  plan.typeName=inv.event_type||'';
+  plan.date=inv.event_date||'';
+  plan.location=inv.location||'';
+  plan.time=inv.event_time||'';
+  plan.extra=plan.extra||{};
+  plan.extra.dresscode=inv.dress_code||'';
+  plan.extra.hashtag=inv.hashtag||'';
+
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
   const bottomCloseEl=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl) bottomCloseEl.style.display='none';
