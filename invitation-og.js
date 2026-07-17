@@ -6,19 +6,35 @@
 //  tarjetita de vista previa (imagen + título + descripción). Como
 //  invitacion.html carga todo su contenido con JavaScript DESPUÉS de la
 //  carga inicial, esos robots (que no ejecutan JavaScript) no alcanzan
-//  a ver nada — por eso hoy no aparece ninguna vista previa bonita.
+//  a ver nada — por eso sin esto no aparece ninguna vista previa bonita.
 //
 //  Esta función intercepta la petición a /i/:slug:
 //  - Si quien pide la página es uno de esos robots → le regresamos un
 //    HTML mínimo con los meta tags correctos (título, descripción, imagen).
 //  - Si es una persona real → le servimos la página normal de siempre.
+//
+//  CAMBIOS DE ESTA VERSIÓN:
+//  1. Los archivos estáticos (imágenes, css, js…) ya NO se interceptan.
+//     Antes, cuando el bot de WhatsApp venía por la imagen del og:image
+//     (/favicon-180.png), caía aquí y recibía HTML en vez del PNG — por
+//     eso el preview salía sin imagen.
+//  2. Googlebot y bingbot ya no están en la lista: ellos SÍ ejecutan
+//     JavaScript, así que les conviene ver la página real (servirles el
+//     HTML vacío con meta refresh a sí mismo les daba una página basura
+//     para indexar).
+//  3. La invitación se consulta vía el RPC get_public_invitation (que
+//     exige el slug exacto) en vez de leer la tabla directo — la tabla
+//     invitations ya no tiene SELECT público.
 // ══════════════════════════════════════════════════════════════
 
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
 
-// Los "robots" conocidos que generan vistas previas de links
-const BOT_PATTERN = /facebookexternalhit|WhatsApp|Twitterbot|Slackbot|LinkedInBot|TelegramBot|Discordbot|Pinterest|SkypeUriPreview|W3C_Validator|redditbot|Googlebot|bingbot/i;
+// Solo bots de vista previa que NO ejecutan JavaScript.
+const BOT_PATTERN = /facebookexternalhit|WhatsApp|Twitterbot|Slackbot|LinkedInBot|TelegramBot|Discordbot|Pinterest|SkypeUriPreview|redditbot/i;
+
+// Archivos estáticos: nunca interceptarlos, ni siquiera para bots.
+const STATIC_ASSET = /\.(png|jpe?g|gif|webp|svg|ico|css|js|mjs|json|xml|txt|map|woff2?|ttf|pdf)$/i;
 
 function esc(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -29,6 +45,11 @@ export default async (request, context) => {
 
   // Nunca interceptar rutas /api/* — esas las maneja su propia edge function
   if (url.pathname.startsWith('/api/')) {
+    return context.next();
+  }
+
+  // Nunca interceptar archivos estáticos (imágenes, css, js…)
+  if (STATIC_ASSET.test(url.pathname)) {
     return context.next();
   }
 
@@ -43,7 +64,7 @@ export default async (request, context) => {
   // Es un robot de vista previa → extraer el slug de la URL.
   // Soporta /i/mi-slug (links viejos) y /mi-slug (link corto con dominio propio).
   const parts = url.pathname.split('/').filter(Boolean);
-  const knownPages = ['terminos.html', 'aviso-de-privacidad.html', 'dragonflai-v2.html', 'invitacion.html', 'invitation-og.js', 'worker.js', 'index.html'];
+  const knownPages = ['terminos.html', 'aviso-de-privacidad.html', 'dragonflai-v2.html', 'invitacion.html', 'index.html', 'app'];
   let slug = '';
   if (parts[0] === 'i' && parts[1]) {
     slug = parts[1];
@@ -53,17 +74,25 @@ export default async (request, context) => {
   const pageUrl = `${url.origin}${url.pathname}`;
 
   let inv = null;
-  try {
-    const apiUrl = `${SUPABASE_URL}/rest/v1/invitations?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=host_names,event_type,event_date,location,background_image_url`;
-    const resp = await fetch(apiUrl, {
-      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-    });
-    if (resp.ok) {
-      const data = await resp.json();
-      inv = Array.isArray(data) && data[0] ? data[0] : null;
+  if (slug) {
+    try {
+      // RPC que exige el slug exacto (la tabla ya no es legible directo)
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_public_invitation`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ p_slug: slug })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        inv = Array.isArray(data) && data[0] ? data[0] : null;
+      }
+    } catch (err) {
+      // Si falla la consulta, seguimos con los valores genéricos de abajo
     }
-  } catch (err) {
-    // Si falla la consulta, seguimos con los valores genéricos de abajo
   }
 
   const title = inv
