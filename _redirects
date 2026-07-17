@@ -1,3 +1,10 @@
+# Invitaciones públicas: /i/<slug> las sirve invitacion.html
 /i/*  /invitacion.html  200
+
+# Atajo a la app
 /app  /dragonflai-v2.html  200
-/*  /invitacion.html  200
+
+# Catch-all: cualquier URL desconocida (typos, links rotos) cae a la landing.
+# Antes caía a invitacion.html y mostraba "invitación no encontrada", lo cual
+# confundía a cualquiera que solo escribió mal la dirección.
+/*  /index.html  200

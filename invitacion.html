@@ -157,6 +157,43 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
 
+// ══════════════════════════════
+//  LOG DE ERRORES EN PRODUCCIÓN
+//  Captura los errores de JavaScript que truenan en el navegador del
+//  usuario y los guarda en Supabase (tabla error_log) — sin esto, solo
+//  nos enteramos de los bugs si alguien se toma la molestia de reportarlos.
+//  Protecciones: máx 10 errores por sesión, sin duplicados, textos
+//  recortados, y jamás deja que el propio logger truene la app.
+// ══════════════════════════════
+(function(){
+  let reported=0; const seen=new Set();
+  function logJsError(message,source,line,col,stack){
+    try{
+      if(typeof sb==='undefined'||!sb||reported>=10) return;
+      const key=String(message||'').slice(0,120);
+      if(!key||seen.has(key)) return;
+      seen.add(key); reported++;
+      let uid=null; try{ uid=(typeof currentUser!=='undefined'&&currentUser)?currentUser.id:null; }catch(_){}
+      sb.from('error_log').insert({
+        page:location.pathname+location.search.slice(0,80),
+        message:String(message||'').slice(0,1000),
+        source:String(source||'').slice(0,300),
+        line:Number.isFinite(line)?line:null,
+        col:Number.isFinite(col)?col:null,
+        stack:String(stack||'').slice(0,2000),
+        user_agent:navigator.userAgent.slice(0,300),
+        user_id:uid
+      }).then(()=>{},()=>{});
+    }catch(_){/* el logger nunca debe romper la app */}
+  }
+  window.addEventListener('error',e=>logJsError(e.message,e.filename,e.lineno,e.colno,e.error&&e.error.stack));
+  window.addEventListener('unhandledrejection',e=>{
+    const r=e&&e.reason||{};
+    logJsError(r.message||String(e&&e.reason||'unhandled rejection'),'unhandledrejection',null,null,r.stack);
+  });
+})();
+
+
 let invitation=null;
 let lang='es';
 

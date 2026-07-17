@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>DragonflAI Events — Planificador Inteligente</title>
+<title>DragonflAI Events — Planeemos tu evento juntos</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
@@ -66,24 +66,20 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);mi
 input,textarea,[contenteditable="true"]{cursor:text}
 
 /* ── ORBS DE FONDO ── */
-/* position:fixed + filter:blur(120px) es carísimo de repintar en Android.
-   Cuando el teclado abre (foco en un input) o hay scroll, Chrome Android a
-   veces no recompone bien esta capa y deja un recuadro gris sólido encima
-   del formulario hasta el siguiente repaint — eso es el bug reportado.
-   translateZ(0)+will-change fuerza su PROPIA capa de composición para que
-   no dependa del hilo principal, y en mobile bajamos el blur para que sea
-   mucho más barato de mantener. */
-.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.15;transform:translateZ(0);will-change:transform;backface-visibility:hidden;isolation:isolate}
+/* Intentamos primero solo bajar el blur y ocultar el orbe más chico en
+   mobile, pero el video que mandaron muestra que el problema persiste —
+   ahora la pantalla completa se queda en blanco varios segundos al hacer
+   scroll, no solo un recuadro. Un elemento position:fixed con blur pesado
+   sigue siendo carísimo de recomponer en Android sin importar cuánto se
+   reduzca el blur, así que la solución definitiva es no pelear más contra
+   esto: en mobile los orbes son puramente decorativos, así que se ocultan
+   por completo. En pantallas grandes (donde el bug no ocurre) se quedan. */
+.bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.15;transform:translateZ(0);will-change:transform;backface-visibility:hidden}
 .bg-orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-150px;right:-150px}
 .bg-orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-150px;left:-150px}
 .bg-orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(46,196,182,.3),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%) translateZ(0)}
 @media(max-width:768px){
-  /* En mobile el blur de 120px es el más caro de mantener frame a frame;
-     bajarlo a 40px resuelve el recuadro gris y de paso ayuda con la carga
-     lenta que también reportaron. El orb-3 (el más chico y menos visible)
-     se oculta del todo en mobile: es puro adorno detrás del formulario. */
-  .bg-orb{filter:blur(40px)}
-  .bg-orb-3{display:none}
+  .bg-orb{display:none}
 }
 
 /* ── FAB CLUSTER (soporte/ayuda) ── */
@@ -573,7 +569,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </svg>
     <div class="logo-text">
       <span class="logo-name">Dragonfl<span class="ai">AI</span> Events</span>
-      <span class="logo-sub">Planificador con IA</span>
+      <span class="logo-sub" data-es="Creamos tu evento juntos" data-en="Let's plan it together">Creamos tu evento juntos</span>
     </div>
   </a>
   <span class="mode-pill diy" id="mode-pill">Planeación personal</span>
@@ -593,8 +589,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <!-- HERO -->
 <section class="hero">
-  <span class="hero-tag">✦ <span data-es="Planificador de eventos con inteligencia artificial" data-en="AI-powered event planning">Planificador de eventos con inteligencia artificial</span></span>
-  <h1 id="hero-h1" data-es="Tu evento <em>perfecto,</em><br>planeado por IA" data-en="Your <em>perfect event,</em><br>planned by AI">Tu evento <em>perfecto,</em><br>planeado por IA</h1>
+  <span class="hero-tag">✦ <span data-es="Planeemos tu evento juntos" data-en="Let's plan your event together">Planeemos tu evento juntos</span></span>
+  <h1 id="hero-h1" data-es="Tu evento <em>perfecto,</em><br>lo creamos juntos" data-en="Your <em>perfect event,</em><br>created together">Tu evento <em>perfecto,</em><br>lo creamos juntos</h1>
   <p class="hero-sub" id="hero-sub" data-es="Responde unas preguntas y obtén cronograma, presupuesto, checklist, proveedores, ideas creativas y tu Save the Date." data-en="Answer a few questions and get timeline, budget, checklist, vendors, creative ideas and your Save the Date.">Responde unas preguntas y obtén cronograma, presupuesto, checklist, proveedores, ideas creativas y tu Save the Date.</p>
 </section>
 
@@ -711,7 +707,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <div class="rgroup" id="vibe-suggestions" style="margin-top:.4rem"></div>
         </div>
       </div>
-      <p style="font-size:11.5px;color:var(--text-3);margin:-.6rem 0 0" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
+      <p style="font-size:11.5px;color:var(--text-3);margin:.5rem 0 0" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
 
       <div class="sdiv"><span data-es="Personaliza tu plan" data-en="Personalize your plan">Personaliza tu plan</span></div>
       <div class="fgrid">
@@ -1296,6 +1292,43 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
+
+// ══════════════════════════════
+//  LOG DE ERRORES EN PRODUCCIÓN
+//  Captura los errores de JavaScript que truenan en el navegador del
+//  usuario y los guarda en Supabase (tabla error_log) — sin esto, solo
+//  nos enteramos de los bugs si alguien se toma la molestia de reportarlos.
+//  Protecciones: máx 10 errores por sesión, sin duplicados, textos
+//  recortados, y jamás deja que el propio logger truene la app.
+// ══════════════════════════════
+(function(){
+  let reported=0; const seen=new Set();
+  function logJsError(message,source,line,col,stack){
+    try{
+      if(typeof sb==='undefined'||!sb||reported>=10) return;
+      const key=String(message||'').slice(0,120);
+      if(!key||seen.has(key)) return;
+      seen.add(key); reported++;
+      let uid=null; try{ uid=(typeof currentUser!=='undefined'&&currentUser)?currentUser.id:null; }catch(_){}
+      sb.from('error_log').insert({
+        page:location.pathname+location.search.slice(0,80),
+        message:String(message||'').slice(0,1000),
+        source:String(source||'').slice(0,300),
+        line:Number.isFinite(line)?line:null,
+        col:Number.isFinite(col)?col:null,
+        stack:String(stack||'').slice(0,2000),
+        user_agent:navigator.userAgent.slice(0,300),
+        user_id:uid
+      }).then(()=>{},()=>{});
+    }catch(_){/* el logger nunca debe romper la app */}
+  }
+  window.addEventListener('error',e=>logJsError(e.message,e.filename,e.lineno,e.colno,e.error&&e.error.stack));
+  window.addEventListener('unhandledrejection',e=>{
+    const r=e&&e.reason||{};
+    logJsError(r.message||String(e&&e.reason||'unhandled rejection'),'unhandledrejection',null,null,r.stack);
+  });
+})();
+
 
 // ══════════════════════════════
 //  STATE
@@ -2386,9 +2419,10 @@ async function sendReminders(invId){
 
   showToast(L?'Enviando recordatorios…':'Sending reminders…');
   try{
+    const {data:{session:remSession}={}}=await sb.auth.getSession();
     const resp=await fetch(`${WORKER_URL}/send-reminders`,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json',...(remSession?.access_token?{'Authorization':'Bearer '+remSession.access_token}:{})},
       body:JSON.stringify({invitation_id:invId})
     });
     const result=await resp.json();
@@ -2536,12 +2570,19 @@ async function sendHelpChatMessage(){
   box.scrollTop=box.scrollHeight;
 
   try{
+    const {data:{session:chatSession}={}}=sb?await sb.auth.getSession():{data:{}};
+    if(!chatSession?.access_token){
+      document.getElementById(thinkingId)?.remove();
+      addHelpChatBubble('assistant',lang==='es'?'Para chatear conmigo necesitas iniciar sesión (es gratis y rápido) — o elige una de las preguntas frecuentes de arriba, esas siempre están disponibles. 😊':'To chat with me you need to log in (free and quick) — or pick one of the quick questions above, those are always available. 😊');
+      return;
+    }
     const res=await fetch(WORKER_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+chatSession.access_token,'X-DFLAI-Purpose':'chat'},
       body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:600,system:HELP_CHAT_SYSTEM,messages:helpChatMessages})
     });
     document.getElementById(thinkingId)?.remove();
+    if(res.status===402){ addHelpChatBubble('assistant',lang==='es'?'Alcanzaste el límite diario del chat de ayuda — vuelve mañana, o escríbenos si es urgente.':'You reached the daily help chat limit — come back tomorrow, or write to us if it\'s urgent.'); return; }
     if(!res.ok){ addHelpChatBubble('assistant',lang==='es'?'Tuve un problema para responder — intenta de nuevo en un momento.':'I had trouble responding — please try again in a moment.'); return; }
     const data=await res.json();
     const reply=data.content?.[0]?.text||(lang==='es'?'No pude generar una respuesta.':'I could not generate a response.');
@@ -2739,22 +2780,22 @@ const THEME_SUGGESTIONS={
 // se puede tomar una, combinarla, o ignorarla y escribir exactamente lo
 // que se busca (ej. "Real Madrid, azul y blanco").
 const VIBE_SUGGESTIONS={
-  'Boda/Wedding':{es:['Elegante y clásico','Rústico y bohemio','Moderno y minimalista','Romántico e íntimo','Glamoroso y lujoso'],
-                  en:['Elegant and classic','Rustic and bohemian','Modern and minimalist','Romantic and intimate','Glamorous and luxurious']},
-  'Cumpleaños/Birthday':{es:['Divertido y colorido','Fan de un equipo o deporte','Fiesta temática (personaje/hobby)','Elegante y sofisticado','Retro / vintage'],
-                  en:['Fun and colorful','Sports fan / favorite team','Themed party (character/hobby)','Elegant and sophisticated','Retro / vintage']},
-  'Baby Shower':{es:['Tierno y delicado','Colores pastel suaves','Divertido y colorido','Elegante y minimalista'],
-                  en:['Sweet and delicate','Soft pastel colors','Fun and colorful','Elegant and minimalist']},
-  'Corporativo/Corporate':{es:['Profesional y sobrio','Moderno y tecnológico','Networking relajado/casual','Elegante ejecutivo'],
-                  en:['Professional and sober','Modern and tech-forward','Relaxed/casual networking','Executive elegant']},
-  'Quinceañera':{es:['Princesa y glamoroso','Moderno y minimalista','Bohemio y natural','Fan de un equipo o deporte','Fiesta temática (país/hobby)'],
-                  en:['Princess and glamorous','Modern and minimalist','Bohemian and natural','Sports fan / favorite team','Themed party (country/hobby)']},
-  'Graduación/Graduation':{es:['Celebración académica formal','Fiesta relajada con amigos','Moderno y elegante','Fan de un equipo o deporte'],
-                  en:['Formal academic celebration','Relaxed party with friends','Modern and elegant','Sports fan / favorite team']},
-  'Aniversario/Anniversary':{es:['Romántico e íntimo','Elegante y clásico','Divertido y desenfadado'],
-                  en:['Romantic and intimate','Elegant and classic','Fun and easygoing']},
-  'Fiesta Infantil/Kids Party':{es:['Fan de un equipo o deporte (fútbol, básquet…)','Personaje o película favorita','Superhéroes','Circo y color','Dinosaurios','Princesas y magia'],
-                  en:['Sports fan (soccer, basketball…)','Favorite character or movie','Superheroes','Circus and color','Dinosaurs','Princesses and magic']}
+  'Boda/Wedding':{es:['Clásica Romántica','Vintage','Boho Chic','Playa','Minimalista Moderna'],
+                  en:['Classic Romantic','Vintage','Boho Chic','Beach','Minimalist Modern']},
+  'Cumpleaños/Birthday':{es:['Neón','Lounge','Retro/80s-90','Hawaiana'],
+                  en:['Neon','Lounge','Retro/80s-90s','Hawaiian']},
+  'Baby Shower':{es:['Clásico Rosa/Azul','Colores Neutrales','Animalitos','Naturaleza'],
+                  en:['Classic Pink/Blue','Neutral Colors','Little Animals','Nature']},
+  'Corporativo/Corporate':{es:['Formal institucional','Innovación tecnológica','Networking lounge','Team building'],
+                  en:['Formal institutional','Tech innovation','Networking lounge','Team building']},
+  'Quinceañera':{es:['Princesa clásica','Hollywood Glam','Boho chic juvenil','Fiesta Temática'],
+                  en:['Classic princess','Hollywood glam','Teen boho chic','Themed party']},
+  'Graduación/Graduation':{es:['Formal académico','Fiesta juvenil','Elegante cóctel','Outdoor casual'],
+                  en:['Formal academic','Youth party','Elegant cocktail','Casual outdoor']},
+  'Aniversario/Anniversary':{es:['Romántico clásico','Cena íntima gourmet','Retro pareja','Viaje temático'],
+                  en:['Classic romantic','Intimate gourmet dinner','Retro couple','Themed trip']},
+  'Fiesta Infantil/Kids Party':{es:['Personajes animados','Animales','Espacio/astronautas','Arcoíris y unicornios','Deportes'],
+                  en:['Cartoon characters','Animals','Space/astronauts','Rainbows and unicorns','Sports']}
 };
 
 // ══════════════════════════════
@@ -2830,7 +2871,7 @@ const T={
     en:['💍 Wedding','🎂 Birthday','🍼 Baby Shower','🏢 Corporate','👑 Quinceañera','🎓 Graduation','🥂 Anniversary','🎈 Kids Party'],
     vals:['Boda/Wedding','Cumpleaños/Birthday','Baby Shower','Corporativo/Corporate','Quinceañera','Graduación/Graduation','Aniversario/Anniversary','Fiesta Infantil/Kids Party']
   },
-  stress:{es:['Muy tranquilo/a','Un poco abrumado/a','Muy abrumado/a','¡Que lo haga la IA! 😭'],en:['Totally calm','A little overwhelmed','Very overwhelmed','Just do it for me 😭']},
+  stress:{es:['Muy tranquilo/a','Un poco abrumado/a','Muy abrumado/a','¡Que alguien más lo haga! 😭'],en:['Totally calm','A little overwhelmed','Very overwhelmed','Just do it for me 😭']},
   exp:{es:['Primera vez','He planeado 1-2 eventos','Tengo experiencia'],en:['First time','Planned 1–2 events','Experienced planner']},
   priority:{
     'Boda/Wedding':{es:['Respetar el presupuesto','Experiencia de invitados','Fotos y video perfectos','Algo único y memorable','Sin estrés'],en:['Staying on budget','Guest experience','Stunning photos','Unique & memorable','Stress-free']},
@@ -3239,6 +3280,16 @@ let plannerCreditSpentThisSession=false;
 async function generate(){
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
 
+  // El Worker de IA ahora exige sesión (protección de costos del lado del
+  // servidor) — pedimos login ANTES de empezar, para dar un mensaje claro
+  // en vez de un error a mitad de la generación. Las 2 generaciones gratis
+  // siguen existiendo, solo que ahora se cuentan por cuenta, no por navegador.
+  if(!currentUser){
+    openAuthModal();
+    showToast(lang==='es'?'Crea tu cuenta gratis para generar tu plan — tus 2 planes gratis te esperan':'Create your free account to generate your plan — your 2 free plans await',true);
+    return;
+  }
+
   // Nuevo plan = nuevos detalles extra. Antes esto se limpiaba solo al
   // cerrar el modal de Publicar, lo que borraba por accidente lo que el
   // usuario ya había llenado en el tab Save the Date sin haber publicado.
@@ -3401,11 +3452,14 @@ async function generate(){
   //  LLAMADAS A IA — SOLO LO QUE REALMENTE NECESITA REDACCIÓN
   //  (vista general + ideas juntas, save the date, y propuesta en modo pro)
   // ══════════════════════════════
+  // gen_id agrupa las 2-3 llamadas de IA de ESTA generación para que el
+  // servidor las cuente como 1 sola generación gratis (no como 3).
+  const genId=(crypto.randomUUID&&crypto.randomUUID())||String(Date.now())+Math.random().toString(36).slice(2);
   const calls=[
-    callClaude(buildCreativePrompt(),'claude-sonnet-4-5',3800).then(h=>({id:'creative',h})),
-    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',1400).then(h=>({id:'savethedate',h}))
+    callClaude(buildCreativePrompt(),'claude-sonnet-4-5',3800,genId).then(h=>({id:'creative',h})),
+    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',1400,genId).then(h=>({id:'savethedate',h}))
   ];
-  if(mode==='pro') calls.push(callClaude(buildProposalPrompt(),'claude-sonnet-4-5',1400).then(h=>({id:'proposal',h})));
+  if(mode==='pro') calls.push(callClaude(buildProposalPrompt(),'claude-sonnet-4-5',1400,genId).then(h=>({id:'proposal',h})));
 
   const results=await Promise.allSettled(calls);
 
@@ -3413,8 +3467,25 @@ async function generate(){
   document.getElementById('gen-btn').disabled=false;
   document.getElementById('panel-overview').classList.add('active');
 
+  // Si el Worker rechazó por falta de sesión o de generaciones/créditos,
+  // dar el mensaje correcto en vez del genérico "una sección falló".
+  const authFail=results.find(r=>r.status==='rejected'&&r.reason?.status===401);
+  const limitFail=results.find(r=>r.status==='rejected'&&r.reason?.status===402);
+  if(authFail){
+    openAuthModal();
+    showToast(lang==='es'?'Tu sesión expiró — inicia sesión de nuevo para generar':'Your session expired — log in again to generate',true);
+    return;
+  }
+  if(limitFail){
+    showToast(lang==='es'?'Has usado todos tus planes disponibles — te llevamos a los planes':'You\'ve used all your available plans — taking you to pricing',true);
+    setTimeout(()=>{ window.location.href='index.html#precios'; },1800);
+    return;
+  }
+
+  let anySucceeded=false;
   results.forEach(r=>{
     if(r.status!=='fulfilled'){ showToast(lang==='es'?'Una sección no se pudo generar':'A section failed to generate',true); return; }
+    anySucceeded=true;
     const v=r.value;
     if(v.id==='creative'){
       const [overviewHtml,ideasHtml]=v.h.split('<!--SPLIT-->');
@@ -3429,8 +3500,15 @@ async function generate(){
     }
   });
 
-  gensUsed++; localStorage.setItem('dflai_gens',gensUsed); updateGenBadge();
-  startCountdown();
+  // Solo contamos la generación si al menos una sección sí se generó —
+  // antes se descontaba aunque TODO fallara (Worker caído, sin internet),
+  // quemando 1 de los 2 planes gratis a cambio de nada.
+  // Nota: este contador local es solo para el badge de la interfaz; el
+  // conteo REAL ahora vive en la base de datos (worker_authorize_ai).
+  if(anySucceeded){
+    gensUsed++; localStorage.setItem('dflai_gens',gensUsed); updateGenBadge();
+    startCountdown();
+  }
 }
 
 function setTabHTML(id,html){
@@ -3790,30 +3868,192 @@ function buildTimeline(){
 // que el usuario ya dio en el formulario), igual que el cronograma se calcula como fracciones
 // del tiempo restante — así funciona bien sin importar si el evento dura 3 horas o todo el día.
 const DAY_ITINERARY_TEMPLATE={
-  es:[
-    {offsetBeforeMin:60,what:'Llegada del equipo y montaje final'},
-    {frac:0,what:'Llegada de invitados'},
-    {frac:0.12,what:'Bienvenida e inicio del programa'},
-    {frac:0.28,what:'Momento principal (ceremonia / apertura / presentación)'},
-    {frac:0.45,what:'Coctel y networking'},
-    {frac:0.60,what:'Comida / cena'},
-    {frac:0.75,what:'Momento especial (brindis, baile, premiaciones)'},
-    {frac:0.90,what:'Entretenimiento / pista abierta'},
-    {frac:1,what:'Cierre del evento'},
-    {offsetAfterMin:30,what:'Desmontaje'}
+  "Boda/Wedding":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Llegada de invitados"},
+    {frac:0.12,what:"Ceremonia"},
+    {frac:0.32,what:"Recepción y coctel"},
+    {frac:0.5,what:"Cena"},
+    {frac:0.68,what:"Primer baile"},
+    {frac:0.8,what:"Brindis y pastel"},
+    {frac:0.92,what:"Fiesta y pista abierta"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
   ],
-  en:[
-    {offsetBeforeMin:60,what:'Team arrival and final setup'},
-    {frac:0,what:'Guest arrival'},
-    {frac:0.12,what:'Welcome and program starts'},
-    {frac:0.28,what:'Main moment (ceremony / opening / presentation)'},
-    {frac:0.45,what:'Cocktail hour and networking'},
-    {frac:0.60,what:'Meal / dinner'},
-    {frac:0.75,what:'Special moment (toast, dance, awards)'},
-    {frac:0.90,what:'Entertainment / open floor'},
-    {frac:1,what:'Event ends'},
-    {offsetAfterMin:30,what:'Breakdown / teardown'}
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Guest arrival"},
+    {frac:0.12,what:"Ceremony"},
+    {frac:0.32,what:"Reception and cocktail hour"},
+    {frac:0.5,what:"Dinner"},
+    {frac:0.68,what:"First dance"},
+    {frac:0.8,what:"Toast and cake"},
+    {frac:0.92,what:"Party and open floor"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
   ]
+  },
+  "Cumpleaños/Birthday":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Llegada de invitados"},
+    {frac:0.15,what:"Bienvenida y recepción"},
+    {frac:0.35,what:"Comida"},
+    {frac:0.55,what:"Pastel y las mañanitas"},
+    {frac:0.7,what:"Juegos y dinámicas"},
+    {frac:0.85,what:"Baile y música"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Guest arrival"},
+    {frac:0.15,what:"Welcome and reception"},
+    {frac:0.35,what:"Meal"},
+    {frac:0.55,what:"Cake and birthday song"},
+    {frac:0.7,what:"Games and activities"},
+    {frac:0.85,what:"Dancing and music"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  },
+  "Baby Shower":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Llegada de invitadas/os"},
+    {frac:0.15,what:"Bienvenida"},
+    {frac:0.4,what:"Juegos"},
+    {frac:0.65,what:"Comida"},
+    {frac:0.85,what:"Apertura de regalos"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Guest arrival"},
+    {frac:0.15,what:"Welcome"},
+    {frac:0.4,what:"Games"},
+    {frac:0.65,what:"Meal"},
+    {frac:0.85,what:"Gift opening"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  },
+  "Corporativo/Corporate":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y prueba de audiovisual"},
+    {frac:0,what:"Registro de asistentes"},
+    {frac:0.15,what:"Bienvenida e inicio"},
+    {frac:0.32,what:"Primera conferencia o sesión"},
+    {frac:0.5,what:"Coffee break"},
+    {frac:0.65,what:"Segunda conferencia o sesión"},
+    {frac:0.85,what:"Networking"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and AV testing"},
+    {frac:0,what:"Attendee check-in"},
+    {frac:0.15,what:"Welcome and opening"},
+    {frac:0.32,what:"First talk or session"},
+    {frac:0.5,what:"Coffee break"},
+    {frac:0.65,what:"Second talk or session"},
+    {frac:0.85,what:"Networking"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  },
+  "Quinceañera":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Misa o ceremonia religiosa"},
+    {frac:0.25,what:"Recepción y coctel"},
+    {frac:0.45,what:"Cena"},
+    {frac:0.62,what:"Vals"},
+    {frac:0.75,what:"Brindis y pastel"},
+    {frac:0.9,what:"Fiesta y pista abierta"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Religious ceremony"},
+    {frac:0.25,what:"Reception and cocktail hour"},
+    {frac:0.45,what:"Dinner"},
+    {frac:0.62,what:"Waltz"},
+    {frac:0.75,what:"Toast and cake"},
+    {frac:0.9,what:"Party and open floor"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  },
+  "Graduación/Graduation":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Llegada de invitados"},
+    {frac:0.2,what:"Ceremonia y entrega de diplomas"},
+    {frac:0.45,what:"Palabras y discursos"},
+    {frac:0.6,what:"Comida o coctel"},
+    {frac:0.8,what:"Fiesta"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Guest arrival"},
+    {frac:0.2,what:"Ceremony and diploma handout"},
+    {frac:0.45,what:"Speeches"},
+    {frac:0.6,what:"Meal or cocktail"},
+    {frac:0.8,what:"Party"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  },
+  "Aniversario/Anniversary":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Llegada y recepción"},
+    {frac:0.3,what:"Cena"},
+    {frac:0.6,what:"Brindis y palabras especiales"},
+    {frac:0.8,what:"Baile o actividad especial"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Arrival and reception"},
+    {frac:0.3,what:"Dinner"},
+    {frac:0.6,what:"Toast and special words"},
+    {frac:0.8,what:"Dance or special activity"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  },
+  "Fiesta Infantil/Kids Party":{
+    es:[
+    {offsetBeforeMin:60,what:"Llegada del equipo y montaje final"},
+    {frac:0,what:"Llegada de niños e invitados"},
+    {frac:0.2,what:"Recepción y bienvenida"},
+    {frac:0.4,what:"Juegos y animación"},
+    {frac:0.6,what:"Pastel"},
+    {frac:0.75,what:"Piñata"},
+    {frac:0.9,what:"Fiesta y baile"},
+    {frac:1,what:"Cierre del evento"},
+    {offsetAfterMin:30,what:"Desmontaje"}
+  ],
+    en:[
+    {offsetBeforeMin:60,what:"Team arrival and final setup"},
+    {frac:0,what:"Kids and guests arrive"},
+    {frac:0.2,what:"Welcome and reception"},
+    {frac:0.4,what:"Games and entertainment"},
+    {frac:0.6,what:"Cake"},
+    {frac:0.75,what:"Piñata"},
+    {frac:0.9,what:"Party and dancing"},
+    {frac:1,what:"Event ends"},
+    {offsetAfterMin:30,what:"Breakdown / teardown"}
+  ]
+  }
 };
 
 function buildDayItinerary(){
@@ -3829,7 +4069,8 @@ function buildDayItinerary(){
     const period=h<12?'AM':'PM'; const h12=h%12===0?12:h%12;
     return `${h12}:${String(mi).padStart(2,'0')} ${period}`;
   };
-  return DAY_ITINERARY_TEMPLATE[p.lang].map(item=>{
+  const typeItinerary=DAY_ITINERARY_TEMPLATE[p.eventTypeRaw]||DAY_ITINERARY_TEMPLATE['Boda/Wedding'];
+  return typeItinerary[p.lang].map(item=>{
     let m;
     if(item.offsetBeforeMin!==undefined) m=startMin-item.offsetBeforeMin;
     else if(item.offsetAfterMin!==undefined) m=endMin+item.offsetAfterMin;
@@ -4485,19 +4726,29 @@ function adjustBudgetWithQuotes(){
 // ══════════════════════════════
 const SYSTEM_HTML='You are an expert event planner AI for DragonflAI Events. Write ALL content in the language specified in the prompt. Return ONLY clean HTML. No markdown, no code fences, no preamble. Never leave content incomplete.';
 
-async function callAI(prompt,model,maxTokens,system){
+async function callAI(prompt,model,maxTokens,system,purpose='generate',genId=null){
+  // El Worker ahora exige sesión — mandamos el token de Supabase.
+  const {data:{session}={}}=sb?await sb.auth.getSession():{data:{}};
+  const headers={'Content-Type':'application/json','X-DFLAI-Purpose':purpose};
+  if(session?.access_token) headers['Authorization']='Bearer '+session.access_token;
+  if(genId) headers['X-DFLAI-Gen-Id']=genId;
   const res=await fetch(WORKER_URL,{
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers,
     body:JSON.stringify({model,max_tokens:maxTokens,system,messages:[{role:'user',content:prompt}]})
   });
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`Error ${res.status}`);}
+  if(!res.ok){
+    const e=await res.json().catch(()=>({}));
+    const err=new Error(e.error?.message||`Error ${res.status}`);
+    err.status=res.status; // 401 = falta login, 402 = sin generaciones/créditos
+    throw err;
+  }
   const data=await res.json();
   return data.content?.[0]?.text||'';
 }
 
-async function callClaude(prompt,model='claude-sonnet-4-5',maxTokens=2000){
-  const h=await callAI(prompt,model,maxTokens,SYSTEM_HTML);
+async function callClaude(prompt,model='claude-sonnet-4-5',maxTokens=2000,genId=null){
+  const h=await callAI(prompt,model,maxTokens,SYSTEM_HTML,'generate',genId);
   return h.replace(/```html?\n?/gi,'').replace(/```\n?/g,'').trim();
 }
 
@@ -4601,7 +4852,9 @@ async function loadMyPlans(){
 }
 
 async function loadSavedPlan(id){
-  const {data,error}=await sb.from('plans').select('plan_data').eq('id',id).single();
+  // .eq('user_id') es redundante si RLS está bien configurado, pero como ya
+  // hubo bugs de RLS antes, esta segunda capa explícita no cuesta nada.
+  const {data,error}=await sb.from('plans').select('plan_data').eq('id',id).eq('user_id',currentUser.id).single();
   if(error||!data){ showToast(lang==='es'?'No se pudo abrir el plan':'Could not open the plan',true); return; }
   const saved=data.plan_data||{};
   plan=saved.plan||{};
@@ -5037,7 +5290,11 @@ async function onGuestExcelFileSelected(event){
 }
 
 
+let countdownTmr=null;
 function startCountdown(){
+  // Limpiar el reloj anterior — sin esto, cada plan generado en la misma
+  // sesión dejaba OTRO setInterval corriendo sobre los mismos elementos.
+  if(countdownTmr){ clearInterval(countdownTmr); countdownTmr=null; }
   const raw=document.getElementById('f-date').value;
   if(!raw) return;
   const eventDate=new Date(raw+'T23:59:59');
@@ -5057,7 +5314,7 @@ function startCountdown(){
     const n=plan.name&&plan.name!=='el anfitrión'&&plan.name!=='the host'?plan.name+', ':'';
     document.getElementById('cd-name').innerHTML=lang==='es'?`${n}¡faltan ${Math.floor(diff/(1000*60*60*24))} días! <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg>`:`${n}only ${Math.floor(diff/(1000*60*60*24))} days! <svg width="20" height="20" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".5" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".5" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/></svg>`;
   }
-  tick(); setInterval(tick,60000);
+  tick(); countdownTmr=setInterval(tick,60000);
 }
 
 function shareWhatsApp(){
@@ -5072,7 +5329,7 @@ Invitados: ${p.guests}
 Presupuesto: $${parseInt(p.budget).toLocaleString()} ${(p.extra&&p.extra.currency)||'MXN'}
 Estilo: ${p.vibe}
 
-GeneRe mi plan completo con IA: cronograma, presupuesto, checklist y Save the Date.
+Creamos juntos mi plan completo: cronograma, presupuesto, checklist y Save the Date.
 
 Quieres el tuyo? -> dragonflaievents.com`
     :`*DragonflAI Events - My ${p.typeName}*
@@ -5083,7 +5340,7 @@ Guests: ${p.guests}
 Budget: $${parseInt(p.budget).toLocaleString()} ${(p.extra&&p.extra.currency)||'MXN'}
 Vibe: ${p.vibe}
 
-I created my complete event plan with AI: timeline, budget, checklist and Save the Date.
+We created my complete event plan together: timeline, budget, checklist and Save the Date.
 
 Get yours -> dragonflaievents.com`;
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');

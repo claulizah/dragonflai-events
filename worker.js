@@ -1,49 +1,62 @@
 // ══════════════════════════════════════════════════════════════
-//  DragonflAI Events — Cloudflare Worker (Sistema de accesos DIY/Planner)
+//  DragonflAI Events — Cloudflare Worker (versión SEGURA)
 //  Reemplaza tu worker.js anterior con este.
+//
+//  QUÉ CAMBIÓ VS LA VERSIÓN ANTERIOR (y por qué):
+//
+//  1. El proxy a Claude ahora EXIGE sesión de Supabase válida.
+//     Antes cualquiera con la URL del Worker podía usar tu API key de
+//     Anthropic gratis y sin límite (el límite de 2 planes vivía solo
+//     en el localStorage del navegador, que se borra en 2 clicks).
+//
+//  2. El límite de generaciones gratis ahora vive en la BASE DE DATOS
+//     (función worker_authorize_ai — ver supabase-setup.sql), por usuario,
+//     no por navegador. Ya no se puede burlar con modo incógnito.
+//
+//  3. Solo se aceptan los modelos y max_tokens que la app realmente usa.
+//     Antes cualquiera podía pedir el modelo más caro con max_tokens
+//     enorme a tu costa.
+//
+//  4. /send-reminders ahora verifica que quien lo llama sea el DUEÑO de
+//     la invitación. Antes cualquiera con un invitation_id podía disparar
+//     correos a tus invitados (spam con tu dominio + costo de Resend).
+//
+//  5. CORS restringido a tus dominios (antes era '*').
+//
+//  6. El webhook de Stripe es idempotente: si Stripe reintenta la misma
+//     notificación (pasa seguido), ya no se aplican los créditos DOBLES.
+//
+//  REQUIERE: correr supabase-setup.sql en Supabase ANTES de desplegar esto.
+//
+// BINDINGS REQUERIDOS (los mismos que ya tienes — no hay nuevos):
+//  - ANTHROPIC_API_KEY
+//  - STRIPE_WEBHOOK_SECRET
+//  - STRIPE_SECRET_KEY
+//  - SUPABASE_URL
+//  - SUPABASE_SERVICE_ROLE_KEY
+//  - RESEND_API_KEY
 // ══════════════════════════════════════════════════════════════
-//
-// BINDINGS REQUERIDOS (Cloudflare dashboard → tu Worker → Settings → Variables):
-//
-//  - ANTHROPIC_API_KEY          (la que ya usas hoy)
-//  - STRIPE_WEBHOOK_SECRET      (la obtienes al crear el webhook en Stripe)
-//  - STRIPE_SECRET_KEY          (NUEVA — Stripe Dashboard → Developers → API keys →
-//                                 "Secret key", empieza con sk_live_ o sk_test_.
-//                                 Se usa para consultar qué productos trae cada compra.
-//                                 NUNCA la pongas en el frontend, solo aquí.)
-//  - SUPABASE_URL               (Supabase dashboard → Settings → API → Project URL)
-//  - SUPABASE_SERVICE_ROLE_KEY  (Supabase dashboard → Settings → API → service_role secret
-//                                 — NUNCA la pongas en el frontend, solo aquí en el Worker)
-//  - RESEND_API_KEY             (NUEVA — Resend dashboard → API Keys. Se usa para mandar
-//                                 los correos de recordatorio. NUNCA la pongas en el frontend.)
-//
-// CÓMO IDENTIFICA CADA COMPRA: cada producto en Stripe debe tener esta metadata
-// (Stripe → Catálogo de productos → tu producto → Metadata):
-//
-//   access_type      = "diy" o "planner"                    (obligatorio en los 5)
-//   credits          = número de eventos, ej. "1", "3", "10" (solo en productos de eventos)
-//   unlimited_days   = "365"                                 (solo en productos Anuales)
-//
-// ENDPOINTS QUE EXPONE ESTE WORKER:
-//
-//  POST /                 → proxy a la API de Claude (igual que siempre)
-//  POST /stripe-webhook   → Stripe llama aquí cuando se confirma un pago;
-//                            este Worker lee qué producto se compró y aplica
-//                            los créditos o el acceso anual correspondiente en Supabase
-//  POST /send-reminders   → NUEVO. Lo llama el botón "Enviar recordatorio" en
-//                            Mis invitaciones. Body: { invitation_id }
-//
-// ══════════════════════════════════════════════════════════════
+
+// Dominios que pueden llamar a este Worker desde el navegador.
+// Agrega/quita según tus entornos.
+const ALLOWED_ORIGINS = [
+  'https://dragonflaievents.com',
+  'https://www.dragonflaievents.com',
+  'https://dragonflai.netlify.app'
+];
+
+// Modelos que la app usa hoy. Si algún día cambias de modelo en el
+// frontend, agrégalo aquí también o el Worker lo rechazará.
+const ALLOWED_MODELS = ['claude-sonnet-4-5'];
+
+// Techos de tokens por propósito — el chat de ayuda nunca necesita más
+// de 800, y la generación de plan nunca pide más de 3800 hoy.
+const MAX_TOKENS = { chat: 800, generate: 4200 };
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-
-    const CORS = {
-      'Access-Control-Allow-Origin': '*', // recomendado: cambiar '*' por tu dominio real
-      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type,Stripe-Signature'
-    };
+    const CORS = corsHeadersFor(request);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: CORS });
@@ -63,16 +76,24 @@ export default {
 
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
-        // client_reference_id es el UUID del usuario de Supabase
-        // (se manda al crear el link de pago — ver goToPay() en el frontend).
         const userId = session.client_reference_id;
 
         if (userId) {
-          try {
-            await applyPurchase(env, userId, session.id);
-          } catch (err) {
-            console.error('Error aplicando la compra:', err);
-            return new Response('Purchase processing failed', { status: 500, headers: CORS });
+          // IDEMPOTENCIA: registrar la sesión ANTES de aplicar. Si ya estaba
+          // registrada (Stripe reintentó, o llegó duplicada), no se aplica
+          // dos veces — sin esto, un reintento del webhook DUPLICA créditos.
+          const isNew = await claimStripeSession(env, session.id);
+          if (isNew) {
+            try {
+              await applyPurchase(env, userId, session.id);
+            } catch (err) {
+              console.error('Error aplicando la compra:', err);
+              // Liberar el registro para que el reintento de Stripe sí la procese
+              await releaseStripeSession(env, session.id);
+              return new Response('Purchase processing failed', { status: 500, headers: CORS });
+            }
+          } else {
+            console.log('Sesión ya procesada, ignorando reintento:', session.id);
           }
         }
       }
@@ -80,24 +101,81 @@ export default {
       return new Response('ok', { status: 200, headers: CORS });
     }
 
-    // ── ENVIAR RECORDATORIOS (lo llama el botón "Enviar recordatorio" en Mis invitaciones) ──
+    // ── ENVIAR RECORDATORIOS ──
     if (url.pathname === '/send-reminders' && request.method === 'POST') {
       try {
+        // Quién llama tiene que estar logueado…
+        const user = await getUserFromRequest(request, env);
+        if (!user) {
+          return json({ success: false, reason: 'login_required' }, 401, CORS);
+        }
+
         const { invitation_id } = await request.json();
         if (!invitation_id) {
-          return new Response(JSON.stringify({ success: false, reason: 'missing_invitation_id' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
+          return json({ success: false, reason: 'missing_invitation_id' }, 400, CORS);
         }
+
+        // …y además ser el DUEÑO de esa invitación. Sin esto, cualquiera con
+        // un invitation_id (que aparece en URLs públicas) podía disparar
+        // correos a los invitados de otra persona.
+        const ownRes = await fetch(
+          `${env.SUPABASE_URL}/rest/v1/invitations?id=eq.${encodeURIComponent(invitation_id)}&select=user_id`,
+          { headers: serviceHeaders(env) }
+        );
+        const ownArr = await ownRes.json();
+        const inv = Array.isArray(ownArr) && ownArr[0];
+        if (!inv) return json({ success: false, reason: 'invitation_not_found' }, 404, CORS);
+        if (inv.user_id !== user.id) return json({ success: false, reason: 'not_your_invitation' }, 403, CORS);
+
         const result = await sendReminderEmails(env, invitation_id);
-        return new Response(JSON.stringify(result), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+        return json(result, 200, CORS);
       } catch (err) {
         console.error('Error enviando recordatorios:', err);
-        return new Response(JSON.stringify({ success: false, reason: 'server_error' }), { status: 500, headers: { ...CORS, 'Content-Type': 'application/json' } });
+        return json({ success: false, reason: 'server_error' }, 500, CORS);
       }
     }
 
-    // ── PROXY A CLAUDE (tu funcionalidad actual) ──
-    if (request.method === 'POST') {
-      const body = await request.text();
+    // ── PROXY A CLAUDE (ahora con autenticación y límites de verdad) ──
+    if (url.pathname === '/' && request.method === 'POST') {
+      // 1) ¿Quién eres? Sin sesión válida de Supabase, no hay IA.
+      const user = await getUserFromRequest(request, env);
+      if (!user) {
+        return json({ error: { type: 'auth', message: 'login_required' } }, 401, CORS);
+      }
+
+      // 2) ¿Qué pides? Solo los modelos/tokens que la app usa de verdad.
+      let payload;
+      try { payload = await request.json(); }
+      catch { return json({ error: { type: 'bad_request', message: 'invalid_json' } }, 400, CORS); }
+
+      if (!ALLOWED_MODELS.includes(payload.model)) {
+        return json({ error: { type: 'bad_request', message: 'model_not_allowed' } }, 400, CORS);
+      }
+
+      const purpose = request.headers.get('X-DFLAI-Purpose') === 'chat' ? 'chat' : 'generate';
+      const cap = MAX_TOKENS[purpose];
+      payload.max_tokens = Math.min(parseInt(payload.max_tokens, 10) || cap, cap);
+
+      // 3) ¿Te toca? La base de datos decide (créditos pagados, acceso anual,
+      //    o tus generaciones gratis) — ver worker_authorize_ai en el SQL.
+      //    gen_id agrupa las 2-3 llamadas de UNA misma generación de plan
+      //    para que cuenten como 1 sola generación gratis, no como 3.
+      const genId = request.headers.get('X-DFLAI-Gen-Id') || null;
+      const authRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/worker_authorize_ai`, {
+        method: 'POST',
+        headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_user_id: user.id, p_purpose: purpose, p_gen_id: genId })
+      });
+      if (!authRes.ok) {
+        console.error('worker_authorize_ai falló:', await authRes.text());
+        return json({ error: { type: 'server', message: 'authorization_check_failed' } }, 500, CORS);
+      }
+      const decision = await authRes.json();
+      if (!decision || decision.allowed !== true) {
+        return json({ error: { type: 'limit', message: (decision && decision.reason) || 'not_allowed' } }, 402, CORS);
+      }
+
+      // 4) Recién aquí gastamos dinero de verdad.
       const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -105,7 +183,7 @@ export default {
           'x-api-key': env.ANTHROPIC_API_KEY,
           'anthropic-version': '2023-06-01'
         },
-        body
+        body: JSON.stringify(payload)
       });
       const data = await anthropicRes.text();
       return new Response(data, {
@@ -119,11 +197,94 @@ export default {
 };
 
 // ══════════════════════════════════════════════════════════════
+//  Helpers
+// ══════════════════════════════════════════════════════════════
+
+function corsHeadersFor(request) {
+  const origin = request.headers.get('Origin') || '';
+  const allow = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allow,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type,Stripe-Signature,Authorization,X-DFLAI-Purpose,X-DFLAI-Gen-Id'
+  };
+}
+
+function json(obj, status, cors) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { ...cors, 'Content-Type': 'application/json' }
+  });
+}
+
+function serviceHeaders(env) {
+  return {
+    'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+    'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
+  };
+}
+
+// Valida el JWT de Supabase que manda el navegador (Authorization: Bearer …)
+// preguntándole a Supabase directamente. Si el token es inválido o venció,
+// regresa null. No implementamos crypto de JWT a mano: Supabase es la fuente
+// de la verdad.
+async function getUserFromRequest(request, env) {
+  const auth = request.headers.get('Authorization') || '';
+  if (!auth.startsWith('Bearer ')) return null;
+  const token = auth.slice(7).trim();
+  if (!token) return null;
+  try {
+    const res = await fetch(`${env.SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!res.ok) return null;
+    const user = await res.json();
+    return user && user.id ? user : null;
+  } catch {
+    return null;
+  }
+}
+
+// Registra la sesión de Stripe como "en proceso". Devuelve true solo la
+// PRIMERA vez que ve ese session_id; los reintentos devuelven false.
+async function claimStripeSession(env, sessionId) {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/processed_stripe_sessions`, {
+    method: 'POST',
+    headers: {
+      ...serviceHeaders(env),
+      'Content-Type': 'application/json',
+      // ignore-duplicates + return=representation: si ya existía, regresa []
+      'Prefer': 'resolution=ignore-duplicates,return=representation'
+    },
+    body: JSON.stringify([{ session_id: sessionId }])
+  });
+  if (!res.ok) {
+    // Si la tabla no existe todavía (SQL sin correr), preferimos procesar la
+    // compra (comportamiento anterior) a perderla.
+    console.error('claimStripeSession falló — ¿corriste supabase-setup.sql?', await res.text());
+    return true;
+  }
+  const rows = await res.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function releaseStripeSession(env, sessionId) {
+  await fetch(`${env.SUPABASE_URL}/rest/v1/processed_stripe_sessions?session_id=eq.${encodeURIComponent(sessionId)}`, {
+    method: 'DELETE',
+    headers: serviceHeaders(env)
+  }).catch(() => {});
+}
+
+// ══════════════════════════════════════════════════════════════
 //  Lee qué producto(s) trae la compra, y aplica los créditos o el
 //  acceso anual correspondiente al perfil del usuario en Supabase.
+//  (Sin cambios funcionales vs tu versión anterior.)
 // ══════════════════════════════════════════════════════════════
 async function applyPurchase(env, userId, sessionId) {
-  // 1) Traer los line items de la sesión, con el producto expandido para leer su metadata
   const liRes = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${sessionId}/line_items?expand[]=data.price.product`,
     { headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}` } }
@@ -134,7 +295,6 @@ async function applyPurchase(env, userId, sessionId) {
   const liData = await liRes.json();
   const lineItems = liData.data || [];
 
-  // 2) Acumular lo que hay que aplicar (por si algún día se compra más de un producto junto)
   let diyCreditsToAdd = 0, plannerCreditsToAdd = 0;
   let diyUnlimitedDays = 0, plannerUnlimitedDays = 0;
 
@@ -163,15 +323,9 @@ async function applyPurchase(env, userId, sessionId) {
     return;
   }
 
-  // 3) Traer el saldo actual del usuario, para sumar créditos y extender vencimientos correctamente
   const profRes = await fetch(
     `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=diy_event_credits,diy_unlimited_until,planner_event_credits,planner_unlimited_until`,
-    {
-      headers: {
-        'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`
-      }
-    }
+    { headers: serviceHeaders(env) }
   );
   if (!profRes.ok) {
     throw new Error('No se pudo leer el perfil actual: ' + await profRes.text());
@@ -180,7 +334,7 @@ async function applyPurchase(env, userId, sessionId) {
   const prof = profArr[0] || {};
 
   const patch = {
-    paid: true, // se conserva por compatibilidad — "¿ha pagado algo alguna vez?"
+    paid: true,
     paid_at: new Date().toISOString(),
     stripe_session_id: sessionId
   };
@@ -189,8 +343,6 @@ async function applyPurchase(env, userId, sessionId) {
     patch.diy_event_credits = (prof.diy_event_credits || 0) + diyCreditsToAdd;
   }
   if (diyUnlimitedDays > 0) {
-    // Si ya tenía anual vigente, se le suman los días desde donde vencía (no desde hoy) —
-    // así renovar antes de que se acabe no le "roba" los días que le quedaban.
     const currentExpiry = prof.diy_unlimited_until ? new Date(prof.diy_unlimited_until) : null;
     const base = (currentExpiry && currentExpiry > new Date()) ? currentExpiry : new Date();
     base.setDate(base.getDate() + diyUnlimitedDays);
@@ -209,8 +361,7 @@ async function applyPurchase(env, userId, sessionId) {
   const patchRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, {
     method: 'PATCH',
     headers: {
-      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
-      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      ...serviceHeaders(env),
       'Content-Type': 'application/json',
       'Prefer': 'return=minimal'
     },
@@ -224,25 +375,19 @@ async function applyPurchase(env, userId, sessionId) {
 
 // Busca a quién le falta responder (y sí dejó su correo), y le manda un
 // recordatorio a cada quien vía Resend. Se llama desde /send-reminders.
+// (Sin cambios vs tu versión anterior — la validación de dueño se hace antes.)
 async function sendReminderEmails(env, invitationId) {
-  // 1) Traer los datos de la invitación (para armar el mensaje y el link)
   const invRes = await fetch(
     `${env.SUPABASE_URL}/rest/v1/invitations?id=eq.${invitationId}&select=host_names,slug,event_date,location`,
-    { headers: { 'apikey': env.SUPABASE_SERVICE_ROLE_KEY, 'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}` } }
+    { headers: serviceHeaders(env) }
   );
   const invData = await invRes.json();
   const inv = Array.isArray(invData) && invData[0];
   if (!inv) return { success: false, reason: 'invitation_not_found' };
 
-  // 2) Traer a quién le falta responder y tiene correo (vía la función segura,
-  //    con la service_role key que sí puede saltarse RLS)
   const pendingRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/get_pending_guests_for_reminder`, {
     method: 'POST',
-    headers: {
-      'apikey': env.SUPABASE_SERVICE_ROLE_KEY,
-      'Authorization': `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-      'Content-Type': 'application/json'
-    },
+    headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
     body: JSON.stringify({ p_invitation_id: invitationId })
   });
   const pending = await pendingRes.json();
@@ -297,7 +442,6 @@ function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invit
 }
 
 // Verificación manual de la firma de Stripe usando Web Crypto API
-// (disponible nativamente en Cloudflare Workers, sin necesitar el SDK de Stripe).
 async function verifyStripeSignature(payload, sigHeader, secret) {
   if (!sigHeader || !secret) return false;
   const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')));
