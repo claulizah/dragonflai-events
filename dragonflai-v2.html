@@ -123,6 +123,7 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 .logo-name .ai{color:var(--teal)}
 .logo-sub{font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
 .mode-pill{font-size:11px;font-weight:600;padding:4px 14px;border-radius:100px;letter-spacing:.03em;transition:all .2s}
+#mode-pill{margin-right:auto;margin-left:10px} /* pegado al logo, no flotando al centro del header */
 .mode-pill.diy{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--border)}
 .mode-pill.pro{background:var(--violet-light);color:var(--violet);border:1px solid rgba(123,47,190,.25)}
 
@@ -759,7 +760,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </div>
         <div class="field">
           <label data-es="Ambiente / estilo" data-en="Vibe / style">Ambiente / estilo</label>
-          <input type="text" id="f-vibe" placeholder="ej. "Blanco y Negro / Retro / Hawaiana" data-placeholder-es="ej. Blanco y Negro / Retro / Hawaiana" data-placeholder-en="e.g. Black and White / Retro / Hawaiian">
+          <input type="text" id="f-vibe" placeholder="ej. Blanco y negro / Bohemia / Hawaiana" data-placeholder-es="ej. Blanco y negro / Bohemia / Hawaiana" data-placeholder-en="e.g. Black &amp; White / Boho / Hawaiian">
           <div class="rgroup" id="vibe-suggestions" style="margin-top:.4rem"></div>
           <p style="font-size:11px;color:var(--text-3);font-style:italic;margin:.45rem 0 0;line-height:1.5" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
         </div>
@@ -2825,17 +2826,17 @@ const BG_GRADIENTS=[
 ];
 
 // 10 fuentes para el nombre de los anfitriones (7 originales + 3 divertidas)
+// Curadas para verse bien en una invitación formal — las casuales (Poppins,
+// Comic Neue, Chewy) se quitaron del selector, pero su CSS sigue existiendo
+// para que tarjetas guardadas con esas letras no se rompan.
 const FONT_OPTIONS=[
   {cls:'',family:"'Cormorant Garamond',serif",label:{es:'Elegante',en:'Elegant'}},
   {cls:'font-classic',family:"'Playfair Display',serif",label:{es:'Clásica',en:'Classic'}},
-  {cls:'font-modern',family:"'Montserrat',sans-serif",label:{es:'Moderna',en:'Modern'}},
   {cls:'font-script',family:"'Dancing Script',cursive",weight:700,label:{es:'Script',en:'Script'}},
   {cls:'font-soft',family:"'Libre Baskerville',serif",label:{es:'Serif suave',en:'Soft serif'}},
-  {cls:'font-round',family:"'Poppins',sans-serif",label:{es:'Redondeada',en:'Rounded'}},
   {cls:'font-editorial',family:"'Cinzel',serif",label:{es:'Editorial',en:'Editorial'}},
-  {cls:'font-fun',family:"'Fredoka',sans-serif",weight:600,label:{es:'Divertida',en:'Fun'}},
-  {cls:'font-comic',family:"'Comic Neue',cursive",weight:700,label:{es:'Amigable',en:'Friendly'}},
-  {cls:'font-playful',family:"'Chewy',cursive",label:{es:'Juguetona',en:'Playful'}}
+  {cls:'font-modern',family:"'Montserrat',sans-serif",label:{es:'Moderna',en:'Modern'}},
+  {cls:'font-fun',family:"'Fredoka',sans-serif",weight:600,label:{es:'Divertida',en:'Fun'}}
 ];
 
 // 10 colores de texto/detalles
@@ -3750,6 +3751,7 @@ function buildIdeasOnlyPrompt(note){
 ${ctx}
 ${note?`USER ADJUSTMENT REQUEST — TOP PRIORITY, follow it above everything else: "${note}"`:''}
 Create ONLY the creative-ideas section for this event. NEVER use <h1>, page titles, or inline style attributes — only <h2>, <h3>, <p>, <ul><li>, <strong>.
+CRITICAL BUDGET RULE: The total budget is ${p.budget} for ${p.guests} guests — EVERY suggestion must be realistically achievable within it. With a modest budget, favor affordable options: seasonal LOCAL flowers (NEVER peonies, imported blooms, or premium florals unless the budget is clearly high-end), DIY-friendly decor, and rentals over purchases. Never propose luxury items or costly themes that don't match the stated budget.
 Reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".
 Include:
 1. Signature moment
@@ -3797,6 +3799,7 @@ ${p.mode==='diy'?`Start DIRECTLY with a warm 2-sentence personalized intro parag
 Use <h2>, <p>, <ul><li>, <strong>. Include: personalized intro, event snapshot as bullet list (date, location, guests, budget, vibe), 3-4 key highlights tied to must-haves, 3 smart practical tips.
 
 === SECTION 2: CREATIVE IDEAS ===
+CRITICAL BUDGET RULE: The total budget is ${p.budget} for ${p.guests} guests — EVERY suggestion must be realistically achievable within it. With a modest budget, favor affordable options: seasonal LOCAL flowers (NEVER peonies, imported blooms, or premium florals unless the budget is clearly high-end), DIY-friendly decor, and rentals over purchases. Never propose luxury items or costly themes that don't match the stated budget.
 Reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".
 Use <h2>, <p>, <ul><li>:
 1. Signature moment
