@@ -328,10 +328,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
 .line-editor{margin-bottom:.6rem}
-.line-editor-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
-.line-editor-row input{flex:1;min-width:120px;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--cream)}
-.line-editor-row input.le-date,.line-editor-row input.le-time{min-width:105px}
-.line-editor-row .le-remove{flex:0 0 auto;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border-gray);background:var(--cream-2);color:var(--text-3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+/* Cada fila es una mini-tarjeta con rejilla de 2 columnas: campos parejos,
+   sin saltos raros, y el botón de quitar (✕) fijo en la esquina — antes el
+   flex-wrap acomodaba los campos en filas desiguales y el ✕ caía solo. */
+.line-editor-row{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;padding:10px;padding-right:40px;border:1.5px solid var(--border-gray);border-radius:var(--radius);background:var(--cream-2)}
+.line-editor-row input{width:100%;min-width:0;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;color:var(--text);background:var(--white)}
+.line-editor-row .le-full{grid-column:1/-1}
+.line-editor-row .le-dt-wrap{display:flex;gap:6px}
+.line-editor-row input.le-date{flex:1.2;min-width:0}
+.line-editor-row input.le-time{flex:1;min-width:0}
+.line-editor-row .le-remove{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border-gray);background:var(--white);color:var(--text-3);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
 .line-editor-add{font-size:12px;color:var(--violet);background:none;border:none;cursor:pointer;padding:2px 0;font-family:'Inter',sans-serif;font-weight:600}
 
 /* Modal de publicar — formulario a la izquierda, vista previa en vivo a
@@ -341,8 +347,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .publish-preview-col{flex:0 0 390px;min-width:320px;max-width:390px}
 @media (max-width:760px){
   .publish-layout{flex-direction:column}
-  .publish-preview-col{order:-1;max-width:none;flex-basis:auto}
+  .publish-preview-col{order:-1;max-width:none;flex-basis:auto;min-width:0;width:100%}
   .publish-preview-col #publish-live-preview-container{position:static!important}
+}
+@media (max-width:600px){
+  /* En teléfono el modal tenía padding de escritorio (2rem + 1.5rem del
+     overlay) y la vista previa se salía por la derecha — se aprieta todo
+     para que la tarjeta quepa completa. */
+  #publish-modal{padding:.75rem}
+  #publish-modal .excel-modal{padding:1.25rem 1rem}
+  #publish-modal .std-card{padding:2rem 1.25rem}
 }
 .theme-swatch{width:34px;height:34px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s}
 .theme-swatch.active{border-color:var(--text);transform:scale(1.15)}
@@ -603,7 +617,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   </a>
   <span class="mode-pill diy" id="mode-pill">Planeación personal</span>
   <div id="account-area" class="account-area">
-    <button class="btn-account" id="btn-login" onclick="openAuthModal()">👤 <span data-es="Iniciar sesión" data-en="Log in">Iniciar sesión</span></button>
+    <button class="btn-account" id="btn-login" onclick="openAuthModal()">👤 <span data-es="Entrar" data-en="Log in">Entrar</span></button>
     <div class="account-menu" id="account-menu" style="display:none">
       <button class="btn-account" id="btn-account-email" onclick="toggleAccountDropdown()"></button>
       <div class="account-dropdown" id="account-dropdown" style="display:none">
@@ -1032,6 +1046,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   <div class="excel-modal" id="auth-modal-body">
     <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem">🪄</span>
     <h3 data-es="Inicia sesión" data-en="Log in">Inicia sesión</h3>
+    <p id="auth-expired-note" style="display:none;background:#FBE0E5;color:#C14A5E;border-radius:var(--radius);padding:10px 14px;font-size:12.5px;line-height:1.5;margin-bottom:.75rem" data-es="⏳ Tu enlace expiró o ya se usó — pasa con los correos que tardan en abrirse. Escribe tu correo y te enviamos uno nuevo." data-en="⏳ Your link expired or was already used — happens with emails opened late. Enter your email and we'll send you a fresh one.">⏳ Tu enlace expiró o ya se usó — pasa con los correos que tardan en abrirse. Escribe tu correo y te enviamos uno nuevo.</p>
     <p data-es="Sin contraseñas — solo dale clic al botón de abajo para crear tu cuenta y tener acceso a la creación de tu evento." data-en="No passwords — just click the button below to create your account and get access to creating your event.">Sin contraseñas — solo dale clic al botón de abajo para crear tu cuenta y tener acceso a la creación de tu evento.</p>
     <input type="text" id="auth-name" placeholder="Tu nombre (opcional)" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.6rem;box-sizing:border-box">
     <input type="email" id="auth-email" placeholder="tu@correo.com" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.75rem;box-sizing:border-box">
@@ -1111,7 +1126,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <div id="publish-form" class="publish-form-col">
       <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:.4rem">
-        <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/</span>
+        <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/i/</span>
         <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
       </div>
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem;display:none" id="pub-slug-locked-note" data-es="El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste." data-en="The link can't change once published — avoids breaking links you already shared.">El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste.</p>
@@ -1441,7 +1456,21 @@ function updateAccountUI(){
 }
 
 function openAuthModal(){ document.getElementById('auth-modal').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeAuthModal(){ document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow=''; }
+function closeAuthModal(){ document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow=''; const n=document.getElementById('auth-expired-note'); if(n) n.style.display='none'; }
+
+// ── Link mágico expirado ──
+// Supabase regresa el error en el hash de la URL (#error=access_denied&
+// error_code=otp_expired...). Antes el usuario veía la URL cruda con el
+// error y no sabía qué hacer — ahora limpiamos la URL, abrimos el login y
+// le explicamos que solo tiene que pedir un enlace nuevo.
+function handleExpiredAuthLink(){
+  const h=location.hash||'';
+  if(!/link-expirado|otp_expired|error=access_denied/.test(h)) return;
+  history.replaceState(null,'',location.pathname+location.search);
+  openAuthModal();
+  const n=document.getElementById('auth-expired-note');
+  if(n) n.style.display='block';
+}
 
 async function sendMagicLink(){
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
@@ -1581,7 +1610,7 @@ async function openPublishModal(){
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
   const bottomCloseEl=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl) bottomCloseEl.style.display='none';
-  document.getElementById('pub-domain-label').textContent=location.host+'/';
+  document.getElementById('pub-domain-label').textContent=invitationHost()+'/i/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
   const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
   if(bgPreviewInit) bgPreviewInit.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
@@ -1869,9 +1898,20 @@ async function buildBrandedQRDataURL(hostNames,hashtag,invUrl){
   return canvas.toDataURL('image/png');
 }
 
+// ── Dominio canónico para links públicos ──
+// Si publicas navegando en dragonflai.netlify.app, el link que compartes
+// igual sale como dragonflaievents.com — un solo dominio "oficial" para tus
+// invitados. En desarrollo local (localhost) se respeta el origin actual.
+function invitationOrigin(){
+  return /(^|\.)netlify\.app$|(^|\.)dragonflaievents\.com$/.test(location.host)
+    ? 'https://dragonflaievents.com'
+    : location.origin;
+}
+function invitationHost(){ return invitationOrigin().replace(/^https?:\/\//,''); }
+
 async function showQRModal(slug,hostNames,hashtag){
   const L=lang==='es';
-  const invUrl=`${location.origin}/${slug}`;
+  const invUrl=`${invitationOrigin()}/i/${slug}`;
   document.getElementById('preview-modal-hint').style.display='none';
   document.getElementById('preview-card-container').innerHTML=`<p style="text-align:center;font-size:12.5px;color:var(--text-3)">${L?'Generando tu QR…':'Generating your QR…'}</p>`;
   document.getElementById('preview-modal').classList.add('open');
@@ -1935,7 +1975,7 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-slug-locked-note').style.display='block';
 
   // Slug de solo lectura — no se puede romper un link ya compartido
-  document.getElementById('pub-domain-label').textContent=location.host+'/';
+  document.getElementById('pub-domain-label').textContent=invitationHost()+'/i/';
   document.getElementById('pub-slug').value=inv.slug;
   document.getElementById('pub-slug').disabled=true;
 
@@ -1990,6 +2030,7 @@ async function openEditInvitationModal(invId){
   plan.name=inv.host_names||'';
   plan.typeName=inv.event_type||'';
   plan.date=inv.event_date||'';
+  plan.rawDate=inv.event_date_raw||plan.rawDate||'';
   plan.location=inv.location||'';
   plan.time=inv.event_time||'';
   plan.extra=plan.extra||{};
@@ -2069,19 +2110,40 @@ function addLineEditorRow(editor,textareaId,fields,values,dateTimeIndex){
   const addBtn=editor.querySelector('.line-editor-add');
   const row=document.createElement('div');
   row.className='line-editor-row';
+  const L=lang==='es';
   fields.forEach((f,i)=>{
     if(i===dateTimeIndex){
       const wrap=document.createElement('div');
-      wrap.style.cssText='display:flex;gap:6px;flex:1 1 230px;min-width:230px';
+      wrap.className='le-dt-wrap le-full';
       const dateInput=document.createElement('input');
-      dateInput.type='date';
-      dateInput.className='le-date';
-      dateInput.style.flex='1.2';
       const timeInput=document.createElement('input');
-      timeInput.type='time';
+      // Los inputs nativos de fecha/hora no muestran placeholder — arrancan
+      // como texto con su hint ("Fecha"/"Hora") y se convierten al enfocar.
+      dateInput.type='text';
+      dateInput.className='le-date';
+      dateInput.placeholder=L?'Fecha':'Date';
+      timeInput.type='text';
       timeInput.className='le-time';
-      timeInput.style.flex='1';
+      timeInput.placeholder=L?'Hora':'Time';
+      // Si la fila ya venía con fecha/hora guardadas (texto formateado, ej.
+      // "Sábado, 17 de enero..."), lo mostramos y lo conservamos tal cual
+      // hasta que la persona elija una fecha nueva — antes se perdía al
+      // editar cualquier otro campo de la invitación.
+      if(values[i]){ wrap.dataset.preserved=values[i]; dateInput.value=values[i]; }
       const onDT=()=>{ syncLineEditor(editor,textareaId,fields,dateTimeIndex); debouncedLivePreview(); };
+      dateInput.addEventListener('focus',()=>{
+        if(wrap.dataset.preserved!==undefined){ delete wrap.dataset.preserved; dateInput.value=''; }
+        dateInput.type='date';
+        // Por default proponemos el día del evento, no el día de hoy —
+        // casi todo el itinerario ocurre ese mismo día.
+        if(!dateInput.value && typeof plan!=='undefined' && plan && plan.rawDate){ dateInput.value=plan.rawDate; onDT(); }
+      });
+      dateInput.addEventListener('blur',()=>{ if(!dateInput.value) dateInput.type='text'; });
+      timeInput.addEventListener('focus',()=>{
+        if(wrap.dataset.preserved!==undefined && !dateInput.value){ delete wrap.dataset.preserved; dateInput.value=''; }
+        timeInput.type='time';
+      });
+      timeInput.addEventListener('blur',()=>{ if(!timeInput.value) timeInput.type='text'; });
       dateInput.oninput=onDT; timeInput.oninput=onDT;
       wrap.appendChild(dateInput); wrap.appendChild(timeInput);
       row.appendChild(wrap);
@@ -2091,6 +2153,10 @@ function addLineEditorRow(editor,textareaId,fields,values,dateTimeIndex){
       input.type='text';
       input.placeholder=f;
       input.value=values[i]||'';
+      // Homologación: en editores de 1-2 campos, y en el primer campo (el
+      // nombre) de los editores largos, el campo ocupa todo el ancho; los
+      // demás se acomodan en pares parejos.
+      if(fields.length<=2 || i===0) input.classList.add('le-full');
       input.oninput=()=>{ syncLineEditor(editor,textareaId,fields,dateTimeIndex); debouncedLivePreview(); };
       row.appendChild(input);
     }
@@ -2115,9 +2181,18 @@ function syncLineEditor(editor,textareaId,fields,dateTimeIndex){
     let inputIdx=0;
     fields.forEach((f,i)=>{
       if(i===dateTimeIndex){
+        const wrap=row.querySelector('.le-dt-wrap');
         const dateInput=row.querySelector('.le-date');
         const timeInput=row.querySelector('.le-time');
-        vals.push(formatEventDateTime(dateInput?dateInput.value:'',timeInput?timeInput.value:''));
+        if(wrap && wrap.dataset.preserved!==undefined){
+          // Fecha/hora que ya venían guardadas y no se han tocado — se
+          // conservan tal cual para no perderlas al editar otros campos.
+          vals.push(wrap.dataset.preserved);
+        } else {
+          const dv=dateInput&&/^\d{4}-\d{2}-\d{2}$/.test(dateInput.value)?dateInput.value:'';
+          const tv=timeInput&&/^\d{2}:\d{2}/.test(timeInput.value)?timeInput.value:'';
+          vals.push(formatEventDateTime(dv,tv));
+        }
       } else {
         const plainInputs=[...row.querySelectorAll('input:not(.le-date):not(.le-time)')];
         vals.push((plainInputs[inputIdx]?plainInputs[inputIdx].value:'').trim());
@@ -2241,8 +2316,17 @@ async function publishInvitation(){
     }
 
     showToast(L?'✅ Cambios guardados':'✅ Changes saved');
+    const editedSlug=slugify(document.getElementById('pub-slug').value);
     closePublishModal();
     loadMyInvitations();
+    // Al terminar de editar, abrimos la invitación pública para ver los
+    // cambios ya aplicados — antes te regresaba a la pantalla anterior y
+    // había que buscar el link a mano. Si el navegador bloquea la pestaña
+    // nueva, navegamos ahí directamente.
+    if(editedSlug){
+      const invW=window.open(`${invitationOrigin()}/i/${editedSlug}`,'_blank');
+      if(!invW) location.href=`${invitationOrigin()}/i/${editedSlug}`;
+    }
     return;
   }
 
@@ -2314,7 +2398,7 @@ async function publishInvitation(){
     }
   }
 
-  lastPublishedUrl=`${location.origin}/${slug}`;
+  lastPublishedUrl=`${invitationOrigin()}/i/${slug}`;
   document.getElementById('publish-url').textContent=lastPublishedUrl;
   try{
     const dataUrl=await buildBrandedQRDataURL(plan.name||'',(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
@@ -2379,10 +2463,10 @@ async function loadMyInvitations(){
     div.innerHTML=`
       <div style="margin-bottom:8px">
         <div style="font-weight:600;font-size:15px;word-break:break-word">${esc(toTitleCase(inv.host_names))}</div>
-        <div style="font-size:11.5px;color:var(--text-3);word-break:break-all">${location.host}/${esc(inv.slug)}</div>
+        <div style="font-size:11.5px;color:var(--text-3);word-break:break-all">${invitationHost()}/i/${esc(inv.slug)}</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-        <button class="btn-account" title="${L?'Ver invitación pública':'View public invitation'}" onclick="window.open('${location.origin}/${esc(inv.slug)}','_blank')">👁️ ${L?'Ver':'View'}</button>
+        <button class="btn-account" title="${L?'Ver invitación pública':'View public invitation'}" onclick="window.open('${invitationOrigin()}/i/${esc(inv.slug)}','_blank')">👁️ ${L?'Ver':'View'}</button>
         <button class="btn-account" title="${L?'Editar invitación':'Edit invitation'}" onclick="openEditInvitationModal('${inv.id}')">✏️ ${L?'Editar':'Edit'}</button>
         <button class="btn-account" title="${L?'Ver/ocultar lista de RSVPs':'Show/hide RSVP list'}" onclick="toggleRsvpList('${inv.id}')">📋 RSVPs</button>
         <button class="btn-account" title="${L?'Descargar RSVPs en Excel':'Download RSVPs as Excel'}" onclick="exportRsvpsToExcel('${inv.id}','${esc(inv.host_names).replace(/'/g,"")}')">📊 Excel</button>
@@ -3027,6 +3111,7 @@ function init(){
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   updateAccountUI();
+  handleExpiredAuthLink();
   refreshPaidStatus().then(checkReturnFromPayment); // confirma sesión y pago contra Supabase, no solo el caché local
   renderPublishPickers();
   const d=new Date(); d.setMonth(d.getMonth()+6);
