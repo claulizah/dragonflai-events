@@ -1052,7 +1052,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <a href="#" onclick="toggleRedeemBox();return false" style="font-size:12.5px;color:var(--text-3)" data-es="¿Tienes un código de acceso?" data-en="Have an access code?">¿Tienes un código de acceso?</a>
     </div>
     <div id="redeem-code-box" style="display:none;margin-top:.75rem">
-      <input type="text" id="redeem-code-input" class="profile-input" placeholder="EJ. TUCODIGO" style="text-align:center;text-transform:uppercase">
+      <input type="text" id="redeem-code-input" class="profile-input" placeholder="ej. BETA2026" style="text-align:center;text-transform:uppercase">
       <button class="btn-excel-unlock" style="margin-top:.5rem" onclick="redeemAccessCode()" data-es="Canjear código" data-en="Redeem code">Canjear código</button>
     </div>
   </div>
@@ -3654,11 +3654,27 @@ async function generate(){
   // servidor las cuente como 1 sola generación gratis (no como 3).
   const genId=(crypto.randomUUID&&crypto.randomUUID())||String(Date.now())+Math.random().toString(36).slice(2);
   lastGenId=genId;
+
+  // ── Streaming (hallazgo V7 #5): el texto aparece conforme se genera ──
+  // Activamos la vista general de inmediato para que se VEA llegar (la
+  // animación de carga vive arriba de los paneles, no los tapa), y
+  // pintamos con throttle para no repintar el DOM en cada delta.
+  document.getElementById('panel-overview').classList.add('active');
+  let _lastPaint=0;
+  const paint=fn=>{ const now=Date.now(); if(now-_lastPaint>150){ _lastPaint=now; try{ fn(); }catch(e){} } };
+  const onCreativeDelta=h=>paint(()=>{
+    const [ovPart,ideasPart]=h.split('<!--SPLIT-->');
+    setTabHTML('overview',planFixedHeader()+cleanAIHtml(ovPart||''));
+    if(ideasPart!==undefined) setTabHTML('ideas',ideasToolbar()+cleanAIHtml(ideasPart));
+  });
+  const onSTDDelta=h=>paint(()=>setTabHTML('savethedate',h));
+  const onProposalDelta=h=>paint(()=>setTabHTML('proposal',renderProposalSummary()+h));
+
   const calls=[
-    callClaude(buildCreativePrompt(),'claude-sonnet-4-5',3800,genId).then(h=>({id:'creative',h})),
-    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',1400,genId).then(h=>({id:'savethedate',h}))
+    callClaude(buildCreativePrompt(),'claude-sonnet-4-5',3800,genId,onCreativeDelta).then(h=>({id:'creative',h})),
+    callClaude(buildSTDPrompt(),'claude-sonnet-4-5',1400,genId,onSTDDelta).then(h=>({id:'savethedate',h}))
   ];
-  if(mode==='pro') calls.push(callClaude(buildProposalPrompt(),'claude-sonnet-4-5',1400,genId).then(h=>({id:'proposal',h})));
+  if(mode==='pro') calls.push(callClaude(buildProposalPrompt(),'claude-sonnet-4-5',1400,genId,onProposalDelta).then(h=>({id:'proposal',h})));
 
   const results=await Promise.allSettled(calls);
 
@@ -5005,16 +5021,17 @@ function adjustBudgetWithQuotes(){
 // ══════════════════════════════
 const SYSTEM_HTML='You are an expert event planner AI for DragonflAI Events. Write ALL content in the language specified in the prompt. Return ONLY clean HTML. No markdown, no code fences, no preamble. Never leave content incomplete.';
 
-async function callAI(prompt,model,maxTokens,system,purpose='generate',genId=null){
+async function callAI(prompt,model,maxTokens,system,purpose='generate',genId=null,onDelta=null){
   // El Worker ahora exige sesión — mandamos el token de Supabase.
   const {data:{session}={}}=sb?await sb.auth.getSession():{data:{}};
   const headers={'Content-Type':'application/json','X-DFLAI-Purpose':purpose};
   if(session?.access_token) headers['Authorization']='Bearer '+session.access_token;
   if(genId) headers['X-DFLAI-Gen-Id']=genId;
+  const wantStream=typeof onDelta==='function';
   const res=await fetch(WORKER_URL,{
     method:'POST',
     headers,
-    body:JSON.stringify({model,max_tokens:maxTokens,system,messages:[{role:'user',content:prompt}]})
+    body:JSON.stringify({model,max_tokens:maxTokens,system,messages:[{role:'user',content:prompt}],...(wantStream?{stream:true}:{})})
   });
   if(!res.ok){
     const e=await res.json().catch(()=>({}));
@@ -5022,13 +5039,41 @@ async function callAI(prompt,model,maxTokens,system,purpose='generate',genId=nul
     err.status=res.status; // 401 = falta login, 402 = sin generaciones/créditos
     throw err;
   }
-  const data=await res.json();
-  return data.content?.[0]?.text||'';
+  if(!wantStream){
+    const data=await res.json();
+    return data.content?.[0]?.text||'';
+  }
+  // ── Streaming SSE (hallazgo V7 #5): acumulamos los deltas de texto y
+  // avisamos con el texto completo hasta el momento en cada avance ──
+  const reader=res.body.getReader();
+  const dec=new TextDecoder();
+  let buf='',full='';
+  while(true){
+    const {done,value}=await reader.read();
+    if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    const lines=buf.split('\n');
+    buf=lines.pop(); // la última línea puede venir incompleta — se guarda para el siguiente chunk
+    for(const line of lines){
+      if(!line.startsWith('data:')) continue;
+      const chunk=line.slice(5).trim();
+      if(!chunk) continue;
+      let ev; try{ ev=JSON.parse(chunk); }catch{ continue; }
+      if(ev.type==='content_block_delta'&&ev.delta&&typeof ev.delta.text==='string'){
+        full+=ev.delta.text;
+        try{ onDelta(full); }catch(e){ console.error('onDelta error:',e); }
+      } else if(ev.type==='error'){
+        throw new Error(ev.error?.message||'stream_error');
+      }
+    }
+  }
+  return full;
 }
 
-async function callClaude(prompt,model='claude-sonnet-4-5',maxTokens=2000,genId=null){
-  const h=await callAI(prompt,model,maxTokens,SYSTEM_HTML,'generate',genId);
-  return h.replace(/```html?\n?/gi,'').replace(/```\n?/g,'').trim();
+async function callClaude(prompt,model='claude-sonnet-4-5',maxTokens=2000,genId=null,onDelta=null){
+  const stripFences=t=>t.replace(/```html?\n?/gi,'').replace(/```\n?/g,'');
+  const h=await callAI(prompt,model,maxTokens,SYSTEM_HTML,'generate',genId,onDelta?(t=>onDelta(stripFences(t))):null);
+  return stripFences(h).trim();
 }
 
 // ══════════════════════════════
