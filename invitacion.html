@@ -955,8 +955,7 @@ function galleryThumbHTML(p,i){
   return `
     <div style="position:relative">
       <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="openPhotoLightbox(${i})" style="cursor:pointer">
-      <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:26px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
-      <button type="button" onclick="deleteEventPhoto('${p.id}')" style="position:absolute;bottom:4px;right:4px;background:rgba(200,50,50,.75);color:#fff;border:none;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer">✕</button>
+      <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
     </div>
   `;
 }
@@ -1037,20 +1036,6 @@ function renderLightbox(){
   `;
 }
 
-async function deleteEventPhoto(photoId){
-  const t=T[lang];
-  if(!confirm(lang==='es'?'¿Borrar esta foto? No se puede deshacer.':'Delete this photo? This cannot be undone.')) return;
-  const {error,count}=await sb.from('event_photos').delete().eq('id',photoId).select('id');
-  if(error){
-    console.error('deleteEventPhoto error:',error);
-    // Un error 42501/PGRST301 aquí normalmente significa que falta una
-    // política RLS de DELETE para invitados anónimos en event_photos.
-    showToast(lang==='es'?'No se pudo borrar la foto (permiso denegado)':'Could not delete the photo (permission denied)');
-    return;
-  }
-  loadEventPhotos();
-}
-
 async function uploadEventPhotos(event){
   const files=Array.from(event.target.files||[]);
   event.target.value='';
@@ -1082,11 +1067,15 @@ async function init(){
   const slug=getSlug();
   if(!slug){ renderNotFound(); return; }
 
-  const {data,error}=await sb.from('invitations').select('*').eq('slug',slug).eq('is_published',true).single();
-  if(error||!data){ renderNotFound(); return; }
+  // La tabla invitations ya no es legible directo (evita que cualquiera
+  // pueda enumerar todas las invitaciones de la plataforma). Este RPC
+  // solo entrega datos si conoces el slug exacto.
+  const {data,error}=await sb.rpc('get_public_invitation',{p_slug:slug});
+  const row=Array.isArray(data)&&data[0];
+  if(error||!row){ renderNotFound(); return; }
 
-  invitation=data;
-  renderInvitation(data);
+  invitation=row;
+  renderInvitation(row);
   loadEventPhotos();
 }
 
