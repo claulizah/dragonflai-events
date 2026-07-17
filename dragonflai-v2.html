@@ -269,6 +269,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .aic ul li:hover{background:var(--teal-light)}
 .aic ul li::before{content:'◆';position:absolute;left:12px;color:var(--teal);font-size:8px;top:12px}
 .aic strong{color:var(--text);font-weight:600}
+/* Encabezado fijo del plan — antes lo redactaba la IA y cambiaba cada vez */
+.plan-hero{text-align:center;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border-gray)}
+.plan-hero-eyebrow{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal-dark);font-weight:600;margin-bottom:.5rem}
+.plan-hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,5vw,34px);font-weight:600;color:var(--text);line-height:1.15}
+.plan-hero-type{font-size:12.5px;color:var(--text-3);font-weight:500;margin-top:.25rem}
+.plan-hero-sub{font-size:12px;color:var(--text-3);margin-top:.35rem}
+/* Barra de "regenerar solo ideas" */
+.ideas-refine{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--cream-2);border:1.5px solid var(--border-gray);border-radius:var(--radius);padding:10px 12px;margin-bottom:1.5rem}
+.ideas-refine input{flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13px;background:var(--white);color:var(--text)}
+.ideas-refine .ideas-refine-hint{flex-basis:100%;font-size:11px;color:var(--text-3);margin:2px 0 0}
 
 /* ── BUDGET CARDS ── */
 .bcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:1rem 0}
@@ -462,6 +472,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 @media(max-width:580px){
   .fgrid{grid-template-columns:1fr}
+  .tpanel{padding:1.25rem .9rem}
+  .aic h2{font-size:19px}
+  .aic p,.aic ul li{font-size:13.5px}
   .mode-grid{grid-template-columns:1fr}
   .hero h1{font-size:2.2rem}
   header{padding:0 1rem}
@@ -746,11 +759,11 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </div>
         <div class="field">
           <label data-es="Ambiente / estilo" data-en="Vibe / style">Ambiente / estilo</label>
-          <input type="text" id="f-vibe" placeholder="ej. Fan del fútbol / Real Madrid, azul y blanco" data-placeholder-es="ej. Fan del fútbol / Real Madrid, azul y blanco" data-placeholder-en="e.g. Football fan / Real Madrid, blue and white">
+          <input type="text" id="f-vibe" placeholder="ej. "Blanco y Negro / Retro / Hawaiana" data-placeholder-es="ej. Blanco y Negro / Retro / Hawaiana" data-placeholder-en="e.g. Black and White / Retro / Hawaiian">
           <div class="rgroup" id="vibe-suggestions" style="margin-top:.4rem"></div>
+          <p style="font-size:11px;color:var(--text-3);font-style:italic;margin:.45rem 0 0;line-height:1.5" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
         </div>
       </div>
-      <p style="font-size:11.5px;color:var(--text-3);margin:.5rem 0 0" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
 
       <div class="sdiv"><span data-es="Personaliza tu plan" data-en="Personalize your plan">Personaliza tu plan</span></div>
       <div class="fgrid">
@@ -1372,6 +1385,7 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 //  STATE
 // ══════════════════════════════
 let lang='es', mode='diy', eventType='Boda/Wedding', guests=50, plan={};
+let lastGenId=null; // agrupa regeneraciones parciales con la generación original (no cobra doble)
 
 // ══════════════════════════════
 //  SESIÓN Y STATUS DE PAGO (Supabase)
@@ -3573,6 +3587,7 @@ async function generate(){
   // gen_id agrupa las 2-3 llamadas de IA de ESTA generación para que el
   // servidor las cuente como 1 sola generación gratis (no como 3).
   const genId=(crypto.randomUUID&&crypto.randomUUID())||String(Date.now())+Math.random().toString(36).slice(2);
+  lastGenId=genId;
   const calls=[
     callClaude(buildCreativePrompt(),'claude-sonnet-4-5',3800,genId).then(h=>({id:'creative',h})),
     callClaude(buildSTDPrompt(),'claude-sonnet-4-5',1400,genId).then(h=>({id:'savethedate',h}))
@@ -3607,8 +3622,11 @@ async function generate(){
     const v=r.value;
     if(v.id==='creative'){
       const [overviewHtml,ideasHtml]=v.h.split('<!--SPLIT-->');
-      setTabHTML('overview',overviewHtml);
-      setTabHTML('ideas',ideasHtml);
+      // El encabezado del plan lo ponemos NOSOTROS (antes la IA inventaba
+      // frases distintas cada vez, tipo "Lo que generamos juntos"), y se
+      // limpian estilos en línea que la IA meta por su cuenta.
+      setTabHTML('overview',planFixedHeader()+cleanAIHtml(overviewHtml));
+      setTabHTML('ideas',ideasToolbar()+cleanAIHtml(ideasHtml));
     } else if(v.id==='savethedate'){
       setTabHTML('savethedate',wrapSTDCard(v.h));
       makeSTDEditable();
@@ -3692,6 +3710,79 @@ function getSeason(dateStr,lang){
   return names[lang==='es'?'es':'en'][key];
 }
 
+// ── Limpieza del HTML que regresa la IA: fuera estilos en línea y <h1> ──
+// (la IA a veces mete colores/tamaños propios y el resultado se ve
+// desalineado con el resto de la app — nuestro CSS manda, no el de la IA)
+function cleanAIHtml(h){
+  return String(h||'')
+    .replace(/\s+style="[^"]*"/gi,'')
+    .replace(/<h1(\s[^>]*)?>/gi,'<h2>')
+    .replace(/<\/h1>/gi,'</h2>');
+}
+
+// ── Encabezado FIJO del plan — mismo estilo y frases siempre ──
+function planFixedHeader(){
+  const L=lang==='es', p=plan;
+  const sub=[p.date,p.location?toTitleCase(p.location):''].filter(Boolean).join(' · ');
+  return `<div class="plan-hero">
+    <div class="plan-hero-eyebrow">${L?'— Tu plan personalizado —':'— Your personalized plan —'}</div>
+    <div class="plan-hero-title">${esc(toTitleCase(p.name||''))}</div>
+    ${p.typeName?`<div class="plan-hero-type">${esc(p.typeName)}</div>`:''}
+    ${sub?`<div class="plan-hero-sub">${esc(sub)}</div>`:''}
+  </div>`;
+}
+
+// ── Barra para regenerar SOLO las ideas creativas ──
+function ideasToolbar(){
+  const L=lang==='es';
+  return `<div class="ideas-refine">
+    <input type="text" id="ideas-refine-input" placeholder="${L?'ej. paleta dorada, ideas más económicas, sin globos…':'e.g. gold palette, cheaper ideas, no balloons…'}">
+    <button type="button" class="btn-account" id="ideas-refine-btn" onclick="regenerateIdeas()">🔄 ${L?'Regenerar ideas':'Regenerate ideas'}</button>
+    <p class="ideas-refine-hint">${L?'Solo se rehace esta pestaña — tu cronograma, presupuesto y checklist quedan intactos.':'Only this tab is redone — your timeline, budget and checklist stay untouched.'}</p>
+  </div>`;
+}
+
+function buildIdeasOnlyPrompt(note){
+  const p=plan;
+  const {outLang,ctx}=buildCtx();
+  const season=getSeason(p.rawDate,p.lang);
+  return `Return ONLY clean HTML, no markdown, no code fences, no preamble. Write ALL text in ${outLang}.
+${ctx}
+${note?`USER ADJUSTMENT REQUEST — TOP PRIORITY, follow it above everything else: "${note}"`:''}
+Create ONLY the creative-ideas section for this event. NEVER use <h1>, page titles, or inline style attributes — only <h2>, <h3>, <p>, <ul><li>, <strong>.
+Reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".
+Include:
+1. Signature moment
+2. Theme & decor (4-5 ideas) — include ONE seasonal flower suggestion for ${season||"the event's time of year"}; phrase it as a general suggestion ("considera flores de temporada como..."), never claiming real research or prices.
+3. Surprise elements (3)
+4. Personal touches (4, use details: "${p.notes||'none'}")
+5. Photo & video moments (3)`;
+}
+
+async function regenerateIdeas(){
+  const L=lang==='es';
+  if(!plan||!plan.typeName){ showToast(L?'Genera tu plan primero':'Generate your plan first',true); return; }
+  const input=document.getElementById('ideas-refine-input');
+  const note=(input?input.value:'').trim();
+  const btn=document.getElementById('ideas-refine-btn');
+  if(btn){ btn.disabled=true; btn.textContent=L?'✨ Generando…':'✨ Generating…'; }
+  try{
+    // Se reutiliza el gen_id de la generación original para que el servidor
+    // NO cuente este refinamiento como una generación nueva.
+    const gid=lastGenId||((crypto.randomUUID&&crypto.randomUUID())||String(Date.now())+Math.random().toString(36).slice(2));
+    lastGenId=gid;
+    const h=await callClaude(buildIdeasOnlyPrompt(note),'claude-sonnet-4-5',2400,gid);
+    setTabHTML('ideas',ideasToolbar()+cleanAIHtml(h));
+    showToast(L?'✨ Ideas actualizadas':'✨ Ideas refreshed');
+  }catch(err){
+    console.error('regenerateIdeas:',err);
+    if(err&&err.status===401){ openAuthModal(); showToast(L?'Inicia sesión para regenerar':'Log in to regenerate',true); }
+    else showToast(L?'No se pudieron regenerar las ideas — intenta de nuevo':'Could not regenerate ideas — try again',true);
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent=`🔄 ${L?'Regenerar ideas':'Regenerate ideas'}`; }
+  }
+}
+
 function buildCreativePrompt(){
   const p=plan;
   const {outLang,ctx}=buildCtx();
@@ -3699,8 +3790,10 @@ function buildCreativePrompt(){
   return `Return ONLY clean HTML for TWO sections, no markdown, no code fences, no preamble. Write ALL text in ${outLang}. Do not mix languages.
 ${ctx}
 
+GLOBAL STYLE RULES: Use ONLY the tags listed per section. NEVER use <h1>, page titles, or big intro headings (e.g. "Lo que generamos juntos", "Ideas Creativas para..." as a page title). NEVER use inline style attributes, colors, or font sizes — our CSS handles all styling.
+
 === SECTION 1: OVERVIEW ===
-${p.mode==='diy'?`Start with a warm 2-sentence personalized intro for "${p.name}" acknowledging their stress "${p.stress}" and priority "${p.priority}". Address them directly.`:'Start with a professional executive summary.'}
+${p.mode==='diy'?`Start DIRECTLY with a warm 2-sentence personalized intro paragraph for "${p.name}" acknowledging their stress "${p.stress}" and priority "${p.priority}". Address them directly. No heading before this paragraph.`:'Start DIRECTLY with a professional executive summary paragraph — no heading before it.'}
 Use <h2>, <p>, <ul><li>, <strong>. Include: personalized intro, event snapshot as bullet list (date, location, guests, budget, vibe), 3-4 key highlights tied to must-haves, 3 smart practical tips.
 
 === SECTION 2: CREATIVE IDEAS ===
@@ -3730,7 +3823,7 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 <div class="std-card">
 <div class="std-content">
 <div class="std-eyebrow">${p.lang==='es'?'— Aparta la Fecha —':'— Save the Date —'}</div>
-<div class="std-names" data-field="names">[Host name or couple's names elegantly — do NOT include any HTML tags like <em>, just plain text]</div>
+<div class="std-names" data-field="names">[The celebrant/host name line — it MUST feature EXACTLY the name "${esc(p.name)}" (for birthdays you may add a short natural flourish like "cumple N años" using that same name). NEVER use the vibe/style/theme text as if it were a name. Plain text only, no HTML tags like <em>]</div>
 <div class="std-divider"><span class="std-divider-icon">◆</span></div>
 <div class="std-details">
 <div class="std-detail-item"><span class="std-icon">📅</span><span class="std-field" data-field="date">[Full date]</span></div>
@@ -4983,6 +5076,10 @@ async function loadSavedPlan(id){
   // anterior se queda "pegado" en las pestañas que este plan no trae.
   tabKeys.forEach(k=>setTabHTML(k,''));
   Object.keys(saved.tabsHtml||{}).forEach(k=>setTabHTML(k,saved.tabsHtml[k]));
+  // Planes guardados antes de que existiera la barra de "regenerar ideas":
+  // se les agrega al abrirlos, sin duplicarla si ya la traen.
+  const ideasEl=document.getElementById('content-ideas');
+  if(ideasEl && ideasEl.innerHTML.trim() && !ideasEl.querySelector('.ideas-refine')) ideasEl.innerHTML=ideasToolbar()+ideasEl.innerHTML;
 
   // Siempre regresar a la primera pestaña, para no quedar en una vista
   // que ya no corresponde al nuevo plan.
