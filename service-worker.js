@@ -1,4 +1,17 @@
-const CACHE_NAME = 'dflai-shell-v1';
+// ══════════════════════════════════════════════════════════════
+//  DragonflAI Events — Service Worker (PWA)
+//
+//  Estrategia:
+//  - HTML / navegación → RED PRIMERO. Así cada deploy llega de inmediato
+//    a todos; el caché solo entra si no hay internet. (La versión anterior
+//    era caché-primero y la gente se quedaba viendo HTML viejo después de
+//    cada actualización.)
+//  - Íconos y assets estáticos → caché primero, refresco en segundo plano.
+//  - Todo lo que no sea GET del mismo origen (Supabase, Stripe, Worker de
+//    IA, fuentes) va directo a la red, sin tocar el caché.
+// ══════════════════════════════════════════════════════════════
+
+const CACHE_NAME = 'dflai-shell-v2';
 const SHELL_URLS = [
   '/dragonflai-v2.html',
   '/manifest.json',
@@ -24,15 +37,32 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-
-  // Solo intervenimos peticiones GET del mismo origen. Todo lo demás
-  // (Supabase, Stripe, el Worker de IA, fuentes de Google) va directo a
-  // la red sin pasar por el service worker — nunca queremos servir una
-  // respuesta vieja/cacheada de un endpoint que genera datos en vivo.
   if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) {
     return;
   }
 
+  const isHTML = request.mode === 'navigate' ||
+    (request.headers.get('accept') || '').includes('text/html');
+
+  if (isHTML) {
+    // RED PRIMERO: siempre la versión más nueva; caché solo sin conexión.
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          }
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match('/dragonflai-v2.html'))
+        )
+    );
+    return;
+  }
+
+  // Assets: caché primero para respuesta instantánea, refresco en fondo.
   event.respondWith(
     caches.match(request).then((cached) => {
       const network = fetch(request)
@@ -43,8 +73,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => cached || caches.match('/dragonflai-v2.html'));
-      // Cache-first para respuesta instantánea; se actualiza en segundo plano.
+        .catch(() => cached);
       return cached || network;
     })
   );

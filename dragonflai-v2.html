@@ -1180,6 +1180,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <a href="#" onclick="exportGuestListExcel();return false" style="font-size:12px;color:var(--teal-dark);display:inline-block;margin-right:14px" data-es="📥 Descargar plantilla en Excel" data-en="📥 Download Excel template">📥 Descargar plantilla en Excel</a>
       <a href="#" onclick="document.getElementById('pub-guest-list-file').click();return false" style="font-size:12px;color:var(--teal-dark);display:inline-block" data-es="📤 Subir Excel lleno" data-en="📤 Upload filled Excel">📤 Subir Excel lleno</a>
       <input type="file" id="pub-guest-list-file" accept=".xlsx" style="display:none" onchange="onGuestExcelFileSelected(event)">
+      <p id="pub-guestlist-edit-note" style="display:none;background:var(--teal-light);color:var(--teal-dark);border-radius:var(--radius);padding:8px 12px;font-size:12px;margin-bottom:.5rem" data-es="ℹ️ Tu lista guardada no se muestra aquí — escribe solo a las personas NUEVAS que quieras agregar." data-en="ℹ️ Your saved list isn't shown here — only type NEW people you want to add.">ℹ️ Tu lista guardada no se muestra aquí — escribe solo a las personas NUEVAS que quieras agregar.</p>
       <textarea id="pub-guest-list" class="profile-input" style="min-height:100px;resize:vertical;margin-top:.5rem" placeholder="Ana Pérez, 2&#10;Juan Gómez&#10;Familia López, 4"></textarea>
       <p style="font-size:11px;color:var(--text-3);margin-top:.3rem" data-es="Para agrupar varias personas (ej. una familia), usa dos puntos: 'Familia López: Juan López, María López'" data-en="To group several people (e.g. a family), use a colon: 'The Lopez Family: Juan Lopez, Maria Lopez'">Para agrupar varias personas (ej. una familia), usa dos puntos: "Familia López: Juan López, María López"</p>
       <label style="display:flex;align-items:center;gap:8px;margin:.5rem 0 .75rem;font-size:13px;color:var(--text-2);cursor:pointer" id="pub-restrict-list-label">
@@ -1227,7 +1228,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <span style="font-size:36px;display:block;margin-bottom:.5rem">🎉</span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
-      <a class="btn-excel-unlock" href="#" onclick="copyPublishUrl();return false" data-es="📋 Copiar link" data-en="📋 Copy link" style="display:block;text-align:center;text-decoration:none">📋 Copiar link</a>
+      <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
+      <a class="btn-excel-close" href="#" onclick="copyPublishUrl();return false" data-es="📋 Copiar link" data-en="📋 Copy link" style="display:block;text-align:center;text-decoration:none">📋 Copiar link</a>
 
       <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
         <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.6rem" data-es="Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos" data-en="Print this QR code and place it at your event — guests scan it to upload and see photos together">Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos</p>
@@ -1610,6 +1612,7 @@ async function openPublishModal(){
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
   const bottomCloseEl=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl) bottomCloseEl.style.display='none';
+  const glNoteNew=document.getElementById('pub-guestlist-edit-note'); if(glNoteNew) glNoteNew.style.display='none';
   document.getElementById('pub-domain-label').textContent=invitationHost()+'/i/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
   const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
@@ -1995,6 +1998,7 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-custom-question').value=inv.custom_question||'';
   document.getElementById('pub-directions').value=inv.directions_info||'';
   document.getElementById('pub-guest-list').value=''; // vacío a propósito — aquí solo se agregan personas nuevas
+  const glNote=document.getElementById('pub-guestlist-edit-note'); if(glNote) glNote.style.display='block';
   document.getElementById('pub-restrict-list').checked=!!inv.restrict_to_guest_list;
   document.getElementById('pub-restrict-list-label').style.opacity=inv.restrict_to_guest_list?'1':'.6';
 
@@ -2269,7 +2273,7 @@ async function publishInvitation(){
   //    crédito de nuevo y sin poder cambiar el link ──
   if(editingInvitationId){
     const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
-    const guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
+    let guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
     const restrictToList=document.getElementById('pub-restrict-list').checked;
 
     const updatePayload={
@@ -2303,6 +2307,15 @@ async function publishInvitation(){
     }
 
     // Agregar invitados NUEVOS a la lista existente — nunca se borra ni reemplaza lo que ya había
+    if(guestListEntries.length>0){
+      // Candado anti-duplicados: si alguien vuelve a pegar su lista completa
+      // al editar, solo se insertan los nombres que NO estaban ya guardados.
+      const {data:existingGuests}=await sb.from('guest_list').select('guest_name').eq('invitation_id',editingInvitationId);
+      const already=new Set((existingGuests||[]).map(g=>(g.guest_name||'').trim().toLowerCase()));
+      const skippedCount=guestListEntries.filter(g=>already.has((g.guest_name||'').trim().toLowerCase())).length;
+      guestListEntries=guestListEntries.filter(g=>!already.has((g.guest_name||'').trim().toLowerCase()));
+      if(skippedCount>0) showToast(L?`ℹ️ ${skippedCount} ya estaban en tu lista — no se duplicaron`:`ℹ️ ${skippedCount} were already on your list — not duplicated`);
+    }
     if(guestListEntries.length>0){
       const rows=guestListEntries.map(g=>({invitation_id:editingInvitationId,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null,guest_email:pubGuestEmails[g.guest_name]||null}));
       const {error:glError}=await sb.from('guest_list').insert(rows);
@@ -3112,6 +3125,9 @@ function init(){
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
   updateAccountUI();
   handleExpiredAuthLink();
+  // Enter en el campo de correo = enviar el link mágico (antes había que tocar el botón sí o sí)
+  const authEmailEl=document.getElementById('auth-email');
+  if(authEmailEl) authEmailEl.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendMagicLink(); } });
   refreshPaidStatus().then(checkReturnFromPayment); // confirma sesión y pago contra Supabase, no solo el caché local
   renderPublishPickers();
   const d=new Date(); d.setMonth(d.getMonth()+6);
