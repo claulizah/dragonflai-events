@@ -322,7 +322,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .vcard-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
 .vcard-tip{font-size:12px;color:var(--text-2);margin-bottom:.6rem}
 .vcard-inputs{display:flex;flex-direction:column;gap:6px}
-.vcard-input{width:100%;padding:7px 9px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:12px;background:var(--white);box-sizing:border-box}
+.vcard-input{width:100%;height:34px;padding:7px 9px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:12px;background:var(--white);box-sizing:border-box;-webkit-appearance:none;appearance:none}
+/* El select pierde su flecha nativa al resetear appearance — se la devolvemos con un chevron propio, manteniendo la misma altura que los inputs */
+select.vcard-input{background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238A94A6' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:26px}
+textarea.vcard-input{height:auto}
 .btn-adjust-budget{display:block;width:100%;padding:12px;border-radius:var(--radius);border:1.5px dashed var(--teal);background:var(--teal-light);color:var(--teal-dark);font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:1.5rem;transition:all .2s}
 .btn-adjust-budget:hover{background:var(--teal);color:#fff}
 .bcard-real-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;color:#fff;background:var(--teal);padding:2px 7px;border-radius:100px;vertical-align:middle}
@@ -387,7 +390,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .theme-swatch.sw-graduation{background:radial-gradient(ellipse 7px 4px at 50% 40%,#1A2332 80%,transparent),#FFFEFC}
 .theme-swatch.sw-hearts{background:radial-gradient(circle at 40% 45%,#E8637A 45%,transparent 50%),#FFFCFC}
 .theme-swatch.sw-animals{background:radial-gradient(circle at 50% 55%,#FFF6E8 55%,transparent 60%),radial-gradient(ellipse 3px 6px at 38% 25%,#F4C2CE 90%,transparent),radial-gradient(ellipse 3px 6px at 62% 25%,#F4C2CE 90%,transparent),#FFFEFB}
-.btn-std-upload-photo{padding:9px 18px;border-radius:100px;border:1.5px dashed var(--violet);background:var(--violet-light);color:var(--violet-dark);font-size:12.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-std-upload-photo{padding:9px 20px;border-radius:100px;border:1.5px dashed var(--violet);background:var(--violet-light);color:var(--violet-dark);font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
 .btn-std-upload-photo:hover{background:var(--violet);color:#fff;border-style:solid}
 .std-logo-mark{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;opacity:.55;z-index:3}
 .std-logo-mark span{font-size:9px;font-weight:600;letter-spacing:.04em;color:var(--text-3)}
@@ -427,7 +430,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .std-footer{font-size:13.5px;color:var(--text-3);margin-top:1.25rem;font-style:italic}
 .std-hashtag{font-size:14.5px;color:var(--custom-text-color,var(--teal));font-weight:700;margin-top:.5rem;letter-spacing:.02em}
 .std-actions{display:flex;justify-content:center;gap:10px;margin-top:1.5rem;flex-wrap:wrap}
-.btn-std-copy{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--glass);color:var(--teal);transition:all .2s;font-family:'Inter',sans-serif}
+.btn-std-copy{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border-strong);background:var(--white);color:var(--teal);transition:all .2s;font-family:'Inter',sans-serif}
 .btn-std-copy:hover{background:rgba(46,196,182,.1)}
 .btn-std-wa{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;display:inline-flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;transition:all .2s}
 .btn-std-img{padding:9px 20px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-family:'Inter',sans-serif;transition:all .2s}
@@ -1244,6 +1247,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
       <a class="btn-excel-close" href="#" onclick="copyPublishUrl();return false" data-es="📋 Copiar link" data-en="📋 Copy link" style="display:block;text-align:center;text-decoration:none">📋 Copiar link</a>
+      <div id="publish-share-msgs" style="margin-top:1rem"></div>
 
       <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
         <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.6rem" data-es="Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos" data-en="Print this QR code and place it at your event — guests scan it to upload and see photos together">Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos</p>
@@ -1839,7 +1843,7 @@ function showInvitationPreview(){
     ? ` style="background-image:url('${pubBackgroundImageUrl}')${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`
     : ` style="background:${pubBgColor}${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`;
   const photoClass=pubBackgroundImageUrl?' theme-custom-photo':'';
-  container.innerHTML=`
+  const previewHtml=`
     <div class="std-card${photoClass}"${cardStyle}>
       <div class="std-content${pubFontClass?' '+pubFontClass:''}">
         <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
@@ -1852,11 +1856,27 @@ function showInvitationPreview(){
           ${e.dresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(e.dresscode)}</span></div>`:''}
           ${document.getElementById('pub-directions')&&document.getElementById('pub-directions').value.trim()?`<div class="std-detail-item"><span class="std-icon">🗺️</span><span>${esc(document.getElementById('pub-directions').value.trim())}</span></div>`:''}
         </div>
+        ${(()=>{const m=(p.stdMessage||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent||'').trim();return m?`<div class="std-footer">${esc(m)}</div>`:'';})()}
         ${e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:''}
       </div>
       <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
     </div>
     ${extraSections}`;
+
+  // ── Hallazgo V7 #2: la invitación pública se renderiza en un contenedor
+  // de hasta 820px, pero esta preview vivía en la columna angosta del modal
+  // (~360px). Con background-size:cover, contenedores de proporciones
+  // distintas RECORTAN la foto distinto — por eso "no era el mismo formato".
+  // Solución: renderizar al ancho real (820px) y escalar visualmente.
+  container.innerHTML=`<div class="pub-preview-scale" style="overflow:hidden"><div class="pub-preview-inner" style="width:820px;transform-origin:top left">${previewHtml}</div></div>`;
+  requestAnimationFrame(()=>{
+    const innerEl=container.querySelector('.pub-preview-inner');
+    const boxEl=container.querySelector('.pub-preview-scale');
+    if(!innerEl||!boxEl) return;
+    const s=Math.min(1,(container.clientWidth||360)/820);
+    innerEl.style.transform=`scale(${s})`;
+    boxEl.style.height=(innerEl.scrollHeight*s)+'px';
+  });
 }
 
 function closeInvitationPreview(){
@@ -1972,6 +1992,8 @@ function closePublishModal(){
 }
 
 let lastPublishedUrl='';
+// Datos para generar los mensajes de compartir por invitado (hallazgo V7 #3)
+let lastPublishedGuests=[], lastPublishedHost='', lastPublishedType='';
 let editingInvitationId=null;
 
 async function openEditInvitationModal(invId){
@@ -2366,6 +2388,13 @@ async function publishInvitation(){
 
   const publishedViaPlanner=result.method==='planner_credit'||result.method==='planner_unlimited';
   const p=plan, e=p.extra||{};
+  // El mensaje/frase de la tarjeta (el pie editable del Save the Date) ahora
+  // SÍ se publica — invitacion.html ya lo renderiza como inv.message, pero
+  // nunca se guardaba. Se toma del plan (si el usuario lo editó) o directo
+  // de la tarjeta (si quedó tal cual lo generó la IA).
+  const stdMessage=(p.stdMessage
+    ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
+    ||'').trim();
   const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
   const guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
   const restrictToList=document.getElementById('pub-restrict-list').checked && guestListEntries.length>0;
@@ -2384,6 +2413,7 @@ async function publishInvitation(){
     location: p.location||'',
     dress_code: e.dresscode||'',
     hashtag: e.hashtag||'',
+    message: stdMessage||null,
     vibe: p.vibe||'',
     theme,
     ask_guest_count: document.getElementById('pub-ask-guests').checked,
@@ -2427,6 +2457,11 @@ async function publishInvitation(){
   }
 
   lastPublishedUrl=`${invitationOrigin()}/i/${slug}`;
+  // Datos para los mensajes de compartir por invitado (hallazgo V7 #3)
+  lastPublishedGuests=guestListEntries.map(g=>g.guest_name);
+  lastPublishedHost=p.name||'';
+  lastPublishedType=p.typeName||'';
+  renderGuestShareMessages();
   document.getElementById('publish-url').textContent=lastPublishedUrl;
   try{
     const dataUrl=await buildBrandedQRDataURL(plan.name||'',(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
@@ -3229,6 +3264,7 @@ function selectType(btn,idx){
   btn.classList.add('active');
   eventType=T.eventTypes.vals[idx];
   applyEventTheme(eventType);
+  applyBudgetRange();
   updateFormTitle(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); updateExtraFieldVisibility(); updateNameLabel();
 }
 
@@ -3356,12 +3392,41 @@ function switchTab(name,btn){
 function updateBudget(val){
   const n=parseInt(val);
   document.getElementById('bval').textContent=n.toLocaleString('en-US');
-  const f=(n-5000)/(500000-5000); // fracción 0–1
+  const slider=document.getElementById('f-budget');
+  const bMin=parseInt(slider.min)||5000, bMax=parseInt(slider.max)||500000;
+  const f=(n-bMin)/(bMax-bMin); // fracción 0–1 según el rango REAL del slider
   // El thumb mide 20px — usamos calc() mezclando % y px para que el relleno
   // quede alineado con el centro real del control, sin importar el ancho del contenedor.
   const stop=`calc((100% - 20px) * ${f} + 10px)`;
-  document.getElementById('f-budget').style.background=`linear-gradient(to right,#2EC4B6 ${stop},rgba(255,255,255,.1) ${stop})`;
+  slider.style.background=`linear-gradient(to right,#2EC4B6 ${stop},rgba(255,255,255,.1) ${stop})`;
   updateProgress();
+}
+
+// ── Rango del slider según el tipo de evento (hallazgo V7 #4) ──
+// Cumpleaños, infantiles y baby showers manejan gastos mucho menores que
+// una boda: el slider ajusta su escala, paso y marcas al elegir el tipo.
+// Las marcas se generan a 0, 1/3, 2/3 y 1 del rango, así SIEMPRE
+// corresponden a su posición real sobre el riel (antes estaban fijas y
+// no coincidían).
+const BUDGET_RANGES={
+  'Cumpleaños/Birthday':       {min:2000, max:150000, step:1000, def:12000},
+  'Fiesta Infantil/Kids Party':{min:2000, max:100000, step:1000, def:8000},
+  'Baby Shower':               {min:2000, max:100000, step:1000, def:8000},
+  'Aniversario/Anniversary':   {min:3000, max:250000, step:1000, def:15000},
+  default:                     {min:5000, max:500000, step:5000, def:15000}
+};
+function fmtBudgetTick(n){ return n>=1000?('$'+Math.round(n/1000)+'K'):('$'+n); }
+function applyBudgetRange(){
+  const r=BUDGET_RANGES[eventType]||BUDGET_RANGES.default;
+  const s=document.getElementById('f-budget');
+  if(!s) return;
+  const prev=parseInt(s.value)||r.def;
+  s.min=r.min; s.max=r.max; s.step=r.step;
+  // Conservar lo que ya había elegido si cabe en el nuevo rango; si no, el default del tipo
+  s.value=(prev>=r.min&&prev<=r.max)?prev:r.def;
+  const ticks=document.querySelector('.budget-ticks');
+  if(ticks) ticks.innerHTML=[0,1/3,2/3,1].map(fr=>`<span>${fmtBudgetTick(r.min+(r.max-r.min)*fr)}</span>`).join('');
+  updateBudget(s.value);
 }
 
 function adjGuests(d){guests=Math.max(5,Math.min(1000,guests+d));document.getElementById('gval').textContent=guests;updateProgress();}
@@ -5079,6 +5144,11 @@ async function loadSavedPlan(id){
   // anterior se queda "pegado" en las pestañas que este plan no trae.
   tabKeys.forEach(k=>setTabHTML(k,''));
   Object.keys(saved.tabsHtml||{}).forEach(k=>setTabHTML(k,saved.tabsHtml[k]));
+  // La tarjeta restaurada conserva sus atributos contenteditable, pero los
+  // listeners no sobreviven al guardado — hay que re-engancharlos para que
+  // las ediciones sobre la tarjeta se sincronicen al plan también aquí.
+  attachSTDBlurGuard();
+  attachSTDSyncToPlan();
   // Planes guardados antes de que existiera la barra de "regenerar ideas":
   // se les agrega al abrirlos, sin duplicarla si ya la traen.
   const ideasEl=document.getElementById('content-ideas');
@@ -5596,6 +5666,49 @@ function copySTD(){
   navigator.clipboard.writeText(txt).then(()=>showToast(lang==='es'?'📋 Save the Date copiado':'📋 Copied!'));
 }
 
+// ── Mensajes para compartir la invitación (hallazgo V7 #3) ──
+// Si hay lista de invitados, cada mensaje incluye el nombre EXACTO con el
+// que la persona debe buscarse al confirmar — la duda más común del RSVP.
+function buildGuestShareMessage(guestName){
+  const L=lang==='es';
+  const evento=[lastPublishedType,lastPublishedHost].filter(Boolean).join(L?' de ':' — ');
+  if(guestName){
+    return L
+      ?`¡Hola, ${guestName}! 🎉\nEstás invitad@ a ${evento||'nuestro evento'}. Confirma tu asistencia aquí:\n${lastPublishedUrl}\n\n👉 Al confirmar, búscate con tu nombre tal cual aparece aquí: "${guestName}"`
+      :`Hi ${guestName}! 🎉\nYou're invited to ${evento||'our event'}. Please RSVP here:\n${lastPublishedUrl}\n\n👉 When confirming, search for your name exactly as it appears here: "${guestName}"`;
+  }
+  return L
+    ?`¡Hola! 🎉 Estás invitad@ a ${evento||'nuestro evento'}. Confirma tu asistencia aquí:\n${lastPublishedUrl}`
+    :`Hi! 🎉 You're invited to ${evento||'our event'}. Please RSVP here:\n${lastPublishedUrl}`;
+}
+
+function renderGuestShareMessages(){
+  const box=document.getElementById('publish-share-msgs');
+  if(!box) return;
+  const L=lang==='es';
+  const n=lastPublishedGuests.length;
+  const label=n>0
+    ?(L?`💬 Copiar mensajes personalizados (${n} invitado${n===1?'':'s'})`:`💬 Copy personalized messages (${n} guest${n===1?'':'s'})`)
+    :(L?'💬 Copiar mensaje para compartir':'💬 Copy share message');
+  const hint=n>0
+    ?(L?'Un mensaje por invitado, con el nombre exacto con el que debe buscarse al confirmar — pégalos en WhatsApp uno por uno.':'One message per guest, with the exact name they must search for when confirming — paste them into WhatsApp one by one.')
+    :(L?'Mensaje listo para pegar en WhatsApp o donde quieras.':'Message ready to paste into WhatsApp or anywhere.');
+  box.innerHTML=`
+    <a class="btn-excel-close" href="#" onclick="copyGuestShareMessages();return false" style="display:block;text-align:center;text-decoration:none">${label}</a>
+    <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0;text-align:center">${hint}</p>`;
+}
+
+function copyGuestShareMessages(){
+  const L=lang==='es';
+  const txt=lastPublishedGuests.length
+    ?lastPublishedGuests.map(g=>buildGuestShareMessage(g)).join('\n\n———\n\n')
+    :buildGuestShareMessage(null);
+  navigator.clipboard.writeText(txt).then(
+    ()=>showToast(L?'💬 Mensajes copiados — pégalos en WhatsApp':'💬 Messages copied — paste them into WhatsApp'),
+    ()=>showToast(L?'No se pudo copiar, intenta de nuevo':'Could not copy, try again',true)
+  );
+}
+
 function shareSTDWA(){
   const txt=getSTDText();
   if(!txt) return;
@@ -5755,6 +5868,34 @@ function makeSTDEditable(){
     el.classList.add('std-editable');
   });
   attachSTDBlurGuard();
+  attachSTDSyncToPlan();
+}
+
+// ── Sincronizar las ediciones de la tarjeta hacia el objeto plan ──
+// La tarjeta invita a "hacer clic en cualquier texto para editarlo", pero
+// esas ediciones vivían SOLO en el DOM: al publicar, el payload se armaba
+// desde el objeto plan, y todo lo editado sobre la tarjeta se perdía
+// (hallazgo V7: "no se muestra la información completa que se ingresó").
+// Este listener delegado escribe cada edición de vuelta en plan.*, que es
+// de donde leen la vista previa de Publicar y publishInvitation.
+function attachSTDSyncToPlan(){
+  const tab=document.getElementById('content-savethedate');
+  if(!tab||tab.dataset.planSyncAttached) return;
+  tab.dataset.planSyncAttached='1';
+  tab.addEventListener('input',e=>{
+    const el=e.target.closest('[contenteditable="true"]');
+    if(!el||!plan) return;
+    const val=(el.textContent||'').trim();
+    plan.extra=plan.extra||{};
+    if(el.classList.contains('std-names')){ plan.name=val; return; }
+    const f=el.dataset.field;
+    if(f==='date') plan.date=val;
+    else if(f==='location') plan.location=val;
+    else if(f==='time') plan.time=val;
+    else if(f==='dresscode') plan.extra.dresscode=val;
+    else if(f==='hashtag') plan.extra.hashtag=val;
+    else if(f==='message') plan.stdMessage=val;
+  });
 }
 
 // El cursor de texto de un campo editable (nombre, hashtag, etc.) a veces
@@ -5957,7 +6098,7 @@ function restoreDraftIfAny(){
   if(data._mode&&data._mode!==mode) setMode(data._mode);
   if(data._eventType){
     const idx=T.eventTypes.vals.indexOf(data._eventType);
-    if(idx>=0){ eventType=data._eventType; applyEventTheme(eventType); renderEventTypes(); }
+    if(idx>=0){ eventType=data._eventType; applyEventTheme(eventType); renderEventTypes(); applyBudgetRange(); }
   }
   updateProgress();
   showToast(lang==='es'?'↩️ Recuperamos lo último que estabas llenando':'↩️ We restored what you were filling out');
