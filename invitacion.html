@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<head>sb.from('invitations').select
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Invitación — DragonflAI Events</title>
@@ -1082,8 +1082,8 @@ async function init(){
   const slug=getSlug();
   if(!slug){ renderNotFound(); return; }
 
-  const {data,error}=await sb.from('invitations').select('*').eq('slug',slug).eq('is_published',true).single();
-  if(error||!data){ renderNotFound(); return; }
+  const { data, error } = await sb.rpc('get_public_invitation', { p_slug: slug });
+  const inv = data && data[0];
 
   invitation=data;
   renderInvitation(data);
