@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
   --teal:#2EC4B6; --teal-dark:#0D6E65; --teal-light:#EAF7F6;
@@ -195,6 +196,18 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 
 
 let invitation=null;
+let isHost=false; // true si quien ve esta invitación tiene sesión iniciada y es su dueño
+
+// Identifica este dispositivo (no una cuenta) para saber qué fotos subió
+// — así el botón de borrar solo aparece en las tuyas, sin necesitar login.
+function getUploaderToken(){
+  let tok=localStorage.getItem('dflai_uploader_token');
+  if(!tok){
+    tok=(crypto.randomUUID&&crypto.randomUUID())||(Date.now()+'-'+Math.random().toString(36).slice(2));
+    localStorage.setItem('dflai_uploader_token',tok);
+  }
+  return tok;
+}
 let lang='es';
 
 const T={
@@ -235,7 +248,7 @@ const T={
     footerPrivacy:'Aviso de privacidad',
     searchNamePlaceholder:'Escribe tu nombre para buscarte…',
     searchHint:'Este evento solo permite confirmar a invitados en la lista del anfitrión.',
-    searchNoResults:'No encontramos ese nombre en la lista — revisa cómo lo escribiste, o pregúntale al anfitrión.',
+    searchNoResults:'🔍 No encontramos ese nombre en la lista. Intenta solo con tu nombre o solo tu apellido — a veces ayuda escribir menos. Si sigue sin aparecer, seguro el anfitrión te puede ayudar directamente.',
     searchAreYouThisPerson:'¿Eres tú?',
     changeNameLink:'No soy yo, buscar otro nombre',
     alreadyResponded:'Ya confirmaste tu asistencia anteriormente — ¡gracias!',
@@ -245,6 +258,14 @@ const T={
     uploadPhotoBtn:'Subir foto(s)',
     noPhotosYet:'Todavía no hay fotos — ¡sé el primero en subir una!',
     photoUploaded:'✅ Foto(s) agregada(s) a la galería',
+    downloadAllBtn:'Descargar todas',
+    downloadingZip:'Preparando tu descarga…',
+    downloadZipProgress:n=>`Comprimiendo fotos… ${n}%`,
+    downloadZipDone:'✅ Descarga lista',
+    downloadZipError:'No se pudo preparar la descarga — intenta de nuevo',
+    confirmDeletePhoto:'¿Borrar esta foto? No se puede deshacer.',
+    photoDeleted:'🗑️ Foto borrada',
+    photoDeleteError:'No se pudo borrar la foto — intenta de nuevo',
 
     yourResponseWas:'Tu respuesta actual:',
     respondingYes:'Sí asistes',
@@ -297,7 +318,7 @@ const T={
     footerPrivacy:'Privacy notice',
     searchNamePlaceholder:'Type your name to find yourself…',
     searchHint:'This event only allows guests on the host\'s list to confirm.',
-    searchNoResults:"We couldn't find that name on the list — check how you typed it, or ask the host.",
+    searchNoResults:"🔍 We couldn't find that name on the list. Try just your first name or just your last name — sometimes less is more. If it still doesn't show up, the host can help you out directly.",
     searchAreYouThisPerson:'Is this you?',
     changeNameLink:"That's not me, search another name",
     alreadyResponded:'You already confirmed your attendance — thank you!',
@@ -307,6 +328,14 @@ const T={
     uploadPhotoBtn:'Upload photo(s)',
     noPhotosYet:'No photos yet — be the first to upload one!',
     photoUploaded:'✅ Photo(s) added to the gallery',
+    downloadAllBtn:'Download all',
+    downloadingZip:'Preparing your download…',
+    downloadZipProgress:n=>`Compressing photos… ${n}%`,
+    downloadZipDone:'✅ Download ready',
+    downloadZipError:'Could not prepare the download — try again',
+    confirmDeletePhoto:'Delete this photo? This cannot be undone.',
+    photoDeleted:'🗑️ Photo deleted',
+    photoDeleteError:'Could not delete the photo — try again',
 
     yourResponseWas:'Your current response:',
     respondingYes:'Attending',
@@ -542,8 +571,9 @@ function renderInvitation(inv){
       </div>
       <div id="event-photos-gallery" class="gallery-grid"></div>
       <p id="event-photos-empty" style="font-size:12.5px;color:var(--text-3);text-align:center;display:none">${t.noPhotosYet}</p>
-      <div style="text-align:center;margin-top:1rem">
+      <div style="text-align:center;margin-top:1rem;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button type="button" id="event-photos-viewall" class="extra-link-btn" style="display:none;border:none;cursor:pointer;font-family:'Inter',sans-serif" onclick="openFullGalleryView()"></button>
+        <button type="button" id="event-photos-downloadall" class="extra-link-btn photos-downloadall-btn" style="display:none;border:none;cursor:pointer;font-family:'Inter',sans-serif" onclick="downloadAllEventPhotos()"></button>
       </div>
     </div>
 
@@ -645,7 +675,7 @@ async function onGuestSearchInput(){
   guestSearchTimer=setTimeout(async()=>{
     const {data,error}=await sb.rpc('search_guest_list',{p_invitation_id:invitation.id,p_query:q});
     if(error||!data||!data.length){
-      resultsEl.innerHTML=`<p style="font-size:12px;color:var(--text-3);margin-top:.5rem">${T[lang].searchNoResults}</p>`;
+      resultsEl.innerHTML=`<div style="background:var(--cream-2);border:1.5px solid var(--border-gray);border-radius:var(--radius);padding:12px 14px;margin-top:.6rem;font-size:13.5px;color:var(--text-2);line-height:1.5">${T[lang].searchNoResults}</div>`;
       return;
     }
     lastSearchResults=data;
@@ -924,16 +954,18 @@ const GALLERY_PREVIEW_COUNT=6; // cuántas miniaturas se muestran en la tarjeta 
 
 async function loadEventPhotos(){
   if(!invitation) return;
-  const {data,error}=await sb.from('event_photos').select('id,photo_url,uploaded_by_name').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
+  const {data,error}=await sb.from('event_photos').select('id,photo_url,uploaded_by_name,uploader_token').eq('invitation_id',invitation.id).order('created_at',{ascending:false});
   const gallery=document.getElementById('event-photos-gallery');
   const emptyMsg=document.getElementById('event-photos-empty');
   const viewAllBtn=document.getElementById('event-photos-viewall');
+  const downloadAllBtn=document.getElementById('event-photos-downloadall');
   if(!gallery) return;
   if(error||!data||!data.length){
     eventPhotosList=[];
     gallery.innerHTML='';
     if(emptyMsg) emptyMsg.style.display='block';
     if(viewAllBtn) viewAllBtn.style.display='none';
+    if(downloadAllBtn) downloadAllBtn.style.display='none';
     return;
   }
   if(emptyMsg) emptyMsg.style.display='none';
@@ -949,15 +981,105 @@ async function loadEventPhotos(){
       viewAllBtn.style.display='none';
     }
   }
+  if(downloadAllBtn){
+    if(data.length>0){
+      downloadAllBtn.style.display='inline-block';
+      downloadAllBtn.textContent='⬇️ '+T[lang].downloadAllBtn;
+    } else {
+      downloadAllBtn.style.display='none';
+    }
+  }
 }
 
 function galleryThumbHTML(p,i){
+  const canDelete=isHost||(p.uploader_token&&p.uploader_token===getUploaderToken());
+  const deleteBtn=canDelete?`<button type="button" onclick="event.stopPropagation();deleteEventPhoto('${p.id}')" title="${T[lang].confirmDeletePhoto}" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;padding:0">✕</button>`:'';
   return `
     <div style="position:relative">
       <img src="${esc(p.photo_url)}" class="gallery-img" loading="lazy" onclick="openPhotoLightbox(${i})" style="cursor:pointer">
       <a href="${esc(p.photo_url)}" download target="_blank" rel="noopener" style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;text-decoration:none">⬇</a>
+      ${deleteBtn}
     </div>
   `;
+}
+
+// Borra una foto de la galería — de la base de datos Y del archivo real en
+// Storage (sin esto, el registro desaparece pero el archivo queda huérfano
+// ocupando espacio para siempre). Mismo nivel de confianza que subir fotos:
+// cualquiera con el link puede borrar cualquier foto, ya que no se rastrea
+// identidad de invitado a nivel de cuenta.
+async function deleteEventPhoto(photoId){
+  const t=T[lang];
+  if(!confirm(t.confirmDeletePhoto)) return;
+  try{
+    const {data,error}=await sb.rpc('delete_event_photo',{p_photo_id:photoId,p_uploader_token:getUploaderToken()});
+    if(error||!data?.success){
+      showToast(t.photoDeleteError);
+      return;
+    }
+
+    closePhotoLightbox();
+    loadEventPhotos();
+    // Si el modal de galería completa está abierto, refrescarlo también
+    const overlay=document.getElementById('full-gallery-overlay');
+    if(overlay&&overlay.style.display!=='none'&&overlay.innerHTML) openFullGalleryView();
+    showToast(t.photoDeleted);
+  }catch(e){
+    console.error('Error borrando la foto:',e);
+    showToast(t.photoDeleteError);
+  }
+}
+
+// único modo de guardarlas era una por una con el botón ⬇ de cada miniatura,
+// tedioso en cuanto hay más de un puñado de fotos.
+async function downloadAllEventPhotos(){
+  const t=T[lang];
+  if(!eventPhotosList.length) return;
+  if(typeof JSZip==='undefined'){ showToast(t.downloadZipError); return; }
+
+  const btns=[...document.querySelectorAll('.photos-downloadall-btn')];
+  if(!btns.length) return;
+  if(btns[0].disabled) return; // ya en proceso — evita doble clic en cualquiera de los dos botones
+  const originalLabels=btns.map(b=>b.textContent);
+  btns.forEach(b=>{ b.disabled=true; b.style.opacity='.6'; b.style.cursor='wait'; });
+  showToast(t.downloadingZip);
+
+  try{
+    const zip=new JSZip();
+    let done=0;
+    for(const photo of eventPhotosList){
+      try{
+        const res=await fetch(photo.photo_url);
+        if(!res.ok) throw new Error('fetch failed: '+res.status);
+        const blob=await res.blob();
+        const ext=(photo.photo_url.split('.').pop()||'jpg').split('?')[0].slice(0,4);
+        zip.file(`foto-${String(done+1).padStart(3,'0')}.${ext}`,blob);
+      }catch(e){
+        // Una foto que falle (link roto, red lenta) no debe tronar la
+        // descarga completa — se omite y seguimos con las demás.
+        console.error('No se pudo incluir una foto en el zip:',e);
+      }
+      done++;
+      const label=t.downloadZipProgress(Math.round((done/eventPhotosList.length)*100));
+      btns.forEach(b=>{ b.textContent=label; });
+    }
+
+    const content=await zip.generateAsync({type:'blob'});
+    const url=URL.createObjectURL(content);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=`fotos-${(invitation?.host_names||'evento').replace(/[^\w]+/g,'-')}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast(t.downloadZipDone);
+  }catch(e){
+    console.error('Error generando el zip de fotos:',e);
+    showToast(t.downloadZipError);
+  }finally{
+    btns.forEach((b,i)=>{ b.disabled=false; b.style.opacity=''; b.style.cursor=''; b.textContent=originalLabels[i]; });
+  }
 }
 
 function openFullGalleryView(){
@@ -972,9 +1094,12 @@ function openFullGalleryView(){
   }
   overlay.innerHTML=`
     <div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:900px;width:100%;max-height:88vh;overflow-y:auto;box-sizing:border-box">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:10px;flex-wrap:wrap">
         <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin:0">${L?'Todas las fotos':'All photos'} (${eventPhotosList.length})</h3>
-        <button type="button" onclick="closeFullGalleryView()" style="background:var(--cream-2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer">✕</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button type="button" class="extra-link-btn photos-downloadall-btn" style="border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap" onclick="downloadAllEventPhotos()">⬇️ ${L?'Descargar todas':'Download all'}</button>
+          <button type="button" onclick="closeFullGalleryView()" style="background:var(--cream-2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;flex-shrink:0">✕</button>
+        </div>
       </div>
       <div class="gallery-grid" style="grid-template-columns:repeat(auto-fill,minmax(110px,1fr))">
         ${eventPhotosList.map((p,i)=>galleryThumbHTML(p,i)).join('')}
@@ -1027,8 +1152,11 @@ function renderLightbox(){
     document.body.appendChild(overlay);
   }
   const navBtn=(dir,label)=>`<button type="button" onclick="event.stopPropagation();navLightbox(${dir})" style="position:absolute;top:50%;${dir<0?'left':'right'}:16px;transform:translateY(-50%);background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">${label}</button>`;
+  const canDelete=isHost||(p.uploader_token&&p.uploader_token===getUploaderToken());
+  const deleteBtn=canDelete?`<button type="button" onclick="event.stopPropagation();deleteEventPhoto('${p.id}')" title="${T[lang].confirmDeletePhoto}" style="position:absolute;top:16px;right:60px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:15px;cursor:pointer">🗑️</button>`:'';
   overlay.innerHTML=`
     <button type="button" onclick="event.stopPropagation();closePhotoLightbox()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer">✕</button>
+    ${deleteBtn}
     ${n>1?navBtn(-1,'‹'):''}
     <img src="${esc(p.photo_url)}" style="max-width:100%;max-height:85vh;border-radius:8px;object-fit:contain" onclick="event.stopPropagation()">
     ${n>1?navBtn(1,'›'):''}
@@ -1055,7 +1183,7 @@ async function uploadEventPhotos(event){
     const {data:urlData}=sb.storage.from('event-photos').getPublicUrl(path);
     if(!urlData?.publicUrl) continue;
 
-    const {error:insErr}=await sb.from('event_photos').insert({invitation_id:invitation.id,photo_url:urlData.publicUrl});
+    const {error:insErr}=await sb.from('event_photos').insert({invitation_id:invitation.id,photo_url:urlData.publicUrl,uploader_token:getUploaderToken()});
     if(!insErr) uploaded++;
   }
 
@@ -1075,6 +1203,18 @@ async function init(){
   if(error||!row){ renderNotFound(); return; }
 
   invitation=row;
+
+  // ¿El visitante ya inició sesión en la app principal en este mismo
+  // navegador? Si es el dueño de ESTA invitación, puede borrar cualquier
+  // foto de la galería, no solo las que él mismo subió.
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    if(session?.user){
+      const {data:ownerCheck}=await sb.rpc('is_invitation_owner',{p_invitation_id:invitation.id});
+      isHost=!!ownerCheck;
+    }
+  }catch(e){ console.error('No se pudo verificar si es el anfitrión:',e); }
+
   renderInvitation(row);
   loadEventPhotos();
 }
