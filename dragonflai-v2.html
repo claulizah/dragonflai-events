@@ -192,7 +192,7 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 .sublabel{display:block;font-size:10.5px;color:var(--text-3);margin-bottom:4px}
 .fcol{grid-column:1/-1}
 .field label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:16px;color:var(--text);background:var(--cream);transition:all .2s;outline:none;-webkit-appearance:none;appearance:none}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:16px;color:var(--text);background:var(--cream);transition:border-color .2s,box-shadow .2s,background-color .2s;outline:none;-webkit-appearance:none;appearance:none;transform:translateZ(0)}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,196,182,.12);background:var(--white)}
 .field input::placeholder,.field textarea::placeholder{color:var(--text-3)}
 .field textarea{resize:vertical;min-height:72px;line-height:1.55}
@@ -1078,10 +1078,10 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem">🪄</span>
     <h3 data-es="Inicia sesión" data-en="Log in">Inicia sesión</h3>
     <p id="auth-expired-note" style="display:none;background:#FBE0E5;color:#C14A5E;border-radius:var(--radius);padding:10px 14px;font-size:12.5px;line-height:1.5;margin-bottom:.75rem" data-es="⏳ Tu enlace expiró o ya se usó — pasa con los correos que tardan en abrirse. Escribe tu correo y te enviamos uno nuevo." data-en="⏳ Your link expired or was already used — happens with emails opened late. Enter your email and we'll send you a fresh one.">⏳ Tu enlace expiró o ya se usó — pasa con los correos que tardan en abrirse. Escribe tu correo y te enviamos uno nuevo.</p>
-    <p data-es="Sin contraseñas — solo dale clic al botón de abajo para crear tu cuenta y tener acceso a la creación de tu evento." data-en="No passwords — just click the button below to create your account and get access to creating your event.">Sin contraseñas — solo dale clic al botón de abajo para crear tu cuenta y tener acceso a la creación de tu evento.</p>
+    <p data-es="Sin contraseñas — solo dale clic al botón de abajo. Te llegará un correo con un link; ábrelo y listo, quedas dentro (no hay ningún password que escribir)." data-en="No passwords — just click the button below. You'll get an email with a link; open it and you're in (no password to type anywhere).">Sin contraseñas — solo dale clic al botón de abajo. Te llegará un correo con un link; ábrelo y listo, quedas dentro (no hay ningún password que escribir).</p>
     <input type="text" id="auth-name" placeholder="Tu nombre (opcional)" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.6rem;box-sizing:border-box">
     <input type="email" id="auth-email" placeholder="tu@correo.com" style="width:100%;padding:12px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;margin-bottom:.75rem;box-sizing:border-box">
-    <button class="btn-excel-unlock" onclick="sendMagicLink()" data-es="Enviarme el link mágico →" data-en="Send me the magic link →" style="width:100%">Enviarme el link mágico →</button>
+    <button class="btn-excel-unlock" id="magic-link-btn" onclick="sendMagicLink()" data-es="Enviarme el link mágico →" data-en="Send me the magic link →" style="width:100%">Enviarme el link mágico →</button>
     <button class="btn-excel-close" onclick="closeAuthModal()" data-es="Ahora no" data-en="Not now">Ahora no</button>
   </div>
 </div>
@@ -1324,9 +1324,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   </div>
   <div id="help-chat-messages" style="flex:1;overflow-y:auto;padding:14px;font-size:13.5px"></div>
   <div id="help-chat-quick" style="padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px"></div>
-  <div style="padding:10px;border-top:1px solid var(--border-gray);display:flex;gap:8px">
-    <input type="text" id="help-chat-input" placeholder="Escribe tu pregunta…" style="flex:1;padding:9px 12px;border-radius:100px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif" onkeydown="if(event.key==='Enter')sendHelpChatMessage()">
-    <button onclick="sendHelpChatMessage()" style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;border:none;cursor:pointer;font-size:14px">➤</button>
+  <div style="padding:10px;border-top:1px solid var(--border-gray);display:flex;gap:8px;align-items:flex-end">
+    <textarea id="help-chat-input" rows="1" placeholder="Escribe tu pregunta…" style="flex:1;padding:9px 12px;border-radius:16px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif;resize:none;max-height:90px;overflow-y:auto;line-height:1.35" oninput="autoGrowHelpChatInput(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHelpChatMessage();}"></textarea>
+    <button onclick="sendHelpChatMessage()" style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;border:none;cursor:pointer;font-size:14px;flex-shrink:0">➤</button>
   </div>
 </div>
 
@@ -1440,6 +1440,11 @@ async function refreshPaidStatus(){
     }
   }
 
+  // Igual que con el nombre pendiente: si el link mágico se abrió en un
+  // navegador/app distinto al que se usó para llenar el formulario, el
+  // borrador local no sobrevive el salto — este es el respaldo del servidor.
+  restoreDraftFromServer();
+
   const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in').eq('id',currentUser.id).single();
   userProfile=data||{};
   currentUserName=userProfile.full_name||'';
@@ -1515,7 +1520,26 @@ async function sendMagicLink(){
   const name=document.getElementById('auth-name').value.trim();
   if(!email){ showToast(lang==='es'?'Escribe tu correo':'Enter your email',true); return; }
   if(name) localStorage.setItem('dflai_pending_name',name);
+
+  // El botón no mostraba ningún cambio mientras esperaba la respuesta de
+  // Supabase (1-3 segundos, a veces más) — parecía que el clic no había
+  // hecho nada, invitando a dar doble clic. Ahora se deshabilita y avisa
+  // "Enviando…" de inmediato, y siempre se restaura al final (éxito o error).
+  const btn=document.getElementById('magic-link-btn');
+  if(btn&&btn.disabled) return; // ya se está enviando — evita duplicados por doble clic o Enter repetido
+  const originalLabel=btn?btn.textContent:'';
+  if(btn){ btn.disabled=true; btn.style.opacity='.7'; btn.style.cursor='wait'; btn.textContent=lang==='es'?'Enviando…':'Sending…'; }
+
+  // Justo antes de mandar el link, respaldamos el borrador en el servidor
+  // ligado a este correo — si el link se abre en otro navegador/app (muy
+  // común: llenar el form en Chrome pero abrir el correo desde Gmail), el
+  // borrador local por sí solo no lo hubiera sobrevivido.
+  await backupDraftToServer(email);
+
   const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
+
+  if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; btn.textContent=originalLabel; }
+
   if(error){ showToast(error.message,true); return; }
   showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link':'✉️ Check your email — we sent you a link');
   closeAuthModal();
@@ -2697,11 +2721,21 @@ function addHelpChatBubble(role,text){
   box.scrollTop=box.scrollHeight;
 }
 
+// El campo del chat de ayuda era un <input> de una sola línea — al escribir
+// preguntas largas, el texto se recortaba y solo se veía el final (reporte
+// de beta: "sólo usa un renglón y no puedo ver todo lo que escribí"). Ahora
+// es un textarea que crece hasta ~4 líneas y después hace scroll interno.
+function autoGrowHelpChatInput(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,90)+'px';
+}
+
 async function sendHelpChatMessage(){
   const input=document.getElementById('help-chat-input');
   const text=input.value.trim();
   if(!text) return;
   input.value='';
+  input.style.height='auto'; // volver a una línea después de enviar
   addHelpChatBubble('user',text);
   helpChatMessages.push({role:'user',content:text});
 
@@ -6159,15 +6193,19 @@ function scheduleDraftSave(){
   draftSaveTimer=setTimeout(saveDraft,500);
 }
 
+function collectDraftData(){
+  const data={};
+  document.querySelectorAll('.fbody [id^="f-"]').forEach(el=>{ data[el.id]=el.value; });
+  data._eventType=eventType;
+  data._guests=guests;
+  data._mode=mode;
+  data._savedAt=Date.now();
+  return data;
+}
+
 function saveDraft(){
   try{
-    const data={};
-    document.querySelectorAll('.fbody [id^="f-"]').forEach(el=>{ data[el.id]=el.value; });
-    data._eventType=eventType;
-    data._guests=guests;
-    data._mode=mode;
-    data._savedAt=Date.now();
-    localStorage.setItem(DRAFT_KEY,JSON.stringify(data));
+    localStorage.setItem(DRAFT_KEY,JSON.stringify(collectDraftData()));
   }catch(e){ /* si localStorage falla (modo privado, cuota llena), simplemente no autoguardamos */ }
 }
 
@@ -6176,13 +6214,13 @@ function clearDraft(){
   localStorage.removeItem(DRAFT_KEY);
 }
 
-function restoreDraftIfAny(){
-  let data;
-  try{ data=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); }catch(e){ return; }
-  if(!data) return;
+let localDraftRestored=false; // si el borrador local restauró algo, no hace falta ir al servidor
+
+function applyDraftData(data){
+  if(!data) return false;
   // Borradores de más de 7 días ya no son relevantes — mejor no confundir
   // con datos viejos de un evento que ya pasó o ya se generó de otra forma.
-  if(!data._savedAt||(Date.now()-data._savedAt)>7*24*60*60*1000){ localStorage.removeItem(DRAFT_KEY); return; }
+  if(!data._savedAt||(Date.now()-data._savedAt)>7*24*60*60*1000) return false;
 
   let restoredSomething=false;
   Object.keys(data).forEach(id=>{
@@ -6190,7 +6228,7 @@ function restoreDraftIfAny(){
     const el=document.getElementById(id);
     if(el&&data[id]){ el.value=data[id]; restoredSomething=true; }
   });
-  if(!restoredSomething) return;
+  if(!restoredSomething) return false;
 
   if(typeof data._guests==='number'){ guests=data._guests; const gvalEl=document.getElementById('gval'); if(gvalEl) gvalEl.textContent=guests; }
   if(data._mode&&data._mode!==mode) setMode(data._mode);
@@ -6199,7 +6237,52 @@ function restoreDraftIfAny(){
     if(idx>=0){ eventType=data._eventType; applyEventTheme(eventType); renderEventTypes(); applyBudgetRange(); }
   }
   updateProgress();
-  showToast(lang==='es'?'↩️ Recuperamos lo último que estabas llenando':'↩️ We restored what you were filling out');
+  return true;
+}
+
+function restoreDraftIfAny(){
+  let data;
+  try{ data=JSON.parse(localStorage.getItem(DRAFT_KEY)||'null'); }catch(e){ return; }
+  const restored=applyDraftData(data);
+  if(restored){
+    localDraftRestored=true;
+    showToast(lang==='es'?'↩️ Recuperamos lo último que estabas llenando':'↩️ We restored what you were filling out');
+  } else if(data&&(!data._savedAt||(Date.now()-data._savedAt)>7*24*60*60*1000)){
+    localStorage.removeItem(DRAFT_KEY);
+  }
+}
+
+// ── Respaldo del borrador en el servidor, ligado al correo ──
+// localStorage no se comparte entre navegadores/apps distintas — si alguien
+// llena el formulario en Chrome pero abre el link mágico desde el navegador
+// interno de Gmail, pierde su borrador aunque el autoguardado local esté
+// funcionando perfecto. Este respaldo (silencioso, nunca bloquea el login)
+// soluciona justo ese caso.
+async function backupDraftToServer(email){
+  if(!sb||!email) return;
+  try{
+    const data=collectDraftData();
+    // Si el formulario está prácticamente vacío no vale la pena guardar nada
+    const hasContent=Object.keys(data).some(k=>!k.startsWith('_')&&data[k]);
+    if(!hasContent) return;
+    await sb.from('form_drafts').upsert({email:email.trim().toLowerCase(),draft_data:data,updated_at:new Date().toISOString()});
+  }catch(e){ console.error('No se pudo respaldar el borrador en el servidor:',e); }
+}
+
+async function restoreDraftFromServer(){
+  if(!sb||!currentUser||localDraftRestored) return;
+  try{
+    const {data,error}=await sb.from('form_drafts').select('draft_data').eq('email',(currentUser.email||'').toLowerCase()).maybeSingle();
+    if(error||!data?.draft_data) return;
+    const restored=applyDraftData(data.draft_data);
+    if(restored){
+      localDraftRestored=true;
+      showToast(lang==='es'?'↩️ Recuperamos lo que estabas llenando antes de entrar':'↩️ We restored what you were filling out before logging in');
+      saveDraft(); // también lo dejamos en local para que futuras vueltas no dependan del servidor
+    }
+    // Se consume una sola vez — evita restaurar datos viejos en un login futuro
+    await sb.from('form_drafts').delete().eq('email',(currentUser.email||'').toLowerCase());
+  }catch(e){ console.error('No se pudo restaurar el borrador desde el servidor:',e); }
 }
 
 function toggleFabCluster(){
