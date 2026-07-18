@@ -297,6 +297,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .tl-when{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-dark);margin-bottom:2px}
 .tl-what{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
 .tl-detail{font-size:13px;color:var(--text-2)}
+/* Itinerario del día: hora + actividad homologadas en una sola línea (a
+   diferencia del Cronograma, que trae un tercer bloque de detalle más largo
+   y conviene dejar apilado) */
+.tl-item.tl-inline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tl-item.tl-inline .tl-when{margin-bottom:0;flex-shrink:0;min-width:84px}
+.tl-item.tl-inline .tl-what{margin-bottom:0}
 
 /* ── CHECKLIST ── */
 .cl-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border-gray);cursor:pointer;transition:background .15s;border-radius:var(--radius);margin-bottom:2px}
@@ -337,7 +343,7 @@ textarea.vcard-input{height:auto}
 /* Fondo con foto propia — la imagen se pone inline vía JS; aquí solo el
    overlay claro para que el texto se lea bien encima de cualquier foto. */
 .std-card.theme-custom-photo{background-size:cover!important;background-position:center!important}
-.std-card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0}
+.std-card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.62);z-index:0}
 .std-card.theme-custom-photo .std-content,.std-card.theme-custom-photo .std-bg-dragonfly,.std-card.theme-custom-photo .std-logo-mark{position:relative;z-index:1}
 
 .std-theme-picker{display:flex;justify-content:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
@@ -420,6 +426,14 @@ textarea.vcard-input{height:auto}
 .text-color-picker{display:flex;justify-content:center;gap:8px;margin-bottom:.4rem;flex-wrap:wrap}
 .text-color-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent}
 .text-color-swatch.active{border-color:var(--violet);transform:scale(1.15)}
+
+/* ── COMBO GRID: 10 estilos curados (fondo+fuente+texto ya armonizados) ── */
+.combo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:10px;justify-items:center}
+.combo-swatch{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;background:none;border:none;padding:0;font-family:'Inter',sans-serif;max-width:80px}
+.combo-swatch-preview{width:56px;height:56px;border-radius:14px;border:2.5px solid transparent;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.combo-swatch.active .combo-swatch-preview{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-light)}
+.combo-swatch-label{font-size:9.5px;color:var(--text-3);text-align:center;line-height:1.2}
+.combo-swatch.active .combo-swatch-label{color:var(--teal-dark);font-weight:700}
 .std-names em{font-style:italic;color:var(--teal)}
 .std-divider{display:flex;align-items:center;gap:12px;margin:1rem auto;width:min(200px,60%)}
 .std-divider::before,.std-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(46,196,182,.4),transparent)}
@@ -580,7 +594,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .excel-modal{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-lg);padding:2rem;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center}
 .excel-modal h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:.5rem;color:var(--text)}
 .excel-modal p{font-size:13.5px;color:var(--text-2);margin-bottom:1.5rem;line-height:1.6}
-.btn-excel-unlock{display:block;width:100%;padding:14px;border-radius:var(--radius);background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;margin-bottom:.6rem;text-decoration:none;box-sizing:border-box}
+.btn-excel-unlock{display:block;width:100%;padding:14px;border-radius:var(--radius);background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:14px;font-weight:600;border:1.5px solid transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;margin-bottom:.6rem;text-decoration:none;box-sizing:border-box}
 .btn-excel-unlock:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,196,182,.3)}
 .btn-excel-close{width:100%;padding:14px;border-radius:var(--radius);background:var(--cream-2);color:var(--text-2);font-size:14px;font-weight:600;border:1.5px solid var(--border-gray);cursor:pointer;font-family:'Inter',sans-serif;box-sizing:border-box}
 .profile-label{display:block;font-size:11px;font-weight:600;color:var(--text-3);margin:.6rem 0 .3rem}
@@ -1148,21 +1162,23 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       </div>
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem;display:none" id="pub-slug-locked-note" data-es="El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste." data-en="The link can't change once published — avoids breaking links you already shared.">El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste.</p>
 
+      <div class="profile-section-divider" data-es="Información principal" data-en="Main details">Información principal</div>
+      <label class="profile-label" data-es="Nombre del festejado/a o de la pareja" data-en="Guest of honor or couple's name">Nombre del festejado/a o de la pareja</label>
+      <input type="text" id="pub-host-names" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Ana &amp; Juan">
+      <label class="profile-label" data-es="Ubicación" data-en="Location">Ubicación</label>
+      <input type="text" id="pub-location" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Jardín El Encanto, Querétaro">
+      <label class="profile-label" data-es="Mensaje o frase de la invitación" data-en="Invitation message or phrase">Mensaje o frase de la invitación</label>
+      <input type="text" id="pub-message" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Prepárate para una noche mágica">
+
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
-      <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .5rem"></p>
-      <div class="std-theme-picker" id="pub-theme-picker"></div>
-      <p style="text-align:center;font-size:12px;color:var(--text-2);margin-bottom:.4rem" data-es="Fondos degradados" data-en="Gradient backgrounds">Fondos degradados</p>
-      <div class="std-theme-picker" id="pub-gradient-picker"></div>
+      <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
+      <div class="combo-grid" id="pub-combo-picker" style="margin-bottom:1rem"></div>
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
         <input type="file" id="pub-bg-photo-input" accept="image/*" style="display:none" onchange="uploadPublishBackground(event)">
         <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0" data-es="Ideal: foto vertical, buena luz, sin texto — menos de 5 MB" data-en="Ideal: portrait photo, good lighting, no text — under 5 MB">Ideal: foto vertical, buena luz, sin texto — menos de 5 MB</p>
         <div id="pub-bg-photo-preview" style="margin-top:.5rem"></div>
       </div>
-
-      <div class="profile-section-divider" data-es="Letra y color del texto (opcional)" data-en="Font & text color (optional)">Letra y color del texto (opcional)</div>
-      <div class="font-picker" id="pub-font-picker"></div>
-      <div class="text-color-picker" id="pub-text-color-picker"></div>
 
       <div class="profile-section-divider" data-es="¿Qué pedirle al invitado en el RSVP?" data-en="What to ask guests in the RSVP?">¿Qué pedirle al invitado en el RSVP?</div>
       <label style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem;font-size:13px;color:var(--text-2);cursor:pointer">
@@ -1634,6 +1650,14 @@ async function openPublishModal(){
   const glNoteNew=document.getElementById('pub-guestlist-edit-note'); if(glNoteNew) glNoteNew.style.display='none';
   document.getElementById('pub-domain-label').textContent=invitationHost()+'/i/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
+  // Estos 3 campos ahora son editables directo aquí — antes solo se podían
+  // cambiar haciendo clic en la tarjeta del tab Save the Date, y ni siquiera
+  // aparecían si esta invitación se abría directo desde "Mis invitaciones".
+  document.getElementById('pub-host-names').value=plan.name||'';
+  document.getElementById('pub-location').value=plan.location||'';
+  document.getElementById('pub-message').value=(plan.stdMessage
+    ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
+    ||'').trim();
   const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
   if(bgPreviewInit) bgPreviewInit.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
 
@@ -1651,16 +1675,7 @@ async function openPublishModal(){
       pubFontClass=fc||'';
     }
   }
-  document.querySelectorAll('#pub-font-picker .font-swatch').forEach((s,i)=>{
-    s.classList.toggle('active', (FONT_OPTIONS[i]&&FONT_OPTIONS[i].cls===pubFontClass));
-  });
-  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>{
-    const swatchColors=TEXT_COLOR_OPTIONS.map((c,i)=>i===0?null:c.hex);
-    s.classList.toggle('active', swatchColors[i]===pubTextColor);
-  });
-  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-gradient-picker .theme-swatch').forEach(s=>{
-    s.classList.toggle('active', s.dataset.bgValue===pubBgColor);
-  });
+  renderPublishPickers();
   updatePubThemeLabel();
 
   document.getElementById('publish-modal').classList.add('open');
@@ -1676,20 +1691,6 @@ let pubTextColor=null;
 
 // Convierte "rgb(250, 249, 247)" (lo que el navegador reporta) de vuelta
 // a "#faf9f7" para poder comparar contra nuestros hex de BG_COLORS.
-function setPublishFont(fontClass,el){
-  pubFontClass=fontClass;
-  document.querySelectorAll('#pub-font-picker .font-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
-  showInvitationPreview();
-}
-
-function setPublishTextColor(hex,el){
-  pubTextColor=hex;
-  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
-  showInvitationPreview();
-}
-
 function updatePubThemeLabel(){
   const label=document.getElementById('pub-current-theme-label');
   if(!label) return;
@@ -1697,6 +1698,14 @@ function updatePubThemeLabel(){
     label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+(lang==='es'?'Tu foto':'Your photo');
     return;
   }
+  const comboIdx=findComboIndex(pubBgColor,pubFontClass,pubTextColor);
+  if(comboIdx>=0){
+    const c=PRESET_COMBOS[comboIdx];
+    label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+(lang==='es'?c.name.es:c.name.en);
+    return;
+  }
+  // Datos de una invitación anterior al sistema de combos — se muestra el
+  // nombre del color base como respaldo, aunque no combine con un preset.
   const matchColor=BG_COLORS.find(c=>c.hex.toLowerCase()===pubBgColor.toLowerCase());
   const matchGradient=BG_GRADIENTS.find(g=>g.value===pubBgColor);
   const match=matchColor||matchGradient;
@@ -1704,9 +1713,8 @@ function updatePubThemeLabel(){
   label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+name;
 }
 
-// Llena los 4 selectores del modal de Publicar (fondo, degradados, fuente,
-// color de texto) desde los MISMOS arreglos que usa el tab Save the Date —
-// así nunca hay que sincronizar 2 listas escritas a mano otra vez.
+// Precarga las fuentes que no vienen por defecto en Google Fonts del <head>
+// (las que solo se usan si el usuario elige un combo con esa tipografía).
 let extraFontsLoaded=false;
 function loadExtraFontsIfNeeded(){
   if(extraFontsLoaded) return;
@@ -1717,47 +1725,28 @@ function loadExtraFontsIfNeeded(){
   document.head.appendChild(link);
 }
 
+// Pinta el combo grid del modal de Publicar/Editar, marcando activo el
+// combo que coincide con el estilo actual (o ninguno si es una foto o un
+// dato antiguo que no combina exacto con los 10 presets).
 function renderPublishPickers(){
-  const themeBox=document.getElementById('pub-theme-picker');
-  if(themeBox) themeBox.innerHTML=BG_COLORS.map(c=>
-    `<span class="theme-swatch" style="background:${c.hex}" data-bg-value="${c.hex}" onclick="setPublishBgColor('${c.hex}',this)" title="${esc(c.name.es)}"></span>`
-  ).join('');
-
-  const gradientBox=document.getElementById('pub-gradient-picker');
-  if(gradientBox) gradientBox.innerHTML=BG_GRADIENTS.map(g=>
-    `<span class="theme-swatch" style="background:${g.value}" data-bg-value="${esc(g.value)}" onclick="setPublishBgColor('${g.value}',this)" title="${esc(g.name.es)}"></span>`
-  ).join('');
-
-  const fontBox=document.getElementById('pub-font-picker');
-  if(fontBox) fontBox.innerHTML=FONT_OPTIONS.map((f,i)=>
-    `<span class="font-swatch${i===0?' active':''}" style="font-family:${f.family}${f.weight?`;font-weight:${f.weight}`:''}" onclick="setPublishFont('${f.cls}',this)">${esc(lang==='es'?f.label.es:f.label.en)}</span>`
-  ).join('');
-
-  const colorBox=document.getElementById('pub-text-color-picker');
-  if(colorBox) colorBox.innerHTML=TEXT_COLOR_OPTIONS.map((c,i)=>
-    `<span class="text-color-swatch${i===0?' active':''}" style="background:${c.hex}" data-hex="${c.hex}" title="${esc(lang==='es'?c.name.es:c.name.en)}" onclick="setPublishTextColor(${c.hex==='#1A2332'?'null':`'${c.hex}'`},this)"></span>`
-  ).join('');
+  const comboBox=document.getElementById('pub-combo-picker');
+  if(comboBox) comboBox.innerHTML=renderComboGridHtml('applyPublishCombo',findComboIndex(pubBgColor,pubFontClass,pubTextColor));
 }
 
-function setPublishBgColor(value,el){
-  pubBgColor=value;
-  pubBackgroundImageUrl=null; // elegir un color/degradado cancela la foto subida
+// Aplica un combo completo (fondo+fuente+texto) de un solo clic — sustituye
+// a los 3 selectores sueltos que antes había que combinar a mano.
+function applyPublishCombo(idx,el){
+  const combo=PRESET_COMBOS[idx];
+  if(!combo) return;
+  pubBgColor=combo.bg;
+  pubFontClass=combo.font;
+  pubTextColor=combo.textColor==='#1A2332'?null:combo.textColor;
+  pubBackgroundImageUrl=null; // elegir un combo cancela la foto subida
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML='';
-  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-gradient-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#pub-combo-picker .combo-swatch').forEach(s=>s.classList.remove('active'));
   if(el) el.classList.add('active');
   updatePubThemeLabel();
-
-  // Aplicar automáticamente el color de texto que combina bien con este
-  // fondo — el usuario puede cambiarlo manualmente después si prefiere otro.
-  const match=[...BG_COLORS,...BG_GRADIENTS].find(c=>(c.hex||c.value)===value);
-  if(match&&match.textPair){
-    pubTextColor=match.textPair==='#1A2332'?null:match.textPair;
-    document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach(s=>{
-      s.classList.toggle('active', s.dataset.hex===match.textPair);
-    });
-  }
-
   showInvitationPreview();
 }
 
@@ -1783,7 +1772,7 @@ async function uploadPublishBackground(event){
   if(!urlData?.publicUrl){ showToast(L?'No se pudo obtener el link de la imagen':'Could not get the image link',true); return; }
 
   pubBackgroundImageUrl=urlData.publicUrl;
-  document.querySelectorAll('#pub-theme-picker .theme-swatch').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#pub-combo-picker .combo-swatch').forEach(s=>s.classList.remove('active'));
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML=`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`;
   updatePubThemeLabel();
@@ -1843,20 +1832,23 @@ function showInvitationPreview(){
     ? ` style="background-image:url('${pubBackgroundImageUrl}')${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`
     : ` style="background:${pubBgColor}${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`;
   const photoClass=pubBackgroundImageUrl?' theme-custom-photo':'';
+  const previewHostNames=(document.getElementById('pub-host-names')?.value||p.name||'').trim();
+  const previewLocation=(document.getElementById('pub-location')?.value||p.location||'').trim();
+  const previewMessage=(document.getElementById('pub-message')?.value||'').trim();
   const previewHtml=`
     <div class="std-card${photoClass}"${cardStyle}>
       <div class="std-content${pubFontClass?' '+pubFontClass:''}">
         <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
-        <div class="std-names">${esc(toTitleCase(p.name||''))}</div>
+        <div class="std-names">${esc(toTitleCase(previewHostNames))}</div>
         <div class="std-divider"><span class="std-divider-icon">◆</span></div>
         <div class="std-details">
           ${p.date?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(p.date)}</span></div>`:''}
-          ${p.location?`<div class="std-detail-item"><span class="std-icon">📍</span><span>${esc(p.location)}</span></div>`:''}
+          ${previewLocation?`<div class="std-detail-item"><span class="std-icon">📍</span><span>${esc(previewLocation)}</span></div>`:''}
           ${p.time?`<div class="std-detail-item"><span class="std-icon">🕕</span><span>${esc(p.time)}</span></div>`:''}
           ${e.dresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(e.dresscode)}</span></div>`:''}
           ${document.getElementById('pub-directions')&&document.getElementById('pub-directions').value.trim()?`<div class="std-detail-item"><span class="std-icon">🗺️</span><span>${esc(document.getElementById('pub-directions').value.trim())}</span></div>`:''}
         </div>
-        ${(()=>{const m=(p.stdMessage||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent||'').trim();return m?`<div class="std-footer">${esc(m)}</div>`:'';})()}
+        ${previewMessage?`<div class="std-footer">${esc(previewMessage)}</div>`:''}
         ${e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:''}
       </div>
       <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
@@ -1982,13 +1974,7 @@ function closePublishModal(){
   document.getElementById('pub-slug').disabled=false;
   document.getElementById('pub-restrict-list-label').style.opacity='1';
   renderAllLineEditors();
-  document.querySelectorAll('#pub-font-picker .font-swatch').forEach((s,i)=>{
-    s.classList.toggle('active', (FONT_OPTIONS[i]&&FONT_OPTIONS[i].cls===pubFontClass));
-  });
-  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>{
-    const swatchColors=TEXT_COLOR_OPTIONS.map((c,i)=>i===0?null:c.hex);
-    s.classList.toggle('active', swatchColors[i]===pubTextColor);
-  });
+  renderPublishPickers();
 }
 
 let lastPublishedUrl='';
@@ -2019,14 +2005,17 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-slug').value=inv.slug;
   document.getElementById('pub-slug').disabled=true;
 
+  // Estos 3 ahora se editan aquí directo — antes solo eran editables
+  // haciendo clic en la tarjeta del tab Save the Date, que ni aparece si
+  // entraste directo desde "Mis invitaciones" sin generar nada en la sesión.
+  document.getElementById('pub-host-names').value=inv.host_names||'';
+  document.getElementById('pub-location').value=inv.location||'';
+  document.getElementById('pub-message').value=inv.message||'';
+
   // Pre-llenar el resto de los campos con lo que ya tiene guardado.
   // Si la invitación es de antes de simplificar los fondos (temas con
   // dibujos que ya no existen), cae de vuelta al crema por defecto.
   pubBgColor=(inv.theme==='theme-custom-color'&&inv.custom_color_hex)?inv.custom_color_hex:'#FAF9F7';
-  document.querySelectorAll('#pub-theme-picker .theme-swatch, #pub-gradient-picker .theme-swatch').forEach(s=>{
-    s.classList.toggle('active', s.dataset.bgValue===pubBgColor);
-  });
-  updatePubThemeLabel();
   document.getElementById('pub-ask-guests').checked=!!inv.ask_guest_count;
   document.getElementById('pub-ask-dietary').checked=!!inv.ask_dietary;
   document.getElementById('pub-ask-message').checked=!!inv.ask_message;
@@ -2050,15 +2039,9 @@ async function openEditInvitationModal(invId){
   renderGalleryPreview();
   pubFontClass=inv.font_family||'';
   pubTextColor=inv.text_color||null;
-  document.querySelectorAll('#pub-font-picker .font-swatch').forEach(s=>s.classList.remove('active'));
-  const fontIdx=FONT_OPTIONS.map(f=>f.cls).indexOf(pubFontClass);
-  const fontSwatches=document.querySelectorAll('#pub-font-picker .font-swatch');
-  if(fontSwatches[fontIdx>=0?fontIdx:0]) fontSwatches[fontIdx>=0?fontIdx:0].classList.add('active');
-  document.querySelectorAll('#pub-text-color-picker .text-color-swatch').forEach((s,i)=>{
-    const swatchColors=TEXT_COLOR_OPTIONS.map((c,i)=>i===0?null:c.hex);
-    s.classList.toggle('active', swatchColors[i]===pubTextColor);
-  });
   pubBackgroundImageUrl=inv.background_image_url||null;
+  renderPublishPickers();
+  updatePubThemeLabel();
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
 
@@ -2315,6 +2298,9 @@ async function publishInvitation(){
 
     const updatePayload={
       theme,
+      host_names: document.getElementById('pub-host-names').value.trim()||null,
+      location: document.getElementById('pub-location').value.trim()||null,
+      message: document.getElementById('pub-message').value.trim()||null,
       ask_guest_count: document.getElementById('pub-ask-guests').checked,
       ask_dietary: document.getElementById('pub-ask-dietary').checked,
       ask_message: document.getElementById('pub-ask-message').checked,
@@ -2388,11 +2374,12 @@ async function publishInvitation(){
 
   const publishedViaPlanner=result.method==='planner_credit'||result.method==='planner_unlimited';
   const p=plan, e=p.extra||{};
-  // El mensaje/frase de la tarjeta (el pie editable del Save the Date) ahora
-  // SÍ se publica — invitacion.html ya lo renderiza como inv.message, pero
-  // nunca se guardaba. Se toma del plan (si el usuario lo editó) o directo
-  // de la tarjeta (si quedó tal cual lo generó la IA).
-  const stdMessage=(p.stdMessage
+  // Estos 3 ahora se leen de los campos editables del modal (fuente de
+  // verdad), con el plan/la tarjeta como respaldo si el usuario no los tocó.
+  const hostNames=(document.getElementById('pub-host-names').value.trim()||p.name||'');
+  const location=(document.getElementById('pub-location').value.trim()||p.location||'');
+  const stdMessage=(document.getElementById('pub-message').value.trim()
+    ||p.stdMessage
     ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
     ||'').trim();
   const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
@@ -2405,12 +2392,12 @@ async function publishInvitation(){
     slug,
     is_published: true,
     published_via_planner: publishedViaPlanner,
-    host_names: p.name||'',
+    host_names: hostNames,
     event_type: p.typeName||'',
     event_date: p.date||'',
     event_date_raw: p.rawDate||null,
     event_time: p.time||'',
-    location: p.location||'',
+    location: location,
     dress_code: e.dresscode||'',
     hashtag: e.hashtag||'',
     message: stdMessage||null,
@@ -2459,12 +2446,12 @@ async function publishInvitation(){
   lastPublishedUrl=`${invitationOrigin()}/i/${slug}`;
   // Datos para los mensajes de compartir por invitado (hallazgo V7 #3)
   lastPublishedGuests=guestListEntries.map(g=>g.guest_name);
-  lastPublishedHost=p.name||'';
+  lastPublishedHost=hostNames;
   lastPublishedType=p.typeName||'';
   renderGuestShareMessages();
   document.getElementById('publish-url').textContent=lastPublishedUrl;
   try{
-    const dataUrl=await buildBrandedQRDataURL(plan.name||'',(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
+    const dataUrl=await buildBrandedQRDataURL(hostNames,(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
     document.getElementById('publish-qr-img').src=dataUrl;
     document.getElementById('publish-qr-download').href=dataUrl;
   }catch(err){
@@ -2889,6 +2876,53 @@ const TEXT_COLOR_OPTIONS=[
   {hex:'#FFFFFF',name:{es:'Blanco',en:'White'}},
   {hex:'#C7CBD1',name:{es:'Plata',en:'Silver'}}
 ];
+
+// 10 combos curados — fondo + fuente + color de texto ya armonizados entre
+// sí, para que elegir "cómo se ve" sea UNA sola decisión y no tres por
+// separado (que era justo lo que hacía difícil que combinaran bien).
+// "Subir tu foto" sigue siendo una opción aparte de este selector.
+const PRESET_COMBOS=[
+  {name:{es:'Elegante Clásico',en:'Classic Elegant'},bg:'#FAF9F7',font:'',textColor:'#1A2332'},
+  {name:{es:'Romance Rosa',en:'Rose Romance'},bg:'#F7E8E8',font:'font-script',textColor:'#6E1E2E'},
+  {name:{es:'Boho Salvia',en:'Boho Sage'},bg:'#EDF2E9',font:'font-soft',textColor:'#1B3B2F'},
+  {name:{es:'Lujo Champagne',en:'Champagne Luxury'},bg:'#F7F1E3',font:'font-editorial',textColor:'#8A6B1E'},
+  {name:{es:'Cielo Sereno',en:'Serene Sky'},bg:'linear-gradient(135deg,#A1C4FD,#C2E9FB)',font:'font-classic',textColor:'#1A2E4A'},
+  {name:{es:'Atardecer Vibrante',en:'Vibrant Sunset'},bg:'linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)',font:'font-modern',textColor:'#FFFFFF'},
+  {name:{es:'Lavanda Soñadora',en:'Dreamy Lavender'},bg:'#F0EAF7',font:'font-script',textColor:'#5A3E7A'},
+  {name:{es:'Fiesta Infantil 🎈',en:'Kids Party 🎈'},bg:'#FF6FA5',font:'font-fun',textColor:'#FFFFFF'},
+  {name:{es:'Oro Rosa Editorial',en:'Rose Gold Editorial'},bg:'linear-gradient(135deg,#F7C6C7,#F4E2D8)',font:'font-editorial',textColor:'#B15A3E'},
+  {name:{es:'Uva Moderno',en:'Modern Grape'},bg:'linear-gradient(135deg,#D8A7E8,#F5A9C4)',font:'font-modern',textColor:'#FFFFFF'}
+];
+
+// Devuelve el font-family CSS completo (con peso si aplica) para una clase
+// de fuente de FONT_OPTIONS — usado para pintar la vista previa "Aa" de
+// cada combo con su tipografía real.
+function comboFontFamily(cls){
+  const f=FONT_OPTIONS.find(f=>f.cls===cls)||FONT_OPTIONS[0];
+  return `${f.family}${f.weight?`;font-weight:${f.weight}`:''}`;
+}
+
+// Encuentra el índice del combo que coincide exactamente con un fondo+fuente
+// +color de texto dados (usado para marcar cuál queda "activo" al abrir el
+// picker con datos ya guardados). null/'' de textColor se normaliza al
+// carbón por defecto, igual que en el resto de la app.
+function findComboIndex(bg,fontCls,textColor){
+  const normText=textColor||'#1A2332';
+  return PRESET_COMBOS.findIndex(c=>c.bg===bg&&(c.font||'')===(fontCls||'')&&c.textColor===normText);
+}
+
+// Genera el HTML de los 10 botones de combo — reusado tanto en el tab Save
+// the Date recién generado como en el modal de Publicar/Editar.
+function renderComboGridHtml(applyFnName,activeIdx){
+  return PRESET_COMBOS.map((c,i)=>{
+    const isActive=(activeIdx===undefined?i===0:i===activeIdx);
+    const name=lang==='es'?c.name.es:c.name.en;
+    return `<button type="button" class="combo-swatch${isActive?' active':''}" onclick="${applyFnName}(${i},this)" title="${esc(name)}">
+      <span class="combo-swatch-preview" style="background:${c.bg};font-family:${comboFontFamily(c.font)};color:${c.textColor}">Aa</span>
+      <span class="combo-swatch-label">${esc(name)}</span>
+    </button>`;
+  }).join('');
+}
 
 const THEME_SUGGESTIONS={
   'Boda/Wedding':{
@@ -3639,12 +3673,16 @@ async function generate(){
   plan.checklistData=buildChecklist();
   const vendorsResult=buildVendors();
   plan.vendorsData=vendorsResult.vendors;
+  // Las preguntas para proveedores ahora son un checklist marcable (no solo
+  // texto corrido) — se guarda el estado en el plan para que persista igual
+  // que el checklist general.
+  plan.vendorQuestionsData=(vendorsResult.vendorQuestions||[]).map(q=>({text:q,checked:false}));
 
   setTabHTML('budget',renderBudget(budgetResult.budget,budgetResult.budgetTips,budgetResult.paqueteInfo));
   setTabHTML('timeline',renderTimeline(plan.timelineData));
   setTabHTML('dayitinerary',renderDayItinerary(plan.dayItineraryData));
   setTabHTML('checklist',renderChecklist(plan.checklistData));
-  setTabHTML('vendors',renderVendors(vendorsResult.vendors,vendorsResult.vendorQuestions,vendorsResult.negotiationTips));
+  setTabHTML('vendors',renderVendors(vendorsResult.vendors,plan.vendorQuestionsData,vendorsResult.negotiationTips));
 
   // ══════════════════════════════
   //  LLAMADAS A IA — SOLO LO QUE REALMENTE NECESITA REDACCIÓN
@@ -3726,6 +3764,11 @@ async function generate(){
   if(anySucceeded){
     gensUsed++; localStorage.setItem('dflai_gens',gensUsed); updateGenBadge();
     startCountdown();
+    // Autoguardar de inmediato — antes, si no dabas clic manual en "Guardar
+    // plan", podías perder el plan generado sin haberlo guardado (aunque ya
+    // se hubiera contado la generación). Ahora crédito y plan guardado
+    // siempre van juntos, sin depender de un clic extra.
+    ensurePlanSaved();
   }
 }
 
@@ -3935,28 +3978,12 @@ function wrapSTDCard(cardHtml){
   // Por si la IA agrega code fences a pesar de la instrucción de no hacerlo
   const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
 
-  const bgSwatchHtml=BG_COLORS.map((c,i)=>
-    `<span class="theme-swatch" style="background:${c.hex}" data-bg-value="${c.hex}" onclick="setSTDBgColor('${c.hex}',this)" title="${esc(c.name[p.lang]||c.name.es)}"></span>`
-  ).join('');
-  const gradientSwatchHtml=BG_GRADIENTS.map((g,i)=>
-    `<span class="theme-swatch" style="background:${g.value}" data-bg-value="${esc(g.value)}" onclick="setSTDBgColor('${g.value}',this)" title="${esc(g.name[p.lang]||g.name.es)}"></span>`
-  ).join('');
-
-  const themePicker=`<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Color de fondo':'Background color'}</p>
-<div class="std-theme-picker" style="margin-bottom:.6rem">${bgSwatchHtml}</div>
-<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Fondos degradados':'Gradient backgrounds'}</p>
-<div class="std-theme-picker" style="margin-bottom:.6rem">${gradientSwatchHtml}</div>
+  const themePicker=`<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.5rem">${p.lang==='es'?'Elige un estilo':'Choose a style'}</p>
+<div class="combo-grid" style="margin-bottom:.85rem">${renderComboGridHtml('applySTDCombo')}</div>
 <div style="text-align:center;margin:.4rem 0 1rem">
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
 <p style="font-size:11px;color:var(--text-3);margin:.4rem 0 0">${p.lang==='es'?'Ideal: foto vertical, buena luz, sin texto — menos de 5 MB':'Ideal: portrait photo, good lighting, no text — under 5 MB'}</p>
-</div>
-<div style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.4rem">${p.lang==='es'?'Letra y color del texto':'Font & text color'}</div>
-<div class="font-picker">
-${FONT_OPTIONS.map((f,i)=>`<span class="font-swatch${i===0?' active':''}" style="font-family:${f.family}${f.weight?`;font-weight:${f.weight}`:''}" onclick="setSTDFont('${f.cls}',this)">${p.lang==='es'?f.label.es:f.label.en}</span>`).join('')}
-</div>
-<div class="text-color-picker" style="margin-bottom:1rem">
-${TEXT_COLOR_OPTIONS.map((c,i)=>`<span class="text-color-swatch${i===0?' active':''}" style="background:${c.hex}" data-hex="${c.hex}" title="${p.lang==='es'?c.name.es:c.name.en}" onclick="setSTDTextColor(${c.hex==='#1A2332'?'null':`'${c.hex}'`},this)"></span>`).join('')}
 </div>
 `;
   // Por si la IA agrega su propio "style" con algún gradiente de fondo al
@@ -4377,7 +4404,7 @@ function buildDayItinerary(){
 function renderDayItinerary(items){
   if(!Array.isArray(items)||!items.length) return '';
   const hint=`<div class="std-edit-hint">✏️ ${plan.lang==='es'?'Haz clic en cualquier hora o actividad para editarla':'Click any time or activity to edit it'}</div>`;
-  const rows=items.map(t=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-when std-editable" contenteditable="true">${esc(t.time)}</div><div class="tl-what std-editable" contenteditable="true">${esc(t.what)}</div></div>`).join('');
+  const rows=items.map(t=>`<div class="tl-item tl-inline"><div class="tl-dot"></div><div class="tl-when std-editable" contenteditable="true">${esc(t.time)}</div><div class="tl-what std-editable" contenteditable="true">${esc(t.what)}</div></div>`).join('');
   return hint+`<div class="timeline">${rows}</div>`;
 }
 
@@ -4931,13 +4958,31 @@ function renderVendors(items,questions,negotiation){
       </div>
     </div>`;
   }).join('');
-  const qs=(questions||[]).map(q=>`<li>${esc(q)}</li>`).join('');
+  // Preguntas para proveedores: checklist marcable (mismo estilo visual que
+  // el tab Checklist) en vez de una lista de texto corrido — así el usuario
+  // va tachando las que ya le hizo a cada proveedor.
+  const qsHint=L?'Marca las que ya le preguntaste a tu proveedor':'Check off the ones you already asked your vendor';
+  const qs=(questions||[]).map((q,qi)=>{
+    if(q.checked===undefined) q.checked=false;
+    return `<div class="cl-item${q.checked?' chk':''}" data-qi="${qi}" onclick="toggleVendorQuestion(this)"><div class="cl-box"></div><div class="cl-text">${esc(q.text)}</div></div>`;
+  }).join('');
   const neg=(negotiation||[]).map(n=>`<li>${esc(n)}</li>`).join('');
   const hint=L?'Deselecciona los que no necesites, y captura el precio real que te coticen — solo se incluyen en tu Excel los que dejes marcados.':'Deselect the ones you don\'t need, and enter the real price you get quoted — only the ones left checked are included in your Excel.';
   return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>
     <div class="vcards">${cards}</div>
     <button class="btn-adjust-budget" onclick="adjustBudgetWithQuotes()">🔄 ${L?'Ajustar presupuesto con estas cotizaciones':'Adjust budget with these quotes'}</button>
-    <h2>${L?'Preguntas para proveedores':'Vendor questions'}</h2><ul>${qs}</ul><h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
+    <h2>${L?'Preguntas para proveedores':'Vendor questions'}</h2>
+    <p style="font-size:12px;color:var(--text-3);margin-bottom:.5rem">${qsHint}</p>
+    ${qs}
+    <h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
+}
+
+function toggleVendorQuestion(el){
+  const qi=+el.dataset.qi;
+  const item=plan.vendorQuestionsData?.[qi];
+  if(!item) return;
+  item.checked=!item.checked;
+  el.classList.toggle('chk',item.checked);
 }
 
 function toggleVendorItem(el){
@@ -5771,17 +5816,16 @@ function setSTDBgColor(value,el){
   card.style.backgroundImage='';
   card.style.background=value;
   card.dataset.bgValue=value;
-  document.querySelectorAll('#content-savethedate .theme-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
+  if(el){
+    document.querySelectorAll('#content-savethedate .combo-swatch').forEach(s=>s.classList.remove('active'));
+    el.classList.add('active');
+  }
 
   // Aplicar automáticamente el color de texto que combina bien con este fondo
   const match=[...BG_COLORS,...BG_GRADIENTS].find(c=>(c.hex||c.value)===value);
   if(match&&match.textPair){
     if(match.textPair==='#1A2332') card.style.removeProperty('--custom-text-color');
     else card.style.setProperty('--custom-text-color',match.textPair);
-    document.querySelectorAll('#content-savethedate .text-color-swatch').forEach(s=>{
-      s.classList.toggle('active', s.dataset.hex===match.textPair);
-    });
   }
 }
 
@@ -5813,7 +5857,7 @@ async function uploadSTDBackground(event){
   if(!card) return;
   card.classList.add('theme-custom-photo');
   card.style.backgroundImage=`url('${publicUrl}')`;
-  document.querySelectorAll('#content-savethedate .theme-swatch').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#content-savethedate .combo-swatch').forEach(s=>s.classList.remove('active'));
   showToast(L?'✅ Foto aplicada como fondo':'✅ Photo applied as background');
 }
 
@@ -5887,13 +5931,24 @@ async function onGalleryFilesSelected(event){
   showToast(L?`✅ ${pubGalleryUrls.length} foto(s) en la galería`:`✅ ${pubGalleryUrls.length} photo(s) in gallery`);
 }
 
+// Aplica un combo completo (fondo+fuente+texto) al Save the Date recién
+// generado, de un solo clic — reusa las 3 funciones existentes por dentro
+// para no duplicar la lógica de cada una.
+function applySTDCombo(idx,el){
+  const combo=PRESET_COMBOS[idx];
+  if(!combo) return;
+  setSTDBgColor(combo.bg,null);
+  setSTDFont(combo.font,null);
+  setSTDTextColor(combo.textColor==='#1A2332'?null:combo.textColor,null);
+  document.querySelectorAll('#content-savethedate .combo-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
 function setSTDFont(fontClass,el){
   const content=document.querySelector('#content-savethedate .std-card .std-content');
   if(!content) return;
   content.classList.remove('font-classic','font-modern','font-script','font-soft','font-round','font-editorial','font-fun','font-comic','font-playful');
   if(fontClass) content.classList.add(fontClass);
-  document.querySelectorAll('#content-savethedate .font-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
 }
 
 function setSTDTextColor(hex,el){
@@ -5901,8 +5956,6 @@ function setSTDTextColor(hex,el){
   if(!card) return;
   if(hex) card.style.setProperty('--custom-text-color',hex);
   else card.style.removeProperty('--custom-text-color');
-  document.querySelectorAll('#content-savethedate .text-color-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
 }
 
 function makeSTDEditable(){
