@@ -42,7 +42,8 @@
 const ALLOWED_ORIGINS = [
   'https://dragonflaievents.com',
   'https://www.dragonflaievents.com',
-  'https://dragonflai.netlify.app'
+  'https://dragonflai.netlify.app',
+  'https://milestone-2--dragonflai.netlify.app'
 ];
 
 // Modelos que la app usa hoy. Si algún día cambias de modelo en el
@@ -156,6 +157,19 @@ export default {
       const cap = MAX_TOKENS[purpose];
       payload.max_tokens = Math.min(parseInt(payload.max_tokens, 10) || cap, cap);
 
+      // Solo los campos que la app usa de verdad — nada de tools,
+      // mcp_servers ni extras que se cobren aparte o cambien el
+      // comportamiento del modelo a nuestras espaldas.
+      const wantStream = payload.stream === true;
+      const upstreamPayload = {
+        model: payload.model,
+        max_tokens: payload.max_tokens,
+        messages: payload.messages
+      };
+      if (payload.system !== undefined) upstreamPayload.system = payload.system;
+      if (payload.temperature !== undefined) upstreamPayload.temperature = payload.temperature;
+      if (wantStream) upstreamPayload.stream = true;
+
       // 3) ¿Te toca? La base de datos decide (créditos pagados, acceso anual,
       //    o tus generaciones gratis) — ver worker_authorize_ai en el SQL.
       //    gen_id agrupa las 2-3 llamadas de UNA misma generación de plan
@@ -183,8 +197,19 @@ export default {
           'x-api-key': env.ANTHROPIC_API_KEY,
           'anthropic-version': '2023-06-01'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(upstreamPayload)
       });
+
+      // Streaming (hallazgo V7 #5): el stream de Anthropic se pasa TAL CUAL
+      // al navegador — el texto va apareciendo conforme el modelo lo genera,
+      // en vez de esperar la respuesta completa en pantalla de carga.
+      if (wantStream && anthropicRes.ok && anthropicRes.body) {
+        return new Response(anthropicRes.body, {
+          status: anthropicRes.status,
+          headers: { ...CORS, 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache' }
+        });
+      }
+
       const data = await anthropicRes.text();
       return new Response(data, {
         status: anthropicRes.status,
@@ -434,6 +459,8 @@ function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invit
 <a href="${invitationUrl}" target="_blank" style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:100px;background-color:#2EC4B6">Confirmar mi asistencia →</a>
 </td></tr>
 <tr><td align="center" style="padding:0 40px 32px">
+<p style="font-size:13px;color:#4A5568;margin:0 0 4px">Con cariño,</p>
+<p style="font-size:13px;color:#4A5568;margin:0 0 10px"><strong>Belu</strong> 🪽 tu planner con alas</p>
 <p style="font-size:12px;color:#8A94A6;margin:0">DragonflAI Events</p>
 </td></tr>
 </table>

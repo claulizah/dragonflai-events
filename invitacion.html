@@ -440,12 +440,29 @@ let selectedGuest=null;
 let lastSearchResults=[];
 let guestSearchTimer=null;
 
+// Misma idea que en la app principal: "Nuestra historia" solo tiene sentido
+// tal cual para bodas y aniversarios — el resto de eventos muestra algo
+// relevante a ESE tipo en su lugar (sobre el festejado, sobre el bebé, etc.)
+const STORY_TYPE_CONFIG=[
+  {match:['Boda','Wedding','Aniversario','Anniversary'],icon:'💌',label:{es:'Nuestra historia',en:'Our Story'}},
+  {match:['Cumpleaños','Birthday','Fiesta Infantil','Kids Party','Quinceañera'],icon:'🎂',label:{es:'Sobre el festejado/a',en:'About the Guest of Honor'}},
+  {match:['Baby Shower'],icon:'👶',label:{es:'Sobre el bebé',en:'About the Baby'}},
+  {match:['Graduación','Graduation'],icon:'🎓',label:{es:'Sobre este logro',en:'About This Achievement'}},
+  {match:['Corporativo','Corporate'],icon:'🏢',label:{es:'Sobre este evento',en:'About This Event'}}
+];
+function getStoryTitleFor(eventType){
+  const needle=String(eventType||'').toLowerCase().trim();
+  const found=STORY_TYPE_CONFIG.find(c=>c.match.some(m=>needle.includes(m.toLowerCase())));
+  return found||STORY_TYPE_CONFIG[0]; // por defecto, "Nuestra historia"
+}
+
 function renderExtraSections(inv,t){
   const sections=[];
 
   if(inv.couple_story){
+    const storyCfg=getStoryTitleFor(inv.event_type);
     sections.push(`<div class="extra-card">
-      <div class="extra-title">💌 ${t.ourStoryTitle}</div>
+      <div class="extra-title">${storyCfg.icon} ${esc(lang==='es'?storyCfg.label.es:storyCfg.label.en)}</div>
       <p class="extra-story">${esc(inv.couple_story).replace(/\n/g,'<br>')}</p>
     </div>`);
   }

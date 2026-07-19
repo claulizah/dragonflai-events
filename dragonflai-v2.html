@@ -1158,17 +1158,23 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <label class="profile-label" data-es="Tu link será:" data-en="Your link will be:">Tu link será:</label>
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:.4rem">
         <span style="font-size:13px;color:var(--text-3);white-space:nowrap" id="pub-domain-label">tudominio.com/i/</span>
-        <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0">
+        <input type="text" id="pub-slug" class="profile-input" placeholder="ana-y-juan" style="margin-bottom:0" oninput="document.getElementById('pub-slug-taken-error').style.display='none';this.style.borderColor=''">
       </div>
+      <div id="pub-slug-taken-error" style="display:none;background:#FBE0E5;border:1.5px solid #E8637A;border-radius:var(--radius);padding:10px 14px;margin:.3rem 0 .5rem;font-size:12.5px;color:#C14A5E;line-height:1.5"></div>
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem;display:none" id="pub-slug-locked-note" data-es="El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste." data-en="The link can't change once published — avoids breaking links you already shared.">El link no se puede cambiar una vez publicado — evita romper enlaces que ya compartiste.</p>
 
       <div class="profile-section-divider" data-es="Información principal" data-en="Main details">Información principal</div>
+      <div id="pub-editing-banner" style="display:none;background:var(--gold-light);border:1.5px solid rgba(212,151,42,.3);border-radius:var(--radius);padding:10px 14px;margin-bottom:.75rem;font-size:12.5px;color:#8A6B1E;line-height:1.5"></div>
+      <label class="profile-label" data-es="Tipo de evento" data-en="Event type">Tipo de evento</label>
+      <select id="pub-event-type" class="profile-input" onchange="updateStorySectionForType(this.value);debouncedLivePreview()"></select>
       <label class="profile-label" data-es="Nombre del festejado/a o de la pareja" data-en="Guest of honor or couple's name">Nombre del festejado/a o de la pareja</label>
       <input type="text" id="pub-host-names" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Ana &amp; Juan">
       <label class="profile-label" data-es="Ubicación" data-en="Location">Ubicación</label>
       <input type="text" id="pub-location" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Jardín El Encanto, Querétaro">
       <label class="profile-label" data-es="Mensaje o frase de la invitación" data-en="Invitation message or phrase">Mensaje o frase de la invitación</label>
       <input type="text" id="pub-message" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Prepárate para una noche mágica">
+      <label class="profile-label" data-es="Dress code (opcional)" data-en="Dress code (optional)">Dress code (opcional)</label>
+      <input type="text" id="pub-dresscode" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Formal, casual elegante, blanco y negro...">
 
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
@@ -1233,7 +1239,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div id="pub-registry-editor" class="line-editor"></div>
       <textarea id="pub-registry" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
 
-      <div class="profile-section-divider" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">Nuestra historia (opcional)</div>
+      <div class="profile-section-divider" id="pub-story-title" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">Nuestra historia (opcional)</div>
       <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('pub-story','std-story');debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
 
       <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
@@ -1658,6 +1664,37 @@ function slugify(str){
 
 let pubBgColor='#FAF9F7';
 
+// Mismo texto que ya se guarda en event_type (el nombre sin el emoji) —
+// así el selector nunca introduce una nomenclatura distinta a la existente.
+function renderPubEventTypeOptions(){
+  const sel=document.getElementById('pub-event-type');
+  if(!sel) return;
+  const names=T.eventTypes[lang].map(s=>s.replace(/^\S+\s/,''));
+  sel.innerHTML=names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+}
+
+// "Nuestra historia" solo tiene sentido tal cual para bodas y aniversarios.
+// Para el resto de eventos se ofrece un campo genérico de información
+// adicional, en vez de preguntas específicas por tipo (más simple y flexible
+// que pedirle a cada anfitrión que encaje su evento en una categoría fija).
+const WEDDING_LIKE_TYPES=['Boda/Wedding','Aniversario/Anniversary'];
+function isWeddingLikeType(typeNameOrRaw){
+  const needle=String(typeNameOrRaw||'').toLowerCase().trim();
+  return WEDDING_LIKE_TYPES.some(k=>k.split('/').some(part=>part.toLowerCase()===needle)||k.toLowerCase()===needle);
+}
+function updateStorySectionForType(typeNameOrRaw){
+  const L=lang==='es';
+  const titleEl=document.getElementById('pub-story-title');
+  const areaEl=document.getElementById('pub-story');
+  const wedding=isWeddingLikeType(typeNameOrRaw);
+  if(titleEl) titleEl.textContent=wedding
+    ?(L?'💌 Nuestra historia (opcional)':'💌 Our story (optional)')
+    :(L?'📝 Información adicional (opcional)':'📝 Additional information (optional)');
+  if(areaEl) areaEl.placeholder=wedding
+    ?(L?'Nos conocimos hace 10 años...':'We met 10 years ago...')
+    :(L?'Cualquier información general que quieras compartir con tus invitados...':'Any general information you\'d like to share with your guests...');
+}
+
 async function openPublishModal(){
   loadExtraFontsIfNeeded();
   document.getElementById('account-dropdown').style.display='none';
@@ -1674,6 +1711,12 @@ async function openPublishModal(){
   const glNoteNew=document.getElementById('pub-guestlist-edit-note'); if(glNoteNew) glNoteNew.style.display='none';
   document.getElementById('pub-domain-label').textContent=invitationHost()+'/i/';
   document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
+  document.getElementById('pub-slug').style.borderColor='';
+  const slugErrEl=document.getElementById('pub-slug-taken-error'); if(slugErrEl) slugErrEl.style.display='none';
+  renderPubEventTypeOptions();
+  document.getElementById('pub-event-type').value=plan.typeName||'';
+  updateStorySectionForType(plan.eventTypeRaw||plan.typeName);
+  const editBanner=document.getElementById('pub-editing-banner'); if(editBanner) editBanner.style.display='none';
   // Estos 3 campos ahora son editables directo aquí — antes solo se podían
   // cambiar haciendo clic en la tarjeta del tab Save the Date, y ni siquiera
   // aparecían si esta invitación se abría directo desde "Mis invitaciones".
@@ -1682,6 +1725,7 @@ async function openPublishModal(){
   document.getElementById('pub-message').value=(plan.stdMessage
     ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
     ||'').trim();
+  document.getElementById('pub-dresscode').value=(plan.extra&&plan.extra.dresscode)||'';
   const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
   if(bgPreviewInit) bgPreviewInit.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
 
@@ -1828,7 +1872,10 @@ function showInvitationPreview(){
   let extraSections='';
 
   if(story){
-    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">💌 ${L?'Nuestra historia':'Our Story'}</div><p style="font-size:13px;color:var(--text-2);text-align:center;white-space:pre-wrap">${esc(story)}</p></div>`;
+    const wedding=isWeddingLikeType(p.eventTypeRaw||document.getElementById('pub-event-type')?.value||p.typeName);
+    const storyIcon=wedding?'💌':'📝';
+    const storyLabel=wedding?(L?'Nuestra historia':'Our Story'):(L?'Información adicional':'Additional Information');
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">${storyIcon} ${esc(storyLabel)}</div><p style="font-size:13px;color:var(--text-2);text-align:center;white-space:pre-wrap">${esc(story)}</p></div>`;
   }
   if(events.length){
     const rows=events.map(ev=>`<div style="padding:8px 0;border-top:1px solid var(--border-gray)"><div style="font-weight:600;font-size:13.5px">${esc(ev.name)}</div>${ev.time?`<div style="font-size:12px;color:var(--text-2)">🕐 ${esc(ev.time)}</div>`:''}${ev.location?`<div style="font-size:12px;color:var(--text-2)">📍 ${esc(ev.location)}</div>`:''}${ev.description?`<div style="font-size:12px;color:var(--text-3);font-style:italic">${esc(ev.description)}</div>`:''}</div>`).join('');
@@ -1869,7 +1916,7 @@ function showInvitationPreview(){
           ${p.date?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(p.date)}</span></div>`:''}
           ${previewLocation?`<div class="std-detail-item"><span class="std-icon">📍</span><span>${esc(previewLocation)}</span></div>`:''}
           ${p.time?`<div class="std-detail-item"><span class="std-icon">🕕</span><span>${esc(p.time)}</span></div>`:''}
-          ${e.dresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(e.dresscode)}</span></div>`:''}
+          ${(()=>{const dc=document.getElementById('pub-dresscode')?.value.trim()||e.dresscode;return dc?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(dc)}</span></div>`:'';})()}
           ${document.getElementById('pub-directions')&&document.getElementById('pub-directions').value.trim()?`<div class="std-detail-item"><span class="std-icon">🗺️</span><span>${esc(document.getElementById('pub-directions').value.trim())}</span></div>`:''}
         </div>
         ${previewMessage?`<div class="std-footer">${esc(previewMessage)}</div>`:''}
@@ -2029,12 +2076,31 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-slug').value=inv.slug;
   document.getElementById('pub-slug').disabled=true;
 
+  renderPubEventTypeOptions();
+  document.getElementById('pub-event-type').value=inv.event_type||'';
+  updateStorySectionForType(inv.event_type);
+
+  // Aviso explícito de que esto EDITA una invitación que ya existe, con lo
+  // que ya tiene guardado (fotos, historia, tipo de evento) — para que no
+  // se confunda con crear un evento nuevo desde cero.
+  const editBanner=document.getElementById('pub-editing-banner');
+  if(editBanner){
+    editBanner.style.display='block';
+    editBanner.textContent=L
+      ?`✏️ Estás editando "${inv.host_names||inv.slug}" — lo que no cambies aquí (historia, fotos ya subidas, etc.) se conserva tal cual. ¿Buscas crear un evento distinto? Genera un plan nuevo y publica desde ahí, en vez de editar este.`
+      :`✏️ You're editing "${inv.host_names||inv.slug}" — anything you don't change here (story, already-uploaded photos, etc.) stays as is. Looking to create a different event? Generate a new plan and publish from there instead of editing this one.`;
+    sb.from('event_photos').select('id',{count:'exact',head:true}).eq('invitation_id',invId).then(({count})=>{
+      if(count>0) editBanner.textContent+=(L?` (Ya tiene ${count} foto${count===1?'':'s'} subida${count===1?'':'s'}.)`:` (Already has ${count} uploaded photo${count===1?'':'s'}.)`);
+    });
+  }
+
   // Estos 3 ahora se editan aquí directo — antes solo eran editables
   // haciendo clic en la tarjeta del tab Save the Date, que ni aparece si
   // entraste directo desde "Mis invitaciones" sin generar nada en la sesión.
   document.getElementById('pub-host-names').value=inv.host_names||'';
   document.getElementById('pub-location').value=inv.location||'';
   document.getElementById('pub-message').value=inv.message||'';
+  document.getElementById('pub-dresscode').value=inv.dress_code||'';
 
   // Pre-llenar el resto de los campos con lo que ya tiene guardado.
   // Si la invitación es de antes de simplificar los fondos (temas con
@@ -2322,9 +2388,11 @@ async function publishInvitation(){
 
     const updatePayload={
       theme,
+      event_type: document.getElementById('pub-event-type').value||null,
       host_names: document.getElementById('pub-host-names').value.trim()||null,
       location: document.getElementById('pub-location').value.trim()||null,
       message: document.getElementById('pub-message').value.trim()||null,
+      dress_code: document.getElementById('pub-dresscode').value.trim()||null,
       ask_guest_count: document.getElementById('pub-ask-guests').checked,
       ask_dietary: document.getElementById('pub-ask-dietary').checked,
       ask_message: document.getElementById('pub-ask-message').checked,
@@ -2417,12 +2485,12 @@ async function publishInvitation(){
     is_published: true,
     published_via_planner: publishedViaPlanner,
     host_names: hostNames,
-    event_type: p.typeName||'',
+    event_type: document.getElementById('pub-event-type').value||p.typeName||'',
     event_date: p.date||'',
     event_date_raw: p.rawDate||null,
     event_time: p.time||'',
     location: location,
-    dress_code: e.dresscode||'',
+    dress_code: document.getElementById('pub-dresscode').value.trim()||e.dresscode||'',
     hashtag: e.hashtag||'',
     message: stdMessage||null,
     vibe: p.vibe||'',
@@ -2450,7 +2518,20 @@ async function publishInvitation(){
 
   const {data:newInv,error}=await sb.from('invitations').insert(payload).select().single();
   if(error){
-    if(error.code==='23505') showToast(lang==='es'?'Ese link ya está en uso, prueba otro':'That link is taken, try another',true);
+    if(error.code==='23505'){
+      const suggestion=slug+'-'+Math.floor(Math.random()*900+100);
+      const errEl=document.getElementById('pub-slug-taken-error');
+      const slugInput=document.getElementById('pub-slug');
+      if(errEl){
+        errEl.style.display='block';
+        errEl.innerHTML=(L?
+          `⚠️ Ese link ya está en uso — probablemente ya tienes una invitación publicada con ese nombre. <a href="#" onclick="document.getElementById('pub-slug').value='${esc(suggestion)}';document.getElementById('pub-slug-taken-error').style.display='none';document.getElementById('pub-slug').style.borderColor='';return false" style="color:#C14A5E;font-weight:700;text-decoration:underline">Usar "${esc(suggestion)}" en su lugar</a>, o revisa "Mis invitaciones" si querías editar la que ya existe.`
+          :`⚠️ That link is already taken — you likely already have a published invitation with that name. <a href="#" onclick="document.getElementById('pub-slug').value='${esc(suggestion)}';document.getElementById('pub-slug-taken-error').style.display='none';document.getElementById('pub-slug').style.borderColor='';return false" style="color:#C14A5E;font-weight:700;text-decoration:underline">Use "${esc(suggestion)}" instead</a>, or check "My invitations" if you meant to edit the existing one.`
+        );
+      }
+      if(slugInput){ slugInput.style.borderColor='#E8637A'; slugInput.scrollIntoView({behavior:'smooth',block:'center'}); }
+      showToast(lang==='es'?'Ese link ya está en uso, prueba otro':'That link is taken, try another',true);
+    }
     else showToast((lang==='es'?'No se pudo publicar: ':'Could not publish: ')+(error.message||error.code||''),true);
     console.error('publishInvitation error:',error);
     return;
@@ -2833,11 +2914,29 @@ async function logout(){
   showToast(lang==='es'?'Sesión cerrada':'Logged out');
 }
 
+// ── Medición de origen (?ref=tiktok / ?ref=ig) ──
+// Guardamos de qué red llegó la persona; al iniciar sesión se escribe una
+// sola vez en su perfil (set_signup_ref solo llena si está vacío).
+(function(){
+  try{
+    const r=new URLSearchParams(location.search).get('ref');
+    if(r) localStorage.setItem('dflai_ref', r.slice(0,40));
+  }catch(_){}
+})();
+function reportSignupRef(){
+  try{
+    const r=localStorage.getItem('dflai_ref');
+    if(!r||!sb||!currentUser) return;
+    sb.rpc('set_signup_ref',{p_ref:r}).then(()=>localStorage.removeItem('dflai_ref'),()=>{});
+  }catch(_){}
+}
+
 if(sb){
   sb.auth.onAuthStateChange((_event,session)=>{
     currentUser=session?session.user:null;
     updateAccountUI();
     refreshPaidStatus();
+    reportSignupRef();
   });
 }
 
@@ -3764,6 +3863,12 @@ async function generate(){
     return;
   }
   if(limitFail){
+    // El worker manda el motivo en err.message: distinguimos el tope GLOBAL
+    // del día (protección de costos en picos de tráfico) del límite personal.
+    if(limitFail.reason?.message==='global_daily_limit'){
+      showToast(lang==='es'?'¡Vera está llena de eventos hoy! 🪽 Las generaciones gratis se agotaron — vuelve mañana, o desbloquea acceso para generar sin fila.':'Vera is fully booked today! 🪽 Free generations ran out — come back tomorrow, or unlock access to skip the line.',true);
+      return;
+    }
     showToast(lang==='es'?'Has usado todos tus planes disponibles — te llevamos a los planes':'You\'ve used all your available plans — taking you to pricing',true);
     setTimeout(()=>{ window.location.href='index.html#precios'; },1800);
     return;
@@ -3802,7 +3907,7 @@ async function generate(){
     // plan", podías perder el plan generado sin haberlo guardado (aunque ya
     // se hubiera contado la generación). Ahora crédito y plan guardado
     // siempre van juntos, sin depender de un clic extra.
-    ensurePlanSaved();
+    ensurePlanSaved().then(()=>{ saveChecklistProgressToServer(); });
   }
 }
 
@@ -4945,10 +5050,38 @@ function renderTimeline(items){
   return `<div class="timeline">${rows}</div>`;
 }
 
+function checklistProgressBarHTML(sections){
+  const total=sections.reduce((s,sec)=>s+(sec.items||[]).length,0);
+  const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const pct=total?Math.round((done/total)*100):0;
+  const L=plan.lang==='es';
+  return `<div id="checklist-progress-wrap" style="margin-bottom:1.25rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span id="checklist-progress-label" style="font-size:13px;font-weight:600;color:var(--text)">${done}/${total} ${L?'tareas':'tasks'} — ${pct}%</span>
+    </div>
+    <div style="height:8px;background:var(--cream-3);border-radius:100px;overflow:hidden">
+      <div id="checklist-progress-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--teal),var(--violet));transition:width .3s"></div>
+    </div>
+  </div>`;
+}
+
+function updateChecklistProgressBar(){
+  const sections=plan.checklistData;
+  if(!Array.isArray(sections)) return;
+  const total=sections.reduce((s,sec)=>s+(sec.items||[]).length,0);
+  const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const pct=total?Math.round((done/total)*100):0;
+  const L=plan.lang==='es';
+  const labelEl=document.getElementById('checklist-progress-label');
+  const fillEl=document.getElementById('checklist-progress-fill');
+  if(labelEl) labelEl.textContent=`${done}/${total} ${L?'tareas':'tasks'} — ${pct}%`;
+  if(fillEl) fillEl.style.width=pct+'%';
+}
+
 function renderChecklist(sections){
   if(!Array.isArray(sections)||!sections.length) return '';
   const L=plan.lang==='es';
-  const hint=L?'Deselecciona lo que no necesites — solo lo que dejes marcado se incluye en tu Excel.':'Deselect what you don\'t need — only what stays checked is included in your Excel.';
+  const hint=L?'Deselecciona lo que no necesites — tu progreso se guarda solo, y solo lo marcado se incluye en tu Excel.':'Deselect what you don\'t need — your progress saves automatically, and only checked items are included in your Excel.';
   const body=sections.map((s,si)=>{
     const items=(s.items||[]).map((i,ii)=>{
       if(i.selected===undefined) i.selected=true; // por defecto viene incluido; el usuario quita lo que no aplique
@@ -4956,7 +5089,31 @@ function renderChecklist(sections){
     }).join('');
     return `<h2>${esc(s.section)}</h2>${items}`;
   }).join('');
-  return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}`;
+  return checklistProgressBarHTML(sections)+`<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}`;
+}
+
+let checklistSaveDebounceTimer=null;
+function scheduleChecklistProgressSave(){
+  clearTimeout(checklistSaveDebounceTimer);
+  checklistSaveDebounceTimer=setTimeout(saveChecklistProgressToServer,600);
+}
+
+async function saveChecklistProgressToServer(){
+  if(!sb||!currentUser||!plan._savedId||!Array.isArray(plan.checklistData)) return;
+  try{
+    await sb.rpc('save_checklist_progress',{p_plan_id:plan._savedId,p_progress:plan.checklistData});
+  }catch(e){ console.error('No se pudo guardar el progreso del checklist:',e); }
+}
+
+async function loadChecklistProgressFromServer(planId){
+  if(!sb||!currentUser||!planId) return false;
+  try{
+    const {data,error}=await sb.from('plan_checklist_progress').select('progress').eq('plan_id',planId).maybeSingle();
+    if(error||!data?.progress) return false;
+    plan.checklistData=data.progress;
+    setTabHTML('checklist',renderChecklist(plan.checklistData));
+    return true;
+  }catch(e){ console.error('No se pudo cargar el progreso del checklist:',e); return false; }
 }
 
 function toggleChecklistItem(el){
@@ -4965,9 +5122,8 @@ function toggleChecklistItem(el){
   if(!item) return;
   item.selected=!item.selected;
   el.classList.toggle('chk',item.selected);
-  const total=plan.checklistData.reduce((s,sec)=>s+sec.items.length,0);
-  const selected=plan.checklistData.reduce((s,sec)=>s+sec.items.filter(i=>i.selected).length,0);
-  showToast(`${selected}/${total} ${lang==='es'?'tareas en tu plan':'tasks in your plan'}`);
+  updateChecklistProgressBar();
+  scheduleChecklistProgressSave();
 }
 
 function renderVendors(items,questions,negotiation){
@@ -5268,6 +5424,10 @@ async function loadSavedPlan(id){
   // anterior se queda "pegado" en las pestañas que este plan no trae.
   tabKeys.forEach(k=>setTabHTML(k,''));
   Object.keys(saved.tabsHtml||{}).forEach(k=>setTabHTML(k,saved.tabsHtml[k]));
+  // El checklist guardado en el snapshot puede estar desactualizado si el
+  // progreso se marcó desde otro dispositivo/sesión después de guardarse —
+  // el servidor siempre tiene la versión más reciente.
+  loadChecklistProgressFromServer(id);
   // La tarjeta restaurada conserva sus atributos contenteditable, pero los
   // listeners no sobreviven al guardado — hay que re-engancharlos para que
   // las ediciones sobre la tarjeta se sincronicen al plan también aquí.
