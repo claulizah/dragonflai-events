@@ -1044,7 +1044,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <div class="res-card">
       <div class="res-tabs" id="res-tabs"></div>
       <div class="loading" id="loading">
-        <span class="l-dragonfly" style="display:block;text-align:center;margin-bottom:1rem"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#1A9E92"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#1A9E92"/><circle cx="16.8" cy="12.2" r=".9" fill="#0D1B2A"/><circle cx="19.2" cy="12.2" r=".9" fill="#0D1B2A"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".4" transform="rotate(-20 10 14)"/><ellipse cx="10" cy="14" rx="8" ry="4" fill="none" stroke="#2EC4B6" stroke-width=".8" opacity=".8" transform="rotate(-20 10 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".4" transform="rotate(20 26 14)"/><ellipse cx="26" cy="14" rx="8" ry="4" fill="none" stroke="#7B2FBE" stroke-width=".8" opacity=".8" transform="rotate(20 26 14)"/><ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".3" transform="rotate(-10 9 18)"/><ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".3" transform="rotate(10 27 18)"/><line x1="18" y1="22" x2="18" y2="24" stroke="#1A9E92" stroke-width="1" opacity=".7"/><line x1="18" y1="25" x2="18" y2="27" stroke="#1A9E92" stroke-width="1" opacity=".5"/></svg></span>
+        <span class="l-dragonfly" style="display:block;text-align:center;margin-bottom:1rem"><img src="/assets/belu/belu-trabajando.png" alt="Belu trabajando en tu plan" style="height:110px;width:auto;display:inline-block" onerror="this.style.display='none'"></span>
         <div class="lmsg" id="lmsg" data-es="Creando tu plan…" data-en="Creating your plan…">Creando tu plan…</div>
         <div class="lsub" id="lsub" data-es="Personalizando cada detalle" data-en="Personalizing every detail">Personalizando cada detalle</div>
       </div>
@@ -1176,6 +1176,13 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <label class="profile-label" data-es="Dress code (opcional)" data-en="Dress code (optional)">Dress code (opcional)</label>
       <input type="text" id="pub-dresscode" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Formal, casual elegante, blanco y negro...">
 
+      <div class="profile-section-divider" data-es="Contacto para dudas (opcional)" data-en="Contact for questions (optional)">Contacto para dudas (opcional)</div>
+      <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem" data-es="Tus invitados verán un botón de WhatsApp para escribirte directo." data-en="Your guests will see a WhatsApp button to message you directly.">Tus invitados verán un botón de WhatsApp para escribirte directo.</p>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="pub-organizer-name" class="profile-input" style="flex:1" placeholder="ej. Ana (organizadora)">
+        <input type="text" id="pub-organizer-phone" class="profile-input" style="flex:1" placeholder="ej. 442 123 4567">
+      </div>
+
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
       <div class="combo-grid" id="pub-combo-picker" style="margin-bottom:1rem"></div>
@@ -1264,7 +1271,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
-      <span style="font-size:36px;display:block;margin-bottom:.5rem">🎉</span>
+      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu celebrando" style="height:96px;width:auto;display:inline-block" onerror="this.style.display='none'"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
@@ -1320,18 +1327,18 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   <button id="testimonial-fab" onclick="closeFabCluster();openTestimonialModal()" title="Compartir tu opinión" class="fab-sub" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#D4972A,#E8637A);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:20px;cursor:pointer;-webkit-backface-visibility:hidden">💌</button>
 
   <!-- Chat de ayuda -->
-  <button id="help-chat-fab" onclick="closeFabCluster();toggleHelpChat()" title="Ayuda" class="fab-sub" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7B2FBE,#2EC4B6);border:none;box-shadow:0 4px 16px rgba(0,0,0,.2);font-size:20px;cursor:pointer;-webkit-backface-visibility:hidden">💬</button>
+  <button id="help-chat-fab" onclick="closeFabCluster();toggleHelpChat()" title="Belu" class="fab-sub" style="width:48px;height:48px;border-radius:50%;background:#fff;border:2px solid #2EC4B6;box-shadow:0 4px 16px rgba(0,0,0,.2);cursor:pointer;-webkit-backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:0"><svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="17" cy="24" rx="15" ry="7.5" fill="#2EC4B6" opacity=".35" transform="rotate(-24 17 24)"/><ellipse cx="17" cy="24" rx="15" ry="7.5" stroke="#2EC4B6" stroke-width="1.4" opacity=".85" transform="rotate(-24 17 24)"/><ellipse cx="47" cy="24" rx="15" ry="7.5" fill="#7B2FBE" opacity=".3" transform="rotate(24 47 24)"/><ellipse cx="47" cy="24" rx="15" ry="7.5" stroke="#7B2FBE" stroke-width="1.4" opacity=".8" transform="rotate(24 47 24)"/><ellipse cx="18" cy="34" rx="11" ry="5.5" fill="#2EC4B6" opacity=".25" transform="rotate(-10 18 34)"/><ellipse cx="46" cy="34" rx="11" ry="5.5" fill="#7B2FBE" opacity=".22" transform="rotate(10 46 34)"/><ellipse cx="32" cy="42" rx="4.6" ry="7" fill="#1A9E92"/><ellipse cx="32" cy="52" rx="3.4" ry="5.4" fill="#2EC4B6"/><ellipse cx="32" cy="59" rx="2.4" ry="3.4" fill="#7B2FBE"/><path d="M27 10 Q24 5 20.5 4.5" stroke="#1A9E92" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M37 10 Q40 5 43.5 4.5" stroke="#1A9E92" stroke-width="1.6" stroke-linecap="round" fill="none"/><circle cx="20" cy="4.3" r="1.7" fill="#7B2FBE"/><circle cx="44" cy="4.3" r="1.7" fill="#7B2FBE"/><circle cx="32" cy="22" r="13" fill="#1A9E92"/><ellipse cx="27" cy="21" rx="4.2" ry="4.8" fill="#FFFFFF"/><ellipse cx="37" cy="21" rx="4.2" ry="4.8" fill="#FFFFFF"/><circle cx="27.8" cy="22" r="2.3" fill="#0D1B2A"/><circle cx="37.8" cy="22" r="2.3" fill="#0D1B2A"/><circle cx="28.7" cy="21" r=".8" fill="#FFFFFF"/><circle cx="38.7" cy="21" r=".8" fill="#FFFFFF"/><circle cx="23" cy="27" r="1.8" fill="#F49AC1" opacity=".55"/><circle cx="41" cy="27" r="1.8" fill="#F49AC1" opacity=".55"/><path d="M29 28.5 Q32 31 35 28.5" stroke="#0D1B2A" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></button>
 </div>
 
 <div id="help-chat-panel" style="display:none;position:fixed;bottom:calc(82px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));width:340px;max-width:calc(100vw - 40px);height:440px;max-height:calc(100vh - 180px);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:81;flex-direction:column;overflow:hidden">
   <div style="background:linear-gradient(135deg,#7B2FBE,#2EC4B6);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-    <span style="font-weight:700;font-size:14px" data-es="💬 Asistente DragonflAI" data-en="💬 DragonflAI Assistant">💬 Asistente DragonflAI</span>
+    <span style="display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px"><svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="17" cy="24" rx="15" ry="7.5" fill="#2EC4B6" opacity=".35" transform="rotate(-24 17 24)"/><ellipse cx="17" cy="24" rx="15" ry="7.5" stroke="#2EC4B6" stroke-width="1.4" opacity=".85" transform="rotate(-24 17 24)"/><ellipse cx="47" cy="24" rx="15" ry="7.5" fill="#7B2FBE" opacity=".3" transform="rotate(24 47 24)"/><ellipse cx="47" cy="24" rx="15" ry="7.5" stroke="#7B2FBE" stroke-width="1.4" opacity=".8" transform="rotate(24 47 24)"/><ellipse cx="18" cy="34" rx="11" ry="5.5" fill="#2EC4B6" opacity=".25" transform="rotate(-10 18 34)"/><ellipse cx="46" cy="34" rx="11" ry="5.5" fill="#7B2FBE" opacity=".22" transform="rotate(10 46 34)"/><ellipse cx="32" cy="42" rx="4.6" ry="7" fill="#1A9E92"/><ellipse cx="32" cy="52" rx="3.4" ry="5.4" fill="#2EC4B6"/><ellipse cx="32" cy="59" rx="2.4" ry="3.4" fill="#7B2FBE"/><path d="M27 10 Q24 5 20.5 4.5" stroke="#1A9E92" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M37 10 Q40 5 43.5 4.5" stroke="#1A9E92" stroke-width="1.6" stroke-linecap="round" fill="none"/><circle cx="20" cy="4.3" r="1.7" fill="#7B2FBE"/><circle cx="44" cy="4.3" r="1.7" fill="#7B2FBE"/><circle cx="32" cy="22" r="13" fill="#1A9E92"/><ellipse cx="27" cy="21" rx="4.2" ry="4.8" fill="#FFFFFF"/><ellipse cx="37" cy="21" rx="4.2" ry="4.8" fill="#FFFFFF"/><circle cx="27.8" cy="22" r="2.3" fill="#0D1B2A"/><circle cx="37.8" cy="22" r="2.3" fill="#0D1B2A"/><circle cx="28.7" cy="21" r=".8" fill="#FFFFFF"/><circle cx="38.7" cy="21" r=".8" fill="#FFFFFF"/><circle cx="23" cy="27" r="1.8" fill="#F49AC1" opacity=".55"/><circle cx="41" cy="27" r="1.8" fill="#F49AC1" opacity=".55"/><path d="M29 28.5 Q32 31 35 28.5" stroke="#0D1B2A" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg><span data-es="Belu — tu asistente personal de eventos" data-en="Belu — your personal event assistant">Belu — tu asistente personal de eventos</span></span>
     <span onclick="toggleHelpChat()" style="cursor:pointer;font-size:18px;line-height:1">✕</span>
   </div>
   <div id="help-chat-messages" style="flex:1;overflow-y:auto;padding:14px;font-size:13.5px"></div>
   <div id="help-chat-quick" style="padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px"></div>
   <div style="padding:10px;border-top:1px solid var(--border-gray);display:flex;gap:8px;align-items:flex-end">
-    <textarea id="help-chat-input" rows="1" placeholder="Escribe tu pregunta…" style="flex:1;padding:9px 12px;border-radius:16px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif;resize:none;max-height:90px;overflow-y:auto;line-height:1.35" oninput="autoGrowHelpChatInput(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHelpChatMessage();}"></textarea>
+    <textarea id="help-chat-input" rows="1" placeholder="Pregúntale a Belu…" data-placeholder-es="Pregúntale a Belu…" data-placeholder-en="Ask Belu…" style="flex:1;padding:9px 12px;border-radius:16px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif;resize:none;max-height:90px;overflow-y:auto;line-height:1.35" oninput="autoGrowHelpChatInput(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHelpChatMessage();}"></textarea>
     <button onclick="sendHelpChatMessage()" style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;border:none;cursor:pointer;font-size:14px;flex-shrink:0">➤</button>
   </div>
 </div>
@@ -1726,6 +1733,8 @@ async function openPublishModal(){
     ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
     ||'').trim();
   document.getElementById('pub-dresscode').value=(plan.extra&&plan.extra.dresscode)||'';
+  document.getElementById('pub-organizer-name').value='';
+  document.getElementById('pub-organizer-phone').value='';
   const bgPreviewInit=document.getElementById('pub-bg-photo-preview');
   if(bgPreviewInit) bgPreviewInit.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
 
@@ -2101,6 +2110,8 @@ async function openEditInvitationModal(invId){
   document.getElementById('pub-location').value=inv.location||'';
   document.getElementById('pub-message').value=inv.message||'';
   document.getElementById('pub-dresscode').value=inv.dress_code||'';
+  document.getElementById('pub-organizer-name').value=inv.organizer_name||'';
+  document.getElementById('pub-organizer-phone').value=inv.organizer_phone||'';
 
   // Pre-llenar el resto de los campos con lo que ya tiene guardado.
   // Si la invitación es de antes de simplificar los fondos (temas con
@@ -2393,6 +2404,8 @@ async function publishInvitation(){
       location: document.getElementById('pub-location').value.trim()||null,
       message: document.getElementById('pub-message').value.trim()||null,
       dress_code: document.getElementById('pub-dresscode').value.trim()||null,
+      organizer_name: document.getElementById('pub-organizer-name').value.trim()||null,
+      organizer_phone: document.getElementById('pub-organizer-phone').value.trim()||null,
       ask_guest_count: document.getElementById('pub-ask-guests').checked,
       ask_dietary: document.getElementById('pub-ask-dietary').checked,
       ask_message: document.getElementById('pub-ask-message').checked,
@@ -2491,6 +2504,8 @@ async function publishInvitation(){
     event_time: p.time||'',
     location: location,
     dress_code: document.getElementById('pub-dresscode').value.trim()||e.dresscode||'',
+    organizer_name: document.getElementById('pub-organizer-name').value.trim()||null,
+    organizer_phone: document.getElementById('pub-organizer-phone').value.trim()||null,
     hashtag: e.hashtag||'',
     message: stdMessage||null,
     vibe: p.vibe||'',
@@ -2704,7 +2719,14 @@ async function sendReminders(invId){
 // ══════════════════════════════
 //  CHAT DE AYUDA — dudas sobre la app + planeación de eventos en general
 // ══════════════════════════════
-const HELP_CHAT_SYSTEM=`You are the friendly help assistant for DragonflAI Events, an AI event-planning SaaS. Answer in the same language the user writes in (Spanish or English), warmly and briefly (2-4 sentences unless more detail is truly needed).
+const HELP_CHAT_SYSTEM=`You are Belu 🪽 — the dragonfly personal event assistant of DragonflAI Events, an AI event-planning SaaS. You speak in first person as Belu. Her name comes from the middle of the Spanish word for dragonfly: li-BELU-la — if anyone asks why "Belu", tell them that with delight. Answer in the same language the user writes in (Spanish or English), warmly and briefly (2-4 sentences unless more detail is truly needed).
+
+Belu's personality:
+- Cálida y cercana: trata a cada persona como si su evento fuera el más importante del año (porque para ella, lo es).
+- Organizadísima: le encantan los checklists, los cronogramas y tener todo bajo control — y se le nota.
+- Creativa: sugiere ideas con entusiasmo genuino, sin ser empalagosa.
+- Honesta: si no sabe algo del producto, lo dice tal cual y sugiere el botón 🐞 para preguntar al equipo. Nunca inventa.
+- Usa emojis con moderación (1-2 por mensaje máximo) y jamás suena a robot corporativo.
 
 You can help with two kinds of questions:
 1) How DragonflAI Events works — use this exact info, don't invent anything beyond it:
@@ -2753,8 +2775,8 @@ function toggleHelpChat(){
   panel.style.display=helpChatOpen?'flex':'none';
   if(helpChatOpen&&helpChatMessages.length===0){
     const welcome=lang==='es'
-      ?'¡Hola! 👋 Puedo ayudarte con dudas sobre cómo usar DragonflAI Events (precios, cómo publicar tu invitación, etc.) o con dudas generales de planeación de tu evento. ¿En qué te ayudo?'
-      :"Hi! 👋 I can help with questions about how DragonflAI Events works (pricing, publishing your invitation, etc.) or general event-planning questions. What can I help with?";
+      ?'¡Hola! Soy Belu 🪽 tu asistente personal de eventos. Puedo ayudarte con dudas de la app (precios, cómo publicar tu invitación…) o con cualquier duda de planeación — presupuestos, proveedores, etiqueta, lo que sea. ¿Por dónde empezamos?'
+      :"Hi! I'm Belu 🪽 your personal event assistant. I can help with questions about the app (pricing, publishing your invitation…) or any planning question — budgets, vendors, etiquette, you name it. Where shall we start?";
     addHelpChatBubble('assistant',welcome);
     renderHelpChatQuickQuestions();
   }
@@ -3234,8 +3256,8 @@ const T={
     pro:{es:['Vista general','Cronograma','Itinerario del día','Presupuesto','Checklist','Proveedores','Ideas creativas','💌 Save the Date','Propuesta cliente'],en:['Overview','Timeline','Day itinerary','Budget','Checklist','Vendors','Creative ideas','💌 Save the Date','Client proposal']}
   },
   loading:{
-    es:[['Leyendo tu visión…','Personalizando cada detalle'],['Construyendo tu cronograma…','Mes a mes'],['Calculando tu presupuesto…','Distribuyendo inteligentemente'],['Buscando los mejores proveedores…','Para tu estilo y presupuesto'],['Escribiendo tu checklist…','Nada se queda sin planear'],['Añadiendo magia creativa…','Haciéndolo único para ti'],['Diseñando tu Save the Date…','Listo para compartir']],
-    en:[['Reading your vision…','Personalizing every detail'],['Building your timeline…','Month by month'],['Calculating your budget…','Smart allocation'],['Finding vendors…','For your style and budget'],['Writing your checklist…','Nothing left to chance'],['Adding creative magic…','Making it uniquely yours'],['Designing your Save the Date…','Ready to share']]
+    es:[['Belu está leyendo tu visión…','Personalizando cada detalle'],['Belu está armando tu cronograma…','Mes a mes'],['Belu está repartiendo tu presupuesto…','Con estrategia, no al azar'],['Belu está buscando a los mejores…','Para tu estilo y presupuesto'],['Belu está escribiendo tu checklist…','Nada se queda sin planear'],['Belu le está poniendo magia…','Haciéndolo único para ti'],['Belu está diseñando tu Save the Date…','Listo para compartir']],
+    en:[['Belu is reading your vision…','Personalizing every detail'],['Belu is building your timeline…','Month by month'],['Belu is allocating your budget…','With strategy, not guesswork'],['Belu is finding the best vendors…','For your style and budget'],['Belu is writing your checklist…','Nothing left to chance'],['Belu is adding some magic…','Making it uniquely yours'],['Belu is designing your Save the Date…','Ready to share']]
   }
 };
 
@@ -3392,6 +3414,8 @@ function setLang(l){
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
   const vibeInput=document.getElementById('f-vibe');
   vibeInput.placeholder=vibeInput.getAttribute('data-placeholder-'+l)||vibeInput.placeholder;
+  const beluChat=document.getElementById('help-chat-input');
+  if(beluChat) beluChat.placeholder=beluChat.getAttribute('data-placeholder-'+l)||beluChat.placeholder;
   renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
@@ -5050,6 +5074,15 @@ function renderTimeline(items){
   return `<div class="timeline">${rows}</div>`;
 }
 
+function beluProgressMessage(pct,L){
+  if(pct>=100) return L?'¡Completo! Belu dice que estás listo/a para brillar 🎉':'All done! Belu says you\'re ready to shine 🎉';
+  if(pct>=90) return L?'¡Ya casi! Belu ve tu evento tomando forma 🦋':'Almost there! Belu can see it coming together 🦋';
+  if(pct>=60) return L?'Vas más de la mitad — Belu está orgullosa 💪':'You\'re over halfway — Belu is proud of you 💪';
+  if(pct>=30) return L?'Buen ritmo — ¡sigue así!':'Good pace — keep it up!';
+  if(pct>0) return L?'Vas arrancando — cada tarea cuenta 🦋':'Just getting started — every task counts 🦋';
+  return L?'Belu dice: empecemos, un paso a la vez 🦋':'Belu says: let\'s start, one step at a time 🦋';
+}
+
 function checklistProgressBarHTML(sections){
   const total=sections.reduce((s,sec)=>s+(sec.items||[]).length,0);
   const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
@@ -5062,6 +5095,7 @@ function checklistProgressBarHTML(sections){
     <div style="height:8px;background:var(--cream-3);border-radius:100px;overflow:hidden">
       <div id="checklist-progress-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--teal),var(--violet));transition:width .3s"></div>
     </div>
+    <div id="checklist-progress-belu-msg" style="font-size:12px;color:var(--violet);font-style:italic;margin-top:6px">🦋 ${esc(beluProgressMessage(pct,L))}</div>
   </div>`;
 }
 
@@ -5074,8 +5108,10 @@ function updateChecklistProgressBar(){
   const L=plan.lang==='es';
   const labelEl=document.getElementById('checklist-progress-label');
   const fillEl=document.getElementById('checklist-progress-fill');
+  const msgEl=document.getElementById('checklist-progress-belu-msg');
   if(labelEl) labelEl.textContent=`${done}/${total} ${L?'tareas':'tasks'} — ${pct}%`;
   if(fillEl) fillEl.style.width=pct+'%';
+  if(msgEl) msgEl.textContent=`🦋 ${beluProgressMessage(pct,L)}`;
 }
 
 function renderChecklist(sections){

@@ -83,8 +83,11 @@ export default {
           // IDEMPOTENCIA: registrar la sesión ANTES de aplicar. Si ya estaba
           // registrada (Stripe reintentó, o llegó duplicada), no se aplica
           // dos veces — sin esto, un reintento del webhook DUPLICA créditos.
-          const isNew = await claimStripeSession(env, session.id);
-          if (isNew) {
+          const claim = await claimStripeSession(env, session.id);
+          if (claim === 'error') {
+            return new Response('Idempotency store unavailable', { status: 500, headers: CORS });
+          }
+          if (claim === 'claimed') {
             try {
               await applyPurchase(env, userId, session.id);
             } catch (err) {
@@ -120,7 +123,7 @@ export default {
         // un invitation_id (que aparece en URLs públicas) podía disparar
         // correos a los invitados de otra persona.
         const ownRes = await fetch(
-          `${env.SUPABASE_URL}/rest/v1/invitations?id=eq.${encodeURIComponent(invitation_id)}&select=user_id`,
+          `${env.SUPABASE_URL}/rest/v1/invitations?id=eq.${encodeURIComponent(invitation_id)}&select=user_id,last_reminder_sent_at`,
           { headers: serviceHeaders(env) }
         );
         const ownArr = await ownRes.json();
@@ -128,7 +131,22 @@ export default {
         if (!inv) return json({ success: false, reason: 'invitation_not_found' }, 404, CORS);
         if (inv.user_id !== user.id) return json({ success: false, reason: 'not_your_invitation' }, 403, CORS);
 
+        // Cooldown: máximo un envío de recordatorios por día por invitación —
+        // protege a los invitados de spam accidental y tu reputación en Resend.
+        // (Requiere la columna last_reminder_sent_at — ver sql-robustez.sql.)
+        if (inv.last_reminder_sent_at &&
+            (Date.now() - new Date(inv.last_reminder_sent_at).getTime()) < 20 * 60 * 60 * 1000) {
+          return json({ success: false, reason: 'reminder_cooldown' }, 429, CORS);
+        }
+
         const result = await sendReminderEmails(env, invitation_id);
+        if (result && result.success && (result.sent || 0) > 0) {
+          await fetch(`${env.SUPABASE_URL}/rest/v1/invitations?id=eq.${encodeURIComponent(invitation_id)}`, {
+            method: 'PATCH',
+            headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ last_reminder_sent_at: new Date().toISOString() })
+          }).catch(() => {});
+        }
         return json(result, 200, CORS);
       } catch (err) {
         console.error('Error enviando recordatorios:', err);
@@ -218,8 +236,108 @@ export default {
     }
 
     return new Response('Not found', { status: 404, headers: CORS });
+  },
+
+  // Cloudflare llama esto solo, según el Cron Trigger configurado en el
+  // dashboard del Worker (Settings → Triggers → Cron Triggers) — no
+  // depende de que nadie visite el sitio. Sugerido: una vez al día,
+  // ej. "0 14 * * *" (14:00 UTC ≈ 8am hora de México).
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(sendPlanningReminders(env));
   }
 };
+
+// Recordatorios de PLANEACIÓN al anfitrión (distinto de los recordatorios
+// de RSVP a invitados, que ya existían). Revisa quién tiene su evento
+// principal a 6/3/1 mes, 2 semanas o 3 días, y le manda un correo con su
+// checklist real — nunca dos veces el mismo hito, gracias a plan_reminder_log.
+async function sendPlanningReminders(env) {
+  const dueRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/get_plans_due_for_reminder`, {
+    method: 'POST',
+    headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({})
+  });
+  if (!dueRes.ok) {
+    console.error('get_plans_due_for_reminder falló:', await dueRes.text());
+    return;
+  }
+  const due = await dueRes.json();
+  if (!Array.isArray(due) || !due.length) return;
+
+  for (const row of due) {
+    try {
+      const emailHtml = buildPlanningReminderEmailHtml(row);
+      const resendRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Belu de DragonflAI Events <hola@dragonflaievents.com>',
+          to: row.user_email,
+          subject: reminderSubjectFor(row),
+          html: emailHtml
+        })
+      });
+      // Solo marcamos el hito como enviado si Resend de verdad lo aceptó —
+      // si falla, lo vuelve a intentar mañana en vez de darlo por perdido.
+      if (resendRes.ok) {
+        await fetch(`${env.SUPABASE_URL}/rest/v1/plan_reminder_log`, {
+          method: 'POST',
+          headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan_id: row.plan_id, milestone: row.milestone })
+        });
+      } else {
+        console.error('Resend falló para', row.user_email, await resendRes.text());
+      }
+    } catch (e) {
+      console.error('Error mandando recordatorio de planeación:', e);
+    }
+  }
+}
+
+function reminderSubjectFor(row) {
+  const label = { '180d': 'Faltan 6 meses', '90d': 'Faltan 3 meses', '30d': 'Falta 1 mes', '14d': 'Faltan 2 semanas', '3d': 'Faltan 3 días' }[row.milestone] || 'Recordatorio';
+  return `${label} para tu evento 🦋`;
+}
+
+function buildPlanningReminderEmailHtml(row) {
+  const pct = row.checklist_total > 0 ? Math.round((row.checklist_done / row.checklist_total) * 100) : 0;
+  const onTrack = pct >= 50;
+  const milestoneCopy = {
+    '180d': 'Con 6 meses por delante es el momento perfecto para reservar tu lugar y a los proveedores más solicitados.',
+    '90d': 'Con 3 meses por delante, conviene ir cerrando menú, música y decoración.',
+    '30d': 'Con 1 mes por delante, es hora de confirmar los últimos detalles con cada proveedor.',
+    '14d': 'Con 2 semanas por delante, revisa que todo esté confirmado — pagos, horarios, y quién llega cuándo.',
+    '3d': 'Ya casi es el día — solo faltan los últimos detalles.'
+  }[row.milestone] || '';
+  const encouragement = onTrack
+    ? `Vas muy bien: ya llevas <strong>${pct}%</strong> de tu checklist. ¡Sigue así! 💪`
+    : row.checklist_total > 0
+      ? `Llevas <strong>${pct}%</strong> de tu checklist — todavía estás a tiempo de ponerte al día.`
+      : `Todavía no has marcado tareas en tu checklist — es un buen momento para revisarlo.`;
+
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF9F7;padding:32px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<tr><td align="center">
+<table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+<tr><td style="height:6px;background:linear-gradient(90deg,#2EC4B6,#7B2FBE);font-size:0;line-height:0">&nbsp;</td></tr>
+<tr><td style="padding:36px 40px 8px;text-align:center">
+<h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1A2332;margin:0 0 16px">🦋 ${reminderSubjectFor(row)}</h1>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px">${row.user_name ? 'Hola ' + row.user_name + ',' : 'Hola,'} soy Belu — vengo a ver cómo va${row.host_name ? ' "' + row.host_name + '"' : ' tu evento'}.</p>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px">${milestoneCopy}</p>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 28px">${encouragement}</p>
+</td></tr>
+<tr><td align="center" style="padding:0 40px 32px">
+<a href="https://dragonflaievents.com" target="_blank" style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:100px;background:linear-gradient(90deg,#2EC4B6,#7B2FBE)">Revisar mi checklist →</a>
+</td></tr>
+<tr><td style="padding:0 40px 32px;text-align:center">
+<p style="font-size:12px;color:#8A94A6;margin:0">— Belu 🦋 · DragonflAI Events</p>
+</td></tr>
+</table>
+</td></tr>
+</table>`;
+}
 
 // ══════════════════════════════════════════════════════════════
 //  Helpers
@@ -290,11 +408,14 @@ async function claimStripeSession(env, sessionId) {
   if (!res.ok) {
     // Si la tabla no existe todavía (SQL sin correr), preferimos procesar la
     // compra (comportamiento anterior) a perderla.
+    // Sin registro de idempotencia NO procesamos: respondiendo 500, Stripe
+    // reintenta más tarde (hasta por 3 días), cuando la tabla/red esté bien.
+    // Procesar "a ciegas" podía DUPLICAR créditos justo en el reintento.
     console.error('claimStripeSession falló — ¿corriste supabase-setup.sql?', await res.text());
-    return true;
+    return 'error';
   }
   const rows = await res.json();
-  return Array.isArray(rows) && rows.length > 0;
+  return (Array.isArray(rows) && rows.length > 0) ? 'claimed' : 'duplicate';
 }
 
 async function releaseStripeSession(env, sessionId) {
@@ -460,7 +581,7 @@ function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invit
 </td></tr>
 <tr><td align="center" style="padding:0 40px 32px">
 <p style="font-size:13px;color:#4A5568;margin:0 0 4px">Con cariño,</p>
-<p style="font-size:13px;color:#4A5568;margin:0 0 10px"><strong>Belu</strong> 🪽 tu planner con alas</p>
+<p style="font-size:13px;color:#4A5568;margin:0 0 10px"><strong>Belu</strong> 🪽 tu asistente personal de eventos</p>
 <p style="font-size:12px;color:#8A94A6;margin:0">DragonflAI Events</p>
 </td></tr>
 </table>
@@ -471,15 +592,37 @@ function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invit
 // Verificación manual de la firma de Stripe usando Web Crypto API
 async function verifyStripeSignature(payload, sigHeader, secret) {
   if (!sigHeader || !secret) return false;
-  const parts = Object.fromEntries(sigHeader.split(',').map(p => p.split('=')));
-  if (!parts.t || !parts.v1) return false;
+  // El header puede traer VARIOS v1 (p. ej. durante rotación de secretos) —
+  // recolectamos todos en vez de quedarnos solo con el último.
+  let t = null; const v1s = [];
+  for (const part of sigHeader.split(',')) {
+    const i = part.indexOf('=');
+    if (i < 0) continue;
+    const k = part.slice(0, i).trim(), v = part.slice(i + 1).trim();
+    if (k === 't') t = v;
+    else if (k === 'v1') v1s.push(v);
+  }
+  if (!t || v1s.length === 0) return false;
 
-  const signedPayload = `${parts.t}.${payload}`;
+  // Anti-replay: rechazar eventos cuyo timestamp esté a más de 5 minutos
+  // de ahora (recomendación oficial de Stripe).
+  const ts = parseInt(t, 10);
+  if (!Number.isFinite(ts) || Math.abs(Date.now() / 1000 - ts) > 300) return false;
+
+  const signedPayload = `${t}.${payload}`;
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
     'raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
   );
   const sigBuffer = await crypto.subtle.sign('HMAC', key, enc.encode(signedPayload));
   const expected = [...new Uint8Array(sigBuffer)].map(b => b.toString(16).padStart(2, '0')).join('');
-  return expected === parts.v1;
+
+  // Comparación en tiempo constante: sin cortocircuito al primer byte distinto.
+  const safeEq = (a, b) => {
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    return diff === 0;
+  };
+  return v1s.some(v => safeEq(expected, v));
 }
