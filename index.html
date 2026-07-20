@@ -655,6 +655,13 @@ const MAX_FREE = 2;
 // Supabase dashboard → Settings → API (mismas llaves que en dragonflai-v2.html)
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
+// Corrige "##access_token=..." (hash doble) que puede quedar de un link
+// mágico anterior sin consumir — sin esto, Supabase nunca reconoce el
+// token aunque esté ahí mismo en la URL, y la sesión nunca prende.
+if (location.hash.startsWith('##')) {
+  history.replaceState(null, '', location.pathname + location.search + location.hash.slice(1));
+}
+
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
@@ -863,7 +870,7 @@ async function sendMagicLink() {
   if (!sb) { showToast(lang==='es'?'Supabase no está configurado todavía.':'Supabase is not configured yet.', true); return; }
   const email = document.getElementById('auth-email').value.trim();
   if (!email) { showToast(lang==='es'?'Escribe tu correo.':'Enter your email.', true); return; }
-  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin+window.location.pathname } });
   if (error) { showToast(error.message, true); return; }
   showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link para entrar.':'✉️ Check your email — we sent you a link to log in.');
   closeAuthModal();
