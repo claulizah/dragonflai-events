@@ -736,7 +736,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <!-- FORM -->
 <div class="form-wrap">
   <div class="belu-dialog" style="padding:0 4px">
-    <img src="/assets/belu/belu-flotando.png" alt="Belu" class="belu-dialog-img" style="height:84px;font-size:12px;color:var(--text-3)" onerror="this.closest('.belu-dialog').style.display='none'">
+    <img src="/assets/belu/belu-flotando.png" alt="Belu" class="belu-dialog-img" style="height:84px;font-size:12px;color:var(--text-3)" onerror="const d=this.closest('.belu-dialog');if(d)d.style.display='none'">
     <div class="belu-bubble"><span data-es="¡Hola! Soy Belu 🪽 Cuéntame de tu evento — yo armo el plan y te acompaño paso a paso hasta el gran día." data-en="Hi! I'm Belu 🪽 Tell me about your event — I'll build the plan and walk with you step by step until the big day.">¡Hola! Soy Belu 🪽 Cuéntame de tu evento — yo armo el plan y te acompaño paso a paso hasta el gran día.</span></div>
   </div>
   <div class="form-card">
@@ -1348,7 +1348,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
-      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:96px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none';this.parentElement.textContent='🎉';this.parentElement.style.fontSize='36px'"> </span>
+      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:96px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="if(this.parentElement){this.style.display='none';this.parentElement.textContent='🎉';this.parentElement.style.fontSize='36px'}"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
@@ -5584,7 +5584,7 @@ function removeTimelineItem(i){
 // para que la app nunca muestre un ícono roto.
 const BELU_ASSET=p=>`/assets/belu/belu-${p}.png`;
 function beluDialogHTML(pose,text,imgH=72,flip=false){
-  return `<div class="belu-dialog"><img src="${BELU_ASSET(pose)}" alt="Belu" class="belu-dialog-img${flip?' belu-flip':''}" style="height:${imgH}px;font-size:12px;color:var(--text-3)" onerror="this.closest('.belu-dialog').style.display='none'"><div class="belu-bubble">${text}</div></div>`;
+  return `<div class="belu-dialog"><img src="${BELU_ASSET(pose)}" alt="Belu" class="belu-dialog-img${flip?' belu-flip':''}" style="height:${imgH}px;font-size:12px;color:var(--text-3)" onerror="const d=this.closest('.belu-dialog');if(d)d.style.display='none'"><div class="belu-bubble">${text}</div></div>`;
 }
 function beluPoseForPct(pct){
   if(pct>=100) return 'fiesta';
