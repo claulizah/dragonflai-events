@@ -1932,7 +1932,7 @@ function loadExtraFontsIfNeeded(){
 // combo que coincide con el estilo actual (o ninguno si es una foto o un
 function renderPublishPickers(){
   const comboBox=document.getElementById('pub-combo-picker');
-  if(comboBox) comboBox.innerHTML=renderFontColorPickers('pub',pubTitleFontClass,pubFontClass,pubBgColor,'applyPublishTitleFont','applyPublishBodyFont','applyPublishBg');
+  if(comboBox) comboBox.innerHTML=renderFontColorPickers('pub',pubTitleFontClass,pubFontClass,pubBgColor,pubTextColor||'#1A2332','applyPublishTitleFont','applyPublishBodyFont','applyPublishBg','applyPublishTextColor');
 }
 
 function applyPublishTitleFont(cls){
@@ -1951,6 +1951,12 @@ function applyPublishBg(hex){
   pubBackgroundImageUrl=null; // elegir un color de fondo cancela la foto subida
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML='';
+  showInvitationPreview();
+}
+// Sobreescribe manualmente el color de texto sugerido automático — antes
+// TEXT_COLOR_OPTIONS existía pero no estaba conectado a ningún selector.
+function applyPublishTextColor(hex){
+  pubTextColor=(hex==='#1A2332')?null:hex;
   showInvitationPreview();
 }
 
@@ -2722,8 +2728,12 @@ async function publishInvitation(){
   // que se desincronicen. viaPlanner se pasa explícito (no lee `result`)
   // para poder usarse también ANTES de intentar desbloquear el acceso.
   const p=plan, e=p.extra||{};
+  // hostNames vivía SOLO dentro de buildInvitationPayload() — pero
+  // lastPublishedHost (más abajo) lo necesita en este scope exterior.
+  // Referenciarlo ahí tronaba con "hostNames is not defined" justo antes
+  // de llegar a mostrar la pantalla de éxito. Hallazgo en vivo, 20 julio.
+  const hostNames=(document.getElementById('pub-host-names').value.trim()||p.name||'');
   function buildInvitationPayload(isPublished,viaPlanner){
-    const hostNames=(document.getElementById('pub-host-names').value.trim()||p.name||'');
     const location=(document.getElementById('pub-location').value.trim()||p.location||'');
     const stdMessage=(document.getElementById('pub-message').value.trim()
       ||p.stdMessage
@@ -2894,6 +2904,13 @@ async function publishInvitation(){
   pendingDraftInvitationId=null;
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
+  // El formulario es mucho más alto que la pantalla de éxito — si el
+  // usuario llegó a "Publicar" habiendo hecho scroll hasta abajo (común en
+  // celular, donde el form es largo), el modal se quedaba en esa misma
+  // posición de scroll y la pantalla de éxito, mucho más corta, terminaba
+  // fuera de la vista. Hallazgo V7.
+  const publishModalBox=document.getElementById('publish-modal').querySelector('.excel-modal');
+  if(publishModalBox) publishModalBox.scrollTop=0;
   const bottomCloseEl2=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl2) bottomCloseEl2.style.display='block';
   if(guestListFailed){
     showToast(lang==='es'?'⚠️ Tu invitación se publicó, pero la lista de invitados NO se pudo guardar — edítala para reintentarlo':'⚠️ Your invitation was published, but the guest list could NOT be saved — edit it to try again',true);
@@ -3330,15 +3347,22 @@ const BG_COLORS=[
 // así que su valor se guarda tal cual (no es un hex simple).
 const BG_GRADIENTS=[
   {value:'linear-gradient(135deg,#FFD3E0,#FFF3C4,#C8F4DE,#C4E1FF)',name:{es:'Arcoíris pastel',en:'Pastel rainbow'},textPair:'#1A2332'},
-  {value:'linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)',name:{es:'Atardecer',en:'Sunset'},textPair:'#FFFFFF'},
   {value:'linear-gradient(135deg,#A1C4FD,#C2E9FB)',name:{es:'Cielo',en:'Sky'},textPair:'#1A2E4A'},
   {value:'linear-gradient(135deg,#FBC2EB,#A6C1EE)',name:{es:'Dulce',en:'Candy'},textPair:'#5A3E7A'},
-  {value:'linear-gradient(135deg,#D4FC79,#96E6A1)',name:{es:'Menta-limón',en:'Mint-lemon'},textPair:'#1B3B2F'},
-  {value:'linear-gradient(135deg,#B4E4B4,#7FC97F)',name:{es:'Bosque',en:'Forest'},textPair:'#FFFFFF'},
   {value:'linear-gradient(135deg,#D8A7E8,#F5A9C4)',name:{es:'Uva',en:'Grape'},textPair:'#FFFFFF'},
   {value:'linear-gradient(135deg,#F7C6C7,#F4E2D8)',name:{es:'Oro rosa',en:'Rose gold'},textPair:'#B15A3E'},
-  {value:'linear-gradient(135deg,#89CFF0,#4FB8AF)',name:{es:'Océano',en:'Ocean'},textPair:'#FFFFFF'},
-  {value:'linear-gradient(135deg,#E6D7F5,#FCE0C8)',name:{es:'Lavanda-durazno',en:'Lavender-peach'},textPair:'#1A2332'}
+  {value:'linear-gradient(135deg,#E6D7F5,#FCE0C8)',name:{es:'Lavanda-durazno',en:'Lavender-peach'},textPair:'#1A2332'},
+  // 6 en estilo acuarela: degradado radial con centro más claro que se
+  // desvanece hacia el borde, imitando cómo se difumina la pintura al agua.
+  // Los primeros 3 ya estaban; los últimos 3 (durazno/menta/turquesa)
+  // reemplazan a Atardecer, Menta-limón, Bosque y Océano — mismos tonos,
+  // pero suavizados para que todo el catálogo quede consistente.
+  {value:'radial-gradient(circle at 30% 20%,#FDEFF5 0%,#F6DCE9 45%,#E6C6DC 100%)',name:{es:'Acuarela rosa',en:'Watercolor pink'},textPair:'#6E1E2E'},
+  {value:'radial-gradient(circle at 70% 25%,#F4F8EE 0%,#E4EEDC 45%,#CFE0C6 100%)',name:{es:'Acuarela salvia',en:'Watercolor sage'},textPair:'#1B3B2F'},
+  {value:'radial-gradient(circle at 30% 75%,#EFF6FB 0%,#DCEBF5 45%,#C2DCEF 100%)',name:{es:'Acuarela azul',en:'Watercolor blue'},textPair:'#1A2E4A'},
+  {value:'radial-gradient(circle at 25% 30%,#FDF3EA 0%,#F9E4D3 45%,#F0CFB0 100%)',name:{es:'Acuarela durazno',en:'Watercolor peach'},textPair:'#B15A3E'},
+  {value:'radial-gradient(circle at 70% 20%,#F1F9F3 0%,#E1F2E6 45%,#C9E8D2 100%)',name:{es:'Acuarela menta',en:'Watercolor mint'},textPair:'#1B3B2F'},
+  {value:'radial-gradient(circle at 30% 65%,#EBF7F5 0%,#D7EFEA 45%,#B9E0D8 100%)',name:{es:'Acuarela turquesa',en:'Watercolor turquoise'},textPair:'#0D6E65'}
 ];
 
 // 10 fuentes para el nombre de los anfitriones (7 originales + 3 divertidas)
@@ -3385,11 +3409,21 @@ const TEXT_COLOR_OPTIONS=[
 // del resto de la información, y color de fondo) en vez de 10 combos fijos
 // que las ataban entre sí — así el título puede llevar una fuente distinta
 // al resto, y no hay que mostrar cada combinación posible como swatch.
-function renderFontColorPickers(idPrefix,curTitleFont,curBodyFont,curBg,onTitleChange,onBodyChange,onBgChange){
+function renderFontColorPickers(idPrefix,curTitleFont,curBodyFont,curBg,curTextColor,onTitleChange,onBodyChange,onBgChange,onTextColorChange){
   const L=lang==='es';
   const fontOpt=(cur)=>FONT_OPTIONS.map(f=>`<option value="${f.cls}"${f.cls===(cur||'')?' selected':''}>${esc(L?f.label.es:f.label.en)}</option>`).join('');
-  const allBg=[...BG_COLORS.map(c=>({v:c.hex,name:c.name})),...BG_GRADIENTS.map(g=>({v:g.value,name:g.name}))];
+  // Decisión de diseño: el selector solo ofrece degradados de aquí en
+  // adelante (BG_COLORS se conserva para que invitaciones ya guardadas con
+  // un color sólido sigan mostrándose bien, pero ya no aparece como opción
+  // nueva).
+  const allBg=BG_GRADIENTS.map(g=>({v:g.value,name:g.name}));
   const bgOpt=allBg.map(b=>`<option value="${esc(b.v)}"${b.v===curBg?' selected':''}>${esc(L?b.name.es:b.name.en)}</option>`).join('');
+  // Selector de color de fuente independiente — antes TEXT_COLOR_OPTIONS
+  // existía en el código pero no estaba conectado a ningún control; el
+  // color de texto solo se derivaba automático del fondo elegido. Ahora el
+  // fondo sigue sugiriendo un color por default, pero esto permite
+  // sobreescribirlo. Hallazgo V7.
+  const textOpt=TEXT_COLOR_OPTIONS.map(t=>`<option value="${t.hex}"${t.hex===(curTextColor||'#1A2332')?' selected':''}>${esc(L?t.name.es:t.name.en)}</option>`).join('');
   const selStyle='width:100%;margin-top:5px;padding:11px 12px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:\'Inter\',sans-serif;font-size:15px;background:#fff';
   return `<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:1rem">
     <label style="font-size:14px;font-weight:600;color:var(--text-2)">${L?'Fuente del título':'Title font'}
@@ -3400,6 +3434,9 @@ function renderFontColorPickers(idPrefix,curTitleFont,curBodyFont,curBg,onTitleC
     </label>
     <label style="font-size:14px;font-weight:600;color:var(--text-2)">${L?'Color de fondo':'Background color'}
       <select id="${idPrefix}-bg" onchange="${onBgChange}(this.value)" style="${selStyle}">${bgOpt}</select>
+    </label>
+    <label style="font-size:14px;font-weight:600;color:var(--text-2)">${L?'Color de fuente':'Font color'}
+      <select id="${idPrefix}-text-color" onchange="${onTextColorChange}(this.value)" style="${selStyle}">${textOpt}</select>
     </label>
   </div>`;
 }
@@ -3601,6 +3638,14 @@ const CEREMONY_FORMATS={
 };
 // Degustación/hospedaje/coordinador ahora aplican a todos los tipos de evento.
 const TYPES_DRESSCODE=['Boda/Wedding','Corporativo/Corporate','Aniversario/Anniversary'];
+
+// Ícono del tab "Save the Date": sobre con corazón solo para eventos
+// románticos (Boda/Aniversario) — el resto usa un ícono neutral. Antes era
+// 💌 fijo para los 8 tipos de evento. Hallazgo V7.
+const TYPES_ROMANTIC_STD=['Boda/Wedding','Aniversario/Anniversary'];
+function stdTabIcon(){
+  return TYPES_ROMANTIC_STD.includes(plan.eventTypeRaw||eventType)?'💌':'📌';
+}
 
 // Relabelea el campo "Nombre" según a quién se refiere realmente en cada tipo de evento.
 const NAME_LABELS={
@@ -3891,7 +3936,7 @@ function renderUpsells(){
 function toggleTag(el){el.classList.toggle('sel');updateProgress();}
 
 function renderTabs(){
-  const labels=T.tabs[mode][lang];
+  const labels=T.tabs[mode][lang].map(l=>l.replace('💌',stdTabIcon()));
   const keys=mode==='pro'?tabKeys:tabKeys.filter(k=>k!=='proposal');
   const tabsEl=document.getElementById('res-tabs');
   if(tabsEl) tabsEl.innerHTML=labels.map((l,i)=>
@@ -4458,12 +4503,18 @@ Output format EXACTLY: [HTML of section 1]<!--SPLIT-->[HTML of section 2]. The l
 function buildSTDPrompt(){
   const p=plan,e=p.extra||{};
   const {outLang,ctx}=buildCtx();
+  // El dress code solo aplica a ciertos tipos de evento (ver TYPES_DRESSCODE)
+  // — antes esta línea siempre se incluía con un placeholder ("Código de
+  // vestimenta") aunque el evento no lo pidiera (ej. Baby Shower, Cumpleaños,
+  // Quinceañera, Graduación, Fiesta Infantil). Hallazgo V7.
+  const showDresscode=TYPES_DRESSCODE.includes(p.eventTypeRaw)||!!e.dresscode;
   const dresscodeText=e.dresscode?esc(e.dresscode):(p.lang==='es'?'Código de vestimenta':'Dress code');
+  const dresscodeLine=showDresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span class="std-field" data-field="dresscode">${dresscodeText}</span></div>`:'';
   const hashtagText=e.hashtag?esc(e.hashtag):(p.lang==='es'?'#TuHashtag':'#YourHashtag');
   return `Return ONLY clean HTML. No markdown, no code fences. Write ALL text in ${outLang}.
 You are an elegant wedding stationer and copywriter. Create a beautiful Save the Date card.
 ${ctx}
-Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure (do not change or omit the dress-code/hashtag lines below — use them exactly as given, they contain real user data). Return ONLY this single block below, nothing before or after it — no buttons, no theme picker, no extra wrapper:
+Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure (do not change or omit the hashtag line below — use it exactly as given, it contains real user data). Return ONLY this single block below, nothing before or after it — no buttons, no theme picker, no extra wrapper:
 <div class="std-card">
 <div class="std-content">
 <div class="std-eyebrow">${p.lang==='es'?'— Aparta la Fecha —':'— Save the Date —'}</div>
@@ -4473,7 +4524,7 @@ Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML st
 <div class="std-detail-item"><span class="std-icon">📅</span><span class="std-field" data-field="date">[Full date]</span></div>
 <div class="std-detail-item"><span class="std-icon">📍</span><span class="std-field" data-field="location">[Location]</span></div>
 <div class="std-detail-item"><span class="std-icon">🕕</span><span class="std-field" data-field="time">[Time]</span></div>
-<div class="std-detail-item"><span class="std-icon">👔</span><span class="std-field" data-field="dresscode">${dresscodeText}</span></div>
+${dresscodeLine}
 </div>
 <div class="std-footer" data-field="message">[Elegant short phrase: "Formal invitation to follow" or a personalized poetic line based on their vibe and details]</div>
 <div class="std-hashtag" data-field="hashtag">${hashtagText}</div>
@@ -4496,7 +4547,7 @@ function wrapSTDCard(cardHtml){
   const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
 
   const themePicker=`<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.5rem">${p.lang==='es'?'Elige un estilo':'Choose a style'}</p>
-${renderFontColorPickers('std','','','#FAF9F7','applySTDTitleFont','applySTDBodyFont','applySTDBg')}
+${renderFontColorPickers('std','','','#FAF9F7',(document.querySelector('#content-savethedate .std-card')?.style.getPropertyValue('--custom-text-color')||'').trim()||'#1A2332','applySTDTitleFont','applySTDBodyFont','applySTDBg','applySTDTextColor')}
 <div style="text-align:center;margin:.4rem 0 1rem">
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
@@ -6764,6 +6815,12 @@ function applySTDBg(hex){
   setSTDBgColor(hex,null);
   schedulePlanResave();
 }
+// setSTDTextColor ya existía en el código pero nunca se llamaba desde
+// ningún lado — el color de texto solo se derivaba automático del fondo.
+function applySTDTextColor(hex){
+  setSTDTextColor(hex==='#1A2332'?null:hex,null);
+  schedulePlanResave();
+}
 
 function setSTDFont(fontClass,el){
   const content=document.querySelector('#content-savethedate .std-card .std-content');
@@ -6874,7 +6931,7 @@ function regen(){
 }
 
 function printPlan(){
-  const labels=T.tabs[mode][lang];
+  const labels=T.tabs[mode][lang].map(l=>l.replace('💌',stdTabIcon()));
   const keys=mode==='pro'?tabKeys:tabKeys.filter(k=>k!=='proposal');
   const labelMap={}; keys.forEach((k,i)=>labelMap[k]=labels[i]);
 

@@ -1359,11 +1359,32 @@ async function init(){
     if(session?.user){
       const {data:ownerCheck}=await sb.rpc('is_invitation_owner',{p_invitation_id:invitation.id});
       isHost=!!ownerCheck;
+      // Si hay una sesión pero NO es la del dueño de esta invitación (ej. un
+      // invitado que alguna vez probó el generador de planes en este mismo
+      // navegador, y esa sesión ya expiró), la cerramos solo localmente para
+      // que no se le pegue un token vencido a su RSVP, que es anónimo por
+      // diseño. scope:'local' no afecta su sesión real en /app.
+      if(!isHost) await sb.auth.signOut({scope:'local'});
     }
   }catch(e){ console.error('No se pudo verificar si es el anfitrión:',e); }
 
   renderInvitation(row);
   loadEventPhotos();
+}
+
+// Autoreparación (ver index.html/dragonflai-v2.html para el detalle
+// completo): esta página nunca registra su propio service worker, pero si
+// el navegador tiene uno viejo con alcance de raíz (de antes de que se
+// acotara a /app), lo quita para que no intercepte las peticiones de esta
+// invitación pública.
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(reg=>{
+      try{
+        if(new URL(reg.scope).pathname==='/') reg.unregister();
+      }catch(e){}
+    });
+  }).catch(()=>{});
 }
 
 init();
