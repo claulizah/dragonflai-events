@@ -635,6 +635,27 @@ footer a:hover{color:var(--teal-dark)}
 
 <script>
 // ══════════════════════════════
+//  AUTOREPARACIÓN — service worker con alcance viejo
+//  Antes, /app registraba el service worker SIN especificar scope, y por
+//  default eso cubre TODO el dominio (incluida esta página) — no solo /app,
+//  que era la intención real. Quien haya visitado /app antes de este fix
+//  se quedó con ese registro viejo instalado, y NINGÚN redeploy futuro lo
+//  quita solo (cambiar el scope en el código no se lleva de encuentro al
+//  que ya estaba activo en su navegador). Este bloque lo detecta y lo
+//  desinstala automáticamente, sin que la persona tenga que abrir DevTools.
+// ══════════════════════════════
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(reg=>{
+      try{
+        if(new URL(reg.scope).pathname==='/') reg.unregister();
+      }catch(e){}
+    });
+  }).catch(()=>{});
+}
+</script>
+<script>
+// ══════════════════════════════
 //  CONFIG — actualiza estos valores
 //  ⚠️ IMPORTANTE: estos links de Stripe tienen el precio configurado
 //  ALLÁ, no aquí. Si subes el precio en Stripe, no necesitas tocar este

@@ -7039,6 +7039,16 @@ document.addEventListener('click',e=>{
 });
 
 if('serviceWorker' in navigator){
+  // Autoreparación (ver index.html para el detalle completo): quita
+  // cualquier registro viejo con alcance de raíz antes de instalar el
+  // nuevo, correctamente acotado a /app.
+  navigator.serviceWorker.getRegistrations().then(regs=>{
+    regs.forEach(reg=>{
+      try{
+        if(new URL(reg.scope).pathname==='/') reg.unregister();
+      }catch(e){}
+    });
+  }).catch(()=>{});
   window.addEventListener('load',()=>{
     navigator.serviceWorker.register('/service-worker.js',{scope:'/app'}).catch(()=>{ /* si falla el registro, la app sigue funcionando normal, solo sin los beneficios de PWA */ });
   });
