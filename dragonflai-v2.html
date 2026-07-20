@@ -4131,7 +4131,7 @@ async function generate(){
   // regenerar — si no, cada clic en "Generar" crearía una fila nueva en
   // vez de reusar el acceso ya desbloqueado, rompiendo la promesa de
   // "sin límite de regeneraciones" para quien ya pagó/canjeó un código.
-  const _previousSavedId=plan._savedId||localStorage.getItem('dflai_last_plan_id')||null;
+  const _previousSavedId=plan._savedId||localStorage.getItem('dflai_last_plan_id_'+currentUser.id)||null;
 
   plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,priorityList,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
   if(_previousSavedId) plan._savedId=_previousSavedId;
@@ -5925,16 +5925,26 @@ async function ensurePlanSaved(){
   const tabsHtml={};
   tabKeys.forEach(k=>{ const el=document.getElementById('content-'+k); if(el) tabsHtml[k]=el.innerHTML; });
   const title=`${plan.typeName}${plan.name?' — '+plan.name:''}`;
+  // Acotada por cuenta — antes era una sola llave global, y si dos cuentas
+  // distintas se probaban en el mismo navegador, la segunda "heredaba" por
+  // accidente el plan_id de la primera (fuga de datos entre cuentas).
+  const planIdKey='dflai_last_plan_id_'+currentUser.id;
 
   if(plan._savedId){
     // Ya existía (se preservó al regenerar) — actualizamos el contenido
     // para que quede el más reciente, sin crear una fila nueva.
-    const {error}=await sb.from('plans').update({
+    // .select().single() convierte un UPDATE silenciosamente bloqueado por
+    // RLS (0 filas afectadas — ej. un id que en realidad es de OTRA cuenta)
+    // en un error explícito, en vez de seguir adelante como si nada.
+    const {data,error}=await sb.from('plans').update({
       title, event_type:plan.typeName, plan_data:{plan,tabsHtml,mode}
-    }).eq('id',plan._savedId);
-    if(error) console.error('No se pudo actualizar el plan guardado:',error);
-    localStorage.setItem('dflai_last_plan_id',plan._savedId);
-    return plan._savedId;
+    }).eq('id',plan._savedId).select().single();
+    if(!error&&data){
+      localStorage.setItem(planIdKey,plan._savedId);
+      return plan._savedId;
+    }
+    console.error('El plan_id guardado no es válido para esta cuenta — se crea uno nuevo:',error);
+    plan._savedId=null; // no es tuyo (o ya no existe) — no lo vuelvas a intentar
   }
 
   const {data,error}=await sb.from('plans').insert({
@@ -5945,7 +5955,7 @@ async function ensurePlanSaved(){
   }).select().single();
   if(error){ console.error('ensurePlanSaved insert error:',error); showToast(lang==='es'?'No se pudo guardar tu plan':'Could not save your plan',true); return null; }
   plan._savedId=data.id;
-  localStorage.setItem('dflai_last_plan_id',data.id);
+  localStorage.setItem(planIdKey,data.id);
   return data.id;
 }
 
