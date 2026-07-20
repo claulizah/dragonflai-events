@@ -736,7 +736,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <!-- FORM -->
 <div class="form-wrap">
   <div class="belu-dialog" style="padding:0 4px">
-    <img src="/assets/belu/belu-flotando.png" alt="Belu" class="belu-dialog-img" style="height:84px" onerror="this.closest('.belu-dialog').style.display='none'">
+    <img src="/assets/belu/belu-flotando.png" alt="Belu" class="belu-dialog-img" style="height:84px;font-size:12px;color:var(--text-3)" onerror="this.closest('.belu-dialog').style.display='none'">
     <div class="belu-bubble"><span data-es="¡Hola! Soy Belu 🪽 Cuéntame de tu evento — yo armo el plan y te acompaño paso a paso hasta el gran día." data-en="Hi! I'm Belu 🪽 Tell me about your event — I'll build the plan and walk with you step by step until the big day.">¡Hola! Soy Belu 🪽 Cuéntame de tu evento — yo armo el plan y te acompaño paso a paso hasta el gran día.</span></div>
   </div>
   <div class="form-card">
@@ -1094,7 +1094,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <div class="res-card">
       <div class="res-tabs" id="res-tabs"></div>
       <div class="loading" id="loading">
-        <span class="l-dragonfly" style="display:block;text-align:center;margin-bottom:1rem"><img src="/assets/belu/belu-trabajando.png" alt="Belu trabajando en tu plan" style="height:110px;width:auto;display:inline-block" onerror="this.style.display='none'"></span>
+        <span class="l-dragonfly" style="display:block;text-align:center;margin-bottom:1rem"><img src="/assets/belu/belu-trabajando.png" alt="Belu" style="height:110px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></span>
         <div class="lmsg" id="lmsg" data-es="Creando tu plan…" data-en="Creating your plan…">Creando tu plan…</div>
         <div class="lsub" id="lsub" data-es="Personalizando cada detalle" data-en="Personalizing every detail">Personalizando cada detalle</div>
       </div>
@@ -1348,7 +1348,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
-      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu celebrando" style="height:96px;width:auto;display:inline-block" onerror="this.style.display='none';this.parentElement.textContent='🎉';this.parentElement.style.fontSize='36px'"> </span>
+      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:96px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none';this.parentElement.textContent='🎉';this.parentElement.style.fontSize='36px'"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
@@ -2801,6 +2801,14 @@ async function publishInvitation(){
   // ── Intentar desbloquear acceso; si no hay crédito, guardar borrador ──
   const result=await tryUnlockAccess('diy');
   if(!result.success){
+    if(result.reason==='save_failed'){
+      // No es un tema de crédito — el plan ni siquiera se pudo guardar
+      // (problema de conexión o de base de datos). Mostrar el paywall aquí
+      // sería engañoso, sobre todo para cuentas con acceso ilimitado que
+      // nunca deberían verlo. El error real ya quedó en la consola.
+      showToast(lang==='es'?'No se pudo guardar tu plan — revisa tu conexión e intenta de nuevo':'Could not save your plan — check your connection and try again',true);
+      return;
+    }
     // Antes cerrábamos el modal aquí, perdiendo todo lo que ya se había
     // llenado (itinerario, historia, galería, tema elegido...). Ahora el
     // formulario se queda abierto DEBAJO del paywall, Y de paso se guarda
@@ -5517,7 +5525,7 @@ function removeTimelineItem(i){
 // para que la app nunca muestre un ícono roto.
 const BELU_ASSET=p=>`/assets/belu/belu-${p}.png`;
 function beluDialogHTML(pose,text,imgH=72,flip=false){
-  return `<div class="belu-dialog"><img src="${BELU_ASSET(pose)}" alt="Belu" class="belu-dialog-img${flip?' belu-flip':''}" style="height:${imgH}px" onerror="this.closest('.belu-dialog').style.display='none'"><div class="belu-bubble">${text}</div></div>`;
+  return `<div class="belu-dialog"><img src="${BELU_ASSET(pose)}" alt="Belu" class="belu-dialog-img${flip?' belu-flip':''}" style="height:${imgH}px;font-size:12px;color:var(--text-3)" onerror="this.closest('.belu-dialog').style.display='none'"><div class="belu-bubble">${text}</div></div>`;
 }
 function beluPoseForPct(pct){
   if(pct>=100) return 'fiesta';
@@ -5935,7 +5943,7 @@ async function ensurePlanSaved(){
     event_type:plan.typeName,
     plan_data:{plan,tabsHtml,mode}
   }).select().single();
-  if(error){ showToast(lang==='es'?'No se pudo guardar tu plan':'Could not save your plan',true); return null; }
+  if(error){ console.error('ensurePlanSaved insert error:',error); showToast(lang==='es'?'No se pudo guardar tu plan':'Could not save your plan',true); return null; }
   plan._savedId=data.id;
   localStorage.setItem('dflai_last_plan_id',data.id);
   return data.id;
@@ -6160,7 +6168,14 @@ async function exportSpreadsheet(){
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para descargar tu Excel':'Log in to download your Excel',true); return; }
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
   const result=await tryUnlockAccess('diy');
-  if(!result.success){openExcelPaywall('excel');return;}
+  if(!result.success){
+    if(result.reason==='save_failed'){
+      showToast(lang==='es'?'No se pudo guardar tu plan — revisa tu conexión e intenta de nuevo':'Could not save your plan — check your connection and try again',true);
+      return;
+    }
+    openExcelPaywall('excel');
+    return;
+  }
   if(typeof ExcelJS==='undefined'){showToast(lang==='es'?'No se pudo cargar el generador de Excel':'Could not load Excel generator',true);return;}
 
   const L=lang==='es';
