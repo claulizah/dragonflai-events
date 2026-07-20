@@ -601,6 +601,12 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .profile-input{width:100%;padding:11px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:15px;box-sizing:border-box;margin-bottom:.4rem;background:var(--white)}
 .profile-section-divider{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-dark);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
 .btn-excel-close:hover{color:var(--text);border-color:var(--teal)}
+/* ── Belu acompañante: imagen + globo de diálogo ── */
+.belu-dialog{display:flex;align-items:flex-end;gap:10px;margin:14px 0}
+.belu-dialog-img{height:72px;width:auto;flex-shrink:0}
+.belu-flip{transform:scaleX(-1)}
+.belu-bubble{position:relative;background:var(--white);border:1.5px solid var(--border-gray);border-radius:16px 16px 16px 4px;padding:10px 14px;font-size:13px;line-height:1.45;color:var(--text);box-shadow:var(--shadow-card);max-width:520px}
+.belu-bubble::before{content:'';position:absolute;left:-7px;bottom:10px;width:12px;height:12px;background:var(--white);border-left:1.5px solid var(--border-gray);border-bottom:1.5px solid var(--border-gray);transform:rotate(45deg)}
 </style>
 </head>
 <body>
@@ -689,6 +695,10 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <!-- FORM -->
 <div class="form-wrap">
+  <div class="belu-dialog" style="padding:0 4px">
+    <img src="/assets/belu/belu-flotando.png" alt="Belu" class="belu-dialog-img" style="height:84px" onerror="this.closest('.belu-dialog').style.display='none'">
+    <div class="belu-bubble"><span data-es="¡Hola! Soy Belu 🪽 Cuéntame de tu evento — yo armo el plan y te acompaño paso a paso hasta el gran día." data-en="Hi! I'm Belu 🪽 Tell me about your event — I'll build the plan and walk with you step by step until the big day.">¡Hola! Soy Belu 🪽 Cuéntame de tu evento — yo armo el plan y te acompaño paso a paso hasta el gran día.</span></div>
+  </div>
   <div class="form-card">
     <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
     <div class="fcard-head">
@@ -4013,11 +4023,13 @@ function planFixedHeader(){
   const L=lang==='es', p=plan;
   const sub=[p.date,p.location?toTitleCase(p.location):''].filter(Boolean).join(' · ');
   return `<div class="plan-hero">
-    <div class="plan-hero-eyebrow">${L?'— Tu plan personalizado —':'— Your personalized plan —'}</div>
+    <div class="plan-hero-eyebrow">${L?'— Plan preparado por Belu 🪽 para ti —':'— Plan prepared by Belu 🪽 for you —'}</div>
     <div class="plan-hero-title">${esc(toTitleCase(p.name||''))}</div>
     ${p.typeName?`<div class="plan-hero-type">${esc(p.typeName)}</div>`:''}
     ${sub?`<div class="plan-hero-sub">${esc(sub)}</div>`:''}
-  </div>`;
+  </div>`+beluDialogHTML('senalando',
+    L?'¡Listo! Armé tu plan con mucho cariño — revisa cada pestaña y ajústala a tu gusto. Aquí sigo para lo que necesites 💜'
+     :"Done! I built your plan with love — check each tab and tweak it your way. I'm right here whenever you need me 💜",64,true);
 }
 
 // ── Barra para regenerar SOLO las ideas creativas ──
@@ -5074,6 +5086,18 @@ function renderTimeline(items){
   return `<div class="timeline">${rows}</div>`;
 }
 
+// ── Belu acompañante: helpers reutilizables ──
+const BELU_ASSET=p=>`/assets/belu/belu-${p}.png`;
+function beluDialogHTML(pose,text,imgH=72,flip=false){
+  return `<div class="belu-dialog"><img src="${BELU_ASSET(pose)}" alt="Belu" class="belu-dialog-img${flip?' belu-flip':''}" style="height:${imgH}px" onerror="this.closest('.belu-dialog').style.display='none'"><div class="belu-bubble">${text}</div></div>`;
+}
+function beluPoseForPct(pct){
+  if(pct>=100) return 'fiesta';
+  if(pct>=60) return 'orgullosa';
+  if(pct>0) return 'optimista';
+  return 'zen';
+}
+
 function beluProgressMessage(pct,L){
   if(pct>=100) return L?'¡Completo! Belu dice que estás listo/a para brillar 🎉':'All done! Belu says you\'re ready to shine 🎉';
   if(pct>=90) return L?'¡Ya casi! Belu ve tu evento tomando forma 🦋':'Almost there! Belu can see it coming together 🦋';
@@ -5095,7 +5119,7 @@ function checklistProgressBarHTML(sections){
     <div style="height:8px;background:var(--cream-3);border-radius:100px;overflow:hidden">
       <div id="checklist-progress-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--teal),var(--violet));transition:width .3s"></div>
     </div>
-    <div id="checklist-progress-belu-msg" style="font-size:12px;color:var(--violet);font-style:italic;margin-top:6px">🦋 ${esc(beluProgressMessage(pct,L))}</div>
+    <div id="checklist-progress-belu-msg" style="display:flex;align-items:center;gap:8px;margin-top:8px"><img id="checklist-belu-pose" src="${BELU_ASSET(beluPoseForPct(pct))}" alt="Belu" style="height:46px;width:auto" onerror="this.style.display='none'"><span id="checklist-belu-text" style="font-size:12px;color:var(--violet);font-style:italic">${esc(beluProgressMessage(pct,L))}</span></div>
   </div>`;
 }
 
@@ -5111,7 +5135,11 @@ function updateChecklistProgressBar(){
   const msgEl=document.getElementById('checklist-progress-belu-msg');
   if(labelEl) labelEl.textContent=`${done}/${total} ${L?'tareas':'tasks'} — ${pct}%`;
   if(fillEl) fillEl.style.width=pct+'%';
-  if(msgEl) msgEl.textContent=`🦋 ${beluProgressMessage(pct,L)}`;
+  const poseEl=document.getElementById('checklist-belu-pose');
+  const textEl=document.getElementById('checklist-belu-text');
+  if(poseEl) poseEl.src=BELU_ASSET(beluPoseForPct(pct));
+  if(textEl) textEl.textContent=beluProgressMessage(pct,L);
+  else if(msgEl) msgEl.textContent=`🦋 ${beluProgressMessage(pct,L)}`;
 }
 
 function renderChecklist(sections){
@@ -5423,13 +5451,13 @@ async function loadMyPlans(){
   const listEl=document.getElementById('myplans-list');
   if(!sb){ listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">Supabase no configurado.</p>`; return; }
   if(!currentUser){
-    listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Inicia sesión para ver tus planes guardados.':'Log in to see your saved plans.'}</p>`;
+    listEl.innerHTML=`<div style="display:flex;justify-content:center">${beluDialogHTML('leyendo',L?'Inicia sesión para ver tus planes guardados — yo los tengo apartaditos.':'Log in to see your saved plans — I\'m keeping them safe for you.',64)}</div>`;
     return;
   }
   listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
   const {data,error}=await sb.from('plans').select('id,title,event_type,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!data||!data.length){
-    listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Todavía no tienes planes guardados.':'No saved plans yet.'}</p>`;
+    listEl.innerHTML=`<div style="display:flex;justify-content:center">${beluDialogHTML('leyendo',L?'Todavía no tienes planes guardados — cuando generes el primero, aquí te lo cuido.':'No saved plans yet — once you create your first one, I\'ll keep it right here.',64)}</div>`;
     return;
   }
   listEl.innerHTML=data.map(p=>`
