@@ -658,6 +658,14 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Corrige "##access_token=..." (hash doble) que puede quedar de un link
 // mágico anterior sin consumir — sin esto, Supabase nunca reconoce el
 // token aunque esté ahí mismo en la URL, y la sesión nunca prende.
+// Hallazgo V7: el link del correo mostraba el dominio de la vista previa de
+// Netlify en vez del dominio de marca. Ahora siempre apunta al canónico.
+function canonicalRedirectUrl(){
+  const CANONICAL='https://dragonflaievents.com';
+  if(/\.netlify\.app$/.test(location.hostname)) return CANONICAL+location.pathname;
+  return location.origin+location.pathname;
+}
+
 if (location.hash.startsWith('##')) {
   history.replaceState(null, '', location.pathname + location.search + location.hash.slice(1));
 }
@@ -870,7 +878,7 @@ async function sendMagicLink() {
   if (!sb) { showToast(lang==='es'?'Supabase no está configurado todavía.':'Supabase is not configured yet.', true); return; }
   const email = document.getElementById('auth-email').value.trim();
   if (!email) { showToast(lang==='es'?'Escribe tu correo.':'Enter your email.', true); return; }
-  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin+window.location.pathname } });
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: canonicalRedirectUrl() } });
   if (error) { showToast(error.message, true); return; }
   showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link para entrar.':'✉️ Check your email — we sent you a link to log in.');
   closeAuthModal();
