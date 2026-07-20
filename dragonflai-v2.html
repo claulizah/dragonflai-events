@@ -1426,6 +1426,13 @@ const MAX_GENERATIONS = 2;
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';        // Project URL
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U'; // anon public key — esta SÍ es segura de exponer aquí
 
+// Corrige "##access_token=..." (hash doble) que puede quedar de un link
+// mágico anterior sin consumir — sin esto, Supabase nunca reconoce el
+// token aunque esté ahí mismo en la URL, y la sesión nunca prende.
+if (location.hash.startsWith('##')) {
+  history.replaceState(null, '', location.pathname + location.search + location.hash.slice(1));
+}
+
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
@@ -1552,13 +1559,14 @@ function updateAccountUI(){
   const menu=document.getElementById('account-menu');
   const emailBtn=document.getElementById('btn-account-email');
   if(currentUser){
-    loginBtn.style.display='none';
-    menu.style.display='block';
-    emailBtn.textContent='👤 '+(currentUserName||currentUser.email);
+    if(loginBtn) loginBtn.style.display='none';
+    if(menu) menu.style.display='block';
+    if(emailBtn) emailBtn.textContent='👤 '+(currentUserName||currentUser.email);
   }else{
-    loginBtn.style.display='inline-block';
-    menu.style.display='none';
-    document.getElementById('account-dropdown').style.display='none';
+    if(loginBtn) loginBtn.style.display='inline-block';
+    if(menu) menu.style.display='none';
+    const dd=document.getElementById('account-dropdown');
+    if(dd) dd.style.display='none';
   }
 }
 
@@ -1601,7 +1609,7 @@ async function sendMagicLink(){
   // borrador local por sí solo no lo hubiera sobrevivido.
   await backupDraftToServer(email);
 
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.href}});
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+window.location.pathname}});
 
   if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; btn.textContent=originalLabel; }
 
@@ -3005,8 +3013,9 @@ let helpChatMessages=[];
 let helpChatOpen=false;
 
 function toggleHelpChat(){
-  helpChatOpen=!helpChatOpen;
   const panel=document.getElementById('help-chat-panel');
+  if(!panel) return; // el widget no está en esta página — nada que abrir
+  helpChatOpen=!helpChatOpen;
   panel.style.display=helpChatOpen?'flex':'none';
   if(helpChatOpen&&helpChatMessages.length===0){
     const welcome=lang==='es'
@@ -3052,6 +3061,7 @@ function findMatchingQuickAnswer(text){
 
 function addHelpChatBubble(role,text){
   const box=document.getElementById('help-chat-messages');
+  if(!box) return;
   const bubble=document.createElement('div');
   bubble.style.cssText=`margin-bottom:10px;display:flex;${role==='user'?'justify-content:flex-end':'justify-content:flex-start'}`;
   bubble.innerHTML=`<div style="max-width:85%;padding:9px 13px;border-radius:14px;line-height:1.5;white-space:pre-wrap;${role==='user'?'background:var(--violet);color:#fff;border-bottom-right-radius:4px':'background:var(--cream-2);color:var(--text);border-bottom-left-radius:4px'}">${esc(text)}</div>`;
@@ -3064,12 +3074,14 @@ function addHelpChatBubble(role,text){
 // de beta: "sólo usa un renglón y no puedo ver todo lo que escribí"). Ahora
 // es un textarea que crece hasta ~4 líneas y después hace scroll interno.
 function autoGrowHelpChatInput(el){
+  if(!el) return;
   el.style.height='auto';
   el.style.height=Math.min(el.scrollHeight,90)+'px';
 }
 
 async function sendHelpChatMessage(){
   const input=document.getElementById('help-chat-input');
+  if(!input) return;
   const text=input.value.trim();
   if(!text) return;
   input.value='';
@@ -3089,12 +3101,14 @@ async function sendHelpChatMessage(){
 
   const thinkingId='thinking-'+Date.now();
   const box=document.getElementById('help-chat-messages');
-  const thinkingEl=document.createElement('div');
-  thinkingEl.id=thinkingId;
-  thinkingEl.style.cssText='margin-bottom:10px;color:var(--text-3);font-size:12.5px';
-  thinkingEl.textContent=lang==='es'?'Escribiendo…':'Typing…';
-  box.appendChild(thinkingEl);
-  box.scrollTop=box.scrollHeight;
+  if(box){
+    const thinkingEl=document.createElement('div');
+    thinkingEl.id=thinkingId;
+    thinkingEl.style.cssText='margin-bottom:10px;color:var(--text-3);font-size:12.5px';
+    thinkingEl.textContent=lang==='es'?'Escribiendo…':'Typing…';
+    box.appendChild(thinkingEl);
+    box.scrollTop=box.scrollHeight;
+  }
 
   try{
     const {data:{session:chatSession}={}}=sb?await sb.auth.getSession():{data:{}};
@@ -3565,6 +3579,7 @@ function updateNameLabel(){
   const input=document.getElementById('f-name');
   const singleRow=document.getElementById('name-single-row');
   const coupleRow=document.getElementById('name-couple-row');
+  if(!lbl||!input||!singleRow||!coupleRow) return;
 
   const showCouple=mode==='diy'&&TYPES_COUPLE_NAMES.includes(eventType);
   singleRow.style.display=showCouple?'none':'block';
@@ -3636,8 +3651,9 @@ function checkReturnFromPayment(){
 
 function setLang(l){
   lang=l;
-  document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
-  document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+  const btnEs=document.getElementById('btn-es'), btnEn=document.getElementById('btn-en');
+  if(btnEs) btnEs.className='lang-btn'+(l==='es'?' active':'');
+  if(btnEn) btnEn.className='lang-btn'+(l==='en'?' active':'');
   document.documentElement.lang=l;
   document.querySelectorAll('[data-es]').forEach(el=>{
     if(el.tagName==='INPUT'||el.tagName==='OPTION') return;
@@ -3646,9 +3662,9 @@ function setLang(l){
   });
   document.querySelectorAll('option[data-'+l+']').forEach(el=>{ el.textContent=el.getAttribute('data-'+l); });
   const ta=document.getElementById('f-notes');
-  ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
+  if(ta) ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
   const vibeInput=document.getElementById('f-vibe');
-  vibeInput.placeholder=vibeInput.getAttribute('data-placeholder-'+l)||vibeInput.placeholder;
+  if(vibeInput) vibeInput.placeholder=vibeInput.getAttribute('data-placeholder-'+l)||vibeInput.placeholder;
   renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
@@ -3658,19 +3674,25 @@ function setLang(l){
 
 function setMode(m){
   mode=m;
-  document.getElementById('card-diy').className='mode-card'+(m==='diy'?' sel-diy':'');
-  document.getElementById('card-pro').className='mode-card'+(m==='pro'?' sel-pro':'');
-  document.getElementById('pro-block').className='pro-block'+(m==='pro'?' show':'');
-  document.getElementById('stress-row').style.display=m==='diy'?'block':'none';
+  const cardDiy=document.getElementById('card-diy'), cardPro=document.getElementById('card-pro');
+  const proBlock=document.getElementById('pro-block'), stressRow=document.getElementById('stress-row');
+  if(cardDiy) cardDiy.className='mode-card'+(m==='diy'?' sel-diy':'');
+  if(cardPro) cardPro.className='mode-card'+(m==='pro'?' sel-pro':'');
+  if(proBlock) proBlock.className='pro-block'+(m==='pro'?' show':'');
+  if(stressRow) stressRow.style.display=m==='diy'?'block':'none';
   updateModePill(); renderTabs(); updateFormTitle(); updateNameLabel();
-  document.getElementById('gen-btn-label').setAttribute('data-es',m==='diy'?'Generar mi plan personalizado':'Generar propuesta para cliente');
-  document.getElementById('gen-btn-label').setAttribute('data-en',m==='diy'?'Generate my personalized plan':'Generate client proposal');
-  document.getElementById('gen-btn-label').textContent=document.getElementById('gen-btn-label').getAttribute('data-'+lang);
+  const genLbl=document.getElementById('gen-btn-label');
+  if(genLbl){
+    genLbl.setAttribute('data-es',m==='diy'?'Generar mi plan personalizado':'Generar propuesta para cliente');
+    genLbl.setAttribute('data-en',m==='diy'?'Generate my personalized plan':'Generate client proposal');
+    genLbl.textContent=genLbl.getAttribute('data-'+lang);
+  }
   if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_mode:m});
 }
 
 function updateModePill(){
   const pill=document.getElementById('mode-pill');
+  if(!pill) return;
   pill.className='mode-pill '+mode;
   pill.textContent=mode==='diy'?(lang==='es'?'Planeación personal':'Personal planner'):(lang==='es'?'Planner profesional':'Pro planner');
 }
@@ -3696,7 +3718,8 @@ function updateFormTitle(){
   const idx=T.eventTypes.vals.indexOf(eventType);
   const name=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
   const prefix=mode==='diy'?(lang==='es'?'Planea tu ':'Plan your '):(lang==='es'?'Evento de cliente: ':'Client event: ');
-  document.getElementById('fcard-title').textContent=prefix+name;
+  const titleEl=document.getElementById('fcard-title');
+  if(titleEl) titleEl.textContent=prefix+name;
 }
 
 function renderRadios(){
@@ -3794,11 +3817,12 @@ function toggleTag(el){el.classList.toggle('sel');updateProgress();}
 function renderTabs(){
   const labels=T.tabs[mode][lang];
   const keys=mode==='pro'?tabKeys:tabKeys.filter(k=>k!=='proposal');
-  document.getElementById('res-tabs').innerHTML=labels.map((l,i)=>
+  const tabsEl=document.getElementById('res-tabs');
+  if(tabsEl) tabsEl.innerHTML=labels.map((l,i)=>
     `<button class="rtab${i===0?' active':''}" onclick="switchTab('${keys[i]}',this)">${l}</button>`
   ).join('');
   const panelsEl=document.getElementById('panels');
-  if(!panelsEl.children.length){
+  if(panelsEl&&!panelsEl.children.length){
     panelsEl.innerHTML=tabKeys.map(k=>
       `<div class="tpanel${k==='overview'?' active':''}" id="panel-${k}"><div class="aic" id="content-${k}"></div></div>`
     ).join('');
@@ -3815,8 +3839,10 @@ function switchTab(name,btn){
 
 function updateBudget(val){
   const n=parseInt(val);
-  document.getElementById('bval').textContent=n.toLocaleString('en-US');
+  const bvalEl=document.getElementById('bval');
+  if(bvalEl) bvalEl.textContent=n.toLocaleString('en-US');
   const slider=document.getElementById('f-budget');
+  if(!slider) return;
   const bMin=parseInt(slider.min)||5000, bMax=parseInt(slider.max)||500000;
   const f=(n-bMin)/(bMax-bMin); // fracción 0–1 según el rango REAL del slider
   // El thumb mide 20px — usamos calc() mezclando % y px para que el relleno
@@ -4445,7 +4471,7 @@ function formatTimeRange(start,end,lang){
   const fmt=t=>{
     if(!t) return '';
     const [h,m]=t.split(':').map(Number);
-    const period=h<12?(lang==='es'?'AM':'AM'):(lang==='es'?'PM':'PM');
+    const period=h<12?'AM':'PM';
     const h12=h%12===0?12:h%12;
     return `${h12}:${String(m).padStart(2,'0')} ${period}`;
   };
@@ -6926,10 +6952,12 @@ async function restoreDraftFromServer(){
 }
 
 function toggleFabCluster(){
-  document.getElementById('fab-cluster').classList.toggle('open');
+  const el=document.getElementById('fab-cluster');
+  if(el) el.classList.toggle('open');
 }
 function closeFabCluster(){
-  document.getElementById('fab-cluster').classList.remove('open');
+  const el=document.getElementById('fab-cluster');
+  if(el) el.classList.remove('open');
 }
 document.addEventListener('click',e=>{
   const cluster=document.getElementById('fab-cluster');
