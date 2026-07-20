@@ -1537,15 +1537,19 @@ async function refreshPaidStatus(){
   if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false}; updateAccountUI(); updateGenBadge(); return isPaid; }
 
   // Si veníamos de mandar el link mágico con un nombre escrito, lo guardamos
-  // ahora que ya hay sesión.
-  const pendingName=localStorage.getItem('dflai_pending_name');
-  if(pendingName){
-    const {error:nameErr}=await sb.rpc('update_my_profile',{new_name:pendingName});
-    if(nameErr){
-      console.error('No se pudo guardar el nombre pendiente:',nameErr);
-    } else {
-      localStorage.removeItem('dflai_pending_name');
-    }
+  // ahora que ya hay sesión — SOLO si el correo coincide con quien inició
+  // sesión (evita que el nombre de alguien más, dejado en este mismo
+  // navegador, se le pegue a la cuenta equivocada).
+  const pendingRaw=localStorage.getItem('dflai_pending_name');
+  if(pendingRaw){
+    try{
+      const pending=JSON.parse(pendingRaw);
+      if(pending&&pending.name&&pending.email===(currentUser.email||'').toLowerCase()){
+        const {error:nameErr}=await sb.rpc('update_my_profile',{new_name:pending.name});
+        if(nameErr) console.error('No se pudo guardar el nombre pendiente:',nameErr);
+      }
+    }catch(e){ /* formato viejo o corrupto — se ignora */ }
+    localStorage.removeItem('dflai_pending_name');
   }
 
   // Igual que con el nombre pendiente: si el link mágico se abrió en un
@@ -1628,7 +1632,11 @@ async function sendMagicLink(){
   const email=document.getElementById('auth-email').value.trim();
   const name=document.getElementById('auth-name').value.trim();
   if(!email){ showToast(lang==='es'?'Escribe tu correo':'Enter your email',true); return; }
-  if(name) localStorage.setItem('dflai_pending_name',name);
+  // Se guarda junto con el correo (no solo el nombre suelto) — así, si
+  // alguien MÁS inicia sesión en este mismo navegador antes de que se
+  // aplique, el correo no va a coincidir y el nombre no se le pega a la
+  // cuenta equivocada.
+  if(name) localStorage.setItem('dflai_pending_name',JSON.stringify({email:email.toLowerCase(),name}));
 
   // El botón no mostraba ningún cambio mientras esperaba la respuesta de
   // Supabase (1-3 segundos, a veces más) — parecía que el clic no había
