@@ -8,7 +8,15 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <meta name="description" content="Estás invitado — confirma tu asistencia aquí.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@600;700&family=Montserrat:wght@500;600&family=Dancing+Script:wght@600;700&family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Alex+Brush&family=Caveat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face{font-family:'Ziggy Zoe';src:url('/assets/fonts/ZiggyZoe.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Sketchbook';src:url('/assets/fonts/Sketchbook.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Zhang QA';src:url('/assets/fonts/ZhangQA.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Quasi';src:url('/assets/fonts/Quasi.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Pressboard JL';src:url('/assets/fonts/PressboardJL.ttf') format('truetype');font-display:swap}
+  @font-face{font-family:'Teen Bold';src:url('/assets/fonts/TeenBold.ttf') format('truetype');font-display:swap}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
@@ -38,12 +46,22 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 .card.font-fun{font-family:'Fredoka',sans-serif}
 .card.font-comic{font-family:'Comic Neue',cursive}
 .card.font-playful{font-family:'Chewy',cursive}
+.card.font-ziggy{font-family:'Ziggy Zoe',cursive}
+.card.font-sketch{font-family:'Sketchbook',cursive}
+.card.font-zhangqa{font-family:'Zhang QA',cursive}
+.card.font-quasi{font-family:'Quasi',serif}
+.card.font-pressboard{font-family:'Pressboard JL',serif}
+.card.font-teenbold{font-family:'Teen Bold',sans-serif}
+.card.font-alexbrush{font-family:'Alex Brush',cursive}
+.card.font-caveat{font-family:'Caveat',cursive;font-weight:600}
 /* Fondo con foto propia — con overlay claro para que el texto se lea */
 .card.theme-custom-photo{background-size:cover!important;background-position:center!important;position:relative}
 .card.theme-custom-photo::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.82);z-index:0;border-radius:inherit}
 .card.theme-custom-photo>*{position:relative;z-index:1}
 .eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--custom-text-color,var(--teal-dark));margin-bottom:1rem;font-weight:600}
-.names{font-size:clamp(2.2rem,7.5vw,3.5rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text))}
+/* El título puede llevar una fuente distinta al resto (--title-font);
+   si no se definió, hereda la del cuerpo — mismo comportamiento de siempre. */
+.names{font-size:clamp(2.2rem,7.5vw,3.5rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:var(--custom-text-color,var(--text));font-family:var(--title-font,inherit)}
 .card.font-script .names{font-weight:700}
 .card.font-fun .names{font-weight:600}
 .card.font-comic .names{font-weight:700}
@@ -630,6 +648,22 @@ function renderInvitation(inv){
   if(inv.background_image_url) cardStyleParts.push(`background-image:url('${esc(inv.background_image_url)}')`);
   else cardStyleParts.push(`background:${esc(bgColor)}`);
   if(inv.text_color) cardStyleParts.push(`--custom-text-color:${esc(inv.text_color)}`);
+  // Fuente del título, independiente del resto de la tarjeta — mismo mapa
+  // de clases que usa el editor (FONT_OPTIONS), aquí como lookup simple.
+  const TITLE_FONT_FAMILIES={
+    '':"'Cormorant Garamond',serif",'font-classic':"'Playfair Display',serif",
+    'font-script':"'Dancing Script',cursive",'font-alexbrush':"'Alex Brush',cursive",
+    'font-soft':"'Libre Baskerville',serif",'font-editorial':"'Cinzel',serif",
+    'font-modern':"'Montserrat',sans-serif",'font-fun':"'Fredoka',sans-serif",
+    'font-caveat':"'Caveat',cursive",'font-ziggy':"'Ziggy Zoe',cursive",
+    'font-sketch':"'Sketchbook',cursive",'font-zhangqa':"'Zhang QA',cursive",
+    'font-quasi':"'Quasi',serif",'font-pressboard':"'Pressboard JL',serif",
+    'font-teenbold':"'Teen Bold',sans-serif",'font-round':"'Poppins',sans-serif",
+    'font-comic':"'Comic Neue',cursive",'font-playful':"'Chewy',cursive"
+  };
+  if(inv.title_font_family && TITLE_FONT_FAMILIES[inv.title_font_family]){
+    cardStyleParts.push(`--title-font:${TITLE_FONT_FAMILIES[inv.title_font_family]}`);
+  }
   document.documentElement.style.setProperty('--custom-text-color',inv.text_color||'#0D6E65');
 
   // Opción B: en vez de tintar cada tarjeta individual, el fondo de TODA

@@ -311,8 +311,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .cl-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-gray);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--white)}
 .cl-item.chk .cl-box{background:var(--teal);border-color:transparent;box-shadow:0 2px 8px rgba(46,196,182,.3)}
 .cl-item.chk .cl-box::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
-.cl-item:not(.chk){opacity:.45}
-.cl-item:not(.chk) .cl-text{text-decoration:line-through;color:var(--text-3)}
+.cl-item.chk{opacity:.55}
+.cl-item.chk .cl-text{text-decoration:line-through;color:var(--text-3)}
 .cl-text{font-size:14px;color:var(--text);line-height:1.5}
 .vq-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border-gray);cursor:pointer;transition:background .15s;border-radius:var(--radius);margin-bottom:2px}
 .vq-item:last-child{border-bottom:none;margin-bottom:0}
@@ -429,7 +429,18 @@ textarea.vcard-input{height:auto}
 .std-content.font-fun{font-family:'Fredoka',sans-serif}
 .std-content.font-comic{font-family:'Comic Neue',cursive}
 .std-content.font-playful{font-family:'Chewy',cursive}
-.std-names{font-size:clamp(1.9rem,11cqw,3.7rem);font-weight:600;color:var(--custom-text-color,var(--text));line-height:1.1;margin-bottom:.75rem;word-break:break-word}
+.std-content.font-ziggy{font-family:'Ziggy Zoe',cursive}
+.std-content.font-sketch{font-family:'Sketchbook',cursive}
+.std-content.font-zhangqa{font-family:'Zhang QA',cursive}
+.std-content.font-quasi{font-family:'Quasi',serif}
+.std-content.font-pressboard{font-family:'Pressboard JL',serif}
+.std-content.font-teenbold{font-family:'Teen Bold',sans-serif}
+.std-content.font-alexbrush{font-family:'Alex Brush',cursive}
+.std-content.font-caveat{font-family:'Caveat',cursive;font-weight:600}
+/* Fuente del título independiente del resto — si no se elige una distinta,
+   hereda la del cuerpo (--title-font sin definir = mismo comportamiento
+   de siempre, así que ninguna invitación ya publicada cambia de aspecto). */
+.std-names{font-size:clamp(1.9rem,11cqw,3.7rem);font-weight:600;color:var(--custom-text-color,var(--text));line-height:1.1;margin-bottom:.75rem;word-break:break-word;font-family:var(--title-font,inherit)}
 .std-content.font-script .std-names{font-weight:700}
 .std-content.font-fun .std-names{font-weight:600}
 .std-content.font-comic .std-names{font-weight:700}
@@ -1311,7 +1322,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div id="pub-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
 
       <div style="display:flex;gap:10px;margin-top:1rem">
-        <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:0;flex:1">Publicar →</button>
+        <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:0;flex:2">Publicar →</button>
         <button class="btn-excel-close" onclick="closePublishModal()" style="flex:1" data-es="Cancelar" data-en="Cancel">Cancelar</button>
       </div>
     </div>
@@ -1429,6 +1440,17 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Corrige "##access_token=..." (hash doble) que puede quedar de un link
 // mágico anterior sin consumir — sin esto, Supabase nunca reconoce el
 // token aunque esté ahí mismo en la URL, y la sesión nunca prende.
+// Hallazgo V7: el link del correo mostraba el dominio de la vista previa de
+// Netlify en vez del dominio de marca — pasaba cuando pedías el login desde
+// ahí en vez de dragonflaievents.com. El correo ahora SIEMPRE apunta al
+// dominio canónico (salvo que estés en localhost, para no romper pruebas
+// locales).
+function canonicalRedirectUrl(){
+  const CANONICAL='https://dragonflaievents.com';
+  if(/\.netlify\.app$/.test(location.hostname)) return CANONICAL+location.pathname;
+  return location.origin+location.pathname;
+}
+
 if (location.hash.startsWith('##')) {
   history.replaceState(null, '', location.pathname + location.search + location.hash.slice(1));
 }
@@ -1609,7 +1631,7 @@ async function sendMagicLink(){
   // borrador local por sí solo no lo hubiera sobrevivido.
   await backupDraftToServer(email);
 
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:window.location.origin+window.location.pathname}});
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:canonicalRedirectUrl()}});
 
   if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; btn.textContent=originalLabel; }
 
@@ -1729,6 +1751,23 @@ function slugify(str){
     .trim().replace(/\s+/g,'-').replace(/-+/g,'-');
 }
 
+// Hallazgo V7: con 200 "Ana" en la plataforma, esperar a que el link choque
+// para recién sugerir algo distinto se siente tarde. El slug por defecto
+// ahora se distingue solo desde el principio — con la fecha del evento si
+// ya existe (dos Anas casi nunca se casan el mismo día), o si no, con un
+// sufijo corto. Sigue siendo 100% editable antes de publicar.
+function defaultSlugFor(p){
+  const base=slugify(p&&p.name)||'mi-evento';
+  if(p&&p.rawDate){
+    const d=new Date(p.rawDate+'T00:00:00');
+    if(!isNaN(d)){
+      const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      return `${base}-${d.getDate()}${months[d.getMonth()]}`;
+    }
+  }
+  return `${base}-${Math.floor(Math.random()*900+100)}`;
+}
+
 let pubBgColor='#FAF9F7';
 
 // Mismo texto que ya se guarda en event_type (el nombre sin el emoji) —
@@ -1766,7 +1805,7 @@ async function openPublishModal(){
   const bottomCloseEl=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl) bottomCloseEl.style.display='none';
   const glNoteNew=document.getElementById('pub-guestlist-edit-note'); if(glNoteNew) glNoteNew.style.display='none';
   document.getElementById('pub-domain-label').textContent=invitationHost()+'/i/';
-  document.getElementById('pub-slug').value=slugify(plan.name)||'mi-evento';
+  document.getElementById('pub-slug').value=defaultSlugFor(plan);
   document.getElementById('pub-slug').style.borderColor='';
   const slugErrEl=document.getElementById('pub-slug-taken-error'); if(slugErrEl) slugErrEl.style.display='none';
   renderPubEventTypeOptions();
@@ -1795,6 +1834,7 @@ async function openPublishModal(){
   // Precargar con el mismo color de fondo que ya tiene el Save the Date, si existe
   pubBgColor='#FAF9F7';
   pubFontClass='';
+  pubTitleFontClass='';
   pubTextColor=null;
   const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
@@ -1804,6 +1844,7 @@ async function openPublishModal(){
     if(stdContent){
       const fc=FONT_OPTIONS.map(f=>f.cls).filter(Boolean).find(c=>stdContent.classList.contains(c));
       pubFontClass=fc||'';
+      pubTitleFontClass=stdContent.dataset.titleFontCls||'';
     }
   }
   renderPublishPickers();
@@ -1818,6 +1859,7 @@ async function openPublishModal(){
 let pubBackgroundImageUrl=null;
 let pubGuestEmails={};
 let pubFontClass='';
+let pubTitleFontClass='';
 let pubTextColor=null;
 
 // Convierte "rgb(250, 249, 247)" (lo que el navegador reporta) de vuelta
@@ -1825,23 +1867,18 @@ let pubTextColor=null;
 function updatePubThemeLabel(){
   const label=document.getElementById('pub-current-theme-label');
   if(!label) return;
+  const L=lang==='es';
   if(pubBackgroundImageUrl){
-    label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+(lang==='es'?'Tu foto':'Your photo');
+    label.textContent=(L?'Diseño actual: ':'Current design: ')+(L?'Tu foto':'Your photo');
     return;
   }
-  const comboIdx=findComboIndex(pubBgColor,pubFontClass,pubTextColor);
-  if(comboIdx>=0){
-    const c=PRESET_COMBOS[comboIdx];
-    label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+(lang==='es'?c.name.es:c.name.en);
-    return;
-  }
-  // Datos de una invitación anterior al sistema de combos — se muestra el
-  // nombre del color base como respaldo, aunque no combine con un preset.
   const matchColor=BG_COLORS.find(c=>c.hex.toLowerCase()===pubBgColor.toLowerCase());
   const matchGradient=BG_GRADIENTS.find(g=>g.value===pubBgColor);
   const match=matchColor||matchGradient;
-  const name=match?(lang==='es'?match.name.es:match.name.en):pubBgColor;
-  label.textContent=(lang==='es'?'Diseño actual: ':'Current design: ')+name;
+  const bgName=match?(L?match.name.es:match.name.en):pubBgColor;
+  const bodyFont=FONT_OPTIONS.find(f=>f.cls===(pubFontClass||''));
+  const fontName=bodyFont?(L?bodyFont.label.es:bodyFont.label.en):'';
+  label.textContent=(L?'Diseño actual: ':'Current design: ')+bgName+(fontName?` · ${fontName}`:'');
 }
 
 // Precarga las fuentes que no vienen por defecto en Google Fonts del <head>
@@ -1852,32 +1889,46 @@ function loadExtraFontsIfNeeded(){
   extraFontsLoaded=true;
   const link=document.createElement('link');
   link.rel='stylesheet';
-  link.href='https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&display=swap';
+  link.href='https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@500;600&family=Cinzel:wght@600;700&family=Fredoka:wght@500;600&family=Comic+Neue:wght@700&family=Chewy&family=Alex+Brush&family=Caveat:wght@600;700&display=swap';
   document.head.appendChild(link);
+
+  // Ziggy Zoe y Sketchbook no están en Google Fonts — se verificaron de
+  // uso libre comercial y se hospedan directo en el repo.
+  const style=document.createElement('style');
+  style.textContent=`
+    @font-face{font-family:'Ziggy Zoe';src:url('/assets/fonts/ZiggyZoe.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'Sketchbook';src:url('/assets/fonts/Sketchbook.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'Zhang QA';src:url('/assets/fonts/ZhangQA.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'Quasi';src:url('/assets/fonts/Quasi.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'Pressboard JL';src:url('/assets/fonts/PressboardJL.ttf') format('truetype');font-display:swap}
+    @font-face{font-family:'Teen Bold';src:url('/assets/fonts/TeenBold.ttf') format('truetype');font-display:swap}
+  `;
+  document.head.appendChild(style);
 }
 
 // Pinta el combo grid del modal de Publicar/Editar, marcando activo el
 // combo que coincide con el estilo actual (o ninguno si es una foto o un
-// dato antiguo que no combina exacto con los 10 presets).
 function renderPublishPickers(){
   const comboBox=document.getElementById('pub-combo-picker');
-  if(comboBox) comboBox.innerHTML=renderComboGridHtml('applyPublishCombo',findComboIndex(pubBgColor,pubFontClass,pubTextColor));
+  if(comboBox) comboBox.innerHTML=renderFontColorPickers('pub',pubTitleFontClass,pubFontClass,pubBgColor,'applyPublishTitleFont','applyPublishBodyFont','applyPublishBg');
 }
 
-// Aplica un combo completo (fondo+fuente+texto) de un solo clic — sustituye
-// a los 3 selectores sueltos que antes había que combinar a mano.
-function applyPublishCombo(idx,el){
-  const combo=PRESET_COMBOS[idx];
-  if(!combo) return;
-  pubBgColor=combo.bg;
-  pubFontClass=combo.font;
-  pubTextColor=combo.textColor==='#1A2332'?null:combo.textColor;
-  pubBackgroundImageUrl=null; // elegir un combo cancela la foto subida
+function applyPublishTitleFont(cls){
+  pubTitleFontClass=cls;
+  showInvitationPreview();
+}
+function applyPublishBodyFont(cls){
+  pubFontClass=cls;
+  updatePubThemeLabel();
+  showInvitationPreview();
+}
+function applyPublishBg(hex){
+  pubBgColor=hex;
+  const opt=[...BG_COLORS,...BG_GRADIENTS].find(b=>(b.hex||b.value)===hex);
+  pubTextColor=opt?(opt.textPair==='#1A2332'?null:opt.textPair):null;
+  pubBackgroundImageUrl=null; // elegir un color de fondo cancela la foto subida
   const preview=document.getElementById('pub-bg-photo-preview');
   if(preview) preview.innerHTML='';
-  document.querySelectorAll('#pub-combo-picker .combo-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
-  updatePubThemeLabel();
   showInvitationPreview();
 }
 
@@ -1959,9 +2010,11 @@ function showInvitationPreview(){
 
   const container=document.getElementById('publish-live-preview-container');
   if(!container) return;
+  const titleFontOpt=FONT_OPTIONS.find(f=>f.cls===pubTitleFontClass);
+  const titleFontCss=titleFontOpt&&pubTitleFontClass?`;--title-font:${titleFontOpt.family}`:'';
   const cardStyle=pubBackgroundImageUrl
-    ? ` style="background-image:url('${pubBackgroundImageUrl}')${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`
-    : ` style="background:${pubBgColor}${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}"`;
+    ? ` style="background-image:url('${pubBackgroundImageUrl}')${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}${titleFontCss}"`
+    : ` style="background:${pubBgColor}${pubTextColor?`;--custom-text-color:${pubTextColor}`:''}${titleFontCss}"`;
   const photoClass=pubBackgroundImageUrl?' theme-custom-photo':'';
   const previewHostNames=(document.getElementById('pub-host-names')?.value||p.name||'').trim();
   const previewLocation=(document.getElementById('pub-location')?.value||p.location||'').trim();
@@ -1995,7 +2048,10 @@ function showInvitationPreview(){
   // (~360px). Con background-size:cover, contenedores de proporciones
   // distintas RECORTAN la foto distinto — por eso "no era el mismo formato".
   // Solución: renderizar al ancho real (820px) y escalar visualmente.
-  container.innerHTML=`<div class="pub-preview-scale" style="overflow:hidden"><div class="pub-preview-inner" style="width:820px;transform-origin:top left">${previewHtml}</div></div>`;
+  // (Hallazgo nuevo: el pintado sin escalar duraba un frame visible —
+  // "el fondo parpadea los primeros momentos" — por eso arranca oculta y
+  // solo se revela cuando el transform ya está aplicado.)
+  container.innerHTML=`<div class="pub-preview-scale" style="overflow:hidden"><div class="pub-preview-inner" style="width:820px;transform-origin:top left;opacity:0">${previewHtml}</div></div>`;
   requestAnimationFrame(()=>{
     const innerEl=container.querySelector('.pub-preview-inner');
     const boxEl=container.querySelector('.pub-preview-scale');
@@ -2003,6 +2059,7 @@ function showInvitationPreview(){
     const s=Math.min(1,(container.clientWidth||360)/820);
     innerEl.style.transform=`scale(${s})`;
     boxEl.style.height=(innerEl.scrollHeight*s)+'px';
+    innerEl.style.opacity='1';
   });
 }
 
@@ -2248,6 +2305,7 @@ async function openEditInvitationModal(invId){
   pubGalleryUrls=Array.isArray(inv.gallery_urls)?[...inv.gallery_urls]:[];
   renderGalleryPreview();
   pubFontClass=inv.font_family||'';
+  pubTitleFontClass=inv.title_font_family||'';
   pubTextColor=inv.text_color||null;
   pubBackgroundImageUrl=inv.background_image_url||null;
   renderPublishPickers();
@@ -2569,6 +2627,7 @@ async function publishInvitation(){
       background_image_url: pubBackgroundImageUrl,
       custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
       font_family: pubFontClass||null,
+      title_font_family: pubTitleFontClass||null,
       text_color: pubTextColor
     };
 
@@ -2689,6 +2748,7 @@ async function publishInvitation(){
       background_image_url: pubBackgroundImageUrl,
       custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
       font_family: pubFontClass||null,
+      title_font_family: pubTitleFontClass||null,
       text_color: pubTextColor
     };
   }
@@ -3259,11 +3319,21 @@ const FONT_OPTIONS=[
   {cls:'',family:"'Cormorant Garamond',serif",label:{es:'Elegante',en:'Elegant'}},
   {cls:'font-classic',family:"'Playfair Display',serif",label:{es:'Clásica',en:'Classic'}},
   {cls:'font-script',family:"'Dancing Script',cursive",weight:700,label:{es:'Script',en:'Script'}},
+  {cls:'font-alexbrush',family:"'Alex Brush',cursive",label:{es:'Caligráfica',en:'Calligraphy'}},
   {cls:'font-soft',family:"'Libre Baskerville',serif",label:{es:'Serif suave',en:'Soft serif'}},
   {cls:'font-editorial',family:"'Cinzel',serif",label:{es:'Editorial',en:'Editorial'}},
   {cls:'font-modern',family:"'Montserrat',sans-serif",label:{es:'Moderna',en:'Modern'}},
-  {cls:'font-fun',family:"'Fredoka',sans-serif",weight:600,label:{es:'Divertida',en:'Fun'}}
+  {cls:'font-fun',family:"'Fredoka',sans-serif",weight:600,label:{es:'Divertida',en:'Fun'}},
+  {cls:'font-caveat',family:"'Caveat',cursive",weight:600,label:{es:'A mano',en:'Handwritten'}},
+  {cls:'font-ziggy',family:"'Ziggy Zoe',cursive",label:{es:'Ziggy (manuscrita)',en:'Ziggy (handwritten)'}},
+  {cls:'font-sketch',family:"'Sketchbook',cursive",label:{es:'Boceto',en:'Sketchbook'}},
+  {cls:'font-zhangqa',family:"'Zhang QA',cursive",label:{es:'Manuscrita casual',en:'Casual handwriting'}},
+  {cls:'font-quasi',family:"'Quasi',serif",label:{es:'Quasi (oriental)',en:'Quasi (oriental)'}},
+  {cls:'font-pressboard',family:"'Pressboard JL',serif",label:{es:'Vintage rústico',en:'Vintage rustic'}},
+  {cls:'font-teenbold',family:"'Teen Bold',sans-serif",label:{es:'Redondeada juvenil',en:'Rounded youthful'}}
 ];
+
+// (el color de fondo usa BG_COLORS + BG_GRADIENTS, definidos más abajo)
 
 // 10 colores de texto/detalles
 const TEXT_COLOR_OPTIONS=[
@@ -3281,51 +3351,27 @@ const TEXT_COLOR_OPTIONS=[
   {hex:'#C7CBD1',name:{es:'Plata',en:'Silver'}}
 ];
 
-// 10 combos curados — fondo + fuente + color de texto ya armonizados entre
-// sí, para que elegir "cómo se ve" sea UNA sola decisión y no tres por
-// separado (que era justo lo que hacía difícil que combinaran bien).
-// "Subir tu foto" sigue siendo una opción aparte de este selector.
-const PRESET_COMBOS=[
-  {name:{es:'Elegante Clásico',en:'Classic Elegant'},bg:'#FAF9F7',font:'',textColor:'#1A2332'},
-  {name:{es:'Romance Rosa',en:'Rose Romance'},bg:'#F7E8E8',font:'font-script',textColor:'#6E1E2E'},
-  {name:{es:'Boho Salvia',en:'Boho Sage'},bg:'#EDF2E9',font:'font-soft',textColor:'#1B3B2F'},
-  {name:{es:'Lujo Champagne',en:'Champagne Luxury'},bg:'#F7F1E3',font:'font-editorial',textColor:'#8A6B1E'},
-  {name:{es:'Cielo Sereno',en:'Serene Sky'},bg:'linear-gradient(135deg,#A1C4FD,#C2E9FB)',font:'font-classic',textColor:'#1A2E4A'},
-  {name:{es:'Atardecer Vibrante',en:'Vibrant Sunset'},bg:'linear-gradient(135deg,#FF9A8B,#FF6A88,#FF99AC)',font:'font-modern',textColor:'#FFFFFF'},
-  {name:{es:'Lavanda Soñadora',en:'Dreamy Lavender'},bg:'#F0EAF7',font:'font-script',textColor:'#5A3E7A'},
-  {name:{es:'Fiesta Infantil 🎈',en:'Kids Party 🎈'},bg:'#FF6FA5',font:'font-fun',textColor:'#FFFFFF'},
-  {name:{es:'Oro Rosa Editorial',en:'Rose Gold Editorial'},bg:'linear-gradient(135deg,#F7C6C7,#F4E2D8)',font:'font-editorial',textColor:'#B15A3E'},
-  {name:{es:'Uva Moderno',en:'Modern Grape'},bg:'linear-gradient(135deg,#D8A7E8,#F5A9C4)',font:'font-modern',textColor:'#FFFFFF'}
-];
-
-// Devuelve el font-family CSS completo (con peso si aplica) para una clase
-// de fuente de FONT_OPTIONS — usado para pintar la vista previa "Aa" de
-// cada combo con su tipografía real.
-function comboFontFamily(cls){
-  const f=FONT_OPTIONS.find(f=>f.cls===cls)||FONT_OPTIONS[0];
-  return `${f.family}${f.weight?`;font-weight:${f.weight}`:''}`;
-}
-
-// Encuentra el índice del combo que coincide exactamente con un fondo+fuente
-// +color de texto dados (usado para marcar cuál queda "activo" al abrir el
-// picker con datos ya guardados). null/'' de textColor se normaliza al
-// carbón por defecto, igual que en el resto de la app.
-function findComboIndex(bg,fontCls,textColor){
-  const normText=textColor||'#1A2332';
-  return PRESET_COMBOS.findIndex(c=>c.bg===bg&&(c.font||'')===(fontCls||'')&&c.textColor===normText);
-}
-
-// Genera el HTML de los 10 botones de combo — reusado tanto en el tab Save
-// the Date recién generado como en el modal de Publicar/Editar.
-function renderComboGridHtml(applyFnName,activeIdx){
-  return PRESET_COMBOS.map((c,i)=>{
-    const isActive=(activeIdx===undefined?i===0:i===activeIdx);
-    const name=lang==='es'?c.name.es:c.name.en;
-    return `<button type="button" class="combo-swatch${isActive?' active':''}" onclick="${applyFnName}(${i},this)" title="${esc(name)}">
-      <span class="combo-swatch-preview" style="background:${c.bg};font-family:${comboFontFamily(c.font)};color:${c.textColor}">Aa</span>
-      <span class="combo-swatch-label">${esc(name)}</span>
-    </button>`;
-  }).join('');
+// Selector de estilo: 3 decisiones independientes (fuente del título, fuente
+// del resto de la información, y color de fondo) en vez de 10 combos fijos
+// que las ataban entre sí — así el título puede llevar una fuente distinta
+// al resto, y no hay que mostrar cada combinación posible como swatch.
+function renderFontColorPickers(idPrefix,curTitleFont,curBodyFont,curBg,onTitleChange,onBodyChange,onBgChange){
+  const L=lang==='es';
+  const fontOpt=(cur)=>FONT_OPTIONS.map(f=>`<option value="${f.cls}"${f.cls===(cur||'')?' selected':''}>${esc(L?f.label.es:f.label.en)}</option>`).join('');
+  const allBg=[...BG_COLORS.map(c=>({v:c.hex,name:c.name})),...BG_GRADIENTS.map(g=>({v:g.value,name:g.name}))];
+  const bgOpt=allBg.map(b=>`<option value="${esc(b.v)}"${b.v===curBg?' selected':''}>${esc(L?b.name.es:b.name.en)}</option>`).join('');
+  const selStyle='width:100%;margin-top:3px;padding:8px 10px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:\'Inter\',sans-serif;font-size:13px;background:#fff';
+  return `<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem">
+    <label style="font-size:12px;font-weight:600;color:var(--text-2)">${L?'Fuente del título':'Title font'}
+      <select id="${idPrefix}-title-font" onchange="${onTitleChange}(this.value)" style="${selStyle}">${fontOpt(curTitleFont)}</select>
+    </label>
+    <label style="font-size:12px;font-weight:600;color:var(--text-2)">${L?'Fuente del resto de la información':'Font for the rest of the details'}
+      <select id="${idPrefix}-body-font" onchange="${onBodyChange}(this.value)" style="${selStyle}">${fontOpt(curBodyFont)}</select>
+    </label>
+    <label style="font-size:12px;font-weight:600;color:var(--text-2)">${L?'Color de fondo':'Background color'}
+      <select id="${idPrefix}-bg" onchange="${onBgChange}(this.value)" style="${selStyle}">${bgOpt}</select>
+    </label>
+  </div>`;
 }
 
 const THEME_SUGGESTIONS={
@@ -3960,6 +4006,7 @@ async function generate(){
   if(pubFaqEl) pubFaqEl.value='';
   pubGalleryUrls=[];
   pubFontClass='';
+  pubTitleFontClass='';
   pubTextColor=null;
   pubBackgroundImageUrl=null;
   pubBgColor='#FAF9F7';
@@ -4419,7 +4466,7 @@ function wrapSTDCard(cardHtml){
   const clean=String(cardHtml||'').replace(/```html|```/g,'').trim();
 
   const themePicker=`<p style="text-align:center;font-size:11px;color:var(--text-3);margin-bottom:.5rem">${p.lang==='es'?'Elige un estilo':'Choose a style'}</p>
-<div class="combo-grid" style="margin-bottom:.85rem">${renderComboGridHtml('applySTDCombo')}</div>
+${renderFontColorPickers('std','','','#FAF9F7','applySTDTitleFont','applySTDBodyFont','applySTDBg')}
 <div style="text-align:center;margin:.4rem 0 1rem">
 <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('std-photo-input').click()">📷 ${p.lang==='es'?'Subir tu foto de fondo':'Upload your background photo'}</button>
 <input type="file" id="std-photo-input" accept="image/*" style="display:none" onchange="uploadSTDBackground(event)">
@@ -5363,7 +5410,10 @@ function renderBudget(items,tips,paquete){
   const cards=items.map((b,bi)=>`<div class="bcard${b.isReal?' bcard-real':''}" style="position:relative">${canRemove?`<span onclick="removeBudgetCategory(${bi})" style="position:absolute;top:6px;right:8px;color:var(--text-3);font-size:13px;cursor:pointer" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}<div class="bcard-label">${esc(b.label)}${b.isReal?` <span class="bcard-real-tag">✓ ${L?'Real':'Actual'}</span>`:''}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div></div>`).join('');
   const tipsHtml=(tips||[]).map(t=>`<li>${esc(t)}</li>`).join('');
   return `<div class="bcards">${cards}</div>
-    <button type="button" onclick="addBudgetCategory()" style="display:block;width:100%;padding:10px;border-radius:var(--radius);border:1.5px dashed var(--border-strong);background:transparent;color:var(--teal-dark);font-weight:600;font-size:13px;cursor:pointer;margin:.75rem 0 1.25rem">+ ${L?'Agregar categoría':'Add category'}</button>
+    <div style="display:flex;gap:8px;margin:.75rem 0 1.25rem">
+    <input type="text" id="budget-new-cat-input" placeholder="${L?'ej. Decoración floral':'e.g. Floral decor'}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addBudgetCategory();}">
+    <button type="button" onclick="addBudgetCategory()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
+  </div>
     <p style="font-size:11px;color:var(--text-3);margin:-1rem 0 1rem">${L?'Al agregar o quitar una categoría, el resto se ajusta solo para que siga sumando el 100% de tu presupuesto.':'Adding or removing a category automatically adjusts the rest so it still adds up to 100% of your budget.'}</p>
     <h2>${L?'Consejos de presupuesto':'Budget tips'}</h2><ul>${tipsHtml}</ul><h2>${L?'Opción paquete todo incluido':'All-inclusive package option'}</h2><p>${esc(paquete||'')}</p>`;
 }
@@ -5383,14 +5433,15 @@ function recalcBudgetAmounts(total){
 
 function addBudgetCategory(){
   const L=plan.lang==='es';
-  const name=prompt(L?'Nombre de la nueva categoría:':'New category name:');
-  if(!name||!name.trim()) return;
+  const input=document.getElementById('budget-new-cat-input');
+  const name=input?input.value.trim():'';
+  if(!name) return;
   if(!Array.isArray(plan.budgetData)||!plan.budgetData.length) return;
   const total=parseInt(plan.budget)||plan.budgetData.reduce((s,b)=>s+b.amount,0);
   const newPct=10; // punto de partida razonable — el usuario puede seguir cotizando y ajustando con precios reales
   const scale=(100-newPct)/100;
   plan.budgetData.forEach(b=>{ b.pct=Math.round(b.pct*scale); });
-  plan.budgetData.push({label:name.trim(),pct:newPct,amount:0,custom:true});
+  plan.budgetData.push({label:name,pct:newPct,amount:0,custom:true});
   recalcBudgetAmounts(total);
   setTabHTML('budget',renderBudget(plan.budgetData,plan.budgetTips,plan.paqueteInfo));
   showToast(L?'✅ Categoría agregada':'✅ Category added');
@@ -5471,8 +5522,8 @@ function beluProgressMessage(pct,L){
 }
 
 function checklistProgressBarHTML(sections){
-  const total=sections.reduce((s,sec)=>s+(sec.items||[]).length,0);
-  const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const total=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false&&i.done===true).length,0);
   const pct=total?Math.round((done/total)*100):0;
   const L=plan.lang==='es';
   return `<div id="checklist-progress-wrap" style="margin-bottom:1.25rem">
@@ -5489,8 +5540,8 @@ function checklistProgressBarHTML(sections){
 function updateChecklistProgressBar(){
   const sections=plan.checklistData;
   if(!Array.isArray(sections)) return;
-  const total=sections.reduce((s,sec)=>s+(sec.items||[]).length,0);
-  const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const total=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const done=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false&&i.done===true).length,0);
   const pct=total?Math.round((done/total)*100):0;
   const L=plan.lang==='es';
   const labelEl=document.getElementById('checklist-progress-label');
@@ -5506,12 +5557,14 @@ function updateChecklistProgressBar(){
 function renderChecklist(sections){
   if(!Array.isArray(sections)||!sections.length) return '';
   const L=plan.lang==='es';
-  const hint=L?'Deselecciona lo que no necesites — tu progreso se guarda solo, y solo lo marcado se incluye en tu Excel.':'Deselect what you don\'t need — your progress saves automatically, and only checked items are included in your Excel.';
+  const hint=L?'Marca cada tarea conforme la vayas completando — tu progreso se guarda solo. ¿Algo no aplica a tu evento? Quítalo con la ✕.':'Check off each task as you complete it — your progress saves automatically. Something doesn’t apply to your event? Remove it with the ✕.';
   const body=sections.map((s,si)=>{
-    const items=(s.items||[]).map((i,ii)=>{
-      if(i.selected===undefined) i.selected=true; // por defecto viene incluido; el usuario quita lo que no aplique
-      const removeBtn=i.custom?`<span onclick="event.stopPropagation();removeCustomChecklistItem(${si},${ii})" style="margin-left:auto;padding-left:10px;color:var(--text-3);font-size:15px;flex-shrink:0" title="${L?'Quitar':'Remove'}">✕</span>`:'';
-      return `<div class="cl-item${i.selected?' chk':''}" data-s="${si}" data-i="${ii}" onclick="toggleChecklistItem(this)" style="display:flex;align-items:flex-start"><div class="cl-box"></div><div style="flex:1"><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div>${removeBtn}</div>`;
+    const visibleItems=(s.items||[]).map((i,ii)=>({i,ii})).filter(({i})=>i.selected!==false);
+    if(!visibleItems.length) return '';
+    const items=visibleItems.map(({i,ii})=>{
+      if(i.done===undefined) i.done=false;
+      const removeBtn=`<span onclick="event.stopPropagation();excludeChecklistItem(${si},${ii})" style="margin-left:auto;padding-left:10px;color:var(--text-3);font-size:13px;flex-shrink:0;white-space:nowrap" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
+      return `<div class="cl-item${i.done?' chk':''}" data-s="${si}" data-i="${ii}" onclick="toggleChecklistItem(this)" style="display:flex;align-items:flex-start"><div class="cl-box"></div><div style="flex:1"><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div>${removeBtn}</div>`;
     }).join('');
     return `<h2>${esc(s.section)}</h2>${items}`;
   }).join('');
@@ -5587,10 +5640,20 @@ function toggleChecklistItem(el){
   const si=+el.dataset.s,ii=+el.dataset.i;
   const item=plan.checklistData?.[si]?.items?.[ii];
   if(!item) return;
-  item.selected=!item.selected;
-  el.classList.toggle('chk',item.selected);
+  item.done=!item.done;
+  el.classList.toggle('chk',item.done);
   updateChecklistProgressBar();
   scheduleChecklistProgressSave();
+}
+
+function excludeChecklistItem(si,ii){
+  const item=plan.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.selected=false;
+  setTabHTML('checklist',renderChecklist(plan.checklistData));
+  updateChecklistProgressBar();
+  scheduleChecklistProgressSave();
+  schedulePlanResave();
 }
 
 function renderVendors(items,questions,negotiation){
@@ -6098,8 +6161,8 @@ async function exportSpreadsheet(){
   const budgetSheetName=L?'Presupuesto':'Budget';
   const budgetTotalRow=(plan.budgetData&&plan.budgetData.length)?plan.budgetData.length+2:null;
   const eventDateObj=plan.rawDate?new Date(plan.rawDate+'T12:00:00'):null;
-  const totalChecklist=(plan.checklistData||[]).reduce((s,sec)=>s+(sec.items||[]).length,0);
-  const doneChecklist=(plan.checklistData||[]).reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const totalChecklist=(plan.checklistData||[]).reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const doneChecklist=(plan.checklistData||[]).reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false&&i.done===true).length,0);
 
   const resumen=[
     [L?'Evento':'Event',plan.typeName],
@@ -6634,20 +6697,31 @@ async function onGalleryFilesSelected(event){
 // Aplica un combo completo (fondo+fuente+texto) al Save the Date recién
 // generado, de un solo clic — reusa las 3 funciones existentes por dentro
 // para no duplicar la lógica de cada una.
-function applySTDCombo(idx,el){
-  const combo=PRESET_COMBOS[idx];
-  if(!combo) return;
-  setSTDBgColor(combo.bg,null);
-  setSTDFont(combo.font,null);
-  setSTDTextColor(combo.textColor==='#1A2332'?null:combo.textColor,null);
-  document.querySelectorAll('#content-savethedate .combo-swatch').forEach(s=>s.classList.remove('active'));
-  if(el) el.classList.add('active');
+// Los 3 controles independientes de estilo de la tarjeta recién generada —
+// título, resto de la información, y fondo (con su color de texto ya
+// emparejado automáticamente, igual que en el modal de Publicar).
+function applySTDTitleFont(cls){
+  const content=document.querySelector('#content-savethedate .std-card .std-content');
+  if(!content) return;
+  const f=FONT_OPTIONS.find(f=>f.cls===cls);
+  if(f) content.style.setProperty('--title-font',f.family);
+  else content.style.removeProperty('--title-font');
+  content.dataset.titleFontCls=cls||'';
+  schedulePlanResave();
+}
+function applySTDBodyFont(cls){
+  setSTDFont(cls,null);
+  schedulePlanResave();
+}
+function applySTDBg(hex){
+  setSTDBgColor(hex,null);
+  schedulePlanResave();
 }
 
 function setSTDFont(fontClass,el){
   const content=document.querySelector('#content-savethedate .std-card .std-content');
   if(!content) return;
-  content.classList.remove('font-classic','font-modern','font-script','font-soft','font-round','font-editorial','font-fun','font-comic','font-playful');
+  content.classList.remove('font-classic','font-modern','font-script','font-soft','font-round','font-editorial','font-fun','font-comic','font-playful','font-ziggy','font-sketch','font-alexbrush','font-caveat');
   if(fontClass) content.classList.add(fontClass);
 }
 
