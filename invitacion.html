@@ -220,6 +220,9 @@ const T={
     invitedFallback:'Estás invitado',
     daysLabel:'Días',
     rsvpTitle:'Confirma tu asistencia',
+    addToCalendar:'Agregar a mi calendario',
+    calendarIcsOption:'Apple / Outlook (.ics)',
+    organizerContactBtn:'¿Dudas? Escríbele',
     yourName:'Tu nombre',
     yourEmail:'Tu correo (opcional, para recordatorios)',
     attendingQ:'¿Asistes?',
@@ -273,7 +276,6 @@ const T={
     editSaved:'✅ Tu respuesta se actualizó',
 
     maxCompanionsNote:'Puedes traer hasta {n} acompañante(s).',
-    ourStoryTitle:'Nuestra historia',
     scheduleTitle:'Itinerario',
     lodgingTitle:'Hospedaje y cómo llegar',
     seeOnMap:'Ver en el mapa',
@@ -290,6 +292,9 @@ const T={
     invitedFallback:"You're invited",
     daysLabel:'Days',
     rsvpTitle:'Confirm your attendance',
+    addToCalendar:'Add to my calendar',
+    calendarIcsOption:'Apple / Outlook (.ics)',
+    organizerContactBtn:'Questions? Message',
     yourName:'Your name',
     yourEmail:'Your email (optional, for reminders)',
     attendingQ:'Will you attend?',
@@ -343,7 +348,6 @@ const T={
     editSaved:'✅ Your response was updated',
 
     maxCompanionsNote:'You can bring up to {n} guest(s).',
-    ourStoryTitle:'Our Story',
     scheduleTitle:'Schedule',
     lodgingTitle:'Lodging & Directions',
     seeOnMap:'See on map',
@@ -372,6 +376,102 @@ function setLang(l){
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function toTitleCase(s){ return String(s??'').toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase()); }
+
+// ── Agregar a mi calendario ──
+// La hora se guarda como texto de exhibición ("6:00 PM – 11:00 PM"), no en
+// formato de máquina — se extrae con regex; si no se puede leer, cae a un
+// bloque razonable de 6pm-11pm en vez de fallar.
+function parseEventTimeRange(eventTime){
+  if(!eventTime) return null;
+  const matches=[...String(eventTime).matchAll(/(\d{1,2}):(\d{2})\s*(AM|PM)/gi)];
+  if(!matches.length) return null;
+  const to24=(h,m,ap)=>{
+    h=parseInt(h,10); m=parseInt(m,10);
+    const isPM=/pm/i.test(ap);
+    if(isPM&&h!==12) h+=12;
+    if(!isPM&&h===12) h=0;
+    return {h,m};
+  };
+  return {start:to24(matches[0][1],matches[0][2],matches[0][3]), end:matches[1]?to24(matches[1][1],matches[1][2],matches[1][3]):null};
+}
+
+function getEventDatesForCalendar(){
+  const dateRaw=invitation?.event_date_raw;
+  if(!dateRaw) return null;
+  const parsed=parseEventTimeRange(invitation.event_time);
+  const startDate=new Date(dateRaw+'T00:00:00');
+  startDate.setHours(parsed?parsed.start.h:18, parsed?parsed.start.m:0, 0, 0);
+  const endDate=new Date(dateRaw+'T00:00:00');
+  if(parsed&&parsed.end) endDate.setHours(parsed.end.h, parsed.end.m, 0, 0);
+  else endDate.setHours(23, 0, 0, 0);
+  if(endDate<=startDate) endDate.setDate(endDate.getDate()+1); // cruza medianoche
+  return {startDate,endDate};
+}
+
+function fmtICSDate(d){
+  const p=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+}
+
+function icsEscape(s){
+  return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+}
+
+function toggleCalendarMenu(e){
+  if(e) e.stopPropagation();
+  const menu=document.getElementById('cal-add-menu');
+  if(menu) menu.style.display=menu.style.display==='block'?'none':'block';
+}
+document.addEventListener('click',()=>{ const m=document.getElementById('cal-add-menu'); if(m) m.style.display='none'; });
+
+function openGoogleCalendar(){
+  const dates=getEventDatesForCalendar();
+  if(!dates||!invitation){ showToast(lang==='es'?'No se pudo generar el evento':'Could not generate the event'); return; }
+  const title=encodeURIComponent(invitation.host_names||(lang==='es'?'Evento':'Event'));
+  const details=encodeURIComponent(lang==='es'?`Invitación de ${invitation.host_names||''}`:`Invitation from ${invitation.host_names||''}`);
+  const location=encodeURIComponent(invitation.location||'');
+  const datesParam=`${fmtICSDate(dates.startDate)}/${fmtICSDate(dates.endDate)}`;
+  // ctz asume zona horaria de México por default — la mayoría de los eventos
+  // publicados hoy son de ese mercado; ajustar si algún día se soporta
+  // zona horaria explícita por evento.
+  const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${datesParam}&details=${details}&location=${location}&ctz=America/Mexico_City`;
+  window.open(url,'_blank');
+  const menu=document.getElementById('cal-add-menu'); if(menu) menu.style.display='none';
+}
+
+function downloadIcsFile(){
+  const dates=getEventDatesForCalendar();
+  if(!dates||!invitation){ showToast(lang==='es'?'No se pudo generar el evento':'Could not generate the event'); return; }
+  const uid=`${invitation.slug||'evento'}-${Date.now()}@dragonflaievents.com`;
+  const ics=[
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DragonflAI Events//ES','CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${fmtICSDate(new Date())}`,
+    `DTSTART:${fmtICSDate(dates.startDate)}`,
+    `DTEND:${fmtICSDate(dates.endDate)}`,
+    `SUMMARY:${icsEscape(invitation.host_names||(lang==='es'?'Evento':'Event'))}`,
+    invitation.location?`LOCATION:${icsEscape(invitation.location)}`:'',
+    `DESCRIPTION:${icsEscape(lang==='es'?`Invitación de ${invitation.host_names||''}`:`Invitation from ${invitation.host_names||''}`)}`,
+    'END:VEVENT','END:VCALENDAR'
+  ].filter(Boolean).join('\r\n');
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`${invitation.slug||'evento'}.ics`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  const menu=document.getElementById('cal-add-menu'); if(menu) menu.style.display='none';
+}
+
+// ── Contacto del organizador ──
+function buildOrganizerWhatsAppLink(inv,t){
+  const digits=String(inv.organizer_phone||'').replace(/\D/g,'');
+  const greeting=lang==='es'
+    ?`¡Hola! Tengo una duda sobre ${inv.host_names||'el evento'}.`
+    :`Hi! I have a question about ${inv.host_names||'the event'}.`;
+  return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
+}
 
 function showToast(msg){
   const t=document.getElementById('toast');
@@ -440,29 +540,15 @@ let selectedGuest=null;
 let lastSearchResults=[];
 let guestSearchTimer=null;
 
-// Misma idea que en la app principal: "Nuestra historia" solo tiene sentido
-// tal cual para bodas y aniversarios — el resto de eventos muestra algo
-// relevante a ESE tipo en su lugar (sobre el festejado, sobre el bebé, etc.)
-const STORY_TYPE_CONFIG=[
-  {match:['Boda','Wedding','Aniversario','Anniversary'],icon:'💌',label:{es:'Nuestra historia',en:'Our Story'}},
-  {match:['Cumpleaños','Birthday','Fiesta Infantil','Kids Party','Quinceañera'],icon:'🎂',label:{es:'Sobre el festejado/a',en:'About the Guest of Honor'}},
-  {match:['Baby Shower'],icon:'👶',label:{es:'Sobre el bebé',en:'About the Baby'}},
-  {match:['Graduación','Graduation'],icon:'🎓',label:{es:'Sobre este logro',en:'About This Achievement'}},
-  {match:['Corporativo','Corporate'],icon:'🏢',label:{es:'Sobre este evento',en:'About This Event'}}
-];
-function getStoryTitleFor(eventType){
-  const needle=String(eventType||'').toLowerCase().trim();
-  const found=STORY_TYPE_CONFIG.find(c=>c.match.some(m=>needle.includes(m.toLowerCase())));
-  return found||STORY_TYPE_CONFIG[0]; // por defecto, "Nuestra historia"
-}
-
+// Campo único de "Información" para TODOS los tipos de evento — antes
+// variaba entre "Nuestra historia" (boda/aniversario) e "Información
+// adicional" (resto); se unificó (mismo cambio hecho en el editor).
 function renderExtraSections(inv,t){
   const sections=[];
 
   if(inv.couple_story){
-    const storyCfg=getStoryTitleFor(inv.event_type);
     sections.push(`<div class="extra-card">
-      <div class="extra-title">${storyCfg.icon} ${esc(lang==='es'?storyCfg.label.es:storyCfg.label.en)}</div>
+      <div class="extra-title">📝 ${esc(lang==='es'?'Información':'Information')}</div>
       <p class="extra-story">${esc(inv.couple_story).replace(/\n/g,'<br>')}</p>
     </div>`);
   }
@@ -576,6 +662,16 @@ function renderInvitation(inv){
     ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
 
     <button type="button" class="rsvp-trigger-btn" onclick="openRsvpModal()">${t.rsvpTitle} →</button>
+
+    <div id="cal-add-wrap" style="margin:-.75rem 0 1.5rem;position:relative">
+      <button type="button" id="cal-add-btn" onclick="toggleCalendarMenu(event)" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--cream-2);color:var(--text-2);border:1.5px solid var(--border-gray);border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer">📅 ${t.addToCalendar}</button>
+      <div id="cal-add-menu" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--white);border:1px solid var(--border-gray);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);overflow:hidden;z-index:20">
+        <a href="#" onclick="openGoogleCalendar();return false" style="display:block;padding:12px 16px;font-size:13.5px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border-gray)">Google Calendar</a>
+        <a href="#" onclick="downloadIcsFile();return false" style="display:block;padding:12px 16px;font-size:13.5px;color:var(--text);text-decoration:none">${t.calendarIcsOption}</a>
+      </div>
+    </div>
+
+    ${inv.organizer_phone?`<a href="${buildOrganizerWhatsAppLink(inv,t)}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;border:none;border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;margin:-.75rem 0 1.5rem;box-sizing:border-box">💬 ${t.organizerContactBtn}${inv.organizer_name?': '+esc(inv.organizer_name):''}</a>`:''}
 
     ${renderExtraSections(inv,t)}
 

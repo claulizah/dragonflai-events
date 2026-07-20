@@ -98,6 +98,7 @@ input,textarea,[contenteditable="true"]{cursor:text}
      se queda solo la libélula, patrón estándar de apps en mobile. */
   .logo-name{display:none}
   .btn-account{max-width:96px}
+.btn-regen-ideas{max-width:none;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
 }
 
 /* ── FAB CLUSTER (soporte/ayuda) ──
@@ -313,6 +314,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .cl-item:not(.chk){opacity:.45}
 .cl-item:not(.chk) .cl-text{text-decoration:line-through;color:var(--text-3)}
 .cl-text{font-size:14px;color:var(--text);line-height:1.5}
+.vq-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border-gray);cursor:pointer;transition:background .15s;border-radius:var(--radius);margin-bottom:2px}
+.vq-item:last-child{border-bottom:none;margin-bottom:0}
+.vq-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-gray);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--white)}
+.vq-item.asked .vq-box{background:var(--teal);border-color:transparent;box-shadow:0 2px 8px rgba(46,196,182,.3)}
+.vq-item.asked .vq-box::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
+.vq-item.asked{opacity:.55}
+.vq-item.asked .vq-text{text-decoration:line-through;color:var(--text-3)}
+.vq-text{font-size:14px;color:var(--text);line-height:1.5}
+.belu-dialog{display:flex;align-items:flex-end;gap:10px;margin:14px 0}
+.belu-dialog-img{height:72px;width:auto;flex-shrink:0}
+.belu-flip{transform:scaleX(-1)}
+.belu-bubble{position:relative;background:var(--white);border:1.5px solid var(--border-gray);border-radius:16px 16px 16px 4px;padding:10px 14px;font-size:13px;line-height:1.45;color:var(--text);box-shadow:var(--shadow-card);max-width:520px}
 .cl-cat{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--teal-dark);margin-top:1px}
 .vcard{position:relative}
 .vcard-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-gray);background:var(--white);display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer}
@@ -550,6 +563,11 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   .cl-text{color:#333!important}
   .cl-cat{color:#2EC4B6!important}
 
+  /* Preguntas para proveedores */
+  .vq-item{border-bottom:1px solid #EEE!important;padding:8px 4px!important;background:transparent!important}
+  .vq-box{border-color:#999!important;background:#fff!important}
+  .vq-text{color:#333!important}
+
   /* Vendor cards */
   .vcards{grid-template-columns:repeat(3,1fr)!important}
   .vcard{background:#F9F9F9!important;border:1px solid #DDD!important}
@@ -591,6 +609,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
    retrasa el hidden hasta que termina el fade para no cortar la animación. */
 .excel-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .25s,visibility 0s linear .25s}
 .excel-modal-overlay.open{opacity:1;pointer-events:all;visibility:visible;transition:opacity .25s}
+/* El paywall puede abrirse ENCIMA del modal de publicar (para no perder lo
+   ya llenado) — necesita ganar el apilado sin importar el orden en el DOM. */
+#excel-modal.open{z-index:220}
 .excel-modal{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-lg);padding:2rem;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.15);text-align:center}
 .excel-modal h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-bottom:.5rem;color:var(--text)}
 .excel-modal p{font-size:13.5px;color:var(--text-2);margin-bottom:1.5rem;line-height:1.6}
@@ -601,12 +622,6 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .profile-input{width:100%;padding:11px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:15px;box-sizing:border-box;margin-bottom:.4rem;background:var(--white)}
 .profile-section-divider{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-dark);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
 .btn-excel-close:hover{color:var(--text);border-color:var(--teal)}
-/* ── Belu acompañante: imagen + globo de diálogo ── */
-.belu-dialog{display:flex;align-items:flex-end;gap:10px;margin:14px 0}
-.belu-dialog-img{height:72px;width:auto;flex-shrink:0}
-.belu-flip{transform:scaleX(-1)}
-.belu-bubble{position:relative;background:var(--white);border:1.5px solid var(--border-gray);border-radius:16px 16px 16px 4px;padding:10px 14px;font-size:13px;line-height:1.45;color:var(--text);box-shadow:var(--shadow-card);max-width:520px}
-.belu-bubble::before{content:'';position:absolute;left:-7px;bottom:10px;width:12px;height:12px;background:var(--white);border-left:1.5px solid var(--border-gray);border-bottom:1.5px solid var(--border-gray);transform:rotate(45deg)}
 </style>
 </head>
 <body>
@@ -1181,6 +1196,33 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <input type="text" id="pub-host-names" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Ana &amp; Juan">
       <label class="profile-label" data-es="Ubicación" data-en="Location">Ubicación</label>
       <input type="text" id="pub-location" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Jardín El Encanto, Querétaro">
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <label class="profile-label" data-es="Fecha" data-en="Date">Fecha</label>
+          <input type="date" id="pub-date" class="profile-input" oninput="debouncedLivePreview()">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <span class="sublabel" data-es="Hora de inicio" data-en="Start time">Hora de inicio</span>
+          <input type="time" id="pub-time-start" class="profile-input" oninput="debouncedLivePreview()">
+        </div>
+        <div style="flex:1">
+          <span class="sublabel" data-es="Hora de fin" data-en="End time">Hora de fin</span>
+          <input type="time" id="pub-time-end" class="profile-input" oninput="debouncedLivePreview()">
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-3);margin:-.3rem 0 .75rem" data-es="¿Se pospuso el evento? Cambia la fecha aquí — tus recordatorios por correo se ajustan solos." data-en="Event postponed? Change the date here — your email reminders adjust automatically.">¿Se pospuso el evento? Cambia la fecha aquí — tus recordatorios por correo se ajustan solos.</p>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <label class="profile-label" data-es="Hashtag (opcional)" data-en="Hashtag (optional)">Hashtag (opcional)</label>
+          <input type="text" id="pub-hashtag" class="profile-input" oninput="debouncedLivePreview()" placeholder="#AnaYJuan">
+        </div>
+        <div style="flex:1">
+          <label class="profile-label" data-es="Estilo / vibe" data-en="Style / vibe">Estilo / vibe</label>
+          <input type="text" id="pub-vibe" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Bohemia, elegante...">
+        </div>
+      </div>
       <label class="profile-label" data-es="Mensaje o frase de la invitación" data-en="Invitation message or phrase">Mensaje o frase de la invitación</label>
       <input type="text" id="pub-message" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Prepárate para una noche mágica">
       <label class="profile-label" data-es="Dress code (opcional)" data-en="Dress code (optional)">Dress code (opcional)</label>
@@ -1256,7 +1298,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div id="pub-registry-editor" class="line-editor"></div>
       <textarea id="pub-registry" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
 
-      <div class="profile-section-divider" id="pub-story-title" data-es="Nuestra historia (opcional)" data-en="Our story (optional)">Nuestra historia (opcional)</div>
+      <div class="profile-section-divider" id="pub-story-title" data-es="📝 Información (opcional)" data-en="📝 Information (optional)">📝 Información (opcional)</div>
       <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('pub-story','std-story');debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
 
       <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
@@ -1281,7 +1323,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
-      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu celebrando" style="height:96px;width:auto;display:inline-block" onerror="this.style.display='none'"> </span>
+      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu celebrando" style="height:96px;width:auto;display:inline-block" onerror="this.style.display='none';this.parentElement.textContent='🎉';this.parentElement.style.fontSize='36px'"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
@@ -1342,13 +1384,13 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <div id="help-chat-panel" style="display:none;position:fixed;bottom:calc(82px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));width:340px;max-width:calc(100vw - 40px);height:440px;max-height:calc(100vh - 180px);background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:81;flex-direction:column;overflow:hidden">
   <div style="background:linear-gradient(135deg,#7B2FBE,#2EC4B6);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-    <span style="display:inline-flex;align-items:center;gap:7px;font-weight:700;font-size:14px"><svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="17" cy="24" rx="15" ry="7.5" fill="#2EC4B6" opacity=".35" transform="rotate(-24 17 24)"/><ellipse cx="17" cy="24" rx="15" ry="7.5" stroke="#2EC4B6" stroke-width="1.4" opacity=".85" transform="rotate(-24 17 24)"/><ellipse cx="47" cy="24" rx="15" ry="7.5" fill="#7B2FBE" opacity=".3" transform="rotate(24 47 24)"/><ellipse cx="47" cy="24" rx="15" ry="7.5" stroke="#7B2FBE" stroke-width="1.4" opacity=".8" transform="rotate(24 47 24)"/><ellipse cx="18" cy="34" rx="11" ry="5.5" fill="#2EC4B6" opacity=".25" transform="rotate(-10 18 34)"/><ellipse cx="46" cy="34" rx="11" ry="5.5" fill="#7B2FBE" opacity=".22" transform="rotate(10 46 34)"/><ellipse cx="32" cy="42" rx="4.6" ry="7" fill="#1A9E92"/><ellipse cx="32" cy="52" rx="3.4" ry="5.4" fill="#2EC4B6"/><ellipse cx="32" cy="59" rx="2.4" ry="3.4" fill="#7B2FBE"/><path d="M27 10 Q24 5 20.5 4.5" stroke="#1A9E92" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M37 10 Q40 5 43.5 4.5" stroke="#1A9E92" stroke-width="1.6" stroke-linecap="round" fill="none"/><circle cx="20" cy="4.3" r="1.7" fill="#7B2FBE"/><circle cx="44" cy="4.3" r="1.7" fill="#7B2FBE"/><circle cx="32" cy="22" r="13" fill="#1A9E92"/><ellipse cx="27" cy="21" rx="4.2" ry="4.8" fill="#FFFFFF"/><ellipse cx="37" cy="21" rx="4.2" ry="4.8" fill="#FFFFFF"/><circle cx="27.8" cy="22" r="2.3" fill="#0D1B2A"/><circle cx="37.8" cy="22" r="2.3" fill="#0D1B2A"/><circle cx="28.7" cy="21" r=".8" fill="#FFFFFF"/><circle cx="38.7" cy="21" r=".8" fill="#FFFFFF"/><circle cx="23" cy="27" r="1.8" fill="#F49AC1" opacity=".55"/><circle cx="41" cy="27" r="1.8" fill="#F49AC1" opacity=".55"/><path d="M29 28.5 Q32 31 35 28.5" stroke="#0D1B2A" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg><span data-es="Belu — tu asistente personal de eventos" data-en="Belu — your personal event assistant">Belu — tu asistente personal de eventos</span></span>
+    <span style="font-weight:700;font-size:14px" data-es="🪽 Belu — tu asistente de eventos" data-en="🪽 Belu — your event assistant">🪽 Belu — tu asistente de eventos</span>
     <span onclick="toggleHelpChat()" style="cursor:pointer;font-size:18px;line-height:1">✕</span>
   </div>
   <div id="help-chat-messages" style="flex:1;overflow-y:auto;padding:14px;font-size:13.5px"></div>
   <div id="help-chat-quick" style="padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px"></div>
   <div style="padding:10px;border-top:1px solid var(--border-gray);display:flex;gap:8px;align-items:flex-end">
-    <textarea id="help-chat-input" rows="1" placeholder="Pregúntale a Belu…" data-placeholder-es="Pregúntale a Belu…" data-placeholder-en="Ask Belu…" style="flex:1;padding:9px 12px;border-radius:16px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif;resize:none;max-height:90px;overflow-y:auto;line-height:1.35" oninput="autoGrowHelpChatInput(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHelpChatMessage();}"></textarea>
+    <textarea id="help-chat-input" rows="1" placeholder="Escribe tu pregunta…" style="flex:1;padding:9px 12px;border-radius:16px;border:1.5px solid var(--border-gray);font-size:13px;font-family:'Inter',sans-serif;resize:none;max-height:90px;overflow-y:auto;line-height:1.35" oninput="autoGrowHelpChatInput(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendHelpChatMessage();}"></textarea>
     <button onclick="sendHelpChatMessage()" style="width:36px;height:36px;border-radius:50%;background:var(--violet);color:#fff;border:none;cursor:pointer;font-size:14px;flex-shrink:0">➤</button>
   </div>
 </div>
@@ -1690,26 +1732,15 @@ function renderPubEventTypeOptions(){
   sel.innerHTML=names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
 }
 
-// "Nuestra historia" solo tiene sentido tal cual para bodas y aniversarios.
-// Para el resto de eventos se ofrece un campo genérico de información
-// adicional, en vez de preguntas específicas por tipo (más simple y flexible
-// que pedirle a cada anfitrión que encaje su evento en una categoría fija).
-const WEDDING_LIKE_TYPES=['Boda/Wedding','Aniversario/Anniversary'];
-function isWeddingLikeType(typeNameOrRaw){
-  const needle=String(typeNameOrRaw||'').toLowerCase().trim();
-  return WEDDING_LIKE_TYPES.some(k=>k.split('/').some(part=>part.toLowerCase()===needle)||k.toLowerCase()===needle);
-}
+// Campo único de "Información" opcional para TODOS los tipos de evento —
+// antes variaba entre "Nuestra historia" (boda/aniversario) e "Información
+// adicional" (resto); se simplificó a un solo label y placeholder consistentes.
 function updateStorySectionForType(typeNameOrRaw){
   const L=lang==='es';
   const titleEl=document.getElementById('pub-story-title');
   const areaEl=document.getElementById('pub-story');
-  const wedding=isWeddingLikeType(typeNameOrRaw);
-  if(titleEl) titleEl.textContent=wedding
-    ?(L?'💌 Nuestra historia (opcional)':'💌 Our story (optional)')
-    :(L?'📝 Información adicional (opcional)':'📝 Additional information (optional)');
-  if(areaEl) areaEl.placeholder=wedding
-    ?(L?'Nos conocimos hace 10 años...':'We met 10 years ago...')
-    :(L?'Cualquier información general que quieras compartir con tus invitados...':'Any general information you\'d like to share with your guests...');
+  if(titleEl) titleEl.textContent=L?'📝 Información (opcional)':'📝 Information (optional)';
+  if(areaEl) areaEl.placeholder=L?'Cualquier información que quieras compartir con tus invitados...':'Any information you\'d like to share with your guests...';
 }
 
 async function openPublishModal(){
@@ -1739,6 +1770,11 @@ async function openPublishModal(){
   // aparecían si esta invitación se abría directo desde "Mis invitaciones".
   document.getElementById('pub-host-names').value=plan.name||'';
   document.getElementById('pub-location').value=plan.location||'';
+  document.getElementById('pub-date').value=plan.rawDate||'';
+  document.getElementById('pub-time-start').value=plan.timeStartRaw||'';
+  document.getElementById('pub-time-end').value=plan.timeEndRaw||'';
+  document.getElementById('pub-hashtag').value=(plan.extra&&plan.extra.hashtag)||'';
+  document.getElementById('pub-vibe').value=plan.vibe||'';
   document.getElementById('pub-message').value=(plan.stdMessage
     ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
     ||'').trim();
@@ -1891,10 +1927,7 @@ function showInvitationPreview(){
   let extraSections='';
 
   if(story){
-    const wedding=isWeddingLikeType(p.eventTypeRaw||document.getElementById('pub-event-type')?.value||p.typeName);
-    const storyIcon=wedding?'💌':'📝';
-    const storyLabel=wedding?(L?'Nuestra historia':'Our Story'):(L?'Información adicional':'Additional Information');
-    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">${storyIcon} ${esc(storyLabel)}</div><p style="font-size:13px;color:var(--text-2);text-align:center;white-space:pre-wrap">${esc(story)}</p></div>`;
+    extraSections+=`<div style="${extraCardStyle}"><div style="${extraTitleStyle}">📝 ${esc(L?'Información':'Information')}</div><p style="font-size:13px;color:var(--text-2);text-align:center;white-space:pre-wrap">${esc(story)}</p></div>`;
   }
   if(events.length){
     const rows=events.map(ev=>`<div style="padding:8px 0;border-top:1px solid var(--border-gray)"><div style="font-weight:600;font-size:13.5px">${esc(ev.name)}</div>${ev.time?`<div style="font-size:12px;color:var(--text-2)">🕐 ${esc(ev.time)}</div>`:''}${ev.location?`<div style="font-size:12px;color:var(--text-2)">📍 ${esc(ev.location)}</div>`:''}${ev.description?`<div style="font-size:12px;color:var(--text-3);font-style:italic">${esc(ev.description)}</div>`:''}</div>`).join('');
@@ -1925,6 +1958,10 @@ function showInvitationPreview(){
   const previewHostNames=(document.getElementById('pub-host-names')?.value||p.name||'').trim();
   const previewLocation=(document.getElementById('pub-location')?.value||p.location||'').trim();
   const previewMessage=(document.getElementById('pub-message')?.value||'').trim();
+  const previewEdited=getEditedDateTimeVibe();
+  const previewDate=previewEdited.dateDisplay||p.date||'';
+  const previewTime=previewEdited.timeDisplay||p.time||'';
+  const previewHashtag=previewEdited.hashtag||e.hashtag||'';
   const previewHtml=`
     <div class="std-card${photoClass}"${cardStyle}>
       <div class="std-content${pubFontClass?' '+pubFontClass:''}">
@@ -1932,14 +1969,14 @@ function showInvitationPreview(){
         <div class="std-names">${esc(toTitleCase(previewHostNames))}</div>
         <div class="std-divider"><span class="std-divider-icon">◆</span></div>
         <div class="std-details">
-          ${p.date?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(p.date)}</span></div>`:''}
+          ${previewDate?`<div class="std-detail-item"><span class="std-icon">📅</span><span>${esc(previewDate)}</span></div>`:''}
           ${previewLocation?`<div class="std-detail-item"><span class="std-icon">📍</span><span>${esc(previewLocation)}</span></div>`:''}
-          ${p.time?`<div class="std-detail-item"><span class="std-icon">🕕</span><span>${esc(p.time)}</span></div>`:''}
+          ${previewTime?`<div class="std-detail-item"><span class="std-icon">🕕</span><span>${esc(previewTime)}</span></div>`:''}
           ${(()=>{const dc=document.getElementById('pub-dresscode')?.value.trim()||e.dresscode;return dc?`<div class="std-detail-item"><span class="std-icon">👔</span><span>${esc(dc)}</span></div>`:'';})()}
           ${document.getElementById('pub-directions')&&document.getElementById('pub-directions').value.trim()?`<div class="std-detail-item"><span class="std-icon">🗺️</span><span>${esc(document.getElementById('pub-directions').value.trim())}</span></div>`:''}
         </div>
         ${previewMessage?`<div class="std-footer">${esc(previewMessage)}</div>`:''}
-        ${e.hashtag?`<div class="std-hashtag">${esc(e.hashtag)}</div>`:''}
+        ${previewHashtag?`<div class="std-hashtag">${esc(previewHashtag)}</div>`:''}
       </div>
       <div class="std-logo-mark"><svg width="12" height="12" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6"/><ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/></svg><span>DragonflAI</span></div>
     </div>
@@ -2053,6 +2090,13 @@ async function showQRModal(slug,hostNames,hashtag){
 function closePublishModal(){
   document.getElementById('publish-modal').classList.remove('open');
   document.body.style.overflow='';
+  // Si veníamos de EDITAR una invitación, plan._savedId quedó apuntando al
+  // plan de ESA invitación (lo enlazamos en openEditInvitationModal). Hay
+  // que soltarlo aquí — si no, generar un plan nuevo después heredaría ese
+  // id viejo (vía el respaldo _previousSavedId de generate()) y
+  // sobreescribiría el plan equivocado en silencio. Esto es lo que
+  // probablemente causó la confusión de "el-anfitrion" hace unos días.
+  if(editingInvitationId) plan._savedId=null;
   // Restaurar el modal a su estado de "publicar nuevo" para la próxima vez
   editingInvitationId=null;
   const L=lang==='es';
@@ -2068,9 +2112,45 @@ function closePublishModal(){
 }
 
 let lastPublishedUrl='';
+// Hallazgo: si el usuario llena todo el formulario de publicación y no
+// tiene crédito, antes el borrador solo vivía en memoria (se perdía al
+// cerrar la pestaña). Ahora se guarda como fila real (is_published:false)
+// en cuanto topa con el paywall, y esta variable recuerda su id para no
+// crear duplicados si reintenta.
+let pendingDraftInvitationId=null;
 // Datos para generar los mensajes de compartir por invitado (hallazgo V7 #3)
 let lastPublishedGuests=[], lastPublishedHost='', lastPublishedType='';
 let editingInvitationId=null;
+
+// Retomar un borrador (invitación nunca publicada por falta de crédito).
+// Reutiliza TODO el llenado de campos de openEditInvitationModal (ya
+// probado) y solo ajusta lo que distingue "continuar un borrador" de
+// "editar lo ya publicado": el slug sigue siendo editable (no hay link
+// compartido que proteger todavía), y al dar clic en Publicar debe pasar
+// por el flujo normal que sí cobra crédito, no por el de edición gratuita.
+async function continueDraftInvitation(invId){
+  await openEditInvitationModal(invId);
+  editingInvitationId=null;
+  pendingDraftInvitationId=invId;
+  const L=lang==='es';
+  document.getElementById('publish-modal-title').textContent=L?'Continuar borrador':'Continue draft';
+  document.getElementById('publish-modal-sub').textContent=L?'Retómala donde la dejaste — publícala en cuanto tengas acceso.':'Pick up where you left off — publish once you have access.';
+  document.getElementById('publish-btn').textContent=L?'Publicar →':'Publish →';
+  document.getElementById('pub-slug').disabled=false;
+  document.getElementById('pub-slug-locked-note').style.display='none';
+  const editBanner=document.getElementById('pub-editing-banner');
+  if(editBanner) editBanner.style.display='none';
+  const glNote=document.getElementById('pub-guestlist-edit-note'); if(glNote) glNote.style.display='none';
+  document.getElementById('pub-guestlist-hint').textContent=L?'Una fila por invitado — nombre y, si quieres, tope de acompañantes.':'One row per guest — name and, optionally, a plus-one cap.';
+  // A diferencia de editar una invitación YA publicada (donde el campo se
+  // deja vacío a propósito — solo agrega nuevos, sin arriesgar RSVPs
+  // reales), un borrador no puede tener RSVPs todavía: se repuebla con la
+  // lista completa que ya se había guardado, para que no se vea "perdida".
+  try{
+    const {data:draftGuests}=await sb.from('guest_list').select('guest_name,group_name,max_companions').eq('invitation_id',invId);
+    document.getElementById('pub-guest-list').value=stringifyGuestList(draftGuests||[]);
+  }catch(err){ console.error('No se pudo recuperar la lista del borrador:',err); }
+}
 
 async function openEditInvitationModal(invId){
   if(!sb||!currentUser) return;
@@ -2082,6 +2162,11 @@ async function openEditInvitationModal(invId){
   if(error||!inv){ showToast(L?'No se pudo cargar la invitación':'Could not load the invitation',true); return; }
 
   editingInvitationId=invId;
+  // Enlazar con el plan REAL de esta invitación — sin esto, cualquier
+  // guardado del plan durante la edición (ej. al sincronizar una fecha
+  // pospuesta) podía crear un plan duplicado, o peor, sobreescribir uno
+  // viejo que hubiera quedado en memoria de una sesión anterior.
+  plan._savedId=inv.plan_id||null;
 
   // Textos del modal en modo edición
   document.getElementById('publish-modal-title').textContent=L?'Editar invitación':'Edit invitation';
@@ -2118,6 +2203,12 @@ async function openEditInvitationModal(invId){
   // entraste directo desde "Mis invitaciones" sin generar nada en la sesión.
   document.getElementById('pub-host-names').value=inv.host_names||'';
   document.getElementById('pub-location').value=inv.location||'';
+  document.getElementById('pub-date').value=inv.event_date_raw||'';
+  const parsedTimes=parseDisplayTimeRange(inv.event_time);
+  document.getElementById('pub-time-start').value=parsedTimes.start;
+  document.getElementById('pub-time-end').value=parsedTimes.end;
+  document.getElementById('pub-hashtag').value=inv.hashtag||'';
+  document.getElementById('pub-vibe').value=inv.vibe||'';
   document.getElementById('pub-message').value=inv.message||'';
   document.getElementById('pub-dresscode').value=inv.dress_code||'';
   document.getElementById('pub-organizer-name').value=inv.organizer_name||'';
@@ -2198,6 +2289,20 @@ function parseGuestList(text){
     }
   });
   return entries;
+}
+
+// Inversa de parseGuestList — para repoblar el textarea con lo que ya se
+// había guardado (ej. al retomar un borrador), en el mismo formato que la
+// persona ya conoce de escribirlo a mano.
+function stringifyGuestList(rows){
+  if(!Array.isArray(rows)||!rows.length) return '';
+  const groups={}; const solo=[];
+  rows.forEach(r=>{
+    if(r.group_name){ (groups[r.group_name]=groups[r.group_name]||[]).push(r.guest_name); }
+    else solo.push(r.max_companions?`${r.guest_name}, ${r.max_companions}`:r.guest_name);
+  });
+  const groupLines=Object.keys(groups).map(g=>`${g}: ${groups[g].join(', ')}`);
+  return [...groupLines,...solo].join('\n');
 }
 
 // "Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia"
@@ -2396,6 +2501,22 @@ function stringifyRegistryLinks(arr){
   return (arr||[]).map(r=>`${r.name} | ${r.url}`).join('\n');
 }
 
+// Lee fecha/hora/hashtag/vibe del modal (compartido entre publicar nuevo y
+// editar) y calcula las versiones de exhibición — mismo formato que usa
+// generate() para que se vea igual en toda la app.
+function getEditedDateTimeVibe(){
+  const rawDate=document.getElementById('pub-date').value||'';
+  const timeStart=document.getElementById('pub-time-start').value||'';
+  const timeEnd=document.getElementById('pub-time-end').value||'';
+  const dateDisplay=rawDate?new Date(rawDate+' ').toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'long',day:'numeric',year:'numeric'}):'';
+  const timeDisplay=formatTimeRange(timeStart,timeEnd,lang);
+  return {
+    rawDate,timeStart,timeEnd,dateDisplay,timeDisplay,
+    hashtag:document.getElementById('pub-hashtag').value.trim(),
+    vibe:document.getElementById('pub-vibe').value.trim()
+  };
+}
+
 async function publishInvitation(){
   if(!sb||!currentUser) return;
   const L=lang==='es';
@@ -2406,12 +2527,18 @@ async function publishInvitation(){
     const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
     let guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
     const restrictToList=document.getElementById('pub-restrict-list').checked;
+    const edited=getEditedDateTimeVibe();
 
     const updatePayload={
       theme,
       event_type: document.getElementById('pub-event-type').value||null,
       host_names: document.getElementById('pub-host-names').value.trim()||null,
       location: document.getElementById('pub-location').value.trim()||null,
+      event_date: edited.dateDisplay||null,
+      event_date_raw: edited.rawDate||null,
+      event_time: edited.timeDisplay||null,
+      hashtag: edited.hashtag||null,
+      vibe: edited.vibe||null,
       message: document.getElementById('pub-message').value.trim()||null,
       dress_code: document.getElementById('pub-dresscode').value.trim()||null,
       organizer_name: document.getElementById('pub-organizer-name').value.trim()||null,
@@ -2442,6 +2569,22 @@ async function publishInvitation(){
       showToast((L?'No se pudo guardar: ':'Could not save: ')+(error.message||error.code||''),true);
       console.error('editInvitation error:',error);
       return;
+    }
+
+    // Sincronizar la fecha/hora editada de vuelta al plan — los
+    // recordatorios por correo leen la fecha DEL PLAN, no de la invitación.
+    // Sin esto, posponer el evento aquí dejaría los recordatorios llegando
+    // según la fecha vieja.
+    if(edited.rawDate){
+      plan.rawDate=edited.rawDate;
+      plan.date=edited.dateDisplay;
+      plan.timeStartRaw=edited.timeStart;
+      plan.timeEndRaw=edited.timeEnd;
+      plan.time=edited.timeDisplay;
+      plan.vibe=edited.vibe;
+      plan.extra=plan.extra||{};
+      plan.extra.hashtag=edited.hashtag;
+      await ensurePlanSaved();
     }
 
     // Agregar invitados NUEVOS a la lista existente — nunca se borra ni reemplaza lo que ya había
@@ -2482,66 +2625,122 @@ async function publishInvitation(){
   }
 
   // ── MODO PUBLICAR NUEVO ──
-  const result=await tryUnlockAccess('diy');
-  if(!result.success){ closePublishModal(); openExcelPaywall('publish'); return; }
   const slug=slugify(document.getElementById('pub-slug').value);
   if(!slug){ showToast(lang==='es'?'Escribe un link válido':'Enter a valid link',true); return; }
 
-  const publishedViaPlanner=result.method==='planner_credit'||result.method==='planner_unlimited';
+  // Payload compartido entre "publicar" y "guardar borrador" — una sola
+  // fuente de verdad para no duplicar 30 campos en dos lugares y arriesgar
+  // que se desincronicen. viaPlanner se pasa explícito (no lee `result`)
+  // para poder usarse también ANTES de intentar desbloquear el acceso.
   const p=plan, e=p.extra||{};
-  // Estos 3 ahora se leen de los campos editables del modal (fuente de
-  // verdad), con el plan/la tarjeta como respaldo si el usuario no los tocó.
-  const hostNames=(document.getElementById('pub-host-names').value.trim()||p.name||'');
-  const location=(document.getElementById('pub-location').value.trim()||p.location||'');
-  const stdMessage=(document.getElementById('pub-message').value.trim()
-    ||p.stdMessage
-    ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
-    ||'').trim();
-  const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
+  function buildInvitationPayload(isPublished,viaPlanner){
+    const hostNames=(document.getElementById('pub-host-names').value.trim()||p.name||'');
+    const location=(document.getElementById('pub-location').value.trim()||p.location||'');
+    const stdMessage=(document.getElementById('pub-message').value.trim()
+      ||p.stdMessage
+      ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
+      ||'').trim();
+    const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
+    const guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
+    const restrictToList=document.getElementById('pub-restrict-list').checked && guestListEntries.length>0;
+    const edited=getEditedDateTimeVibe();
+    return {
+      user_id: currentUser.id,
+      plan_id: plan._savedId||null,
+      slug,
+      is_published: isPublished,
+      published_via_planner: !!(isPublished&&viaPlanner),
+      host_names: hostNames,
+      event_type: document.getElementById('pub-event-type').value||p.typeName||'',
+      event_date: edited.dateDisplay||p.date||'',
+      event_date_raw: edited.rawDate||p.rawDate||null,
+      event_time: edited.timeDisplay||p.time||'',
+      location: location,
+      dress_code: document.getElementById('pub-dresscode').value.trim()||e.dresscode||'',
+      organizer_name: document.getElementById('pub-organizer-name').value.trim()||null,
+      organizer_phone: document.getElementById('pub-organizer-phone').value.trim()||null,
+      hashtag: edited.hashtag||e.hashtag||'',
+      message: stdMessage||null,
+      vibe: edited.vibe||p.vibe||'',
+      theme,
+      ask_guest_count: document.getElementById('pub-ask-guests').checked,
+      ask_dietary: document.getElementById('pub-ask-dietary').checked,
+      ask_message: document.getElementById('pub-ask-message').checked,
+      ask_song_request: document.getElementById('pub-ask-song').checked,
+      ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
+      directions_info: document.getElementById('pub-directions').value.trim()||null,
+      custom_question: document.getElementById('pub-custom-question').value.trim()||null,
+      restrict_to_guest_list: restrictToList,
+      events_schedule: parseEventsSchedule(document.getElementById('pub-events').value),
+      lodging_info: document.getElementById('pub-lodging').value.trim()||null,
+      map_url: document.getElementById('pub-map-url').value.trim()||null,
+      registry_links: parseRegistryLinks(document.getElementById('pub-registry').value),
+      couple_story: document.getElementById('pub-story').value.trim()||null,
+      faq: parseFAQ(document.getElementById('pub-faq').value),
+      gallery_urls: pubGalleryUrls,
+      background_image_url: pubBackgroundImageUrl,
+      custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
+      font_family: pubFontClass||null,
+      text_color: pubTextColor
+    };
+  }
+
+  // Guarda (o actualiza) un borrador NO publicado — best-effort y silencioso:
+  // si falla, el usuario no pierde nada porque el formulario sigue lleno en
+  // pantalla; esto es solo una red de seguridad extra por si cierra la
+  // pestaña antes de pagar.
+  async function saveInvitationDraft(){
+    try{
+      const draftPayload=buildInvitationPayload(false,false);
+      let draftId=pendingDraftInvitationId;
+      if(draftId){
+        await sb.from('invitations').update(draftPayload).eq('id',draftId);
+      } else {
+        const {data,error:dErr}=await sb.from('invitations').insert(draftPayload).select('id').single();
+        if(dErr || !data) return;
+        draftId=data.id;
+        pendingDraftInvitationId=draftId;
+      }
+      // Lista de invitados del borrador: un borrador nunca es público
+      // (get_public_invitation e i.is_published=true lo bloquean), así que
+      // es IMPOSIBLE que ya existan RSVPs reales sobre él todavía — por eso
+      // aquí sí es seguro reemplazar la lista completa en cada guardado, a
+      // diferencia del modo "editar invitación ya publicada" (que solo
+      // agrega nombres nuevos, para no arriesgar respuestas de invitados).
+      const draftGuests=parseGuestList(document.getElementById('pub-guest-list').value);
+      await sb.from('guest_list').delete().eq('invitation_id',draftId);
+      if(draftGuests.length>0){
+        const draftRows=draftGuests.map(g=>({invitation_id:draftId,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null,guest_email:pubGuestEmails[g.guest_name]||null}));
+        await sb.from('guest_list').insert(draftRows);
+      }
+    }catch(err){ console.error('saveInvitationDraft error:',err); }
+  }
+
+  // ── Intentar desbloquear acceso; si no hay crédito, guardar borrador ──
+  const result=await tryUnlockAccess('diy');
+  if(!result.success){
+    // Antes cerrábamos el modal aquí, perdiendo todo lo que ya se había
+    // llenado (itinerario, historia, galería, tema elegido...). Ahora el
+    // formulario se queda abierto DEBAJO del paywall, Y de paso se guarda
+    // como borrador en la base de datos — al pagar o canjear un código,
+    // basta con volver a dar clic en "Publicar" (incluso en otra sesión).
+    showToast(lang==='es'?'Ya casi — solo falta desbloquear el acceso para publicar':'Almost there — just unlock access to publish',true);
+    openExcelPaywall('publish');
+    saveInvitationDraft();
+    return;
+  }
+
   const guestListEntries=parseGuestList(document.getElementById('pub-guest-list').value);
-  const restrictToList=document.getElementById('pub-restrict-list').checked && guestListEntries.length>0;
+  const viaPlanner=result.method==='planner_credit'||result.method==='planner_unlimited';
 
-  const payload={
-    user_id: currentUser.id,
-    plan_id: plan._savedId||null,
-    slug,
-    is_published: true,
-    published_via_planner: publishedViaPlanner,
-    host_names: hostNames,
-    event_type: document.getElementById('pub-event-type').value||p.typeName||'',
-    event_date: p.date||'',
-    event_date_raw: p.rawDate||null,
-    event_time: p.time||'',
-    location: location,
-    dress_code: document.getElementById('pub-dresscode').value.trim()||e.dresscode||'',
-    organizer_name: document.getElementById('pub-organizer-name').value.trim()||null,
-    organizer_phone: document.getElementById('pub-organizer-phone').value.trim()||null,
-    hashtag: e.hashtag||'',
-    message: stdMessage||null,
-    vibe: p.vibe||'',
-    theme,
-    ask_guest_count: document.getElementById('pub-ask-guests').checked,
-    ask_dietary: document.getElementById('pub-ask-dietary').checked,
-    ask_message: document.getElementById('pub-ask-message').checked,
-    ask_song_request: document.getElementById('pub-ask-song').checked,
-    ask_lodging_need: document.getElementById('pub-ask-lodging').checked,
-    directions_info: document.getElementById('pub-directions').value.trim()||null,
-    custom_question: document.getElementById('pub-custom-question').value.trim()||null,
-    restrict_to_guest_list: restrictToList,
-    events_schedule: parseEventsSchedule(document.getElementById('pub-events').value),
-    lodging_info: document.getElementById('pub-lodging').value.trim()||null,
-    map_url: document.getElementById('pub-map-url').value.trim()||null,
-    registry_links: parseRegistryLinks(document.getElementById('pub-registry').value),
-    couple_story: document.getElementById('pub-story').value.trim()||null,
-    faq: parseFAQ(document.getElementById('pub-faq').value),
-    gallery_urls: pubGalleryUrls,
-    background_image_url: pubBackgroundImageUrl,
-    custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
-    font_family: pubFontClass||null,
-    text_color: pubTextColor
-  };
-
-  const {data:newInv,error}=await sb.from('invitations').insert(payload).select().single();
+  let newInv, error;
+  if(pendingDraftInvitationId){
+    // Ya había un borrador de este mismo plan (topó el paywall antes) —
+    // lo actualizamos a publicado en vez de insertar una fila duplicada.
+    ({data:newInv,error}=await sb.from('invitations').update(buildInvitationPayload(true,viaPlanner)).eq('id',pendingDraftInvitationId).select().single());
+  } else {
+    ({data:newInv,error}=await sb.from('invitations').insert(buildInvitationPayload(true,viaPlanner)).select().single());
+  }
   if(error){
     if(error.code==='23505'){
       const suggestion=slug+'-'+Math.floor(Math.random()*900+100);
@@ -2562,8 +2761,15 @@ async function publishInvitation(){
     return;
   }
 
-  // Si el anfitrión pegó una lista de invitados, la guardamos ligada a esta invitación
+  // Si el anfitrión pegó una lista de invitados, la guardamos ligada a esta
+  // invitación. Se borra+inserta (no solo insert) porque si esto venía de
+  // un borrador, saveInvitationDraft() ya pudo haber guardado una lista
+  // antes — así nunca se duplica, y de paso siempre queda la versión más
+  // reciente de lo que el anfitrión escribió.
   let guestListFailed=false;
+  if(newInv){
+    await sb.from('guest_list').delete().eq('invitation_id',newInv.id);
+  }
   if(guestListEntries.length>0 && newInv){
     const rows=guestListEntries.map(g=>({invitation_id:newInv.id,guest_name:g.guest_name,max_companions:g.max_companions,group_name:g.group_name||null,guest_email:pubGuestEmails[g.guest_name]||null}));
     const {error:glError}=await sb.from('guest_list').insert(rows);
@@ -2587,6 +2793,7 @@ async function publishInvitation(){
   }catch(err){
     console.error('Error generando el QR con diseño:',err);
   }
+  pendingDraftInvitationId=null;
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
   const bottomCloseEl2=document.getElementById('publish-modal-bottom-close'); if(bottomCloseEl2) bottomCloseEl2.style.display='block';
@@ -2626,13 +2833,31 @@ async function loadMyInvitations(){
     return;
   }
   listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
-  const {data:invs,error}=await sb.from('invitations').select('id,slug,host_names,event_date,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  const {data:invs,error}=await sb.from('invitations').select('id,slug,host_names,event_date,created_at,is_published').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!invs||!invs.length){
     listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Todavía no has publicado ninguna invitación.':'You have not published any invitations yet.'}</p>`;
     return;
   }
   listEl.innerHTML='';
   for(const inv of invs){
+    // Borrador (topó el paywall y aún no se publica): tarjeta simplificada,
+    // sin botones que asumen que ya existe un link público (RSVPs, QR,
+    // recordatorios...) porque para un borrador ese link no existe todavía.
+    if(inv.is_published===false){
+      const draftDiv=document.createElement('div');
+      draftDiv.style.cssText='padding:14px 0;border-bottom:1px solid var(--border-gray)';
+      draftDiv.innerHTML=`
+        <div style="margin-bottom:8px">
+          <div style="font-weight:600;font-size:15px;word-break:break-word">${esc(toTitleCase(inv.host_names||''))||(L?'(Sin nombre aún)':'(No name yet)')}</div>
+          <span style="display:inline-block;margin-top:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;background:#FDF0D5;color:#9A6B00">⏳ ${L?'Pendiente de pago':'Pending payment'}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-account" style="background:var(--teal);color:#fff;border-color:var(--teal)" onclick="continueDraftInvitation('${inv.id}')">✨ ${L?'Continuar y publicar':'Continue & publish'}</button>
+          <button class="btn-account" title="${L?'Eliminar borrador':'Delete draft'}" style="color:#C14A5E" onclick="deleteInvitation('${inv.id}','${esc(inv.host_names||'').replace(/'/g,"")}')">🗑️ ${L?'Eliminar':'Delete'}</button>
+        </div>`;
+      listEl.appendChild(draftDiv);
+      continue;
+    }
     const {count:yesCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',true);
     const {count:noCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',false);
     const {count:guestListTotal}=await sb.from('guest_list').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id);
@@ -3424,8 +3649,6 @@ function setLang(l){
   ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
   const vibeInput=document.getElementById('f-vibe');
   vibeInput.placeholder=vibeInput.getAttribute('data-placeholder-'+l)||vibeInput.placeholder;
-  const beluChat=document.getElementById('help-chat-input');
-  if(beluChat) beluChat.placeholder=beluChat.getAttribute('data-placeholder-'+l)||beluChat.placeholder;
   renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
@@ -3634,14 +3857,16 @@ function adjGuests(d){guests=Math.max(5,Math.min(1000,guests+d));document.getEle
 
 function updateProgress(){
   let s=30;
-  const hasName=document.getElementById('name-couple-row').style.display==='grid'
-    ?(document.getElementById('f-name-1').value||document.getElementById('f-name-2').value)
-    :document.getElementById('f-name').value;
+  const coupleRowEl=document.getElementById('name-couple-row');
+  const hasName=coupleRowEl&&coupleRowEl.style.display==='grid'
+    ?(document.getElementById('f-name-1')?.value||document.getElementById('f-name-2')?.value)
+    :document.getElementById('f-name')?.value;
   if(hasName) s+=15;
-  if(document.getElementById('f-location').value) s+=15;
-  const n=document.getElementById('f-notes').value;
+  if(document.getElementById('f-location')?.value) s+=15;
+  const n=document.getElementById('f-notes')?.value||'';
   if(n.length>20) s+=20; if(n.length>80) s+=20;
-  document.getElementById('prog-fill').style.width=Math.min(100,s)+'%';
+  const fillEl=document.getElementById('prog-fill');
+  if(fillEl) fillEl.style.width=Math.min(100,s)+'%';
 }
 
 function updateGenBadge(){
@@ -3678,6 +3903,9 @@ let plannerCreditSpentThisSession=false;
 
 async function generate(){
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
+  // Nuevo plan → cualquier borrador de invitación pendiente pertenece al
+  // plan ANTERIOR; no debe mezclarse con este.
+  pendingDraftInvitationId=null;
 
   // El Worker de IA ahora exige sesión (protección de costos del lado del
   // servidor) — pedimos login ANTES de empezar, para dar un mensaje claro
@@ -3835,6 +4063,11 @@ async function generate(){
   // ══════════════════════════════
   const budgetResult=buildBudget();
   plan.budgetData=budgetResult.budget;
+  // budgetTips y paqueteInfo también se persisten — antes solo vivían en
+  // esta variable local y se perdían al re-renderizar el tab (ej. al
+  // agregar/quitar una categoría o ajustar con cotizaciones reales).
+  plan.budgetTips=budgetResult.budgetTips;
+  plan.paqueteInfo=budgetResult.paqueteInfo;
   plan.timelineData=buildTimeline();
   plan.dayItineraryData=buildDayItinerary();
   plan.checklistData=buildChecklist();
@@ -3844,12 +4077,16 @@ async function generate(){
   // texto corrido) — se guarda el estado en el plan para que persista igual
   // que el checklist general.
   plan.vendorQuestionsData=(vendorsResult.vendorQuestions||[]).map(q=>({text:q,checked:false}));
+  // Igual para los tips de negociación — antes solo vivían en una variable
+  // local (vendorsResult.negotiationTips) que se perdía al agregar o quitar
+  // un proveedor y volver a renderizar la pestaña.
+  plan.negotiationTipsData=vendorsResult.negotiationTips||[];
 
   setTabHTML('budget',renderBudget(budgetResult.budget,budgetResult.budgetTips,budgetResult.paqueteInfo));
   setTabHTML('timeline',renderTimeline(plan.timelineData));
   setTabHTML('dayitinerary',renderDayItinerary(plan.dayItineraryData));
   setTabHTML('checklist',renderChecklist(plan.checklistData));
-  setTabHTML('vendors',renderVendors(vendorsResult.vendors,plan.vendorQuestionsData,vendorsResult.negotiationTips));
+  setTabHTML('vendors',renderVendors(plan.vendorsData,plan.vendorQuestionsData,plan.negotiationTipsData));
 
   // ══════════════════════════════
   //  LLAMADAS A IA — SOLO LO QUE REALMENTE NECESITA REDACCIÓN
@@ -4037,7 +4274,7 @@ function ideasToolbar(){
   const L=lang==='es';
   return `<div class="ideas-refine">
     <input type="text" id="ideas-refine-input" placeholder="${L?'ej. paleta dorada, ideas más económicas, sin globos…':'e.g. gold palette, cheaper ideas, no balloons…'}">
-    <button type="button" class="btn-account" id="ideas-refine-btn" onclick="regenerateIdeas()">🔄 ${L?'Regenerar ideas':'Regenerate ideas'}</button>
+    <button type="button" class="btn-account btn-regen-ideas" id="ideas-refine-btn" onclick="regenerateIdeas()">🔄 ${L?'Regenerar ideas':'Regenerate ideas'}</button>
     <p class="ideas-refine-hint">${L?'Solo se rehace esta pestaña — tu cronograma, presupuesto y checklist quedan intactos.':'Only this tab is redone — your timeline, budget and checklist stay untouched.'}</p>
   </div>`;
 }
@@ -4051,6 +4288,7 @@ ${ctx}
 ${note?`USER ADJUSTMENT REQUEST — TOP PRIORITY, follow it above everything else: "${note}"`:''}
 Create ONLY the creative-ideas section for this event. NEVER use <h1>, page titles, or inline style attributes — only <h2>, <h3>, <p>, <ul><li>, <strong>.
 CRITICAL BUDGET RULE: The total budget is ${p.budget} for ${p.guests} guests — EVERY suggestion must be realistically achievable within it. With a modest budget, favor affordable options: seasonal LOCAL flowers (NEVER peonies, imported blooms, or premium florals unless the budget is clearly high-end), DIY-friendly decor, and rentals over purchases. Never propose luxury items or costly themes that don't match the stated budget.
+${p.extra&&p.extra.edadFestejado?`CRITICAL AGE RULE: The guest of honor is turning ${p.extra.edadFestejado}. Every idea must genuinely fit that age (supervision needs, attention span, themes). Do not default to generic "kids party" ideas that ignore the specific age given.`:''}
 Reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".
 Include:
 1. Signature moment
@@ -4099,6 +4337,7 @@ Use <h2>, <p>, <ul><li>, <strong>. Include: personalized intro, event snapshot a
 
 === SECTION 2: CREATIVE IDEAS ===
 CRITICAL BUDGET RULE: The total budget is ${p.budget} for ${p.guests} guests — EVERY suggestion must be realistically achievable within it. With a modest budget, favor affordable options: seasonal LOCAL flowers (NEVER peonies, imported blooms, or premium florals unless the budget is clearly high-end), DIY-friendly decor, and rentals over purchases. Never propose luxury items or costly themes that don't match the stated budget.
+${p.extra&&p.extra.edadFestejado?`CRITICAL AGE RULE: The guest of honor is turning ${p.extra.edadFestejado}. Every idea — games, activities, music references, decor complexity, level of independence assumed — MUST genuinely fit that age. A 3-year-old's party looks nothing like a 12-year-old's: adjust supervision needs, attention span, and themes accordingly. Do not default to generic "kids party" ideas that ignore the specific age given.`:''}
 Reference their vibe "${p.vibe}", location "${p.location}", must-haves, and details "${p.notes||'none'}".
 Use <h2>, <p>, <ul><li>:
 1. Signature moment
@@ -4182,6 +4421,25 @@ function wrapSTDCard(cardHtml){
 //  La personalización viene de los datos reales del usuario (fecha, presupuesto,
 //  prioridad, must-haves seleccionados) en vez de pedirle a la IA que "adivine".
 // ══════════════════════════════
+
+// Inversa de formatTimeRange — necesaria para precargar los inputs
+// type="time" al editar una invitación ya publicada (donde solo se guardó
+// el texto de exhibición, no la hora en formato de máquina).
+function parseDisplayTimeRange(display){
+  if(!display) return {start:'',end:''};
+  const matches=[...String(display).matchAll(/(\d{1,2}):(\d{2})\s*(AM|PM)/gi)];
+  const to24=(h,m,ap)=>{
+    h=parseInt(h,10); m=parseInt(m,10);
+    const isPM=/pm/i.test(ap);
+    if(isPM&&h!==12) h+=12;
+    if(!isPM&&h===12) h=0;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+  };
+  return {
+    start:matches[0]?to24(matches[0][1],matches[0][2],matches[0][3]):'',
+    end:matches[1]?to24(matches[1][1],matches[1][2],matches[1][3]):''
+  };
+}
 
 function formatTimeRange(start,end,lang){
   const fmt=t=>{
@@ -5075,18 +5333,97 @@ function renderProposalSummary(){
 function renderBudget(items,tips,paquete){
   if(!Array.isArray(items)||!items.length) return '';
   const L=plan.lang==='es';
-  const cards=items.map(b=>`<div class="bcard${b.isReal?' bcard-real':''}"><div class="bcard-label">${esc(b.label)}${b.isReal?` <span class="bcard-real-tag">✓ ${L?'Real':'Actual'}</span>`:''}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div></div>`).join('');
+  const canRemove=items.length>1;
+  const cards=items.map((b,bi)=>`<div class="bcard${b.isReal?' bcard-real':''}" style="position:relative">${canRemove?`<span onclick="removeBudgetCategory(${bi})" style="position:absolute;top:6px;right:8px;color:var(--text-3);font-size:13px;cursor:pointer" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}<div class="bcard-label">${esc(b.label)}${b.isReal?` <span class="bcard-real-tag">✓ ${L?'Real':'Actual'}</span>`:''}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div></div>`).join('');
   const tipsHtml=(tips||[]).map(t=>`<li>${esc(t)}</li>`).join('');
-  return `<div class="bcards">${cards}</div><h2>${L?'Consejos de presupuesto':'Budget tips'}</h2><ul>${tipsHtml}</ul><h2>${L?'Opción paquete todo incluido':'All-inclusive package option'}</h2><p>${esc(paquete||'')}</p>`;
+  return `<div class="bcards">${cards}</div>
+    <button type="button" onclick="addBudgetCategory()" style="display:block;width:100%;padding:10px;border-radius:var(--radius);border:1.5px dashed var(--border-strong);background:transparent;color:var(--teal-dark);font-weight:600;font-size:13px;cursor:pointer;margin:.75rem 0 1.25rem">+ ${L?'Agregar categoría':'Add category'}</button>
+    <p style="font-size:11px;color:var(--text-3);margin:-1rem 0 1rem">${L?'Al agregar o quitar una categoría, el resto se ajusta solo para que siga sumando el 100% de tu presupuesto.':'Adding or removing a category automatically adjusts the rest so it still adds up to 100% of your budget.'}</p>
+    <h2>${L?'Consejos de presupuesto':'Budget tips'}</h2><ul>${tipsHtml}</ul><h2>${L?'Opción paquete todo incluido':'All-inclusive package option'}</h2><p>${esc(paquete||'')}</p>`;
+}
+
+// Recalcula montos en dólares a partir del % de cada categoría, y corrige
+// el redondeo en la última para que la suma sea EXACTA al presupuesto total
+// (nunca $0.37 de diferencia por acumulación de redondeos).
+function recalcBudgetAmounts(total){
+  const data=plan.budgetData;
+  if(!Array.isArray(data)||!data.length) return;
+  let sumPct=data.reduce((s,b)=>s+b.pct,0);
+  data[data.length-1].pct+=(100-sumPct);
+  data.forEach(b=>{ b.amount=Math.round(total*b.pct/100); });
+  let sumAmt=data.reduce((s,b)=>s+b.amount,0);
+  data[data.length-1].amount+=(total-sumAmt);
+}
+
+function addBudgetCategory(){
+  const L=plan.lang==='es';
+  const name=prompt(L?'Nombre de la nueva categoría:':'New category name:');
+  if(!name||!name.trim()) return;
+  if(!Array.isArray(plan.budgetData)||!plan.budgetData.length) return;
+  const total=parseInt(plan.budget)||plan.budgetData.reduce((s,b)=>s+b.amount,0);
+  const newPct=10; // punto de partida razonable — el usuario puede seguir cotizando y ajustando con precios reales
+  const scale=(100-newPct)/100;
+  plan.budgetData.forEach(b=>{ b.pct=Math.round(b.pct*scale); });
+  plan.budgetData.push({label:name.trim(),pct:newPct,amount:0,custom:true});
+  recalcBudgetAmounts(total);
+  setTabHTML('budget',renderBudget(plan.budgetData,plan.budgetTips,plan.paqueteInfo));
+  showToast(L?'✅ Categoría agregada':'✅ Category added');
+  schedulePlanResave();
+}
+
+function removeBudgetCategory(bi){
+  if(!Array.isArray(plan.budgetData)||plan.budgetData.length<=1) return;
+  const L=plan.lang==='es';
+  const total=parseInt(plan.budget)||plan.budgetData.reduce((s,b)=>s+b.amount,0);
+  const removedPct=plan.budgetData[bi].pct;
+  plan.budgetData.splice(bi,1);
+  const sumRemaining=plan.budgetData.reduce((s,b)=>s+b.pct,0)||1;
+  plan.budgetData.forEach(b=>{ b.pct=Math.round(b.pct+(removedPct*b.pct/sumRemaining)); });
+  recalcBudgetAmounts(total);
+  setTabHTML('budget',renderBudget(plan.budgetData,plan.budgetTips,plan.paqueteInfo));
+  showToast(L?'🗑️ Categoría quitada':'🗑️ Category removed');
+  schedulePlanResave();
 }
 
 function renderTimeline(items){
-  if(!Array.isArray(items)||!items.length) return '';
-  const rows=items.map(t=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-when">${esc(t.when)}</div><div class="tl-what">${esc(t.what)}</div><div class="tl-detail">${esc(t.detail)}</div></div>`).join('');
-  return `<div class="timeline">${rows}</div>`;
+  const L=plan.lang==='es';
+  const hint=L?'Quita lo que no aplique y agrega tus propias actividades — tu itinerario se guarda solo.':'Remove what doesn\'t apply and add your own activities — your timeline saves automatically.';
+  const rows=(items||[]).map((t,i)=>`<div class="tl-item" style="display:flex;align-items:flex-start;gap:8px">
+    <div style="flex:1;position:relative">
+      <div class="tl-dot"></div><div class="tl-when">${esc(t.when)}</div><div class="tl-what">${esc(t.what)}</div>${t.detail?`<div class="tl-detail">${esc(t.detail)}</div>`:''}
+    </div>
+    <span onclick="removeTimelineItem(${i})" style="color:var(--text-3);font-size:15px;cursor:pointer;flex-shrink:0;padding-top:2px" title="${L?'Quitar':'Remove'}">✕</span>
+  </div>`).join('');
+  const addForm=`<div style="display:flex;gap:8px;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray);flex-wrap:wrap">
+    <input type="text" id="tl-new-when" placeholder="${L?'ej. Sábado 5:00 PM':'e.g. Saturday 5:00 PM'}" style="width:150px;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px">
+    <input type="text" id="tl-new-what" placeholder="${L?'ej. Corte de pastel':'e.g. Cake cutting'}" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addTimelineItem();}">
+    <button type="button" onclick="addTimelineItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
+  </div>`;
+  if(!Array.isArray(items)||!items.length) return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${addForm}`;
+  return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p><div class="timeline">${rows}</div>${addForm}`;
 }
 
-// ── Belu acompañante: helpers reutilizables ──
+function addTimelineItem(){
+  const whenEl=document.getElementById('tl-new-when'), whatEl=document.getElementById('tl-new-what');
+  const what=whatEl?.value.trim();
+  if(!what) return;
+  const when=whenEl?.value.trim()||'';
+  if(!Array.isArray(plan.timelineData)) plan.timelineData=[];
+  plan.timelineData.push({when,what,detail:''});
+  setTabHTML('timeline',renderTimeline(plan.timelineData));
+  schedulePlanResave();
+}
+
+function removeTimelineItem(i){
+  if(!Array.isArray(plan.timelineData)) return;
+  plan.timelineData.splice(i,1);
+  setTabHTML('timeline',renderTimeline(plan.timelineData));
+  schedulePlanResave();
+}
+
+// Assets del personaje Belu — PNG con fondo transparente. Todos los usos
+// llevan onerror que oculta la imagen si el asset no está desplegado aún,
+// para que la app nunca muestre un ícono roto.
 const BELU_ASSET=p=>`/assets/belu/belu-${p}.png`;
 function beluDialogHTML(pose,text,imgH=72,flip=false){
   return `<div class="belu-dialog"><img src="${BELU_ASSET(pose)}" alt="Belu" class="belu-dialog-img${flip?' belu-flip':''}" style="height:${imgH}px" onerror="this.closest('.belu-dialog').style.display='none'"><div class="belu-bubble">${text}</div></div>`;
@@ -5132,14 +5469,12 @@ function updateChecklistProgressBar(){
   const L=plan.lang==='es';
   const labelEl=document.getElementById('checklist-progress-label');
   const fillEl=document.getElementById('checklist-progress-fill');
-  const msgEl=document.getElementById('checklist-progress-belu-msg');
   if(labelEl) labelEl.textContent=`${done}/${total} ${L?'tareas':'tasks'} — ${pct}%`;
   if(fillEl) fillEl.style.width=pct+'%';
   const poseEl=document.getElementById('checklist-belu-pose');
   const textEl=document.getElementById('checklist-belu-text');
   if(poseEl) poseEl.src=BELU_ASSET(beluPoseForPct(pct));
   if(textEl) textEl.textContent=beluProgressMessage(pct,L);
-  else if(msgEl) msgEl.textContent=`🦋 ${beluProgressMessage(pct,L)}`;
 }
 
 function renderChecklist(sections){
@@ -5149,11 +5484,53 @@ function renderChecklist(sections){
   const body=sections.map((s,si)=>{
     const items=(s.items||[]).map((i,ii)=>{
       if(i.selected===undefined) i.selected=true; // por defecto viene incluido; el usuario quita lo que no aplique
-      return `<div class="cl-item${i.selected?' chk':''}" data-s="${si}" data-i="${ii}" onclick="toggleChecklistItem(this)"><div class="cl-box"></div><div><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div></div>`;
+      const removeBtn=i.custom?`<span onclick="event.stopPropagation();removeCustomChecklistItem(${si},${ii})" style="margin-left:auto;padding-left:10px;color:var(--text-3);font-size:15px;flex-shrink:0" title="${L?'Quitar':'Remove'}">✕</span>`:'';
+      return `<div class="cl-item${i.selected?' chk':''}" data-s="${si}" data-i="${ii}" onclick="toggleChecklistItem(this)" style="display:flex;align-items:flex-start"><div class="cl-box"></div><div style="flex:1"><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div>${removeBtn}</div>`;
     }).join('');
     return `<h2>${esc(s.section)}</h2>${items}`;
   }).join('');
-  return checklistProgressBarHTML(sections)+`<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}`;
+  const addForm=`<div style="display:flex;gap:8px;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
+    <input type="text" id="checklist-new-item-input" placeholder="${L?'ej. Confirmar con el florista':'e.g. Confirm with the florist'}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomChecklistItem();}">
+    <button type="button" onclick="addCustomChecklistItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
+  </div>`;
+  return checklistProgressBarHTML(sections)+`<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}${addForm}`;
+}
+
+function addCustomChecklistItem(){
+  const input=document.getElementById('checklist-new-item-input');
+  const text=input?.value.trim();
+  if(!text) return;
+  const L=plan.lang==='es';
+  if(!Array.isArray(plan.checklistData)) plan.checklistData=[];
+  let customSection=plan.checklistData.find(s=>s.isCustomSection);
+  if(!customSection){
+    customSection={section:L?'Tareas personalizadas':'Custom tasks',items:[],isCustomSection:true};
+    plan.checklistData.push(customSection);
+  }
+  customSection.items.push({text,cat:L?'Personalizado':'Custom',selected:true,custom:true});
+  setTabHTML('checklist',renderChecklist(plan.checklistData));
+  scheduleChecklistProgressSave();
+  schedulePlanResave();
+}
+
+function removeCustomChecklistItem(si,ii){
+  const item=plan.checklistData?.[si]?.items?.[ii];
+  if(!item||!item.custom) return;
+  plan.checklistData[si].items.splice(ii,1);
+  if(!plan.checklistData[si].items.length) plan.checklistData.splice(si,1); // quitar la sección si quedó vacía
+  setTabHTML('checklist',renderChecklist(plan.checklistData));
+  scheduleChecklistProgressSave();
+  schedulePlanResave();
+}
+
+let planResaveDebounceTimer=null;
+// Guardado automático para ediciones manuales sobre un plan ya generado
+// (agregar/quitar proveedor, categoría de presupuesto, o tarea del
+// checklist). Sin esto, esos cambios solo vivían en memoria y se perdían
+// si cerrabas la pestaña sin darle "Guardar plan" a mano.
+function schedulePlanResave(){
+  clearTimeout(planResaveDebounceTimer);
+  planResaveDebounceTimer=setTimeout(()=>{ ensurePlanSaved(); },900);
 }
 
 let checklistSaveDebounceTimer=null;
@@ -5195,20 +5572,26 @@ function renderVendors(items,questions,negotiation){
   const L=plan.lang==='es';
   const cards=items.map((v,vi)=>{
     if(v.selected===undefined) v.selected=true; // por defecto vienen incluidos; el usuario quita los que no necesite
-    return `<div class="vcard${v.selected?' chk':''}" data-i="${vi}">
+    const removeBtn=v.custom?`<span onclick="event.stopPropagation();removeCustomVendor(${vi})" style="position:absolute;top:8px;right:34px;color:var(--text-3);font-size:15px;cursor:pointer" title="${L?'Quitar':'Remove'}">✕</span>`:'';
+    const typeNameBlock=v.custom
+      ?`<input type="text" class="vcard-input" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal-dark);border:none;background:transparent;padding:0;margin-bottom:4px;height:auto" placeholder="${L?'Categoría (ej. Florista)':'Category (e.g. Florist)'}" value="${esc(v.type)}" oninput="plan.vendorsData[${vi}].type=this.value;schedulePlanResave()">
+         <input type="text" class="vcard-input" style="font-size:14px;font-weight:600;color:var(--text);border:none;background:transparent;padding:0;margin-bottom:.6rem;height:auto" placeholder="${L?'Nombre del proveedor':'Vendor name'}" value="${esc(v.name)}" oninput="plan.vendorsData[${vi}].name=this.value;schedulePlanResave()">`
+      :`<div class="vcard-type">${esc(v.type)}</div>
+         <div class="vcard-name">${esc(v.name)}</div>
+         <div class="vcard-tip">${esc(v.tip)}</div>`;
+    return `<div class="vcard${v.selected?' chk':''}" data-i="${vi}" style="position:relative">
       <div class="vcard-check" onclick="toggleVendorItem(this)"></div>
-      <div class="vcard-type">${esc(v.type)}</div>
-      <div class="vcard-name">${esc(v.name)}</div>
-      <div class="vcard-tip">${esc(v.tip)}</div>
+      ${removeBtn}
+      ${typeNameBlock}
       <div class="vcard-inputs">
-        <input type="number" min="0" class="vcard-input" placeholder="${L?'Precio cotizado':'Quoted price'}" value="${v.quotedPrice||''}" oninput="plan.vendorsData[${vi}].quotedPrice=this.value">
-        <select class="vcard-input" onchange="plan.vendorsData[${vi}].availability=this.value">
+        <input type="number" min="0" class="vcard-input" placeholder="${L?'Precio cotizado':'Quoted price'}" value="${v.quotedPrice||''}" oninput="plan.vendorsData[${vi}].quotedPrice=this.value;schedulePlanResave()">
+        <select class="vcard-input" onchange="plan.vendorsData[${vi}].availability=this.value;schedulePlanResave()">
           <option value="" ${!v.availability?'selected':''}>${L?'¿Disponible?':'Available?'}</option>
           <option value="yes" ${v.availability==='yes'?'selected':''}>${L?'Sí, disponible':'Yes, available'}</option>
           <option value="no" ${v.availability==='no'?'selected':''}>${L?'No disponible':'Not available'}</option>
           <option value="unknown" ${v.availability==='unknown'?'selected':''}>${L?'Aún no sé':'Not sure yet'}</option>
         </select>
-        <input type="text" class="vcard-input" placeholder="${L?'Notas':'Notes'}" value="${esc(v.notes||'')}" oninput="plan.vendorsData[${vi}].notes=this.value">
+        <input type="text" class="vcard-input" placeholder="${L?'Notas':'Notes'}" value="${esc(v.notes||'')}" oninput="plan.vendorsData[${vi}].notes=this.value;schedulePlanResave()">
       </div>
     </div>`;
   }).join('');
@@ -5218,12 +5601,13 @@ function renderVendors(items,questions,negotiation){
   const qsHint=L?'Marca las que ya le preguntaste a tu proveedor':'Check off the ones you already asked your vendor';
   const qs=(questions||[]).map((q,qi)=>{
     if(q.checked===undefined) q.checked=false;
-    return `<div class="cl-item${q.checked?' chk':''}" data-qi="${qi}" onclick="toggleVendorQuestion(this)"><div class="cl-box"></div><div class="cl-text">${esc(q.text)}</div></div>`;
+    return `<div class="vq-item${q.checked?' asked':''}" data-qi="${qi}" onclick="toggleVendorQuestion(this)"><div class="vq-box"></div><div class="vq-text">${esc(q.text)}</div></div>`;
   }).join('');
   const neg=(negotiation||[]).map(n=>`<li>${esc(n)}</li>`).join('');
   const hint=L?'Deselecciona los que no necesites, y captura el precio real que te coticen — solo se incluyen en tu Excel los que dejes marcados.':'Deselect the ones you don\'t need, and enter the real price you get quoted — only the ones left checked are included in your Excel.';
   return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>
     <div class="vcards">${cards}</div>
+    <button type="button" onclick="addCustomVendor()" style="display:block;width:100%;padding:11px;border-radius:var(--radius);border:1.5px dashed var(--border-strong);background:transparent;color:var(--teal-dark);font-weight:600;font-size:13.5px;cursor:pointer;margin-bottom:1.25rem">+ ${L?'Agregar proveedor':'Add vendor'}</button>
     <button class="btn-adjust-budget" onclick="adjustBudgetWithQuotes()">🔄 ${L?'Ajustar presupuesto con estas cotizaciones':'Adjust budget with these quotes'}</button>
     <h2>${L?'Preguntas para proveedores':'Vendor questions'}</h2>
     <p style="font-size:12px;color:var(--text-3);margin-bottom:.5rem">${qsHint}</p>
@@ -5231,12 +5615,28 @@ function renderVendors(items,questions,negotiation){
     <h2>${L?'Tips de negociación':'Negotiation tips'}</h2><ul>${neg}</ul>`;
 }
 
+function addCustomVendor(){
+  const L=plan.lang==='es';
+  if(!Array.isArray(plan.vendorsData)) plan.vendorsData=[];
+  plan.vendorsData.push({type:'',name:'',tip:'',selected:true,custom:true});
+  setTabHTML('vendors',renderVendors(plan.vendorsData,plan.vendorQuestionsData,plan.negotiationTipsData));
+  schedulePlanResave();
+}
+
+function removeCustomVendor(vi){
+  const item=plan.vendorsData?.[vi];
+  if(!item||!item.custom) return;
+  plan.vendorsData.splice(vi,1);
+  setTabHTML('vendors',renderVendors(plan.vendorsData,plan.vendorQuestionsData,plan.negotiationTipsData));
+  schedulePlanResave();
+}
+
 function toggleVendorQuestion(el){
   const qi=+el.dataset.qi;
   const item=plan.vendorQuestionsData?.[qi];
   if(!item) return;
   item.checked=!item.checked;
-  el.classList.toggle('chk',item.checked);
+  el.classList.toggle('asked',item.checked);
 }
 
 function toggleVendorItem(el){
@@ -5246,18 +5646,30 @@ function toggleVendorItem(el){
   if(!item) return;
   item.selected=!item.selected;
   card.classList.toggle('chk',item.selected);
+  schedulePlanResave();
 }
 
 // Mapea cada tipo de proveedor a su categoría correspondiente de BUDGET_CATS (índice)
-const VENDOR_TO_BUDGET_IDX={
-  'Fotografía y Video':2,'Photography & Video':2,
-  'Música / DJ':3,'Music / DJ':3,
-  'Catering':1,
-  'Decoración y Flores':0,'Decor & Flowers':0,
-  'Lugar del Evento':0,'Venue':0,
-  'Transporte':6,'Transportation':6,
-  'Coordinador de Evento':6,'Event Coordinator':6,
-  'Mobiliario y Renta':0,'Furniture & Rentals':0
+// Antes mapeaba a una POSICIÓN numérica fija (0-7) — se rompía en silencio
+// si el usuario quitaba una categoría de presupuesto, porque todas las
+// posteriores se recorren de lugar. Ahora mapea al NOMBRE de la categoría,
+// que no cambia sin importar cuántas se agreguen o quiten.
+const VENDOR_TO_BUDGET_LABEL={
+  'Fotografía y Video':['Fotografía y Video','Photography & Video'],
+  'Photography & Video':['Fotografía y Video','Photography & Video'],
+  'Música / DJ':['Música y Entretenimiento','Music & Entertainment'],
+  'Music / DJ':['Música y Entretenimiento','Music & Entertainment'],
+  'Catering':['Catering y Bebidas','Catering & Drinks'],
+  'Decoración y Flores':['Lugar y Decoración','Venue & Decor'],
+  'Decor & Flowers':['Lugar y Decoración','Venue & Decor'],
+  'Lugar del Evento':['Lugar y Decoración','Venue & Decor'],
+  'Venue':['Lugar y Decoración','Venue & Decor'],
+  'Transporte':['Transporte y Extras','Transport & Extras'],
+  'Transportation':['Transporte y Extras','Transport & Extras'],
+  'Coordinador de Evento':['Transporte y Extras','Transport & Extras'],
+  'Event Coordinator':['Transporte y Extras','Transport & Extras'],
+  'Mobiliario y Renta':['Lugar y Decoración','Venue & Decor'],
+  'Furniture & Rentals':['Lugar y Decoración','Venue & Decor']
 };
 
 function adjustBudgetWithQuotes(){
@@ -5270,11 +5682,15 @@ function adjustBudgetWithQuotes(){
   const total=parseInt(plan.budget)||0;
   const budget=plan.budgetData;
 
-  // Sumar cotizaciones reales por categoría de presupuesto (puede haber varios proveedores en la misma categoría)
+  // Sumar cotizaciones reales por categoría de presupuesto (buscando por
+  // nombre, no por posición — si el usuario quitó esa categoría, la
+  // cotización simplemente se ignora en vez de aplicarse a la equivocada)
   const realByIdx={};
   quoted.forEach(v=>{
-    const idx=VENDOR_TO_BUDGET_IDX[v.type];
-    if(idx===undefined) return;
+    const labelPair=VENDOR_TO_BUDGET_LABEL[v.type];
+    if(!labelPair) return;
+    const idx=budget.findIndex(b=>labelPair.includes(b.label));
+    if(idx<0) return;
     realByIdx[idx]=(realByIdx[idx]||0)+parseFloat(v.quotedPrice);
   });
 
