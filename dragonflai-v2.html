@@ -7040,7 +7040,7 @@ document.addEventListener('click',e=>{
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/service-worker.js').catch(()=>{ /* si falla el registro, la app sigue funcionando normal, solo sin los beneficios de PWA */ });
+    navigator.serviceWorker.register('/service-worker.js',{scope:'/app'}).catch(()=>{ /* si falla el registro, la app sigue funcionando normal, solo sin los beneficios de PWA */ });
   });
 }
 
