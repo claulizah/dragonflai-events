@@ -381,7 +381,21 @@ textarea.vcard-input{height:auto}
 @media (max-width:760px){
   .publish-layout{flex-direction:column}
   .publish-preview-col{order:-1;max-width:none;flex-basis:auto;min-width:0;width:100%}
-  .publish-preview-col #publish-live-preview-container{position:static!important}
+  /* Antes se apagaba el sticky aquí (position:static), lo que obligaba a
+     subir hasta arriba del modal para ver cada cambio de fuente/color. En
+     vez de apagarlo, se deja pegada pero compacta (con su propio scroll
+     interno) — el cambio siempre es visible sin perder el lugar. */
+  .publish-preview-col #publish-live-preview-container{
+    position:sticky;
+    top:0;
+    z-index:5;
+    max-height:36vh;
+    overflow-y:auto;
+    background:var(--white);
+    box-shadow:0 4px 14px rgba(0,0,0,.14);
+    border-radius:0 0 16px 16px;
+    margin-bottom:.5rem;
+  }
 }
 @media (max-width:600px){
   /* En teléfono el modal tenía padding de escritorio (2rem + 1.5rem del
@@ -1184,7 +1198,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 </div>
 
 <!-- PUBLICAR / EDITAR INVITACIÓN -->
-<div class="excel-modal-overlay" id="publish-modal" onclick="if(event.target===this) closePublishModal()">
+<div class="excel-modal-overlay" id="publish-modal">
   <div class="excel-modal" style="max-width:920px;text-align:left;max-height:88vh;overflow-y:auto">
     <h3 style="text-align:center" id="publish-modal-title" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
     <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" id="publish-modal-sub" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
@@ -3360,15 +3374,15 @@ function renderFontColorPickers(idPrefix,curTitleFont,curBodyFont,curBg,onTitleC
   const fontOpt=(cur)=>FONT_OPTIONS.map(f=>`<option value="${f.cls}"${f.cls===(cur||'')?' selected':''}>${esc(L?f.label.es:f.label.en)}</option>`).join('');
   const allBg=[...BG_COLORS.map(c=>({v:c.hex,name:c.name})),...BG_GRADIENTS.map(g=>({v:g.value,name:g.name}))];
   const bgOpt=allBg.map(b=>`<option value="${esc(b.v)}"${b.v===curBg?' selected':''}>${esc(L?b.name.es:b.name.en)}</option>`).join('');
-  const selStyle='width:100%;margin-top:3px;padding:8px 10px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:\'Inter\',sans-serif;font-size:13px;background:#fff';
-  return `<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem">
-    <label style="font-size:12px;font-weight:600;color:var(--text-2)">${L?'Fuente del título':'Title font'}
+  const selStyle='width:100%;margin-top:5px;padding:11px 12px;border-radius:8px;border:1.3px solid var(--border-gray);font-family:\'Inter\',sans-serif;font-size:15px;background:#fff';
+  return `<div style="display:flex;flex-direction:column;gap:14px;margin-bottom:1rem">
+    <label style="font-size:14px;font-weight:600;color:var(--text-2)">${L?'Fuente del título':'Title font'}
       <select id="${idPrefix}-title-font" onchange="${onTitleChange}(this.value)" style="${selStyle}">${fontOpt(curTitleFont)}</select>
     </label>
-    <label style="font-size:12px;font-weight:600;color:var(--text-2)">${L?'Fuente del resto de la información':'Font for the rest of the details'}
+    <label style="font-size:14px;font-weight:600;color:var(--text-2)">${L?'Fuente del resto de la información':'Font for the rest of the details'}
       <select id="${idPrefix}-body-font" onchange="${onBodyChange}(this.value)" style="${selStyle}">${fontOpt(curBodyFont)}</select>
     </label>
-    <label style="font-size:12px;font-weight:600;color:var(--text-2)">${L?'Color de fondo':'Background color'}
+    <label style="font-size:14px;font-weight:600;color:var(--text-2)">${L?'Color de fondo':'Background color'}
       <select id="${idPrefix}-bg" onchange="${onBgChange}(this.value)" style="${selStyle}">${bgOpt}</select>
     </label>
   </div>`;
