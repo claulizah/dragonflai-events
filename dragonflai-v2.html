@@ -377,26 +377,16 @@ textarea.vcard-input{height:auto}
    la derecha (en pantallas angostas, se acomodan uno debajo del otro). */
 .publish-layout{display:flex;gap:1.5rem;align-items:flex-start}
 .publish-form-col{flex:1.4 1 400px;min-width:0}
-.publish-preview-col{flex:0 0 390px;min-width:320px;max-width:390px}
+/* El sticky vive en este contenedor DE AFUERA (no en
+   #publish-live-preview-container, que antes lo tenía y competía con este
+   mismo — dos sticky anidados podían romper el cálculo de ambos). Aplica
+   igual en desktop y celular: se confirmó que el problema de "hay que subir
+   y bajar para ver el cambio" pasaba en los dos, no solo en pantallas
+   angostas. Hallazgo V7. */
+.publish-preview-col{flex:0 0 390px;min-width:320px;max-width:390px;position:sticky;top:0;z-index:5;align-self:flex-start}
 @media (max-width:760px){
   .publish-layout{flex-direction:column}
-  /* El sticky vive aquí, en el contenedor DE AFUERA, no en el de adentro
-     (#publish-live-preview-container) — ese contenedor interno mide casi
-     lo mismo que su padre inmediato, así que no le daba "cuarto" para
-     quedarse pegado mientras se baja por el formulario, que es mucho más
-     alto. Puesto aquí, el padre real (.publish-layout, que sí abarca
-     preview + formulario juntos) sí le da ese espacio. Hallazgo V7. */
-  .publish-preview-col{
-    order:-1;
-    max-width:none;
-    flex-basis:auto;
-    min-width:0;
-    width:100%;
-    position:sticky;
-    top:0;
-    z-index:5;
-    align-self:flex-start;
-  }
+  .publish-preview-col{order:-1;max-width:none;flex-basis:auto;min-width:0;width:100%}
   .publish-preview-col #publish-live-preview-container{
     max-height:36vh;
     overflow-y:auto;
@@ -1271,7 +1261,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
-      <div class="combo-grid" id="pub-combo-picker" style="margin-bottom:1rem"></div>
+      <div id="pub-combo-picker" style="margin-bottom:1rem"></div>
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
         <input type="file" id="pub-bg-photo-input" accept="image/*" style="display:none" onchange="uploadPublishBackground(event)">
@@ -1352,7 +1342,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
     <div class="publish-preview-col">
       <p style="font-size:11px;color:var(--text-3);text-align:center;margin-bottom:.5rem" data-es="Vista previa — se actualiza sola mientras editas" data-en="Live preview — updates automatically as you edit">Vista previa — se actualiza sola mientras editas</p>
-      <div id="publish-live-preview-container" style="position:sticky;top:0"></div>
+      <div id="publish-live-preview-container"></div>
     </div>
     </div>
 
