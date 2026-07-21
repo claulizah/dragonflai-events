@@ -857,6 +857,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <input type="text" id="f-vibe" placeholder="ej. Blanco y negro / Bohemia / Hawaiana" data-placeholder-es="ej. Blanco y negro / Bohemia / Hawaiana" data-placeholder-en="e.g. Black &amp; White / Boho / Hawaiian">
           <div class="rgroup" id="vibe-suggestions" style="margin-top:.4rem"></div>
           <p style="font-size:11px;color:var(--text-3);font-style:italic;margin:.45rem 0 0;line-height:1.5" data-es="Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan." data-en="Pick a suggestion or type exactly what you want — the more specific, the better your plan turns out.">Elige una sugerencia o escribe exactamente lo que buscas — entre más específico, mejor sale tu plan.</p>
+          <p style="font-size:11px;color:var(--text-3);margin:.25rem 0 0;line-height:1.5" data-es="¿No tienes una idea todavía? No te preocupes — con lo que nos cuentes de tu evento te ayudamos a sugerir un estilo." data-en="Don't have an idea yet? No worries — with what you tell us about your event, we'll help suggest a style.">¿No tienes una idea todavía? No te preocupes — con lo que nos cuentes de tu evento te ayudamos a sugerir un estilo.</p>
         </div>
       </div>
 
@@ -2629,7 +2630,7 @@ function getEditedDateTimeVibe(){
   const rawDate=document.getElementById('pub-date').value||'';
   const timeStart=document.getElementById('pub-time-start').value||'';
   const timeEnd=document.getElementById('pub-time-end').value||'';
-  const dateDisplay=rawDate?new Date(rawDate+' ').toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'long',day:'numeric',year:'numeric'}):'';
+  const dateDisplay=rawDate?new Date(rawDate+'T12:00:00').toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'long',day:'numeric',year:'numeric'}):'';
   const timeDisplay=formatTimeRange(timeStart,timeEnd,lang);
   return {
     rawDate,timeStart,timeEnd,dateDisplay,timeDisplay,
@@ -4268,7 +4269,7 @@ async function generate(){
     proCtx=` | Client: ${client||'the client'} | Company: ${company||'DragonflAI Events'} | Budget: ${bsense} | Tone: ${tone} | Upsells: ${upsells}`;
   }
 
-  const dateStr=date?new Date(date+' ').toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'long',day:'numeric',year:'numeric'}):'TBD';
+  const dateStr=date?new Date(date+'T12:00:00').toLocaleDateString(lang==='es'?'es-MX':'en-US',{month:'long',day:'numeric',year:'numeric'}):'TBD';
   const idx=T.eventTypes.vals.indexOf(eventType);
   const typeName=idx>=0?T.eventTypes[lang][idx].replace(/^\S+\s/,''):eventType.split('/')[0];
 
@@ -6506,9 +6507,9 @@ async function exportSpreadsheet(){
 
   // Regalos — plantilla editable en blanco
   xlAddSheet(wb,L?'Regalos':'Gifts',
-    [L?'Invitado':'Guest',L?'¿Trajo regalo?':'Brought a gift?',L?'Tipo de regalo':'Gift type',L?'Valor estimado':'Estimated value',L?'Descripción':'Description',L?'Agradecimiento enviado':'Thank you sent'],
-    Array.from({length:20},()=>['','','','','','']),
-    [24,16,18,16,30,18]);
+    [L?'Invitado':'Guest',L?'¿Trajo regalo?':'Brought a gift?',L?'Tipo de regalo':'Gift type',L?'Descripción':'Description',L?'Agradecimiento enviado':'Thank you sent'],
+    Array.from({length:20},()=>['','','','','']),
+    [24,16,18,30,18]);
 
   // Comparador de lugares — plantilla editable en blanco
   xlAddSheet(wb,L?'Comparador de Lugares':'Venue Comparison',
