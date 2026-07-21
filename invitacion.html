@@ -175,6 +175,16 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
+// Cliente aparte, SIN sesión nunca (persistSession/autoRefreshToken en
+// false) — dedicado solo al RSVP del invitado. El RSVP es anónimo por
+// diseño; usar el cliente "sb" de arriba lo exponía a arrastrar una sesión
+// vieja (o a una condición de carrera con el signOut() de esa sesión) y
+// mandar un encabezado de autenticación inconsistente. Este cliente nunca
+// tiene nada que limpiar, así que siempre manda la petición de la misma
+// forma, limpia.
+const sbAnon = (window.supabase && SUPABASE_URL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {auth:{persistSession:false,autoRefreshToken:false}})
+  : null;
 
 // ══════════════════════════════
 //  LOG DE ERRORES EN PRODUCCIÓN
@@ -1027,7 +1037,7 @@ async function submitRSVP(e){
       custom_answer: sharedCustom
     }));
 
-    const {error}=await sb.from('rsvps').insert(payloads);
+    const {error}=await sbAnon.from('rsvps').insert(payloads);
     if(error){
       showToast(t.toastError);
       btn.disabled=false; btn.textContent=t.confirmBtn;
@@ -1048,7 +1058,7 @@ async function submitRSVP(e){
 
   // ── Editando una respuesta ya existente — vía la función segura, no un insert nuevo ──
   if(editingGuestListId){
-    const {data,error}=await sb.rpc('update_my_rsvp',{
+    const {data,error}=await sbAnon.rpc('update_my_rsvp',{
       p_guest_list_id: editingGuestListId,
       p_attending: attending,
       p_guest_email: document.getElementById('r-email').value.trim()||null,
@@ -1084,7 +1094,7 @@ async function submitRSVP(e){
     custom_answer: document.getElementById('r-custom')?document.getElementById('r-custom').value.trim():null
   };
 
-  const {error}=await sb.from('rsvps').insert(payload);
+  const {error}=await sbAnon.from('rsvps').insert(payload);
   if(error){
     showToast(t.toastError);
     btn.disabled=false; btn.textContent=t.confirmBtn;
