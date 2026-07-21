@@ -193,7 +193,11 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 .sublabel{display:block;font-size:10.5px;color:var(--text-3);margin-bottom:4px}
 .fcol{grid-column:1/-1}
 .field label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
-.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:16px;color:var(--text);background:var(--cream);transition:border-color .2s,box-shadow .2s,background-color .2s;outline:none;-webkit-appearance:none;appearance:none;transform:translateZ(0)}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:16px;color:var(--text);background:var(--cream);transition:border-color .2s,box-shadow .2s,background-color .2s;outline:none;-webkit-appearance:none;appearance:none;transform:translateZ(0);text-overflow:ellipsis}
+/* Resalta un campo obligatorio vacío al intentar generar el plan — se
+   quita solo en cuanto la persona empieza a corregirlo. */
+.field input.f-required-error,.field .counter.f-required-error{border-color:#C14A5E!important;box-shadow:0 0 0 3px rgba(193,74,94,.15)!important;animation:f-shake .3s}
+@keyframes f-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(46,196,182,.12);background:var(--white)}
 .field input::placeholder,.field textarea::placeholder{color:var(--text-3)}
 .field textarea{resize:vertical;min-height:72px;line-height:1.55}
@@ -698,6 +702,29 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <button class="btn-account" id="btn-account-email" onclick="toggleAccountDropdown()"></button>
       <div class="account-dropdown" id="account-dropdown" style="display:none">
         <button onclick="openMyPlans()">📁 <span data-es="Mis planes" data-en="My plans">Mis planes</span></button>
+<script>
+// "Cambio de pantallas al inicio" al recargar /app estando logueada: el
+// botón "Entrar" siempre se pinta primero (no tiene display:none por
+// default), y solo se oculta cuando termina la verificación asíncrona de
+// sesión (sb.auth.onAuthStateChange, más abajo) — eso tarda un instante y
+// se ve como un brinco de "Entrar" a tu nombre. Aquí revisamos localStorage
+// de forma síncrona (antes de que el navegador pinte) para adivinar el
+// estado correcto desde el primer render — onAuthStateChange corrige esto
+// después de todas formas si la sesión real resulta inválida/expirada.
+(function(){
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && k.indexOf('-auth-token')!==-1 && localStorage.getItem(k)){
+        const btn=document.getElementById('btn-login');
+        if(btn) btn.style.display='none';
+        break;
+      }
+    }
+  }catch(_){}
+})();
+</script>
+
         <button onclick="openMyInvitations()">📬 <span data-es="Mis invitaciones" data-en="My invitations">Mis invitaciones</span></button>
         <button onclick="openProfileModal()">⚙️ <span data-es="Mi perfil" data-en="My profile">Mi perfil</span></button>
         <button onclick="logout()">🚪 <span data-es="Cerrar sesión" data-en="Log out">Cerrar sesión</span></button>
@@ -774,7 +801,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </div>
         <div class="field">
           <label data-es="Ciudad / lugar" data-en="City / location">Ciudad / lugar</label>
-          <input type="text" id="f-location" placeholder="ej. Querétaro, México">
+          <input type="text" id="f-location" placeholder="ej. Querétaro, México" data-placeholder-es="ej. Querétaro, México" data-placeholder-en="e.g. Querétaro, Mexico">
         </div>
         <div class="field fcol">
           <label data-es="Horario del evento" data-en="Event time">Horario del evento</label>
@@ -807,6 +834,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
           <p style="font-size:11px;color:var(--text-3);margin:2px 0 0" data-es="Elige tu tipo de moneda" data-en="Choose your currency">Elige tu tipo de moneda</p>
           <input type="range" id="f-budget" min="5000" max="500000" step="5000" value="15000" oninput="updateBudget(this.value)">
           <div class="budget-ticks"><span>$5K</span><span>$100K</span><span>$250K</span><span>$500K</span></div>
+          <p style="font-size:11px;color:var(--text-3);margin:.35rem 0 0" data-es="Es tu presupuesto total estimado — no es un rango, solo un valor" data-en="Your total estimated budget — a single value, not a range">Es tu presupuesto total estimado — no es un rango, solo un valor</p>
         </div>
         <div class="field">
           <label data-es="Número de invitados" data-en="Number of guests">Número de invitados</label>
@@ -958,7 +986,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <div class="field">
           <label data-es="Paleta de colores" data-en="Color palette">Paleta de colores</label>
           <div id="color-suggestions" class="rgroup" style="margin-bottom:.5rem"></div>
-          <input type="text" id="f-colors" placeholder="ej. Verde sage, dorado y crema">
+          <input type="text" id="f-colors" placeholder="ej. Verde sage, dorado y crema" data-placeholder-es="ej. Verde sage, dorado y crema" data-placeholder-en="e.g. Sage green, gold and cream">
         </div>
         <div class="field">
           <label data-es="Tipo de lugar" data-en="Venue type">Tipo de lugar</label>
@@ -1029,7 +1057,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         </div>
         <div class="field">
           <label data-es="Alergias o restricciones alimentarias" data-en="Allergies or dietary restrictions">Alergias o restricciones alimentarias</label>
-          <input type="text" id="f-allergies" placeholder="ej. Un invitado es celíaco, dos veganos…">
+          <input type="text" id="f-allergies" placeholder="ej. Un invitado es celíaco, dos veganos…" data-placeholder-es="ej. Un invitado es celíaco, dos veganos…" data-placeholder-en="e.g. One guest is celiac, two vegans…">
         </div>
         <div class="field" id="lodging-row">
           <label data-es="¿Hospedaje para invitados de fuera?" data-en="Lodging for out-of-town guests?">¿Hospedaje para invitados de fuera?</label>
@@ -3646,6 +3674,38 @@ function stdTabIcon(){
   return TYPES_ROMANTIC_STD.includes(plan.eventTypeRaw||eventType)?'💌':'📌';
 }
 
+// "Cuéntanos más" y el hashtag mostraban siempre el mismo ejemplo de boda
+// (aunque el evento fuera Baby Shower o Corporativo) — ahora varían igual
+// que ya hacía NAME_LABELS. Hallazgo de validación de diseño, 20-21 julio.
+const NOTES_PLACEHOLDER={
+  'Boda/Wedding':{es:'ej. La pareja se conoció en Oaxaca, aman el jazz, necesitan opciones veganas…',en:'e.g. The couple met in Oaxaca, loves jazz, needs vegan options…'},
+  'Aniversario/Anniversary':{es:'ej. Cumplen 20 años de casados, les encanta bailar salsa…',en:'e.g. Celebrating 20 years married, they love dancing salsa…'},
+  'Cumpleaños/Birthday':{es:'ej. Le encanta el fútbol y el mole poblano, quiere una fiesta sorpresa…',en:'e.g. Loves soccer and mole poblano, wants a surprise party…'},
+  'Baby Shower':{es:'ej. Es niña, el tema es de conejitos, la mamá es alérgica al gluten…',en:"e.g. It's a girl, bunny theme, the mom is gluten intolerant…"},
+  'Quinceañera':{es:'ej. Le encanta el K-pop, quiere vals sorpresa, colores pastel…',en:'e.g. Loves K-pop, wants a surprise waltz, pastel colors…'},
+  'Fiesta Infantil/Kids Party':{es:'ej. Le encantan los dinosaurios, tendrá inflables, alergia a los cacahuates…',en:'e.g. Loves dinosaurs, will have inflatables, peanut allergy…'},
+  'Corporativo/Corporate':{es:'ej. Es el aniversario 10 de la empresa, habrá premiación, catering kosher…',en:"e.g. It's the company's 10th anniversary, there'll be an awards segment, kosher catering…"},
+  'Graduación/Graduation':{es:'ej. Se gradúan de ingeniería, quieren toga y birrete personalizados…',en:'e.g. Graduating in engineering, want custom cap and gown…'}
+};
+const HASHTAG_PLACEHOLDER={
+  'Boda/Wedding':{es:'ej. #ClauYAlexSeCasan',en:'e.g. #ClauAndAlexSayIDo'},
+  'Aniversario/Anniversary':{es:'ej. #20AñosJuntos',en:'e.g. #20YearsTogether'},
+  'Cumpleaños/Birthday':{es:'ej. #FiestaDeSofia',en:"e.g. #SofiasParty"},
+  'Baby Shower':{es:'ej. #BabyShowerSofia',en:"e.g. #SofiasBabyShower"},
+  'Quinceañera':{es:'ej. #XVDeSofia',en:"e.g. #SofiasQuince"},
+  'Fiesta Infantil/Kids Party':{es:'ej. #CumpleDeSofia',en:"e.g. #SofiasBirthdayBash"},
+  'Corporativo/Corporate':{es:'ej. #AcmeCorp10Años',en:'e.g. #AcmeCorp10Years'},
+  'Graduación/Graduation':{es:'ej. #GradSofia2026',en:'e.g. #GradSofia2026'}
+};
+function updateTypedPlaceholders(){
+  const notesEl=document.getElementById('f-notes');
+  const notesCfg=NOTES_PLACEHOLDER[eventType];
+  if(notesEl&&notesCfg){ notesEl.setAttribute('data-placeholder-es',notesCfg.es); notesEl.setAttribute('data-placeholder-en',notesCfg.en); notesEl.placeholder=notesCfg[lang]; }
+  const hashtagEl=document.getElementById('f-hashtag');
+  const hashtagCfg=HASHTAG_PLACEHOLDER[eventType];
+  if(hashtagEl&&hashtagCfg){ hashtagEl.setAttribute('data-placeholder-es',hashtagCfg.es); hashtagEl.setAttribute('data-placeholder-en',hashtagCfg.en); hashtagEl.placeholder=hashtagCfg[lang]; }
+}
+
 // Relabelea el campo "Nombre" según a quién se refiere realmente en cada tipo de evento.
 const NAME_LABELS={
   'Boda/Wedding':{es:['Nombre de los novios','ej. Ana & Juan'],en:['Names of the couple','e.g. Ana & Juan']},
@@ -3728,7 +3788,7 @@ function init(){
   renderUpsells();
   renderTabs();
   updateExtraFieldVisibility();
-  updateNameLabel();
+  updateNameLabel(); updateTypedPlaceholders();
   updateGenBadge();
   const lockEl=document.getElementById('excel-lock');
   if(lockEl) lockEl.style.display=isPaid?'none':'inline';
@@ -3781,11 +3841,15 @@ function setLang(l){
     if(txt) el.innerHTML=txt;
   });
   document.querySelectorAll('option[data-'+l+']').forEach(el=>{ el.textContent=el.getAttribute('data-'+l); });
-  const ta=document.getElementById('f-notes');
-  if(ta) ta.placeholder=ta.getAttribute('data-placeholder-'+l)||ta.placeholder;
-  const vibeInput=document.getElementById('f-vibe');
-  if(vibeInput) vibeInput.placeholder=vibeInput.getAttribute('data-placeholder-'+l)||vibeInput.placeholder;
-  renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel();
+  // Antes solo f-notes y f-vibe cambiaban de placeholder con el idioma —
+  // los demás campos con ejemplo (ubicación, colores, alergias, hashtag)
+  // nunca lo hacían aunque se les pusiera el atributo, porque nada los
+  // leía. Ahora cualquier campo con data-placeholder-es queda cubierto.
+  document.querySelectorAll('[data-placeholder-es]').forEach(el=>{
+    const txt=el.getAttribute('data-placeholder-'+l);
+    if(txt) el.placeholder=txt;
+  });
+  renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel(); updateTypedPlaceholders();
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
   renderPublishPickers();
@@ -3800,7 +3864,7 @@ function setMode(m){
   if(cardPro) cardPro.className='mode-card'+(m==='pro'?' sel-pro':'');
   if(proBlock) proBlock.className='pro-block'+(m==='pro'?' show':'');
   if(stressRow) stressRow.style.display=m==='diy'?'block':'none';
-  updateModePill(); renderTabs(); updateFormTitle(); updateNameLabel();
+  updateModePill(); renderTabs(); updateFormTitle(); updateNameLabel(); updateTypedPlaceholders();
   const genLbl=document.getElementById('gen-btn-label');
   if(genLbl){
     genLbl.setAttribute('data-es',m==='diy'?'Generar mi plan personalizado':'Generar propuesta para cliente');
@@ -3831,7 +3895,7 @@ function selectType(btn,idx){
   eventType=T.eventTypes.vals[idx];
   applyEventTheme(eventType);
   applyBudgetRange();
-  updateFormTitle(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); updateExtraFieldVisibility(); updateNameLabel();
+  updateFormTitle(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); updateExtraFieldVisibility(); updateNameLabel(); updateTypedPlaceholders();
 }
 
 function updateFormTitle(){
@@ -3847,13 +3911,14 @@ function renderRadios(){
     const opts=T[key][lang];
     const cur=radios[key]||'';
     document.getElementById(id).innerHTML=opts.map((o,i)=>
-      `<span class="ropt${o===cur||(!radios[key]&&i===1)?' sel':''}" onclick="selRadio(this,'${key}')">${o}</span>`
+      `<span class="ropt${o===cur?' sel':''}" onclick="selRadio(this,'${key}')">${o}</span>`
     ).join('');
   });
-  // Prioridad: multi-select (puede elegir varias), ahora personalizada por tipo de evento
+  // Prioridad: multi-select (puede elegir varias), personalizada por tipo de evento.
+  // Antes forzaba la primera opción si no había ninguna elegida — ahora
+  // arranca vacío, sin preselección. Decisión de producto, 20-21 julio.
   const pOpts=(T.priority[eventType]||T.priority['Boda/Wedding'])[lang];
-  // Si venimos de otro tipo de evento y ninguna selección previa existe en la lista nueva, reiniciar
-  if(!radios.priority||!radios.priority.length||!radios.priority.some(p=>pOpts.includes(p))) radios.priority=[pOpts[0]];
+  if(radios.priority&&radios.priority.length&&!radios.priority.some(p=>pOpts.includes(p))) radios.priority=[];
   document.getElementById('priority-opts').innerHTML=pOpts.map(o=>
     `<span class="ropt${radios.priority.includes(o)?' sel':''}" onclick="selPriority(this)">${o}</span>`
   ).join('');
@@ -3861,10 +3926,6 @@ function renderRadios(){
 
 function selPriority(el){
   const group=el.closest('.rgroup');
-  const willBeSelected=!el.classList.contains('sel');
-  // No permitir dejar cero opciones seleccionadas — siempre al menos una
-  const currentlySelected=group.querySelectorAll('.ropt.sel').length;
-  if(!willBeSelected&&currentlySelected<=1) return;
   el.classList.toggle('sel');
   radios.priority=[...group.querySelectorAll('.ropt.sel')].map(o=>o.textContent);
   updateProgress();
@@ -3922,7 +3983,9 @@ function renderMustHaves(){
   const items=mh[lang]||mh.es;
   const c=document.getElementById('must-haves');
   const sel=[...c.querySelectorAll('.tag.sel')].map(t=>t.dataset.idx);
-  c.innerHTML=items.map((item,i)=>`<span class="tag${i<2||sel.includes(String(i))?' sel':''}" data-idx="${i}" onclick="toggleTag(this)">${item}</span>`).join('');
+  // Antes las primeras 2 opciones venían siempre premarcadas — ahora arranca
+  // sin preselección, igual que estrés/experiencia/prioridades.
+  c.innerHTML=items.map((item,i)=>`<span class="tag${sel.includes(String(i))?' sel':''}" data-idx="${i}" onclick="toggleTag(this)">${item}</span>`).join('');
 }
 
 function renderUpsells(){
@@ -4047,7 +4110,38 @@ function updateGenBadge(){
 
 let plannerCreditSpentThisSession=false;
 
+// Campos obligatorios antes de generar: nombre, fecha y ubicación.
+// "Número de invitados" no se incluye aquí porque es un contador que
+// siempre trae un valor por default (50) — nunca queda vacío de verdad.
+// Se resalta cada campo vacío en rojo y se hace scroll al primero.
+function validateRequiredFields(){
+  const missing=[];
+  const coupleVisible=document.getElementById('name-couple-row').style.display!=='none';
+  if(coupleVisible){
+    const n1=document.getElementById('f-name-1'), n2=document.getElementById('f-name-2');
+    if(!n1.value.trim()) missing.push(n1);
+    if(!n2.value.trim()) missing.push(n2);
+  }else{
+    const nameEl=document.getElementById('f-name');
+    if(!nameEl.value.trim()) missing.push(nameEl);
+  }
+  const dateEl=document.getElementById('f-date');
+  if(!dateEl.value) missing.push(dateEl);
+  const locEl=document.getElementById('f-location');
+  if(!locEl.value.trim()) missing.push(locEl);
+  missing.forEach(el=>{
+    el.classList.add('f-required-error');
+    el.addEventListener('input',function clearErr(){ el.classList.remove('f-required-error'); el.removeEventListener('input',clearErr); },{once:true});
+  });
+  if(missing.length) missing[0].scrollIntoView({behavior:'smooth',block:'center'});
+  return missing.length===0;
+}
+
 async function generate(){
+  if(!validateRequiredFields()){
+    showToast(lang==='es'?'Faltan campos obligatorios — están marcados en rojo':'Required fields are missing — marked in red',true);
+    return;
+  }
   if(WORKER_URL==='YOUR_WORKER_URL_HERE'){showToast(lang==='es'?'Configura tu Worker URL en el código':'Set your Worker URL in the code',true);return;}
   // Nuevo plan → cualquier borrador de invitación pendiente pertenece al
   // plan ANTERIOR; no debe mezclarse con este.
