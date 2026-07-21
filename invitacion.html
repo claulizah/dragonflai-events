@@ -175,16 +175,43 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   : null;
-// Cliente aparte, SIN sesión nunca (persistSession/autoRefreshToken en
-// false) — dedicado solo al RSVP del invitado. El RSVP es anónimo por
-// diseño; usar el cliente "sb" de arriba lo exponía a arrastrar una sesión
-// vieja (o a una condición de carrera con el signOut() de esa sesión) y
-// mandar un encabezado de autenticación inconsistente. Este cliente nunca
-// tiene nada que limpiar, así que siempre manda la petición de la misma
-// forma, limpia.
-const sbAnon = (window.supabase && SUPABASE_URL.startsWith('http'))
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {auth:{persistSession:false,autoRefreshToken:false}})
-  : null;
+// El RSVP del invitado es anónimo por diseño. Un segundo createClient()
+// (aunque fuera con persistSession:false) sigue creando una segunda
+// instancia de GoTrueClient sobre la MISMA llave de almacenamiento del
+// proyecto, y Supabase advierte explícitamente que eso puede producir
+// comportamiento indefinido — y en la práctica rompió la confirmación para
+// TODOS, incluida la cuenta con sesión real. En vez de un segundo cliente,
+// estas dos funciones hablan directo con la API por fetch(), sin pasar por
+// ningún módulo de autenticación — no hay nada que se pueda pisar con "sb".
+async function anonInsertRsvps(payloads){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/rsvps`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(payloads)
+    });
+    if(!res.ok){
+      let error; try{ error=await res.json(); }catch(e){ error={message:res.statusText,status:res.status}; }
+      return {error};
+    }
+    return {error:null};
+  }catch(err){ return {error:{message:String(err)}}; }
+}
+async function anonUpdateMyRsvp(params){
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/rpc/update_my_rsvp`,{
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':`Bearer ${SUPABASE_ANON_KEY}`,'Content-Type':'application/json'},
+      body:JSON.stringify(params)
+    });
+    if(!res.ok){
+      let error; try{ error=await res.json(); }catch(e){ error={message:res.statusText,status:res.status}; }
+      return {data:null,error};
+    }
+    const data=await res.json();
+    return {data,error:null};
+  }catch(err){ return {data:null,error:{message:String(err)}}; }
+}
 
 // ══════════════════════════════
 //  LOG DE ERRORES EN PRODUCCIÓN
@@ -1037,7 +1064,7 @@ async function submitRSVP(e){
       custom_answer: sharedCustom
     }));
 
-    const {error}=await sbAnon.from('rsvps').insert(payloads);
+    const {error}=await anonInsertRsvps(payloads);
     if(error){
       showToast(t.toastError);
       btn.disabled=false; btn.textContent=t.confirmBtn;
@@ -1058,7 +1085,7 @@ async function submitRSVP(e){
 
   // ── Editando una respuesta ya existente — vía la función segura, no un insert nuevo ──
   if(editingGuestListId){
-    const {data,error}=await sbAnon.rpc('update_my_rsvp',{
+    const {data,error}=await anonUpdateMyRsvp({
       p_guest_list_id: editingGuestListId,
       p_attending: attending,
       p_guest_email: document.getElementById('r-email').value.trim()||null,
@@ -1094,7 +1121,7 @@ async function submitRSVP(e){
     custom_answer: document.getElementById('r-custom')?document.getElementById('r-custom').value.trim():null
   };
 
-  const {error}=await sbAnon.from('rsvps').insert(payload);
+  const {error}=await anonInsertRsvps([payload]);
   if(error){
     showToast(t.toastError);
     btn.disabled=false; btn.textContent=t.confirmBtn;
