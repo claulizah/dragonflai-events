@@ -1,7 +1,7 @@
 {
-  "name": "DragonflAI Events — Planificador Inteligente",
+  "name": "DragonflAI Events — Belu, tu asistente personal de eventos",
   "short_name": "DragonflAI",
-  "description": "Genera en segundos un plan completo para tu boda, quinceañera o evento: cronograma, presupuesto, checklist, proveedores y Save the Date, con IA.",
+  "description": "Cuéntale a Belu tu evento y ella genera el plan completo: cronograma, presupuesto, checklist, proveedores e invitación con RSVP.",
   "start_url": "/dragonflai-v2.html?source=pwa",
   "scope": "/",
   "display": "standalone",
@@ -12,7 +12,7 @@
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
