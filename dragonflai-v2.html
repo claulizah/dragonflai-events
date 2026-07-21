@@ -4231,7 +4231,7 @@ async function generate(){
     ?' | Contratando proveedores por separado':' | Tipo de venue: por definir';
   const stress=radios.stress||T.stress[lang][1];
   const exp=radios.exp||T.exp[lang][1];
-  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[T.priority[lang][0]];
+  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[(T.priority[eventType]||T.priority['Boda/Wedding'])[lang][0]];
   const priority=priorityList.join(', ');
 
   // ── Detalles adicionales (todos opcionales) ──
