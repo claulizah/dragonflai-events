@@ -301,9 +301,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 /* Itinerario del día: hora + actividad homologadas en una sola línea (a
    diferencia del Cronograma, que trae un tercer bloque de detalle más largo
    y conviene dejar apilado) */
-.tl-item.tl-inline{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tl-item.tl-inline{display:flex;align-items:baseline;gap:12px;flex-wrap:nowrap}
 .tl-item.tl-inline .tl-when{margin-bottom:0;flex-shrink:0;min-width:84px}
-.tl-item.tl-inline .tl-what{margin-bottom:0}
+.tl-item.tl-inline .tl-what{margin-bottom:0;min-width:0;flex:1}
 
 /* ── CHECKLIST ── */
 .cl-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border-gray);cursor:pointer;transition:background .15s;border-radius:var(--radius);margin-bottom:2px}
@@ -380,15 +380,24 @@ textarea.vcard-input{height:auto}
 .publish-preview-col{flex:0 0 390px;min-width:320px;max-width:390px}
 @media (max-width:760px){
   .publish-layout{flex-direction:column}
-  .publish-preview-col{order:-1;max-width:none;flex-basis:auto;min-width:0;width:100%}
-  /* Antes se apagaba el sticky aquí (position:static), lo que obligaba a
-     subir hasta arriba del modal para ver cada cambio de fuente/color. En
-     vez de apagarlo, se deja pegada pero compacta (con su propio scroll
-     interno) — el cambio siempre es visible sin perder el lugar. */
-  .publish-preview-col #publish-live-preview-container{
+  /* El sticky vive aquí, en el contenedor DE AFUERA, no en el de adentro
+     (#publish-live-preview-container) — ese contenedor interno mide casi
+     lo mismo que su padre inmediato, así que no le daba "cuarto" para
+     quedarse pegado mientras se baja por el formulario, que es mucho más
+     alto. Puesto aquí, el padre real (.publish-layout, que sí abarca
+     preview + formulario juntos) sí le da ese espacio. Hallazgo V7. */
+  .publish-preview-col{
+    order:-1;
+    max-width:none;
+    flex-basis:auto;
+    min-width:0;
+    width:100%;
     position:sticky;
     top:0;
     z-index:5;
+    align-self:flex-start;
+  }
+  .publish-preview-col #publish-live-preview-container{
     max-height:36vh;
     overflow-y:auto;
     background:var(--white);
@@ -5493,7 +5502,7 @@ function renderBudget(items,tips,paquete){
   return `<div class="bcards">${cards}</div>
     <div style="display:flex;gap:8px;margin:.75rem 0 1.25rem">
     <input type="text" id="budget-new-cat-input" placeholder="${L?'ej. Decoración floral':'e.g. Floral decor'}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addBudgetCategory();}">
-    <button type="button" onclick="addBudgetCategory()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
+    <button type="button" onclick="addBudgetCategory()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ ${L?'Agregar':'Add'}</button>
   </div>
     <p style="font-size:11px;color:var(--text-3);margin:-1rem 0 1rem">${L?'Al agregar o quitar una categoría, el resto se ajusta solo para que siga sumando el 100% de tu presupuesto.':'Adding or removing a category automatically adjusts the rest so it still adds up to 100% of your budget.'}</p>
     <h2>${L?'Consejos de presupuesto':'Budget tips'}</h2><ul>${tipsHtml}</ul><h2>${L?'Opción paquete todo incluido':'All-inclusive package option'}</h2><p>${esc(paquete||'')}</p>`;
