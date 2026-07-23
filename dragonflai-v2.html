@@ -87,20 +87,61 @@ input,textarea,[contenteditable="true"]{cursor:text}
   max-width:420px;width:100%;text-align:center;
   background:var(--white);border-radius:24px;padding:2.5rem 2rem;
   box-shadow:0 20px 60px rgba(0,0,0,.12);
+  position:relative;
 }
 .launcher-belu-img{height:130px;width:auto;margin-bottom:1rem}
 .launcher-content h2{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text);margin-bottom:.5rem}
 .launcher-content p{color:var(--text-2);font-size:15px;margin-bottom:1.75rem}
-.launcher-btn{
-  display:flex;align-items:center;gap:.85rem;width:100%;
-  padding:.9rem 1.25rem;margin-bottom:.9rem;
-  border:1.5px solid var(--border-gray);border-radius:14px;background:var(--cream);
-  font-family:'Inter',sans-serif;font-size:15.5px;font-weight:600;color:var(--text);
-  cursor:pointer;transition:border-color .2s,background-color .2s,transform .15s;
-  text-align:left;
+.launcher-skip{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--text-3);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:underline}
+#launcher-carousel{position:relative}
+.launcher-dots{display:flex;justify-content:center;gap:8px;margin-bottom:1.5rem}
+.launcher-dot{width:8px;height:8px;border-radius:50%;background:var(--cream-3);cursor:pointer;transition:background-color .2s,transform .2s}
+.launcher-dot.active{background:var(--teal);transform:scale(1.3)}
+.launcher-btn-primary{
+  width:100%;padding:.9rem 1.25rem;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;
+  font-family:'Inter',sans-serif;font-size:15.5px;font-weight:700;cursor:pointer;
+  transition:transform .15s,opacity .2s;
 }
-.launcher-btn:hover{border-color:var(--teal);background:var(--teal-light);transform:translateY(-1px)}
-.launcher-btn img{height:44px;width:44px;object-fit:contain;flex-shrink:0;border-radius:50%}
+.launcher-btn-primary:hover{transform:translateY(-1px)}
+.launcher-btn-primary:disabled{opacity:.6;cursor:wait}
+.launcher-email-input{
+  width:100%;padding:.85rem 1rem;margin-bottom:1rem;border:1.5px solid var(--border-gray);
+  border-radius:12px;font-family:'Inter',sans-serif;font-size:15px;color:var(--text);
+  box-sizing:border-box;
+}
+.launcher-email-input:focus{outline:none;border-color:var(--teal)}
+.launcher-email-status{font-size:13px;margin-top:1rem;line-height:1.5;min-height:1.2em}
+.dashboard-wrap{max-width:700px;margin:2.5rem auto;padding:0 1.5rem}
+.dashboard-header{text-align:center;margin-bottom:2rem}
+.dashboard-header h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--text);margin-bottom:.4rem}
+.dashboard-selector{
+  display:block;margin:.5rem auto 0;padding:.6rem 1rem;border-radius:12px;
+  border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;
+  color:var(--text);background:var(--white);max-width:320px;
+}
+.dash-card{
+  background:var(--white);border:1.5px solid var(--border-gray);border-radius:16px;
+  padding:20px 22px;margin-bottom:16px;
+}
+.dash-card-title{font-size:13px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px}
+.dash-event-name{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--text);margin-bottom:2px}
+.dash-event-meta{font-size:13px;color:var(--text-3);margin-bottom:4px}
+.dash-countdown{font-size:15px;font-weight:600;color:var(--violet);margin-top:8px}
+.dash-urgency-alert{font-size:12.5px;padding:8px 10px;border-radius:10px;margin-top:8px;line-height:1.5}
+.dash-urgency-overdue{background:rgba(193,74,94,.1);color:#8a2e3e}
+.dash-urgency-soon{background:var(--gold-light);color:#8a6b1e}
+.dash-stat-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;color:var(--text-2)}
+.dash-stat-row b{color:var(--text)}
+.dash-gallery-thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.dash-gallery-thumbs img{width:56px;height:56px;object-fit:cover;border-radius:8px}
+.dash-card-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.dash-tips-list{margin:0 0 10px;padding-left:20px;font-size:13.5px;color:var(--text-2);line-height:1.7}
+.dash-custom-tip-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13.5px;color:var(--text);border-top:1px solid var(--cream-3)}
+.dash-custom-tip-row button{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:13px}
+.dash-tip-add-row{display:flex;gap:8px;margin-top:10px}
+.dash-tip-add-row input{flex:1;padding:.6rem .8rem;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13.5px}
+.dash-tip-add-row input:focus{outline:none;border-color:var(--teal)}
 @media (max-width:480px){
   .launcher-content{padding:2rem 1.5rem}
   .launcher-belu-img{height:100px}
@@ -339,8 +380,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .tl-item.tl-inline .tl-what{margin-bottom:0;min-width:0;flex:1}
 
 /* ── CHECKLIST ── */
-.cl-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border-gray);cursor:pointer;transition:background .15s;border-radius:var(--radius);margin-bottom:2px}
+.cl-item{display:flex;align-items:flex-start;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border-gray);transition:background .15s;border-radius:var(--radius);margin-bottom:2px}
 .cl-item:last-child{border-bottom:none;margin-bottom:0}
+.cl-item.cl-status-done{opacity:.55}
+.cl-item.cl-status-done .cl-text{text-decoration:line-through;color:var(--text-3)}
+.cl-item.cl-status-postponed{opacity:.7}
+.cl-item.cl-status-postponed .cl-text{font-style:italic;color:var(--text-2)}
+.cl-status-select{
+  font-size:11.5px;font-family:'Inter',sans-serif;padding:3px 6px;border-radius:8px;
+  border:1.5px solid var(--border-gray);background:var(--white);color:var(--text-2);cursor:pointer;
+}
+.cl-status-done .cl-status-select{border-color:var(--teal);color:var(--teal-dark)}
+.cl-status-postponed .cl-status-select{border-color:var(--gold);color:#8a6b1e}
+.cl-assignee-input{
+  font-size:11.5px;font-family:'Inter',sans-serif;padding:3px 6px;border-radius:8px;
+  border:1.5px solid var(--border-gray);width:90px;color:var(--text-2);
+}
+.cl-assignee-input:focus{outline:none;border-color:var(--teal)}
 .cl-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border-gray);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--white)}
 .cl-item.chk .cl-box{background:var(--teal);border-color:transparent;box-shadow:0 2px 8px rgba(46,196,182,.3)}
 .cl-item.chk .cl-box::after{content:'';width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
@@ -684,22 +740,52 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <body>
 
 <!-- LAUNCHER — pantalla de bienvenida equivalente a la de la app móvil.
-     Se muestra siempre que se entra a /app, antes del formulario. -->
+     Se muestra siempre que se entra a /app, antes del formulario.
+     Paso 1: carrusel visual de la herramienta. Paso 2: pide el correo
+     directo — el sistema detecta si ya existe cuenta y decide a dónde
+     llevar a la persona (sin pedirle que elija "nuevo" vs "regresa"). -->
 <div id="launcher-screen" class="launcher-screen">
   <div class="launcher-content">
-    <img src="/assets/belu/belu-saludando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
-    <h2 data-es="¡Hola de nuevo!" data-en="Hello again!">¡Hola de nuevo!</h2>
-    <p data-es="¿Qué te gustaría hacer hoy?" data-en="What would you like to do today?">¿Qué te gustaría hacer hoy?</p>
-    <button class="launcher-btn" onclick="launcherHasPlan()">
-      <img src="/assets/belu/belu-sentada.png" alt="" onerror="this.style.display='none'">
-      <span data-es="Ya tengo un plan con ustedes" data-en="I already have a plan with you">Ya tengo un plan con ustedes</span>
-    </button>
-    <button class="launcher-btn" onclick="launcherFirstTime()">
-      <img src="/assets/belu/belu-fiesta.png" alt="" onerror="this.style.display='none'">
-      <span data-es="Es mi primera vez" data-en="It's my first time">Es mi primera vez</span>
-    </button>
+
+    <button class="launcher-skip" onclick="closeLauncher()" data-es="Omitir por ahora" data-en="Skip for now">Omitir por ahora</button>
+
+    <div id="launcher-carousel">
+      <div class="launcher-slide" data-slide="0">
+        <img src="/assets/belu/belu-saludando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+        <h2 data-es="¡Hola! Soy Belu" data-en="Hi! I'm Belu">¡Hola! Soy Belu</h2>
+        <p data-es="Tu asistente para planear el evento perfecto" data-en="Your assistant for planning the perfect event">Tu asistente para planear el evento perfecto</p>
+      </div>
+      <div class="launcher-slide" data-slide="1" style="display:none">
+        <img src="/assets/belu/belu-trabajando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+        <h2 data-es="Cuéntame tu evento" data-en="Tell me about your event">Cuéntame tu evento</h2>
+        <p data-es="Cronograma, presupuesto y checklist, armados en segundos" data-en="Timeline, budget, and checklist, built in seconds">Cronograma, presupuesto y checklist, armados en segundos</p>
+      </div>
+      <div class="launcher-slide" data-slide="2" style="display:none">
+        <img src="/assets/belu/belu-exitosa.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+        <h2 data-es="Y sigo contigo hasta el evento" data-en="And I stay with you through the event">Y sigo contigo hasta el evento</h2>
+        <p data-es="Invitación digital con RSVP, y galería de fotos que tus invitados suben solo con un QR" data-en="Digital invitation with RSVP, and a photo gallery your guests upload to with just a QR code">Invitación digital con RSVP, y galería de fotos que tus invitados suben solo con un QR</p>
+      </div>
+
+      <div class="launcher-dots">
+        <span class="launcher-dot active" onclick="launcherGoToSlide(0)"></span>
+        <span class="launcher-dot" onclick="launcherGoToSlide(1)"></span>
+        <span class="launcher-dot" onclick="launcherGoToSlide(2)"></span>
+      </div>
+      <button class="launcher-btn-primary" id="launcher-next-btn" onclick="launcherNextSlide()" data-es="Siguiente" data-en="Next">Siguiente</button>
+    </div>
+
+    <div id="launcher-email-step" style="display:none">
+      <img src="/assets/belu/belu-senalando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+      <h2 data-es="¿Cuál es tu correo?" data-en="What's your email?">¿Cuál es tu correo?</h2>
+      <p data-es="Así sabemos si ya tienes planes guardados con nosotros" data-en="This way we know if you already have saved plans with us">Así sabemos si ya tienes planes guardados con nosotros</p>
+      <input type="email" id="launcher-email-input" class="launcher-email-input" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter') launcherSubmitEmail()">
+      <button class="launcher-btn-primary" id="launcher-email-submit-btn" onclick="launcherSubmitEmail()" data-es="Continuar" data-en="Continue">Continuar</button>
+      <div id="launcher-email-status" class="launcher-email-status"></div>
+    </div>
+
   </div>
 </div>
+
 
 <!-- BACKGROUND ORBS -->
 <div class="bg-orb bg-orb-1"></div>
@@ -780,6 +866,26 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   </div>
 </header>
 
+<!-- DASHBOARD — pantalla de inicio para quien ya tiene sesión y planes
+     guardados. Se centra en UN evento (checklist, presupuesto, invitación,
+     confirmaciones, fotos) — el selector solo aparece si hay más de uno
+     (pensado sobre todo para planners con varios clientes). -->
+<div id="user-dashboard" style="display:none">
+  <div class="dashboard-wrap">
+    <div class="dashboard-header">
+      <h1 data-es="Tu evento" data-en="Your event">Tu evento</h1>
+      <select id="dashboard-event-selector" class="dashboard-selector" style="display:none" onchange="dashboardSelectPlan(this.value)"></select>
+    </div>
+    <div id="dashboard-event-detail"><p style="text-align:center;color:var(--text-3);font-size:13px">Cargando…</p></div>
+    <button class="btn-gen" onclick="dashboardCreateNewEvent()" style="margin-top:1.5rem">
+      <span data-es="+ Crear nuevo evento" data-en="+ Create new event">+ Crear nuevo evento</span>
+    </button>
+  </div>
+</div>
+
+<!-- Envuelve hero + selector de modo + formulario para poder ocultarlo
+     por completo cuando se muestra el dashboard de "mis planes". -->
+<div id="main-planner-view">
 <!-- HERO -->
 <section class="hero">
   <span class="hero-tag">✦ <span data-es="Planeemos tu evento juntos" data-en="Let's plan your event together">Planeemos tu evento juntos</span></span>
@@ -1132,6 +1238,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       </button>
     </div>
   </div>
+</div>
 </div>
 
 <!-- RESULTS -->
@@ -1685,26 +1792,61 @@ function updateAccountUI(){
   }
 }
 
+const LAUNCHER_SLIDE_COUNT=3;
+let launcherSlideIndex=0;
 function closeLauncher(){
   const el=document.getElementById('launcher-screen');
   if(el) el.style.display='none';
 }
-function launcherHasPlan(){
-  closeLauncher();
-  if(currentUser){
-    openMyPlans();
+function launcherGoToSlide(i){
+  document.querySelectorAll('#launcher-carousel .launcher-slide').forEach((el,idx)=>{ el.style.display=idx===i?'block':'none'; });
+  document.querySelectorAll('.launcher-dot').forEach((el,idx)=>{ el.classList.toggle('active',idx===i); });
+  launcherSlideIndex=i;
+  const btn=document.getElementById('launcher-next-btn');
+  if(btn) btn.textContent=(i===LAUNCHER_SLIDE_COUNT-1)?(lang==='es'?'Continuar':'Continue'):(lang==='es'?'Siguiente':'Next');
+}
+function launcherNextSlide(){
+  if(launcherSlideIndex<LAUNCHER_SLIDE_COUNT-1){
+    launcherGoToSlide(launcherSlideIndex+1);
   } else {
-    // Aún no hay sesión — pedimos login primero. Nota: después de iniciar
-    // sesión, la persona tiene que darle clic a "Mis planes" ella misma
-    // en el menú de cuenta; no encadenamos automáticamente a Mis Planes
-    // post-login todavía (se puede agregar después si hace falta).
-    openAuthModal();
+    launcherShowEmailStep();
   }
 }
-function launcherFirstTime(){
-  closeLauncher();
-  // El formulario normal ya está detrás del launcher — no se necesita
-  // hacer nada más, solo revelarlo al cerrar esta pantalla.
+function launcherShowEmailStep(){
+  document.getElementById('launcher-carousel').style.display='none';
+  document.getElementById('launcher-email-step').style.display='block';
+}
+async function launcherSubmitEmail(){
+  const emailEl=document.getElementById('launcher-email-input');
+  const email=emailEl.value.trim();
+  const statusEl=document.getElementById('launcher-email-status');
+  if(!email){ emailEl.focus(); return; }
+
+  const btn=document.getElementById('launcher-email-submit-btn');
+  const originalLabel=btn.textContent;
+  btn.disabled=true; btn.textContent=lang==='es'?'Un momento…':'One moment…';
+  statusEl.textContent=''; statusEl.style.color='';
+
+  // shouldCreateUser:false hace que Supabase distinga los 2 casos con
+  // certeza: si el correo ya tiene cuenta, manda el link mágico normal
+  // (error===null). Si NO existe, regresa el error específico de abajo
+  // — ahí dejamos pasar a la persona directo al formulario, sin cuenta
+  // todavía (igual que el flujo normal de "primera vez").
+  const {error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:canonicalRedirectUrl()}});
+
+  btn.disabled=false; btn.textContent=originalLabel;
+
+  if(!error){
+    statusEl.style.color='var(--teal-dark)';
+    statusEl.textContent=lang==='es'?'✉️ Te mandamos un link a tu correo — ábrelo para entrar a tus planes.':"✉️ We've sent you a link — open it to access your plans.";
+    return;
+  }
+  if(error.message && error.message.toLowerCase().includes('signups not allowed')){
+    closeLauncher();
+    return;
+  }
+  statusEl.style.color='#C14A5E';
+  statusEl.textContent=error.message;
 }
 function openAuthModal(){ document.getElementById('auth-modal').classList.add('open'); document.body.style.overflow='hidden'; }
 function closeAuthModal(){ document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow=''; const n=document.getElementById('auth-expired-note'); if(n) n.style.display='none'; }
@@ -3406,13 +3548,341 @@ function reportSignupRef(){
 }
 
 if(sb){
-  sb.auth.onAuthStateChange((_event,session)=>{
+  // Supabase dispara varios eventos (INITIAL_SESSION, y a veces otros más)
+  // para la MISMA sesión justo al cargar la página — sin este control,
+  // refreshPaidStatus() (2 consultas a Supabase: profiles + RPC de acceso)
+  // se ejecutaba 3 veces de golpe en cada carga. Comparamos contra el
+  // último usuario ya procesado por este listener — si es el mismo,
+  // saltamos el refetch aquí (otros llamados directos a refreshPaidStatus()
+  // en el resto del código, ej. después de una compra, no se tocan).
+  let lastAuthListenerUserId=undefined; // undefined = todavía no se ha procesado ningún evento
+  sb.auth.onAuthStateChange(async(_event,session)=>{
+    const newUserId=session?session.user.id:null;
     currentUser=session?session.user:null;
     updateAccountUI();
-    refreshPaidStatus();
+    if(newUserId===lastAuthListenerUserId){
+      routeInitialScreen(); // sigue corriendo — es barato y solo actúa una vez (initialRoutingDone)
+      return;
+    }
+    lastAuthListenerUserId=newUserId;
+    await refreshPaidStatus();
     reportSignupRef();
+    routeInitialScreen();
   });
 }
+
+// Decide qué mostrar al cargar la página: si ya hay sesión, nos saltamos
+// el launcher; si además tiene planes guardados, mostramos el dashboard
+// en vez del formulario en blanco. Solo corre una vez — cambios de sesión
+// posteriores (ej. token refresh en segundo plano) no deben reordenar la
+// pantalla de alguien a media edición.
+let initialRoutingDone=false;
+let dashboardCurrentPlanId=null;
+let dashboardCurrentPlanData={};
+let dashboardInspoFiles=[];
+function dashboardInspoFilesSelected(event){
+  const files=Array.from(event.target.files||[]).slice(0,3); // máximo 3, para no mandar payloads enormes
+  dashboardInspoFiles=files;
+  const previewEl=document.getElementById('dash-inspo-preview');
+  previewEl.innerHTML='';
+  files.forEach(f=>{
+    const img=document.createElement('img');
+    img.style.cssText='width:56px;height:56px;object-fit:cover;border-radius:8px';
+    img.src=URL.createObjectURL(f);
+    previewEl.appendChild(img);
+  });
+  document.getElementById('dash-inspo-generate-btn').style.display=files.length?'block':'none';
+}
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result.split(',')[1]);
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function dashboardGenerateInspoIdeas(){
+  const L=lang==='es';
+  if(!dashboardInspoFiles.length||!dashboardCurrentPlanId) return;
+  const btn=document.getElementById('dash-inspo-generate-btn');
+  const ideasEl=document.getElementById('dash-inspo-ideas');
+  btn.disabled=true; btn.textContent=L?'Analizando fotos…':'Analyzing photos…';
+
+  try{
+    const imageBlocks=await Promise.all(dashboardInspoFiles.map(async f=>({
+      type:'image',
+      source:{type:'base64',media_type:f.type||'image/jpeg',data:await fileToBase64(f)}
+    })));
+    const savedPlan=dashboardCurrentPlanData.plan||{};
+    const promptText=L
+      ?`Estas son fotos de inspiración que subió la persona para su evento (tipo: ${savedPlan.typeName||''}, presupuesto: $${savedPlan.budget||''}). Con base en el estilo/colores/ambiente que ves en las fotos, sugiere 4-5 ideas concretas y accionables para su evento (decoración, colores, detalles). Responde solo con la lista, sin preámbulo.`
+      :`These are inspiration photos the person uploaded for their event (type: ${savedPlan.typeName||''}, budget: $${savedPlan.budget||''}). Based on the style/colors/mood in the photos, suggest 4-5 concrete, actionable ideas for their event (décor, colors, details). Reply with just the list, no preamble.`;
+
+    const {data:{session}={}}=sb?await sb.auth.getSession():{data:{}};
+    const headers={'Content-Type':'application/json','X-DFLAI-Purpose':'chat'};
+    if(session?.access_token) headers['Authorization']='Bearer '+session.access_token;
+    const res=await fetch(WORKER_URL,{
+      method:'POST',
+      headers,
+      body:JSON.stringify({
+        model:'claude-sonnet-4-5',
+        max_tokens:800,
+        messages:[{role:'user',content:[...imageBlocks,{type:'text',text:promptText}]}]
+      })
+    });
+    if(!res.ok){
+      const e=await res.json().catch(()=>({}));
+      throw new Error(e.error?.message||`Error ${res.status}`);
+    }
+    const data=await res.json();
+    const ideasText=data.content?.[0]?.text||'';
+
+    ideasEl.innerHTML=esc(ideasText).replace(/\n/g,'<br>');
+
+    // Guardamos solo el texto de las ideas — las fotos en sí no se
+    // suben a almacenamiento permanente en esta primera versión, solo
+    // se usan una vez para generar la sugerencia.
+    if(!dashboardCurrentPlanData.plan) dashboardCurrentPlanData.plan={};
+    dashboardCurrentPlanData.plan.inspirationIdeas=ideasText;
+    await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  }catch(err){
+    showToast(err.message||(L?'No se pudieron generar ideas':'Could not generate ideas'),true);
+  }finally{
+    btn.disabled=false; btn.textContent=L?'✨ Generar ideas':'✨ Generate ideas';
+  }
+}
+
+async function routeInitialScreen(){
+  if(initialRoutingDone) return;
+  initialRoutingDone=true;
+  if(!currentUser) return; // sin sesión: se queda el launcher tal cual
+
+  closeLauncher(); // ya sabemos quién es, no hace falta preguntarle nada
+
+  const {data,error}=await sb.from('plans').select('id').eq('user_id',currentUser.id).limit(1);
+  if(!error && data && data.length){
+    showUserDashboard();
+  }
+  // si no tiene planes todavía (cuenta nueva), se queda el formulario
+  // normal, que ya está visible por default.
+}
+
+function showUserDashboard(){
+  document.getElementById('main-planner-view').style.display='none';
+  document.getElementById('user-dashboard').style.display='block';
+  loadDashboardPlans();
+}
+
+function dashboardCreateNewEvent(){
+  document.getElementById('user-dashboard').style.display='none';
+  document.getElementById('main-planner-view').style.display='block';
+}
+
+async function loadDashboardPlans(){
+  const L=lang==='es';
+  const {data,error}=await sb.from('plans').select('id,title,event_type,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(error||!data||!data.length){
+    // Ya no quedan planes (ej. se acaba de borrar el último) — no dejamos
+    // la tarjeta del plan ya borrado en pantalla, mandamos al formulario.
+    dashboardCreateNewEvent();
+    showToast(L?'Ya no tienes eventos guardados — crea uno nuevo':'You have no saved events left — create a new one');
+    return;
+  }
+
+  const sel=document.getElementById('dashboard-event-selector');
+  if(data.length>1){
+    sel.style.display='block';
+    sel.innerHTML=data.map(p=>`<option value="${p.id}">${esc(p.title)}</option>`).join('');
+  } else {
+    sel.style.display='none';
+  }
+
+  // Prioridad para decidir cuál mostrar primero: el "evento principal" que
+  // la persona haya elegido en su perfil, si sigue existiendo en la lista;
+  // si no, el más reciente (data ya viene ordenado por fecha descendente).
+  let initialId=data[0].id;
+  if(userProfile.main_plan_id && data.some(p=>p.id===userProfile.main_plan_id)){
+    initialId=userProfile.main_plan_id;
+  }
+  sel.value=initialId;
+  dashboardSelectPlan(initialId);
+}
+
+async function dashboardSelectPlan(planId){
+  const L=lang==='es';
+  const detailEl=document.getElementById('dashboard-event-detail');
+  detailEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
+
+  const [{data:planRow,error:planErr},{data:progressRow},{data:invRows}]=await Promise.all([
+    sb.from('plans').select('id,title,event_type,created_at,plan_data').eq('id',planId).eq('user_id',currentUser.id).single(),
+    sb.from('plan_checklist_progress').select('progress').eq('plan_id',planId).maybeSingle(),
+    sb.from('invitations').select('id,is_published,slug,gallery_urls').eq('plan_id',planId).eq('user_id',currentUser.id)
+  ]);
+
+  if(planErr||!planRow){
+    detailEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'No se pudo cargar este evento.':'Could not load this event.'}</p>`;
+    return;
+  }
+
+  const savedPlan=(planRow.plan_data&&planRow.plan_data.plan)||{};
+
+  // Checklist: el progreso guardado en el servidor manda; si nunca se ha
+  // tocado, usamos el snapshot que trae el plan (todo sin marcar).
+  const sections=(progressRow&&progressRow.progress)||savedPlan.checklistData||[];
+  const totalTasks=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const doneTasks=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false&&i.done===true).length,0);
+  const pct=totalTasks?Math.round((doneTasks/totalTasks)*100):0;
+
+  // Cuenta regresiva y urgencia por sección — ambas dependen de la fecha
+  // real del evento, si ya se definió.
+  const today=new Date(); today.setHours(0,0,0,0);
+  const eventDateObj=savedPlan.rawDate?new Date(savedPlan.rawDate+'T12:00:00'):null;
+  let daysUntilEvent=null;
+  if(eventDateObj){ daysUntilEvent=Math.round((eventDateObj-today)/(1000*60*60*24)); }
+
+  // Por sección: si tiene tareas sin marcar y su fecha típica ya pasó (o
+  // está muy cerca), la marcamos urgente/atrasada. Aproximación por
+  // sección, no por tarea individual — ver CHECKLIST_SECTION_TIMING.
+  let overdueSections=[],soonSections=[];
+  if(eventDateObj){
+    sections.forEach(sec=>{
+      const pending=(sec.items||[]).filter(i=>i.selected!==false&&i.done!==true&&i.status!=='postponed').length;
+      if(!pending) return;
+      const monthsBefore=CHECKLIST_SECTION_TIMING[sec.section];
+      if(monthsBefore===undefined) return; // sección no reconocida — no adivinamos
+      const suggestedDate=new Date(eventDateObj); suggestedDate.setDate(suggestedDate.getDate()-Math.round(monthsBefore*30));
+      const daysUntilDue=Math.round((suggestedDate-today)/(1000*60*60*24));
+      if(daysUntilDue<0) overdueSections.push(sec.section);
+      else if(daysUntilDue<=30) soonSections.push(sec.section);
+    });
+  }
+
+  // Presupuesto: total planeado + hasta 3 categorías más grandes, tal
+  // como se generaron — no hay todavía seguimiento de "gasto real".
+  const budgetTotal=parseInt(savedPlan.budget)||0;
+  const budgetTop=(savedPlan.budgetData||[]).slice().sort((a,b)=>(b.amount||0)-(a.amount||0)).slice(0,3);
+
+  // Invitación: puede no existir todavía si nunca la publicó.
+  const inv=(invRows&&invRows[0])||null;
+  let rsvpYes=0,rsvpNo=0,guestTotal=0;
+  if(inv){
+    const [{count:yc},{count:nc},{count:gt}]=await Promise.all([
+      sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',true),
+      sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',false),
+      sb.from('guest_list').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id)
+    ]);
+    rsvpYes=yc||0; rsvpNo=nc||0; guestTotal=gt||0;
+  }
+  const galleryUrls=(inv&&inv.gallery_urls)||[];
+
+  detailEl.innerHTML=`
+    <div class="dash-card">
+      <div class="dash-event-name">${esc(planRow.title)}</div>
+      <div class="dash-event-meta">${esc(planRow.event_type||'')}</div>
+      ${daysUntilEvent!==null?`<div class="dash-countdown">${daysUntilEvent>0?(L?`Faltan <b>${daysUntilEvent}</b> días para tu evento`:`<b>${daysUntilEvent}</b> days until your event`):(daysUntilEvent===0?(L?'¡Hoy es tu evento! 🎉':'Today is your event! 🎉'):(L?'Tu evento ya pasó':'Your event has passed'))}</div>`:''}
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">${L?'Checklist':'Checklist'}</div>
+      <div style="height:8px;background:var(--cream-3);border-radius:100px;overflow:hidden;margin-bottom:8px">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--teal),var(--violet))"></div>
+      </div>
+      <div class="dash-stat-row"><span>${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}</span><b>${pct}%</b></div>
+      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
+      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">${L?'Presupuesto':'Budget'}</div>
+      <div class="dash-stat-row"><span>${L?'Total planeado':'Total planned'}</span><b>$${budgetTotal.toLocaleString(L?'es-MX':'en-US')}</b></div>
+      ${budgetTop.map(b=>`<div class="dash-stat-row" style="font-size:13px"><span>${esc(b.category||b.name||'')}</span><span>$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}</span></div>`).join('')}
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">${L?'Invitación':'Invitation'}</div>
+      ${inv?`
+        <div class="dash-stat-row"><span>${L?'Estado':'Status'}</span><b>${inv.is_published?(L?'Publicada':'Published'):(L?'Borrador':'Draft')}</b></div>
+        <div class="dash-stat-row"><span>${L?'Confirmaron':'Confirmed'}</span><b style="color:var(--teal-dark)">${rsvpYes}</b></div>
+        <div class="dash-stat-row"><span>${L?'No podrán ir':'Not attending'}</span><b>${rsvpNo}</b></div>
+        <div class="dash-stat-row"><span>${L?'Invitados en tu lista':'Guests on your list'}</span><b>${guestTotal}</b></div>
+        ${galleryUrls.length?`<div class="dash-stat-row"><span>${L?'Fotos subidas':'Photos uploaded'}</span><b>${galleryUrls.length}</b></div><div class="dash-gallery-thumbs">${galleryUrls.slice(0,6).map(u=>`<img src="${u}">`).join('')}</div>`:''}
+      `:`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has creado tu invitación digital para este evento.':'You have not created your digital invitation for this event yet.'}</p>`}
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">${L?'Ideas basadas en tus fotos':'Ideas based on your photos'}</div>
+      <p style="font-size:12.5px;color:var(--text-3);margin-bottom:10px">${L?'Sube 2-3 fotos que te inspiren (Pinterest, otra boda que te gustó, etc.) y Belu te sugiere ideas para tu estilo.':'Upload 2-3 photos that inspire you (Pinterest, another wedding you liked, etc.) and Belu suggests ideas for your style.'}</p>
+      <input type="file" id="dash-inspo-input" accept="image/*" multiple style="display:none" onchange="dashboardInspoFilesSelected(event)">
+      <button class="btn-account" onclick="document.getElementById('dash-inspo-input').click()">📷 ${L?'Elegir fotos':'Choose photos'}</button>
+      <div id="dash-inspo-preview" style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap"></div>
+      <button class="btn-gen" id="dash-inspo-generate-btn" style="display:none;margin-top:6px" onclick="dashboardGenerateInspoIdeas()">${L?'✨ Generar ideas':'✨ Generate ideas'}</button>
+      <div id="dash-inspo-ideas" style="margin-top:12px;font-size:13.5px;color:var(--text-2);line-height:1.6"></div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-title">${L?'Ideas para ahorrar':'Ways to save'}</div>
+      <ul class="dash-tips-list">
+        ${budgetTipsForType(planRow.event_type).es && (L?budgetTipsForType(planRow.event_type).es:budgetTipsForType(planRow.event_type).en).map(t=>`<li>${esc(t)}</li>`).join('')}
+      </ul>
+      <div id="dash-custom-tips-list"></div>
+      <div class="dash-tip-add-row">
+        <input type="text" id="dash-new-tip-input" placeholder="${L?'Agrega tu propia idea…':'Add your own idea…'}" onkeydown="if(event.key==='Enter') dashboardAddBudgetTip()">
+        <button class="btn-account" onclick="dashboardAddBudgetTip()">${L?'Agregar':'Add'}</button>
+      </div>
+    </div>
+
+    <div class="dash-card-actions">
+      <button class="btn-account" onclick="loadSavedPlan('${planId}')">${L?'Abrir plan completo':'Open full plan'}</button>
+      <button class="btn-account" onclick="deleteSavedPlan('${planId}')">🗑️ ${L?'Borrar':'Delete'}</button>
+    </div>
+  `;
+  dashboardCurrentPlanId=planId;
+  dashboardCurrentPlanData=planRow.plan_data||{plan:{}};
+  renderDashboardCustomTips();
+
+  dashboardInspoFiles=[];
+  document.getElementById('dash-inspo-preview').innerHTML='';
+  document.getElementById('dash-inspo-generate-btn').style.display='none';
+  const savedIdeas=(dashboardCurrentPlanData.plan&&dashboardCurrentPlanData.plan.inspirationIdeas)||'';
+  document.getElementById('dash-inspo-ideas').innerHTML=savedIdeas?esc(savedIdeas).replace(/\n/g,'<br>'):'';
+}
+
+function renderDashboardCustomTips(){
+  const L=lang==='es';
+  const tips=(dashboardCurrentPlanData.plan&&dashboardCurrentPlanData.plan.customBudgetTips)||[];
+  const listEl=document.getElementById('dash-custom-tips-list');
+  if(!listEl) return;
+  listEl.innerHTML=tips.map((t,i)=>`
+    <div class="dash-custom-tip-row">
+      <span>${esc(t)}</span>
+      <button onclick="dashboardRemoveBudgetTip(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+async function dashboardAddBudgetTip(){
+  const input=document.getElementById('dash-new-tip-input');
+  const text=input.value.trim();
+  if(!text||!dashboardCurrentPlanId) return;
+  if(!dashboardCurrentPlanData.plan) dashboardCurrentPlanData.plan={};
+  if(!Array.isArray(dashboardCurrentPlanData.plan.customBudgetTips)) dashboardCurrentPlanData.plan.customBudgetTips=[];
+  dashboardCurrentPlanData.plan.customBudgetTips.push(text);
+  input.value='';
+  renderDashboardCustomTips();
+  const {error}=await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  if(error) showToast(lang==='es'?'No se pudo guardar tu idea':'Could not save your idea',true);
+}
+
+async function dashboardRemoveBudgetTip(index){
+  if(!dashboardCurrentPlanId||!dashboardCurrentPlanData.plan) return;
+  dashboardCurrentPlanData.plan.customBudgetTips.splice(index,1);
+  renderDashboardCustomTips();
+  const {error}=await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  if(error) showToast(lang==='es'?'No se pudo borrar':'Could not delete',true);
+}
+
 
 let radios={stress:'',exp:'',priority:[],todoIncluido:'No sé todavía'};
 let gensUsed=parseInt(localStorage.getItem('dflai_gens')||'0');
@@ -3734,6 +4204,46 @@ const CEREMONY_FORMATS={
 };
 // Degustación/hospedaje/coordinador ahora aplican a todos los tipos de evento.
 const TYPES_DRESSCODE=['Boda/Wedding','Corporativo/Corporate','Aniversario/Anniversary'];
+
+// Tips curados para ahorrar presupuesto, por tipo de evento — contenido
+// editable directamente aquí por el equipo (no depende de la IA).
+const BUDGET_TIPS={
+  'Boda/Wedding':{es:['Usa flores de temporada en vez de importadas — cuestan hasta la mitad','Arma tú misma los centros de mesa con velas y elementos naturales','Contrata catering solo para el platillo principal y haz los postres/entremeses en casa o con un familiar','Reutiliza la decoración floral de la ceremonia también en la recepción'],en:['Use in-season flowers instead of imported ones — often half the cost','Make your own centerpieces with candles and natural elements','Hire catering only for the main course, and make desserts/appetizers at home','Reuse the ceremony flowers again at the reception']},
+  'Cumpleaños/Birthday':{es:['Decora con globos inflados en casa en vez de arreglos comprados','Pide un pastel de panadería local en vez de repostería de diseño','Organiza juegos con materiales que ya tienes en casa'],en:['Decorate with balloons inflated at home instead of bought arrangements','Order a cake from a local bakery instead of a designer one','Set up games using materials you already have at home']},
+  'Baby Shower':{es:['Arma los centros de mesa con flores de temporada','Imprime los juegos tú misma en vez de comprar kits','Prepara snacks caseros en vez de contratar catering completo'],en:['Make centerpieces with in-season flowers','Print the games yourself instead of buying kits','Prepare homemade snacks instead of hiring full catering']},
+  'Corporativo/Corporate':{es:['Usa el espacio de tu propia oficina en vez de rentar un salón','Ofrece un coffee break en vez de un banquete completo','Manda los materiales en digital en vez de imprimir folletos'],en:['Use your own office space instead of renting a venue','Offer a coffee break instead of a full banquet','Send materials digitally instead of printing handouts']},
+  'Quinceañera':{es:['Renta el vestido en vez de comprarlo','Decora tú misma con telas y luces en vez de rentar decoración completa','Usa música grabada para el vals en vez de banda en vivo'],en:['Rent the dress instead of buying it','Decorate yourself with fabrics and lights instead of renting full décor','Use recorded music for the waltz instead of a live band']},
+  'Graduación/Graduation':{es:['Haz la fiesta en casa o jardín en vez de rentar un salón','Prepara un buffet casero en vez de contratar catering','Decora con fotos impresas en casa'],en:['Host the party at home or in a garden instead of renting a venue','Prepare a homemade buffet instead of hiring catering','Decorate with photos printed at home']},
+  'Aniversario/Anniversary':{es:['Organiza una cena en casa decorada en vez de ir a un restaurante','Arma un álbum de fotos tú misma en vez de contratar un servicio profesional','Compra flores de mercado en vez de floristería'],en:['Host a decorated dinner at home instead of going to a restaurant','Make a photo album yourself instead of hiring a professional service','Buy flowers from the market instead of a florist']},
+  'Fiesta Infantil/Kids Party':{es:['Haz la piñata en casa en vez de comprarla','Prepara snacks caseros en vez de contratar catering','Organiza juegos tradicionales en vez de rentar inflables'],en:['Make the piñata at home instead of buying one','Prepare homemade snacks instead of hiring catering','Set up traditional games instead of renting inflatables']}
+};
+function budgetTipsForType(type){ return BUDGET_TIPS[type]||BUDGET_TIPS['Boda/Wedding']; }
+
+// Urgencia típica por sección del checklist, en meses antes del evento —
+// aproximación curada (el checklist no trae fecha por tarea individual,
+// solo por sección). Sirve para resaltar qué es más urgente según cuánto
+// falte para el evento, no para dar una fecha exacta por tarea.
+// Estados posibles de una tarea del checklist — reemplaza el simple
+// "hecho/no hecho" de antes. done se mantiene sincronizado (done=true
+// solo cuando status==='done') para no romper el resto del código que
+// ya calcula el % de avance a partir de item.done.
+const CHECKLIST_STATUS_OPTIONS={
+  es:[{value:'pending',label:'Pendiente'},{value:'in_progress',label:'En progreso'},{value:'done',label:'Hecho'},{value:'postponed',label:'Pospuesto'}],
+  en:[{value:'pending',label:'Pending'},{value:'in_progress',label:'In progress'},{value:'done',label:'Done'},{value:'postponed',label:'Postponed'}]
+};
+const CHECKLIST_SECTION_TIMING={
+  'Lugar y Logística':6,'Venue & Logistics':6,
+  'Catering y Menu':4,'Catering & Menu':4,
+  'Entretenimiento':4,'Entertainment':4,
+  'Fotografía y Video':5,'Photography & Video':5,
+  'Invitados e Invitaciones':5,'Guests & Invitations':5,
+  'Ceremonia':3,'Ceremony':3,'Ceremonia y Vals':3,'Ceremony & Waltz':3,
+  'Diplomas y Ceremonia':2,'Diplomas & Ceremony':2,
+  'Registro y Material Corporativo':2,'Registration & Corporate Materials':2,
+  'Decoración':2,'Decor':2,
+  'Detalles Finales':1,'Final Details':1,
+  'Dia del Evento':0.25,'Event Day':0.25
+};
 
 // Ícono del tab "Save the Date": sobre con corazón solo para eventos
 // románticos (Boda/Aniversario) — el resto usa un ícono neutral. Antes era
@@ -5800,14 +6310,28 @@ function updateChecklistProgressBar(){
 function renderChecklist(sections){
   if(!Array.isArray(sections)||!sections.length) return '';
   const L=plan.lang==='es';
-  const hint=L?'Marca cada tarea conforme la vayas completando — tu progreso se guarda solo. ¿Algo no aplica a tu evento? Quítalo con la ✕.':'Check off each task as you complete it — your progress saves automatically. Something doesn’t apply to your event? Remove it with the ✕.';
+  const statusOpts=CHECKLIST_STATUS_OPTIONS[plan.lang]||CHECKLIST_STATUS_OPTIONS.es;
+  const hint=L?'Marca el estado y quién está a cargo de cada tarea — tu progreso se guarda solo. ¿Algo no aplica a tu evento? Quítalo con la ✕.':'Set the status and who\'s in charge of each task — your progress saves automatically. Something doesn’t apply to your event? Remove it with the ✕.';
   const body=sections.map((s,si)=>{
     const visibleItems=(s.items||[]).map((i,ii)=>({i,ii})).filter(({i})=>i.selected!==false);
     if(!visibleItems.length) return '';
     const items=visibleItems.map(({i,ii})=>{
-      if(i.done===undefined) i.done=false;
-      const removeBtn=`<span onclick="event.stopPropagation();excludeChecklistItem(${si},${ii})" style="margin-left:auto;padding-left:10px;color:var(--text-3);font-size:13px;flex-shrink:0;white-space:nowrap" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
-      return `<div class="cl-item${i.done?' chk':''}" data-s="${si}" data-i="${ii}" onclick="toggleChecklistItem(this)" style="display:flex;align-items:flex-start"><div class="cl-box"></div><div style="flex:1"><div class="cl-text">${esc(i.text)}</div><div class="cl-cat">${esc(i.cat)}</div></div>${removeBtn}</div>`;
+      if(i.status===undefined) i.status=i.done===true?'done':'pending';
+      i.done=(i.status==='done'); // mantener sincronizado para el resto del código
+      const removeBtn=`<span onclick="event.stopPropagation();excludeChecklistItem(${si},${ii})" style="margin-left:8px;color:var(--text-3);font-size:13px;flex-shrink:0;white-space:nowrap" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
+      const statusSelect=`<select class="cl-status-select" data-s="${si}" data-i="${ii}" onchange="updateChecklistItemStatus(this)" onclick="event.stopPropagation()">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
+      const assigneeInput=`<input type="text" class="cl-assignee-input" data-s="${si}" data-i="${ii}" placeholder="${L?'¿Quién?':'Who?'}" value="${esc(i.assignedTo||'')}" onclick="event.stopPropagation()" oninput="updateChecklistItemAssignee(this)">`;
+      return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
+        <div style="flex:1;min-width:0">
+          <div class="cl-text">${esc(i.text)}</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
+            <span class="cl-cat">${esc(i.cat)}</span>
+            ${statusSelect}
+            ${assigneeInput}
+          </div>
+        </div>
+        ${removeBtn}
+      </div>`;
     }).join('');
     return `<h2>${esc(s.section)}</h2>${items}`;
   }).join('');
@@ -5815,7 +6339,31 @@ function renderChecklist(sections){
     <input type="text" id="checklist-new-item-input" placeholder="${L?'ej. Confirmar con el florista':'e.g. Confirm with the florist'}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomChecklistItem();}">
     <button type="button" onclick="addCustomChecklistItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
   </div>`;
-  return checklistProgressBarHTML(sections)+`<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}${addForm}`;
+  const importExportRow=`<div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
+    <button type="button" class="btn-account" onclick="document.getElementById('checklist-import-input').click()">📥 ${L?'Importar Excel':'Import Excel'}</button>
+    <input type="file" id="checklist-import-input" accept=".xlsx,.xls" style="display:none" onchange="importChecklistFromExcel(event)">
+  </div>`;
+  return checklistProgressBarHTML(sections)+`<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${body}${addForm}${importExportRow}`;
+}
+
+function updateChecklistItemStatus(select){
+  const si=+select.dataset.s,ii=+select.dataset.i;
+  const item=plan.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.status=select.value;
+  item.done=(item.status==='done');
+  const row=select.closest('.cl-item');
+  if(row) row.className='cl-item cl-status-'+item.status;
+  updateChecklistProgressBar();
+  scheduleChecklistProgressSave();
+}
+
+function updateChecklistItemAssignee(input){
+  const si=+input.dataset.s,ii=+input.dataset.i;
+  const item=plan.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.assignedTo=input.value;
+  scheduleChecklistProgressSave();
 }
 
 function addCustomChecklistItem(){
@@ -5879,14 +6427,62 @@ async function loadChecklistProgressFromServer(planId){
   }catch(e){ console.error('No se pudo cargar el progreso del checklist:',e); return false; }
 }
 
-function toggleChecklistItem(el){
-  const si=+el.dataset.s,ii=+el.dataset.i;
-  const item=plan.checklistData?.[si]?.items?.[ii];
-  if(!item) return;
-  item.done=!item.done;
-  el.classList.toggle('chk',item.done);
-  updateChecklistProgressBar();
-  scheduleChecklistProgressSave();
+async function importChecklistFromExcel(event){
+  const file=event.target.files[0];
+  event.target.value=''; // permite volver a elegir el mismo archivo después
+  if(!file) return;
+  const L=plan.lang==='es';
+  if(!Array.isArray(plan.checklistData)||!plan.checklistData.length){
+    showToast(L?'Genera tu checklist primero':'Generate your checklist first',true);
+    return;
+  }
+  try{
+    const wb=new ExcelJS.Workbook();
+    await wb.xlsx.load(await file.arrayBuffer());
+    const ws=wb.getWorksheet('Checklist');
+    if(!ws){ showToast(L?'No se encontró la hoja "Checklist" en ese archivo':'Could not find a "Checklist" sheet in that file',true); return; }
+
+    const statusOptsImp=CHECKLIST_STATUS_OPTIONS[plan.lang]||CHECKLIST_STATUS_OPTIONS.es;
+    const labelToValue=label=>{
+      const norm=String(label||'').trim().toLowerCase();
+      const found=statusOptsImp.find(o=>o.label.toLowerCase()===norm);
+      return found?found.value:null;
+    };
+
+    // Índice rápido sección+tarea -> item real, para hacer coincidir cada
+    // fila del Excel con su tarea correspondiente en el checklist actual.
+    const index={};
+    plan.checklistData.forEach(s=>(s.items||[]).forEach(i=>{ index[(s.section+'|||'+i.text).toLowerCase()]=i; }));
+
+    let matched=0,unmatched=0;
+    ws.eachRow((row,rowNumber)=>{
+      if(rowNumber===1) return; // encabezado
+      const section=row.getCell(1).text?.trim();
+      const task=row.getCell(2).text?.trim();
+      const statusLabel=row.getCell(4).text?.trim();
+      const assignedTo=row.getCell(5).text?.trim()||'';
+      if(!section||!task) return;
+      const item=index[(section+'|||'+task).toLowerCase()];
+      if(!item){ unmatched++; return; }
+      const statusVal=labelToValue(statusLabel);
+      if(statusVal){ item.status=statusVal; item.done=(statusVal==='done'); }
+      item.assignedTo=assignedTo;
+      matched++;
+    });
+
+    setTabHTML('checklist',renderChecklist(plan.checklistData));
+    scheduleChecklistProgressSave();
+    schedulePlanResave();
+
+    if(unmatched){
+      showToast(L?`✅ ${matched} tareas actualizadas — ${unmatched} filas no coincidieron con tu checklist actual (¿se editó el texto?)`:`✅ ${matched} tasks updated — ${unmatched} rows didn't match your current checklist (was the text edited?)`);
+    } else {
+      showToast(L?`✅ ${matched} tareas actualizadas desde tu Excel`:`✅ ${matched} tasks updated from your Excel`);
+    }
+  }catch(err){
+    console.error('Error importando checklist desde Excel:',err);
+    showToast(L?'No se pudo leer ese archivo — confirma que sea el Excel exportado desde aquí':'Could not read that file — make sure it\'s the Excel exported from here',true);
+  }
 }
 
 function excludeChecklistItem(si,ii){
@@ -6246,9 +6842,16 @@ async function loadSavedPlan(id){
   // anterior se queda "pegado" en las pestañas que este plan no trae.
   tabKeys.forEach(k=>setTabHTML(k,''));
   Object.keys(saved.tabsHtml||{}).forEach(k=>setTabHTML(k,saved.tabsHtml[k]));
-  // El checklist guardado en el snapshot puede estar desactualizado si el
-  // progreso se marcó desde otro dispositivo/sesión después de guardarse —
-  // el servidor siempre tiene la versión más reciente.
+  // El checklist SIEMPRE se vuelve a renderizar con la lógica actual, en
+  // vez de confiar en el HTML guardado como snapshot — un plan guardado
+  // antes de que existiera el sistema de estado/responsable tendría un
+  // snapshot con controles viejos (y clics rotos, ya que esas funciones
+  // ya no existen). Esto también migra solo el done/no-done viejo al
+  // nuevo campo status la primera vez que se abre.
+  if(Array.isArray(plan.checklistData)) setTabHTML('checklist',renderChecklist(plan.checklistData));
+  // El progreso guardado en el servidor puede estar más actualizado si se
+  // marcó desde otro dispositivo/sesión después de guardarse — sobreescribe
+  // lo anterior si existe.
   loadChecklistProgressFromServer(id);
   // La tarjeta restaurada conserva sus atributos contenteditable, pero los
   // listeners no sobreviven al guardado — hay que re-engancharlos para que
@@ -6267,6 +6870,11 @@ async function loadSavedPlan(id){
   document.querySelectorAll('.rtab').forEach((t,i)=>t.classList.toggle('active',i===0));
 
   closeMyPlans();
+  const dash=document.getElementById('user-dashboard');
+  if(dash && dash.style.display!=='none'){
+    dash.style.display='none';
+    document.getElementById('main-planner-view').style.display='block';
+  }
   document.getElementById('res-section').style.display='block';
   document.getElementById('res-section').scrollIntoView({behavior:'smooth',block:'start'});
   showToast(lang==='es'?'📂 Plan cargado':'📂 Plan loaded');
@@ -6277,6 +6885,7 @@ async function deleteSavedPlan(id){
   if(error){ showToast(lang==='es'?'No se pudo borrar':'Could not delete',true); return; }
   showToast(lang==='es'?'🗑️ Plan borrado':'🗑️ Plan deleted');
   loadMyPlans();
+  if(document.getElementById('user-dashboard')) loadDashboardPlans();
 }
 
 const PAYWALL_CONTENT={
@@ -6540,8 +7149,10 @@ async function exportSpreadsheet(){
   // Checklist — solo lo que el usuario dejó marcado
   if(plan.checklistData&&plan.checklistData.length){
     const rows=[];
-    plan.checklistData.forEach(s=>(s.items||[]).forEach(i=>{ if(i.selected!==false) rows.push([s.section,i.text,i.cat,'']); }));
-    xlAddSheet(wb,'Checklist',[L?'Sección':'Section',L?'Tarea':'Task',L?'Categoría':'Category',L?'Hecho':'Done'],rows,[22,38,18,8]);
+    const statusOptsXl=CHECKLIST_STATUS_OPTIONS[plan.lang]||CHECKLIST_STATUS_OPTIONS.es;
+    const statusLabel=v=>(statusOptsXl.find(o=>o.value===v)||statusOptsXl[0]).label;
+    plan.checklistData.forEach(s=>(s.items||[]).forEach(i=>{ if(i.selected!==false) rows.push([s.section,i.text,i.cat,statusLabel(i.status||'pending'),i.assignedTo||'']); }));
+    xlAddSheet(wb,'Checklist',[L?'Sección':'Section',L?'Tarea':'Task',L?'Categoría':'Category',L?'Estado':'Status',L?'Responsable':'Assigned to'],rows,[22,38,18,14,16]);
   }
 
   // Proveedores — con fórmula real de Restante
