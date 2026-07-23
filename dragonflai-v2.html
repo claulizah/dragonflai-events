@@ -154,6 +154,49 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-editable-text{border:1.5px dashed transparent;border-radius:10px;padding:8px;transition:border-color .2s;min-height:1.6em}
 .dash-editable-text:hover,.dash-editable-text:focus{border-color:var(--border-gray);outline:none}
 .dash-editable-text:empty::before{content:attr(data-placeholder);color:var(--text-3);font-style:italic}
+.dash-budget-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.dash-budget-table thead th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3);padding:0 8px 8px;font-weight:700}
+.dash-budget-table thead th:not(:first-child),.dash-budget-table td:not(:first-child){text-align:right}
+.dash-budget-row td{padding:9px 8px;border-bottom:1px solid var(--cream-3)}
+.dbt-label{color:var(--text);position:relative}
+.dbt-amt{color:var(--text-2);font-variant-numeric:tabular-nums}
+.dbt-over{color:#C14A5E;font-weight:700}
+.dbt-remove{margin-left:8px;color:var(--text-3);cursor:pointer;font-size:12px}
+.dash-budget-table tfoot td{padding:10px 8px 4px;font-weight:700;color:var(--text);border-top:2px solid var(--text);font-variant-numeric:tabular-nums}
+
+.dash-inv-status{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px}
+.dash-inv-status-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dash-inv-status-dot.published{background:var(--teal)}
+.dash-inv-status-dot.draft{background:var(--gold)}
+.dash-rsvp-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.dash-rsvp-block{
+  background:var(--cream);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;
+  transition:transform .15s,box-shadow .2s;border:1.5px solid transparent;
+}
+.dash-rsvp-block:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.dash-rsvp-confirmed .drb-num{color:var(--teal-dark)}
+.dash-rsvp-declined .drb-num{color:#C14A5E}
+.dash-rsvp-pending .drb-num{color:var(--gold)}
+.drb-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;line-height:1.1}
+.drb-label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.02em;margin-top:2px}
+.dash-rsvp-namelist-box{background:var(--cream);border-radius:12px;padding:12px 14px;margin-bottom:14px;max-height:220px;overflow-y:auto}
+
+.dash-vendor-card{background:var(--cream);border-radius:14px;padding:14px 16px;margin-bottom:12px}
+.dash-vendor-head{display:flex;justify-content:space-between;align-items:flex-start}
+.dash-vendor-name{font-size:15px;font-weight:700;color:var(--text)}
+.dash-vendor-cat{font-size:12px;color:var(--text-3)}
+.dash-vendor-status-select{font-size:12px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--border-gray);background:var(--white);font-family:'Inter',sans-serif}
+.dash-vendor-status-contratado{border-color:var(--teal)!important;color:var(--teal-dark)}
+.dash-vendor-status-cotizando{border-color:var(--gold)!important;color:#8a6b1e}
+.dash-vendor-status-pendiente{color:var(--text-3)}
+.dash-vendor-price-input{font-size:12.5px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--border-gray);width:100px;font-family:'Inter',sans-serif}
+.dash-vendor-notes{width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:12.5px;resize:vertical;min-height:40px;box-sizing:border-box}
+.dash-vendor-attachments{margin-top:8px}
+.dash-vendor-attachment{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:5px 0;border-top:1px dashed var(--border-gray)}
+.dash-vendor-attachment a{color:var(--violet);text-decoration:underline}
+.dash-vendor-add-form{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dash-vendor-add-form input,.dash-vendor-add-form select{padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px}
+.dash-vendor-add-form input{flex:1;min-width:140px}
 
 .dashboard-header{text-align:center;margin-bottom:2rem}
 .dashboard-header h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--text);margin-bottom:.4rem}
@@ -233,8 +276,8 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 .logo-svg{width:36px;height:36px;flex-shrink:0}
 .logo-text{display:flex;flex-direction:column;line-height:1}
 .logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);letter-spacing:.5px}
-.logo-name .ai{color:var(--teal)}
-.logo-sub{font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
+.logo-name .ai{color:#0F7A70}
+.logo-sub{font-size:10px;color:#6B6B85;letter-spacing:.12em;text-transform:uppercase;margin-top:1px}
 .mode-pill{font-size:11px;font-weight:600;padding:4px 14px;border-radius:100px;letter-spacing:.03em;transition:all .2s}
 #mode-pill{margin-right:auto;margin-left:10px} /* pegado al logo, no flotando al centro del header */
 .mode-pill.diy{background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--border)}
@@ -3623,19 +3666,34 @@ if(sb){
 let initialRoutingDone=false;
 let dashboardCurrentPlanId=null;
 let dashboardCurrentPlanData={};
+let dashboardRsvpLists={confirmed:[],declined:[],pending:[]};
+let dashboardVendorSignedUrls={};
 let dashboardInspoFiles=[];
 function dashboardInspoFilesSelected(event){
-  const files=Array.from(event.target.files||[]).slice(0,3); // máximo 3, para no mandar payloads enormes
-  dashboardInspoFiles=files;
+  const L=lang==='es';
+  const newFiles=Array.from(event.target.files||[]);
+  event.target.value=''; // permite volver a elegir el mismo archivo si lo quita y lo vuelve a subir
+  for(const f of newFiles){
+    if(dashboardInspoFiles.length>=3){ showToast(L?'Máximo 3 fotos':'Maximum 3 photos',true); break; }
+    dashboardInspoFiles.push(f);
+  }
+  renderDashboardInspoPreview();
+}
+
+function renderDashboardInspoPreview(){
   const previewEl=document.getElementById('dash-inspo-preview');
-  previewEl.innerHTML='';
-  files.forEach(f=>{
-    const img=document.createElement('img');
-    img.style.cssText='width:56px;height:56px;object-fit:cover;border-radius:8px';
-    img.src=URL.createObjectURL(f);
-    previewEl.appendChild(img);
-  });
-  document.getElementById('dash-inspo-generate-btn').style.display=files.length?'block':'none';
+  previewEl.innerHTML=dashboardInspoFiles.map((f,i)=>`
+    <div style="position:relative">
+      <img src="${URL.createObjectURL(f)}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;display:block">
+      <span onclick="dashboardRemoveInspoFile(${i})" style="position:absolute;top:-6px;right:-6px;background:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-3);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.25)" title="${lang==='es'?'Quitar':'Remove'}">✕</span>
+    </div>
+  `).join('');
+  document.getElementById('dash-inspo-generate-btn').style.display=dashboardInspoFiles.length?'block':'none';
+}
+
+function dashboardRemoveInspoFile(i){
+  dashboardInspoFiles.splice(i,1);
+  renderDashboardInspoPreview();
 }
 
 function fileToBase64(file){
@@ -3732,6 +3790,59 @@ function dashboardSwitchTab(tabName){
   document.querySelectorAll('.dash-tab-panel').forEach(p=>{ p.style.display=(p.dataset.panel===tabName)?'block':'none'; });
 }
 
+function dashboardEditInvitation(planId){
+  loadSavedPlan(planId).then(()=>openPublishModal());
+}
+
+function dashboardToggleRsvpList(category){
+  const L=lang==='es';
+  const el=document.getElementById('dash-rsvp-namelist');
+  if(!el) return;
+  if(el.dataset.showing===category){ el.innerHTML=''; el.dataset.showing=''; return; }
+  const items=dashboardRsvpLists[category]||[];
+  const labels={confirmed:L?'Confirmaron':'Confirmed',declined:L?'No podrán ir':'Not attending',pending:L?'Faltan por confirmar':'Awaiting response'};
+  el.dataset.showing=category;
+  const rowsHtml=category==='pending'
+    ? items.map(g=>`<div class="dash-stat-row" style="font-size:13px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;width:100%">
+          <input type="checkbox" ${g.sent?'checked':''} onchange="dashboardToggleInvitationSent(${g.id},this.checked)">
+          <span style="flex:1">${esc(g.name||'')}</span>
+          <span style="font-size:11px;color:var(--text-3)">${g.sent?(L?'Invitación enviada':'Invitation sent'):(L?'Sin enviar':'Not sent')}</span>
+        </label>
+      </div>`).join('')
+    : items.map(n=>`<div class="dash-stat-row" style="font-size:13px">${esc(n||'')}</div>`).join('');
+  el.innerHTML=`<div class="dash-rsvp-namelist-box">
+    <div class="dash-subcard-title" style="margin-bottom:8px">${labels[category]} (${items.length})</div>
+    ${items.length?rowsHtml:`<p style="font-size:12.5px;color:var(--text-3)">${L?'Nadie en esta categoría todavía.':'No one in this category yet.'}</p>`}
+  </div>`;
+}
+
+async function dashboardToggleInvitationSent(guestId,sent){
+  const {error}=await sb.from('guest_list').update({invitation_sent:sent}).eq('id',guestId);
+  if(error){ showToast(lang==='es'?'No se pudo actualizar':'Could not update',true); console.error(error); }
+}
+
+async function dashboardDownloadGuestList(){
+  const L=lang==='es';
+  const wb=new ExcelJS.Workbook();
+  const ws=wb.addWorksheet(L?'Invitados':'Guests');
+  ws.columns=[{header:L?'Nombre':'Name',width:28},{header:L?'Estado':'Status',width:20},{header:L?'Invitación enviada':'Invitation sent',width:18}];
+  ws.getRow(1).font={bold:true};
+  const rows=[
+    ...dashboardRsvpLists.confirmed.map(n=>[n,L?'Confirmó':'Confirmed','']),
+    ...dashboardRsvpLists.declined.map(n=>[n,L?'No podrá ir':'Not attending','']),
+    ...dashboardRsvpLists.pending.map(g=>[g.name,L?'Falta por confirmar':'Awaiting response',g.sent?(L?'Sí':'Yes'):(L?'No':'No')])
+  ];
+  rows.forEach(r=>ws.addRow(r));
+  const buf=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=(L?'invitados':'guests')+'.xlsx';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 function renderDashboardChecklistDetail(sections){
   const L=lang==='es';
   const statusOpts=CHECKLIST_STATUS_OPTIONS[lang]||CHECKLIST_STATUS_OPTIONS.es;
@@ -3742,19 +3853,178 @@ function renderDashboardChecklistDetail(sections){
       if(i.status===undefined) i.status=i.done===true?'done':'pending';
       const statusSelect=`<select class="cl-status-select" onchange="dashboardUpdateChecklistStatus(${si},${ii},this.value,this)">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
       const assigneeInput=`<input type="text" class="cl-assignee-input" placeholder="${L?'¿Quién?':'Who?'}" value="${esc(i.assignedTo||'')}" oninput="dashboardUpdateChecklistAssignee(${si},${ii},this.value)">`;
+      const catTag=(i.cat&&i.cat!==s.section)?`<span class="cl-cat">${esc(i.cat)}</span>`:'';
       return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
         <div style="flex:1;min-width:0">
           <div class="cl-text">${esc(i.text)}</div>
           <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
-            <span class="cl-cat">${esc(i.cat)}</span>
+            ${catTag}
             ${statusSelect}
             ${assigneeInput}
           </div>
         </div>
       </div>`;
     }).join('');
-    return `<h2 style="font-size:13px;margin-top:14px">${esc(s.section)}</h2>${rows}`;
+    return `<h2 style="font-size:13px;margin-top:14px;cursor:pointer;user-select:none" onclick="dashboardToggleChecklistSection(${si})">▾ ${esc(s.section)}</h2><div class="dash-cl-section-body" data-section="${si}">${rows}</div>`;
   }).join('');
+}
+
+async function dashboardImportVendors(event){
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file||!dashboardCurrentPlanId) return;
+  const L=lang==='es';
+  const vendorsData=dashboardCurrentPlanData.plan?.vendorsData;
+  if(!Array.isArray(vendorsData)||!vendorsData.length){
+    showToast(L?'Este evento no tiene proveedores generados':'This event has no generated vendors',true);
+    return;
+  }
+  try{
+    const wb=new ExcelJS.Workbook();
+    await wb.xlsx.load(await file.arrayBuffer());
+    const ws=wb.getWorksheet(L?'Proveedores':'Vendors');
+    if(!ws){ showToast(L?'No se encontró la hoja "Proveedores" en ese archivo':'Could not find a "Vendors" sheet in that file',true); return; }
+
+    const statusLabelToValue={};
+    Object.entries({contratado:{es:'Contratado',en:'Hired'},cotizando:{es:'Cotizando',en:'Getting quotes'},pendiente:{es:'Pendiente',en:'Pending'}}).forEach(([val,labels])=>{
+      statusLabelToValue[labels.es.toLowerCase()]=val;
+      statusLabelToValue[labels.en.toLowerCase()]=val;
+    });
+
+    const index={};
+    vendorsData.forEach(v=>{ index[(v.type+'|||'+v.name).toLowerCase()]=v; });
+
+    let matched=0,unmatched=0;
+    ws.eachRow((row,rowNumber)=>{
+      if(rowNumber===1) return;
+      const type=row.getCell(1).text?.trim();
+      const name=row.getCell(2).text?.trim();
+      const statusText=row.getCell(8).text?.trim();
+      const priceVal=row.getCell(10).value;
+      if(!type&&!name) return;
+      const vendor=index[(type+'|||'+name).toLowerCase()];
+      if(!vendor){ unmatched++; return; }
+      const statusVal=statusLabelToValue[(statusText||'').toLowerCase()];
+      if(statusVal) vendor.status=statusVal;
+      const price=typeof priceVal==='number'?priceVal:parseFloat(priceVal);
+      if(price) vendor.quotedPrice=price;
+      matched++;
+    });
+
+    await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+    dashboardSelectPlan(dashboardCurrentPlanId);
+    showToast(unmatched
+      ?(L?`✅ ${matched} proveedores actualizados — ${unmatched} filas no coincidieron`:`✅ ${matched} vendors updated — ${unmatched} rows didn't match`)
+      :(L?`✅ ${matched} proveedores actualizados`:`✅ ${matched} vendors updated`));
+  }catch(err){
+    console.error('Error importando proveedores desde Excel:',err);
+    showToast(L?'No se pudo leer ese archivo':'Could not read that file',true);
+  }
+}
+
+function dashboardToggleChecklistSection(si){
+  const body=document.querySelector(`.dash-cl-section-body[data-section="${si}"]`);
+  if(!body) return;
+  const collapsed=body.style.display==='none';
+  body.style.display=collapsed?'block':'none';
+  const heading=body.previousElementSibling;
+  if(heading) heading.textContent=(collapsed?'▾ ':'▸ ')+heading.textContent.replace(/^[▾▸]\s*/,'');
+}
+
+function renderDashboardVendorCard(v,vi){
+  const L=lang==='es';
+  const statusLabels={contratado:{es:'Contratado',en:'Hired'},cotizando:{es:'Cotizando',en:'Getting quotes'},pendiente:{es:'Pendiente',en:'Pending'}};
+  const attachmentsHtml=(v.attachments||[]).map((a,ai)=>{
+    const url=dashboardVendorSignedUrls[a.path];
+    return `<div class="dash-vendor-attachment">
+      ${url?`<a href="${url}" target="_blank" rel="noopener">📎 ${esc(a.name)}</a>`:`<span>📎 ${esc(a.name)}</span>`}
+      <span onclick="dashboardRemoveVendorAttachment(${vi},${ai})" style="cursor:pointer;color:var(--text-3)">✕</span>
+    </div>`;
+  }).join('');
+  return `<div class="dash-vendor-card">
+    <div class="dash-vendor-head">
+      <div>
+        <div class="dash-vendor-name">${esc(v.name||'')}</div>
+        <div class="dash-vendor-cat">${esc(v.type||'')}</div>
+      </div>
+      <span onclick="dashboardRemoveVendor(${vi})" style="color:var(--text-3);cursor:pointer" title="${L?'Quitar proveedor':'Remove vendor'}">✕</span>
+    </div>
+    ${v.tip?`<p style="font-size:12px;color:var(--text-3);margin:4px 0 0">${esc(v.tip)}</p>`:''}
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <select class="dash-vendor-status-select dash-vendor-status-${v.status||'pendiente'}" onchange="dashboardUpdateVendorField(${vi},'status',this.value,this)">
+        <option value="pendiente"${v.status==='pendiente'?' selected':''}>${statusLabels.pendiente[L?'es':'en']}</option>
+        <option value="cotizando"${v.status==='cotizando'?' selected':''}>${statusLabels.cotizando[L?'es':'en']}</option>
+        <option value="contratado"${v.status==='contratado'?' selected':''}>${statusLabels.contratado[L?'es':'en']}</option>
+      </select>
+      <input type="text" class="dash-vendor-price-input" placeholder="${L?'Precio':'Price'}" value="${esc(v.quotedPrice||'')}" onchange="dashboardUpdateVendorField(${vi},'quotedPrice',this.value)">
+    </div>
+    <textarea class="dash-vendor-notes" placeholder="${L?'Notas…':'Notes…'}" onblur="dashboardUpdateVendorField(${vi},'notes',this.value)">${esc(v.notes||'')}</textarea>
+    <div class="dash-vendor-attachments">${attachmentsHtml}</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn-account" onclick="document.getElementById('dash-vendor-file-${vi}').click()">📎 ${L?'Adjuntar archivo':'Attach file'}</button>
+      <input type="file" id="dash-vendor-file-${vi}" style="display:none" onchange="dashboardUploadVendorAttachment(event,${vi})">
+    </div>
+  </div>`;
+}
+
+async function dashboardAddVendor(){
+  const L=lang==='es';
+  const name=document.getElementById('dash-vendor-new-name').value.trim();
+  const type=document.getElementById('dash-vendor-new-category').value.trim();
+  const status=document.getElementById('dash-vendor-new-status').value;
+  if(!name||!dashboardCurrentPlanId) return;
+  if(!dashboardCurrentPlanData.plan) dashboardCurrentPlanData.plan={};
+  if(!Array.isArray(dashboardCurrentPlanData.plan.vendorsData)) dashboardCurrentPlanData.plan.vendorsData=[];
+  dashboardCurrentPlanData.plan.vendorsData.push({name,type,status,selected:true,custom:true,quotedPrice:'',notes:'',attachments:[]});
+  await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  showToast(L?'✅ Proveedor agregado':'✅ Vendor added');
+  dashboardSelectPlan(dashboardCurrentPlanId);
+}
+
+function dashboardRemoveVendor(vi){
+  const vendors=dashboardCurrentPlanData.plan?.vendorsData;
+  if(!vendors) return;
+  vendors.splice(vi,1);
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+function dashboardUpdateVendorField(vi,field,value,selectEl){
+  const vendor=dashboardCurrentPlanData.plan?.vendorsData?.[vi];
+  if(!vendor) return;
+  vendor[field]=value;
+  if(field==='status'&&selectEl) selectEl.className='dash-vendor-status-select dash-vendor-status-'+value;
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
+}
+
+async function dashboardUploadVendorAttachment(event,vi){
+  const L=lang==='es';
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file||!dashboardCurrentPlanId) return;
+  if(file.size>10*1024*1024){ showToast(L?'El archivo debe pesar menos de 10 MB':'File must be under 10 MB',true); return; }
+  showToast(L?'Subiendo archivo…':'Uploading file…');
+  const path=`${currentUser.id}/${dashboardCurrentPlanId}/${Date.now()}-${file.name}`;
+  const {error}=await sb.storage.from('vendor-documents').upload(path,file,{upsert:false});
+  if(error){ showToast(L?'No se pudo subir el archivo':'Could not upload the file',true); console.error(error); return; }
+  const vendor=dashboardCurrentPlanData.plan?.vendorsData?.[vi];
+  if(!vendor) return;
+  if(!Array.isArray(vendor.attachments)) vendor.attachments=[];
+  vendor.attachments.push({name:file.name,path});
+  await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  showToast(L?'✅ Archivo subido':'✅ File uploaded');
+  dashboardSelectPlan(dashboardCurrentPlanId);
+}
+
+async function dashboardRemoveVendorAttachment(vi,ai){
+  const vendor=dashboardCurrentPlanData.plan?.vendorsData?.[vi];
+  if(!vendor||!vendor.attachments?.[ai]) return;
+  const path=vendor.attachments[ai].path;
+  await sb.storage.from('vendor-documents').remove([path]);
+  vendor.attachments.splice(ai,1);
+  await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  dashboardSelectPlan(dashboardCurrentPlanId);
 }
 
 function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
@@ -3966,13 +4236,26 @@ async function dashboardSelectPlan(planId){
   // Invitación: puede no existir todavía si nunca la publicó.
   const inv=(invRows&&invRows[0])||null;
   let rsvpYes=0,rsvpNo=0,guestTotal=0;
+  dashboardRsvpLists={confirmed:[],declined:[],pending:[]};
   if(inv){
-    const [{count:yc},{count:nc},{count:gt}]=await Promise.all([
-      sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',true),
-      sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',false),
-      sb.from('guest_list').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id)
+    const [{data:rsvpRows},{data:guestRows}]=await Promise.all([
+      sb.from('rsvps').select('guest_name,attending').eq('invitation_id',inv.id),
+      sb.from('guest_list').select('id,guest_name,invitation_sent').eq('invitation_id',inv.id)
     ]);
-    rsvpYes=yc||0; rsvpNo=nc||0; guestTotal=gt||0;
+    const responded=new Set();
+    (rsvpRows||[]).forEach(r=>{
+      responded.add((r.guest_name||'').toLowerCase().trim());
+      if(r.attending) dashboardRsvpLists.confirmed.push(r.guest_name);
+      else dashboardRsvpLists.declined.push(r.guest_name);
+    });
+    (guestRows||[]).forEach(g=>{
+      // Los pendientes se guardan como objeto (no solo el nombre) porque
+      // aquí sí necesitamos su id para poder marcar "ya se la envié".
+      if(!responded.has((g.guest_name||'').toLowerCase().trim())) dashboardRsvpLists.pending.push({id:g.id,name:g.guest_name,sent:!!g.invitation_sent});
+    });
+    rsvpYes=dashboardRsvpLists.confirmed.length;
+    rsvpNo=dashboardRsvpLists.declined.length;
+    guestTotal=(guestRows||[]).length;
   }
   const galleryUrls=(inv&&inv.gallery_urls)||[];
 
@@ -3990,10 +4273,24 @@ async function dashboardSelectPlan(planId){
   `;
 
   const canRemoveBudget=(savedPlan.budgetData||[]).length>1;
+  const budgetRowsHtml=(savedPlan.budgetData||[]).map((b,bi)=>{
+    const over=b.spent!==undefined&&b.spent!==null&&b.spent>b.amount;
+    return `<tr class="dash-budget-row">
+      <td class="dbt-label">${esc(b.label||'')}${canRemoveBudget?`<span onclick="dashboardRemoveBudgetCategory(${bi})" class="dbt-remove" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}</td>
+      <td class="dbt-amt">$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}</td>
+      <td class="dbt-amt${over?' dbt-over':''}">${(b.spent!==undefined&&b.spent!==null)?'$'+Number(b.spent).toLocaleString(L?'es-MX':'en-US'):'—'}</td>
+    </tr>`;
+  }).join('');
   const budgetTabHtml=`
-    <div class="dash-stat-row"><span>${L?'Total planeado':'Total planned'}</span><b>$${budgetTotal.toLocaleString(L?'es-MX':'en-US')}</b></div>
-    ${hasSpentData?`<div class="dash-stat-row"><span>${L?'Total gastado (real)':'Total spent (actual)'}</span><b style="color:${spentTotal>budgetTotal?'#C14A5E':'var(--teal-dark)'}">$${spentTotal.toLocaleString(L?'es-MX':'en-US')}</b></div>`:''}
-    <div style="margin-top:10px">${(savedPlan.budgetData||[]).map((b,bi)=>`<div class="dash-stat-row" style="font-size:13px"><span>${esc(b.label||'')}</span><span style="display:flex;align-items:center;gap:8px">$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}${b.spent!==undefined&&b.spent!==null?` <span style="color:${b.spent>b.amount?'#C14A5E':'var(--teal-dark)'}">(${L?'real':'actual'}: $${Number(b.spent).toLocaleString()})</span>`:''}${canRemoveBudget?`<span onclick="dashboardRemoveBudgetCategory(${bi})" style="color:var(--text-3);cursor:pointer" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}</span></div>`).join('')}</div>
+    <table class="dash-budget-table">
+      <thead><tr><th>${L?'Categoría':'Category'}</th><th>${L?'Planeado':'Planned'}</th><th>${L?'Real':'Actual'}</th></tr></thead>
+      <tbody>${budgetRowsHtml}</tbody>
+      <tfoot><tr>
+        <td>${L?'TOTAL':'TOTAL'}</td>
+        <td>$${budgetTotal.toLocaleString(L?'es-MX':'en-US')}</td>
+        <td class="${hasSpentData&&spentTotal>budgetTotal?'dbt-over':''}">${hasSpentData?'$'+spentTotal.toLocaleString(L?'es-MX':'en-US'):'—'}</td>
+      </tr></tfoot>
+    </table>
     <div style="display:flex;gap:8px;margin-top:14px">
       <input type="text" id="dash-budget-new-cat-input" placeholder="${L?'ej. Decoración floral':'e.g. Floral decor'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();dashboardAddBudgetCategory();}">
       <button class="btn-account" onclick="dashboardAddBudgetCategory()">+ ${L?'Agregar':'Add'}</button>
@@ -4005,18 +4302,59 @@ async function dashboardSelectPlan(planId){
     </div>
   `;
 
+  const pendingCount=dashboardRsvpLists.pending.length;
   const invitationTabHtml=inv?`
-    <div class="dash-stat-row"><span>${L?'Estado':'Status'}</span><b>${inv.is_published?(L?'Publicada':'Published'):(L?'Borrador':'Draft')}</b></div>
-    <div class="dash-stat-row"><span>${L?'Confirmaron':'Confirmed'}</span><b style="color:var(--teal-dark)">${rsvpYes}</b></div>
-    <div class="dash-stat-row"><span>${L?'No podrán ir':'Not attending'}</span><b>${rsvpNo}</b></div>
+    <div class="dash-inv-status">
+      <span class="dash-inv-status-dot ${inv.is_published?'published':'draft'}"></span>
+      ${inv.is_published?(L?'Publicada':'Published'):(L?'Borrador':'Draft')}
+    </div>
+    <div class="dash-rsvp-row">
+      <div class="dash-rsvp-block dash-rsvp-confirmed" onclick="dashboardToggleRsvpList('confirmed')"><div class="drb-num">${rsvpYes}</div><div class="drb-label">${L?'Confirmaron':'Confirmed'}</div></div>
+      <div class="dash-rsvp-block dash-rsvp-declined" onclick="dashboardToggleRsvpList('declined')"><div class="drb-num">${rsvpNo}</div><div class="drb-label">${L?'No podrán ir':'Not attending'}</div></div>
+      <div class="dash-rsvp-block dash-rsvp-pending" onclick="dashboardToggleRsvpList('pending')"><div class="drb-num">${pendingCount}</div><div class="drb-label">${L?'Faltan por confirmar':'Awaiting response'}</div></div>
+    </div>
+    <div id="dash-rsvp-namelist"></div>
     <div class="dash-stat-row"><span>${L?'Invitados en tu lista':'Guests on your list'}</span><b>${guestTotal}</b></div>
     ${galleryUrls.length?`<div class="dash-stat-row"><span>${L?'Fotos subidas':'Photos uploaded'}</span><b>${galleryUrls.length}</b></div><div class="dash-gallery-thumbs">${galleryUrls.slice(0,6).map(u=>`<img src="${u}">`).join('')}</div>`:''}
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
       <button class="btn-account" onclick="dashboardEditInvitation('${planId}')">✏️ ${L?'Editar invitación':'Edit invitation'}</button>
       <button class="btn-account" onclick="showQRModal('${esc(inv.slug||'').replace(/'/g,"")}','${esc(inv.host_names||'').replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ ${L?'Ver/descargar QR':'View/download QR'}</button>
+      <button class="btn-account" onclick="dashboardDownloadGuestList()">📥 ${L?'Descargar lista de invitados':'Download guest list'}</button>
     </div>
   `:`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has creado tu invitación digital para este evento.':'You have not created your digital invitation for this event yet.'}</p>
     <button class="btn-gen" style="margin-top:10px" onclick="dashboardEditInvitation('${planId}')">${L?'Crear mi invitación':'Create my invitation'}</button>`;
+
+  const vendors=(savedPlan.vendorsData||[]).map((v,vi)=>({v,vi})).filter(({v})=>v.selected!==false);
+  const vendorStatusLabels={contratado:{es:'Contratado',en:'Hired'},cotizando:{es:'Cotizando',en:'Getting quotes'},pendiente:{es:'Pendiente',en:'Pending'}};
+
+  // El bucket de documentos es privado — necesitamos un link firmado
+  // (temporal) por cada archivo adjunto, no una URL pública fija.
+  dashboardVendorSignedUrls={};
+  const allPaths=vendors.flatMap(({v})=>(v.attachments||[]).map(a=>a.path));
+  if(allPaths.length){
+    await Promise.all(allPaths.map(async p=>{
+      const {data}=await sb.storage.from('vendor-documents').createSignedUrl(p,3600);
+      if(data?.signedUrl) dashboardVendorSignedUrls[p]=data.signedUrl;
+    }));
+  }
+
+  const vendorsTabHtml=`
+    <div id="dash-vendors-list">${vendors.map(({v,vi})=>renderDashboardVendorCard(v,vi)).join('')||`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has agregado proveedores.':'You have not added any vendors yet.'}</p>`}</div>
+    <div class="dash-vendor-add-form">
+      <input type="text" id="dash-vendor-new-name" placeholder="${L?'Nombre del proveedor':'Vendor name'}">
+      <input type="text" id="dash-vendor-new-category" placeholder="${L?'Categoría (ej. Fotografía)':'Category (e.g. Photography)'}">
+      <select id="dash-vendor-new-status">
+        <option value="pendiente">${L?'Pendiente':'Pending'}</option>
+        <option value="cotizando">${L?'Cotizando':'Getting quotes'}</option>
+        <option value="contratado">${L?'Contratado':'Hired'}</option>
+      </select>
+      <button class="btn-gen" onclick="dashboardAddVendor()">+ ${L?'Agregar proveedor':'Add vendor'}</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-account" onclick="document.getElementById('vendors-import-input-dash').click()">📥 ${L?'Importar Excel de proveedores':'Import vendors Excel'}</button>
+      <input type="file" id="vendors-import-input-dash" accept=".xlsx,.xls" style="display:none" onchange="dashboardImportVendors(event)">
+    </div>
+  `;
 
   const ideasTabHtml=`
     <div class="dash-subcard-title">📷 ${L?'Ideas basadas en tus fotos':'Ideas based on your photos'}</div>
@@ -4060,12 +4398,14 @@ async function dashboardSelectPlan(planId){
       <button class="dash-tab active" data-tab="checklist" onclick="dashboardSwitchTab('checklist')">📋 ${L?'Checklist':'Checklist'}</button>
       <button class="dash-tab" data-tab="budget" onclick="dashboardSwitchTab('budget')">💰 ${L?'Presupuesto':'Budget'}</button>
       <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
+      <button class="dash-tab" data-tab="vendors" onclick="dashboardSwitchTab('vendors')">🤝 ${L?'Proveedores':'Vendors'}</button>
       <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
     </div>
 
     <div class="dash-tab-panel dash-card" data-panel="checklist">${checklistTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="budget" style="display:none">${budgetTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="invitation" style="display:none">${invitationTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="vendors" style="display:none">${vendorsTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="ideas" style="display:none">${ideasTabHtml}</div>
   `;
   dashboardCurrentPlanId=planId;
@@ -6559,11 +6899,12 @@ function renderChecklist(sections){
       const removeBtn=`<span onclick="event.stopPropagation();excludeChecklistItem(${si},${ii})" style="margin-left:8px;color:var(--text-3);font-size:13px;flex-shrink:0;white-space:nowrap" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
       const statusSelect=`<select class="cl-status-select" data-s="${si}" data-i="${ii}" onchange="updateChecklistItemStatus(this)" onclick="event.stopPropagation()">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
       const assigneeInput=`<input type="text" class="cl-assignee-input" data-s="${si}" data-i="${ii}" placeholder="${L?'¿Quién?':'Who?'}" value="${esc(i.assignedTo||'')}" onclick="event.stopPropagation()" oninput="updateChecklistItemAssignee(this)">`;
+      const catTag=(i.cat&&i.cat!==s.section)?`<span class="cl-cat">${esc(i.cat)}</span>`:'';
       return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
         <div style="flex:1;min-width:0">
           <div class="cl-text">${esc(i.text)}</div>
           <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
-            <span class="cl-cat">${esc(i.cat)}</span>
+            ${catTag}
             ${statusSelect}
             ${assigneeInput}
           </div>
@@ -7462,12 +7803,14 @@ async function exportSpreadsheet(){
     const ws=wb.addWorksheet(L?'Proveedores':'Vendors',{properties:{tabColor:{argb:XL_TEAL}}});
     ws.columns=[{width:18},{width:28},{width:32},{width:20},{width:16},{width:18},{width:18},{width:14},{width:13},{width:14},{width:11},{width:16},{width:11},{width:16}];
     xlStyleHeader(ws.addRow(header));
+    const vendorStatusXl={contratado:{es:'Contratado',en:'Hired'},cotizando:{es:'Cotizando',en:'Getting quotes'},pendiente:{es:'Pendiente',en:'Pending'}};
     let i=0;
     plan.vendorsData.forEach(v=>{
       if(v.selected===false) return;
       i++;
       const r=i+1;
-      const row=ws.addRow([v.type,v.name,v.tip,'','','','','',0,0,0,'',{formula:`J${r}-K${r}`},'']);
+      const statusLbl=v.status?(vendorStatusXl[v.status]?.[L?'es':'en']||''):'';
+      const row=ws.addRow([v.type,v.name,v.tip,'','','','',statusLbl,0,Number(v.quotedPrice)||0,0,'',{formula:`J${r}-K${r}`},'']);
       xlStyleDataRow(row,i%2===0);
     });
     ws.views=[{state:'frozen',ySplit:1}];
