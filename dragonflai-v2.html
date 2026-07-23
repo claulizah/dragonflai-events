@@ -76,6 +76,35 @@ input,textarea,[contenteditable="true"]{cursor:text}
    por completo. En pantallas grandes (donde el bug no ocurre) se quedan. */
 .bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.15;transform:translateZ(0);will-change:transform;backface-visibility:hidden}
 .bg-orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-150px;right:-150px}
+
+/* Launcher — equivalente web de la pantalla de bienvenida de la app móvil */
+.launcher-screen{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,var(--cream),var(--teal-light) 60%,var(--violet-light));
+  display:flex;align-items:center;justify-content:center;padding:2rem;
+}
+.launcher-content{
+  max-width:420px;width:100%;text-align:center;
+  background:var(--white);border-radius:24px;padding:2.5rem 2rem;
+  box-shadow:0 20px 60px rgba(0,0,0,.12);
+}
+.launcher-belu-img{height:130px;width:auto;margin-bottom:1rem}
+.launcher-content h2{font-family:'Cormorant Garamond',serif;font-size:2rem;color:var(--text);margin-bottom:.5rem}
+.launcher-content p{color:var(--text-2);font-size:15px;margin-bottom:1.75rem}
+.launcher-btn{
+  display:flex;align-items:center;gap:.85rem;width:100%;
+  padding:.9rem 1.25rem;margin-bottom:.9rem;
+  border:1.5px solid var(--border-gray);border-radius:14px;background:var(--cream);
+  font-family:'Inter',sans-serif;font-size:15.5px;font-weight:600;color:var(--text);
+  cursor:pointer;transition:border-color .2s,background-color .2s,transform .15s;
+  text-align:left;
+}
+.launcher-btn:hover{border-color:var(--teal);background:var(--teal-light);transform:translateY(-1px)}
+.launcher-btn img{height:44px;width:44px;object-fit:contain;flex-shrink:0;border-radius:50%}
+@media (max-width:480px){
+  .launcher-content{padding:2rem 1.5rem}
+  .launcher-belu-img{height:100px}
+}
 .bg-orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-150px;left:-150px}
 .bg-orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(46,196,182,.3),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%) translateZ(0)}
 @media(max-width:768px){
@@ -653,6 +682,24 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 </style>
 </head>
 <body>
+
+<!-- LAUNCHER — pantalla de bienvenida equivalente a la de la app móvil.
+     Se muestra siempre que se entra a /app, antes del formulario. -->
+<div id="launcher-screen" class="launcher-screen">
+  <div class="launcher-content">
+    <img src="/assets/belu/belu-saludando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+    <h2 data-es="¡Hola de nuevo!" data-en="Hello again!">¡Hola de nuevo!</h2>
+    <p data-es="¿Qué te gustaría hacer hoy?" data-en="What would you like to do today?">¿Qué te gustaría hacer hoy?</p>
+    <button class="launcher-btn" onclick="launcherHasPlan()">
+      <img src="/assets/belu/belu-sentada.png" alt="" onerror="this.style.display='none'">
+      <span data-es="Ya tengo un plan con ustedes" data-en="I already have a plan with you">Ya tengo un plan con ustedes</span>
+    </button>
+    <button class="launcher-btn" onclick="launcherFirstTime()">
+      <img src="/assets/belu/belu-fiesta.png" alt="" onerror="this.style.display='none'">
+      <span data-es="Es mi primera vez" data-en="It's my first time">Es mi primera vez</span>
+    </button>
+  </div>
+</div>
 
 <!-- BACKGROUND ORBS -->
 <div class="bg-orb bg-orb-1"></div>
@@ -1638,6 +1685,27 @@ function updateAccountUI(){
   }
 }
 
+function closeLauncher(){
+  const el=document.getElementById('launcher-screen');
+  if(el) el.style.display='none';
+}
+function launcherHasPlan(){
+  closeLauncher();
+  if(currentUser){
+    openMyPlans();
+  } else {
+    // Aún no hay sesión — pedimos login primero. Nota: después de iniciar
+    // sesión, la persona tiene que darle clic a "Mis planes" ella misma
+    // en el menú de cuenta; no encadenamos automáticamente a Mis Planes
+    // post-login todavía (se puede agregar después si hace falta).
+    openAuthModal();
+  }
+}
+function launcherFirstTime(){
+  closeLauncher();
+  // El formulario normal ya está detrás del launcher — no se necesita
+  // hacer nada más, solo revelarlo al cerrar esta pantalla.
+}
 function openAuthModal(){ document.getElementById('auth-modal').classList.add('open'); document.body.style.overflow='hidden'; }
 function closeAuthModal(){ document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow=''; const n=document.getElementById('auth-expired-note'); if(n) n.style.display='none'; }
 
@@ -4231,7 +4299,7 @@ async function generate(){
     ?' | Contratando proveedores por separado':' | Tipo de venue: por definir';
   const stress=radios.stress||T.stress[lang][1];
   const exp=radios.exp||T.exp[lang][1];
-  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[(T.priority[eventType]||T.priority['Boda/Wedding'])[lang][0]];
+  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[T.priority[lang][0]];
   const priority=priorityList.join(', ');
 
   // ── Detalles adicionales (todos opcionales) ──
@@ -4379,7 +4447,7 @@ async function generate(){
     // El worker manda el motivo en err.message: distinguimos el tope GLOBAL
     // del día (protección de costos en picos de tráfico) del límite personal.
     if(limitFail.reason?.message==='global_daily_limit'){
-      showToast(lang==='es'?'¡Vera está llena de eventos hoy! 🪽 Las generaciones gratis se agotaron — vuelve mañana, o desbloquea acceso para generar sin fila.':'Vera is fully booked today! 🪽 Free generations ran out — come back tomorrow, or unlock access to skip the line.',true);
+      showToast(lang==='es'?'¡Belu está llena de eventos hoy! 🪽 Las generaciones gratis se agotaron — vuelve mañana, o desbloquea acceso para generar sin fila.':'Belu is fully booked today! 🪽 Free generations ran out — come back tomorrow, or unlock access to skip the line.',true);
       return;
     }
     showToast(lang==='es'?'Has usado todos tus planes disponibles — te llevamos a los planes':'You\'ve used all your available plans — taking you to pricing',true);
