@@ -113,6 +113,48 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .launcher-email-input:focus{outline:none;border-color:var(--teal)}
 .launcher-email-status{font-size:13px;margin-top:1rem;line-height:1.5;min-height:1.2em}
 .dashboard-wrap{max-width:700px;margin:2.5rem auto;padding:0 1.5rem}
+
+.dash-cover{
+  border-radius:24px;padding:32px 28px;color:#fff;position:relative;
+  box-shadow:0 20px 50px rgba(0,0,0,.15);margin-bottom:1.25rem;
+  animation:dashCoverIn .5s ease-out;
+}
+@keyframes dashCoverIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.dash-cover-actions{position:absolute;top:18px;right:20px;display:flex;gap:8px}
+.dash-cover-actions button{
+  background:rgba(255,255,255,.22);border:none;border-radius:10px;width:34px;height:34px;
+  color:#fff;cursor:pointer;font-size:15px;backdrop-filter:blur(4px);transition:background .2s;
+}
+.dash-cover-actions button:hover{background:rgba(255,255,255,.35)}
+.dash-cover-eventtype{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.dash-cover-name{font-family:'Cormorant Garamond',serif;font-size:2.4rem;line-height:1.1;margin:4px 0 8px}
+.dash-cover-countdown{font-size:15px;font-weight:600;background:rgba(255,255,255,.2);display:inline-block;padding:6px 14px;border-radius:100px}
+
+.dash-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem}
+.dash-stat-block{
+  background:var(--white);border:1.5px solid var(--border-gray);border-radius:16px;
+  padding:14px 8px;text-align:center;animation:dashCoverIn .5s ease-out .1s backwards;
+}
+.dsb-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--violet);line-height:1.1}
+.dsb-label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
+@media (max-width:480px){
+  .dash-stats-row{grid-template-columns:repeat(2,1fr)}
+  .dash-cover-name{font-size:1.9rem}
+}
+
+.dash-tabs{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:2px}
+.dash-tab{
+  flex-shrink:0;padding:9px 16px;border-radius:100px;border:1.5px solid var(--border-gray);
+  background:var(--white);color:var(--text-2);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.dash-tab.active{background:linear-gradient(135deg,var(--teal),var(--violet));border-color:transparent;color:#fff}
+.dash-tab-panel{animation:dashCoverIn .3s ease-out}
+.dash-subcard-title{font-size:13px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px}
+.dash-editable-text{border:1.5px dashed transparent;border-radius:10px;padding:8px;transition:border-color .2s;min-height:1.6em}
+.dash-editable-text:hover,.dash-editable-text:focus{border-color:var(--border-gray);outline:none}
+.dash-editable-text:empty::before{content:attr(data-placeholder);color:var(--text-3);font-style:italic}
+
 .dashboard-header{text-align:center;margin-bottom:2rem}
 .dashboard-header h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--text);margin-bottom:.4rem}
 .dashboard-selector{
@@ -437,6 +479,8 @@ textarea.vcard-input{height:auto}
 .btn-adjust-budget{display:block;width:100%;padding:12px;border-radius:var(--radius);border:1.5px dashed var(--teal);background:var(--teal-light);color:var(--teal-dark);font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:1.5rem;transition:all .2s}
 .btn-adjust-budget:hover{background:var(--teal);color:#fff}
 .bcard-real-tag{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;color:#fff;background:var(--teal);padding:2px 7px;border-radius:100px;vertical-align:middle}
+.bcard-spent{font-size:11px;color:var(--violet);font-weight:600;margin-top:4px;padding-top:4px;border-top:1px dashed var(--border-gray)}
+.bcard-spent.bcard-over{color:#C14A5E}
 .bcard.bcard-real{border-color:var(--teal)}
 
 /* ── SAVE THE DATE ── */
@@ -834,7 +878,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <div class="account-menu" id="account-menu" style="display:none">
       <button class="btn-account" id="btn-account-email" onclick="toggleAccountDropdown()"></button>
       <div class="account-dropdown" id="account-dropdown" style="display:none">
-        <button onclick="openMyPlans()">📁 <span data-es="Mis planes" data-en="My plans">Mis planes</span></button>
+        <button onclick="document.getElementById('account-dropdown').style.display='none';showUserDashboard()">📁 <span data-es="Mis planes" data-en="My plans">Mis planes</span></button>
 <script>
 // "Cambio de pantallas al inicio" al recargar /app estando logueada: el
 // botón "Entrar" siempre se pinta primero (no tiene display:none por
@@ -872,10 +916,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
      (pensado sobre todo para planners con varios clientes). -->
 <div id="user-dashboard" style="display:none">
   <div class="dashboard-wrap">
-    <div class="dashboard-header">
-      <h1 data-es="Tu evento" data-en="Your event">Tu evento</h1>
-      <select id="dashboard-event-selector" class="dashboard-selector" style="display:none" onchange="dashboardSelectPlan(this.value)"></select>
-    </div>
+    <select id="dashboard-event-selector" class="dashboard-selector" style="display:none" onchange="dashboardSelectPlan(this.value)"></select>
     <div id="dashboard-event-detail"><p style="text-align:center;color:var(--text-3);font-size:13px">Cargando…</p></div>
     <button class="btn-gen" onclick="dashboardCreateNewEvent()" style="margin-top:1.5rem">
       <span data-es="+ Crear nuevo evento" data-en="+ Create new event">+ Crear nuevo evento</span>
@@ -886,6 +927,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 <!-- Envuelve hero + selector de modo + formulario para poder ocultarlo
      por completo cuando se muestra el dashboard de "mis planes". -->
 <div id="main-planner-view">
+<div id="back-to-dashboard-link" style="display:none;text-align:center;padding:.75rem 0">
+  <button onclick="showUserDashboard()" style="background:none;border:none;color:var(--violet);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:underline">← <span data-es="Volver a mi evento" data-en="Back to my event">Volver a mi evento</span></button>
+</div>
 <!-- HERO -->
 <section class="hero">
   <span class="hero-tag">✦ <span data-es="Planeemos tu evento juntos" data-en="Let's plan your event together">Planeemos tu evento juntos</span></span>
@@ -3659,14 +3703,22 @@ async function routeInitialScreen(){
   initialRoutingDone=true;
   if(!currentUser) return; // sin sesión: se queda el launcher tal cual
 
-  closeLauncher(); // ya sabemos quién es, no hace falta preguntarle nada
-
+  // Importante: decidimos A DÓNDE vamos ANTES de cerrar el launcher — si
+  // cerráramos el launcher primero y decidiéramos después (la consulta de
+  // abajo tarda un poco), se alcanzaba a ver el formulario en blanco un
+  // instante antes de que apareciera el dashboard. Con el launcher tapando
+  // todo hasta que ya sabemos el destino final, no hay ningún parpadeo.
   const {data,error}=await sb.from('plans').select('id').eq('user_id',currentUser.id).limit(1);
-  if(!error && data && data.length){
-    showUserDashboard();
+  const hasPlans=!error && data && data.length;
+
+  if(hasPlans){
+    document.getElementById('main-planner-view').style.display='none';
+    document.getElementById('user-dashboard').style.display='block';
+    loadDashboardPlans();
   }
   // si no tiene planes todavía (cuenta nueva), se queda el formulario
   // normal, que ya está visible por default.
+  closeLauncher();
 }
 
 function showUserDashboard(){
@@ -3675,9 +3727,153 @@ function showUserDashboard(){
   loadDashboardPlans();
 }
 
+function dashboardSwitchTab(tabName){
+  document.querySelectorAll('.dash-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabName));
+  document.querySelectorAll('.dash-tab-panel').forEach(p=>{ p.style.display=(p.dataset.panel===tabName)?'block':'none'; });
+}
+
+function renderDashboardChecklistDetail(sections){
+  const L=lang==='es';
+  const statusOpts=CHECKLIST_STATUS_OPTIONS[lang]||CHECKLIST_STATUS_OPTIONS.es;
+  return (sections||[]).map((s,si)=>{
+    const visible=(s.items||[]).map((i,ii)=>({i,ii})).filter(({i})=>i.selected!==false);
+    if(!visible.length) return '';
+    const rows=visible.map(({i,ii})=>{
+      if(i.status===undefined) i.status=i.done===true?'done':'pending';
+      const statusSelect=`<select class="cl-status-select" onchange="dashboardUpdateChecklistStatus(${si},${ii},this.value,this)">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
+      const assigneeInput=`<input type="text" class="cl-assignee-input" placeholder="${L?'¿Quién?':'Who?'}" value="${esc(i.assignedTo||'')}" oninput="dashboardUpdateChecklistAssignee(${si},${ii},this.value)">`;
+      return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
+        <div style="flex:1;min-width:0">
+          <div class="cl-text">${esc(i.text)}</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap">
+            <span class="cl-cat">${esc(i.cat)}</span>
+            ${statusSelect}
+            ${assigneeInput}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<h2 style="font-size:13px;margin-top:14px">${esc(s.section)}</h2>${rows}`;
+  }).join('');
+}
+
+function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
+  const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.status=value;
+  item.done=(value==='done');
+  const row=selectEl.closest('.cl-item');
+  if(row) row.className='cl-item cl-status-'+value;
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
+  // También el % y las alertas de urgencia de arriba dependen de esto —
+  // recargamos toda la vista para que se reflejen sin tener que reabrir.
+  dashboardSelectPlan(dashboardCurrentPlanId);
+}
+
+function dashboardUpdateChecklistAssignee(si,ii,value){
+  const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.assignedTo=value;
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
+}
+
+function dashboardSaveInspoIdeasEdit(el){
+  if(!dashboardCurrentPlanId) return;
+  if(!dashboardCurrentPlanData.plan) dashboardCurrentPlanData.plan={};
+  dashboardCurrentPlanData.plan.inspirationIdeas=el.innerText;
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
+}
+
+function dashboardRecalcBudgetAmounts(data,total){
+  if(!Array.isArray(data)||!data.length) return;
+  let sumPct=data.reduce((s,b)=>s+b.pct,0);
+  data[data.length-1].pct+=(100-sumPct);
+  data.forEach(b=>{ b.amount=Math.round(total*b.pct/100); });
+  let sumAmt=data.reduce((s,b)=>s+b.amount,0);
+  data[data.length-1].amount+=(total-sumAmt);
+}
+
+function dashboardAddBudgetCategory(){
+  const L=lang==='es';
+  const input=document.getElementById('dash-budget-new-cat-input');
+  const name=input?input.value.trim():'';
+  if(!name||!dashboardCurrentPlanId) return;
+  const budgetData=dashboardCurrentPlanData.plan?.budgetData;
+  if(!Array.isArray(budgetData)||!budgetData.length) return;
+  const total=parseInt(dashboardCurrentPlanData.plan.budget)||budgetData.reduce((s,b)=>s+b.amount,0);
+  const newPct=10;
+  const scale=(100-newPct)/100;
+  budgetData.forEach(b=>{ b.pct=Math.round(b.pct*scale); });
+  budgetData.push({label:name,pct:newPct,amount:0,custom:true});
+  dashboardRecalcBudgetAmounts(budgetData,total);
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    showToast(L?'✅ Categoría agregada':'✅ Category added');
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+function dashboardRemoveBudgetCategory(bi){
+  const budgetData=dashboardCurrentPlanData.plan?.budgetData;
+  if(!Array.isArray(budgetData)||budgetData.length<=1) return;
+  const L=lang==='es';
+  const total=parseInt(dashboardCurrentPlanData.plan.budget)||budgetData.reduce((s,b)=>s+b.amount,0);
+  const removedPct=budgetData[bi].pct;
+  budgetData.splice(bi,1);
+  const sumRemaining=budgetData.reduce((s,b)=>s+b.pct,0)||1;
+  budgetData.forEach(b=>{ b.pct=Math.round(b.pct+(removedPct*b.pct/sumRemaining)); });
+  dashboardRecalcBudgetAmounts(budgetData,total);
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    showToast(L?'🗑️ Categoría quitada':'🗑️ Category removed');
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+async function dashboardImportBudget(event){
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file||!dashboardCurrentPlanId) return;
+  const L=lang==='es';
+  const budgetData=dashboardCurrentPlanData.plan?.budgetData;
+  if(!Array.isArray(budgetData)||!budgetData.length){
+    showToast(L?'Este evento no tiene presupuesto generado':'This event has no generated budget',true);
+    return;
+  }
+  try{
+    const wb=new ExcelJS.Workbook();
+    await wb.xlsx.load(await file.arrayBuffer());
+    const ws=wb.getWorksheet(L?'Presupuesto':'Budget');
+    if(!ws){ showToast(L?'No se encontró la hoja "Presupuesto" en ese archivo':'Could not find a "Budget" sheet in that file',true); return; }
+    const index={};
+    budgetData.forEach(b=>{ index[b.label.toLowerCase()]=b; });
+    let matched=0,unmatched=0;
+    ws.eachRow((row,rowNumber)=>{
+      if(rowNumber===1) return;
+      const label=row.getCell(1).text?.trim();
+      const spentCell=row.getCell(3).value;
+      const spent=typeof spentCell==='number'?spentCell:parseFloat(spentCell)||0;
+      if(!label||label.toUpperCase()==='TOTAL') return;
+      const item=index[label.toLowerCase()];
+      if(!item){ unmatched++; return; }
+      item.spent=spent;
+      matched++;
+    });
+    await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+    dashboardSelectPlan(dashboardCurrentPlanId);
+    showToast(unmatched
+      ?(L?`✅ ${matched} categorías actualizadas — ${unmatched} filas no coincidieron`:`✅ ${matched} categories updated — ${unmatched} rows didn't match`)
+      :(L?`✅ Gasto real actualizado para ${matched} categorías`:`✅ Actual spend updated for ${matched} categories`));
+  }catch(err){
+    console.error('Error importando presupuesto desde Excel (dashboard):',err);
+    showToast(L?'No se pudo leer ese archivo':'Could not read that file',true);
+  }
+}
+
+
 function dashboardCreateNewEvent(){
   document.getElementById('user-dashboard').style.display='none';
   document.getElementById('main-planner-view').style.display='block';
+  const backLink=document.getElementById('back-to-dashboard-link');
+  if(backLink) backLink.style.display='block';
 }
 
 async function loadDashboardPlans(){
@@ -3718,7 +3914,7 @@ async function dashboardSelectPlan(planId){
   const [{data:planRow,error:planErr},{data:progressRow},{data:invRows}]=await Promise.all([
     sb.from('plans').select('id,title,event_type,created_at,plan_data').eq('id',planId).eq('user_id',currentUser.id).single(),
     sb.from('plan_checklist_progress').select('progress').eq('plan_id',planId).maybeSingle(),
-    sb.from('invitations').select('id,is_published,slug,gallery_urls').eq('plan_id',planId).eq('user_id',currentUser.id)
+    sb.from('invitations').select('id,is_published,slug,gallery_urls,host_names,hashtag').eq('plan_id',planId).eq('user_id',currentUser.id)
   ]);
 
   if(planErr||!planRow){
@@ -3760,9 +3956,12 @@ async function dashboardSelectPlan(planId){
   }
 
   // Presupuesto: total planeado + hasta 3 categorías más grandes, tal
-  // como se generaron — no hay todavía seguimiento de "gasto real".
+  // como se generaron. El gasto real (si ya se importó desde Excel) vive
+  // en item.spent por categoría.
   const budgetTotal=parseInt(savedPlan.budget)||0;
   const budgetTop=(savedPlan.budgetData||[]).slice().sort((a,b)=>(b.amount||0)-(a.amount||0)).slice(0,3);
+  const hasSpentData=(savedPlan.budgetData||[]).some(b=>b.spent!==undefined&&b.spent!==null);
+  const spentTotal=hasSpentData?(savedPlan.budgetData||[]).reduce((s,b)=>s+(Number(b.spent)||0),0):null;
 
   // Invitación: puede no existir todavía si nunca la publicó.
   const inv=(invRows&&invRows[0])||null;
@@ -3777,66 +3976,97 @@ async function dashboardSelectPlan(planId){
   }
   const galleryUrls=(inv&&inv.gallery_urls)||[];
 
+  const theme=EVENT_THEMES[savedPlan.eventTypeRaw]||EVENT_THEMES['Boda/Wedding'];
+  const countdownHtml=daysUntilEvent!==null?(daysUntilEvent>0?(L?`Faltan <b>${daysUntilEvent}</b> días`:`<b>${daysUntilEvent}</b> days left`):(daysUntilEvent===0?(L?'¡Hoy es tu evento! 🎉':'Today is your event! 🎉'):(L?'Tu evento ya pasó':'Your event has passed'))):'';
+
+  const checklistTabHtml=`
+    <div style="height:10px;background:rgba(255,255,255,.3);border-radius:100px;overflow:hidden;margin-bottom:10px">
+      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${theme.teal},${theme.violet})"></div>
+    </div>
+    <div class="dash-stat-row"><span>${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}</span><b>${pct}%</b></div>
+    ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
+    ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+    <div id="dash-checklist-detail" style="margin-top:14px">${renderDashboardChecklistDetail(sections)}</div>
+  `;
+
+  const canRemoveBudget=(savedPlan.budgetData||[]).length>1;
+  const budgetTabHtml=`
+    <div class="dash-stat-row"><span>${L?'Total planeado':'Total planned'}</span><b>$${budgetTotal.toLocaleString(L?'es-MX':'en-US')}</b></div>
+    ${hasSpentData?`<div class="dash-stat-row"><span>${L?'Total gastado (real)':'Total spent (actual)'}</span><b style="color:${spentTotal>budgetTotal?'#C14A5E':'var(--teal-dark)'}">$${spentTotal.toLocaleString(L?'es-MX':'en-US')}</b></div>`:''}
+    <div style="margin-top:10px">${(savedPlan.budgetData||[]).map((b,bi)=>`<div class="dash-stat-row" style="font-size:13px"><span>${esc(b.label||'')}</span><span style="display:flex;align-items:center;gap:8px">$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}${b.spent!==undefined&&b.spent!==null?` <span style="color:${b.spent>b.amount?'#C14A5E':'var(--teal-dark)'}">(${L?'real':'actual'}: $${Number(b.spent).toLocaleString()})</span>`:''}${canRemoveBudget?`<span onclick="dashboardRemoveBudgetCategory(${bi})" style="color:var(--text-3);cursor:pointer" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}</span></div>`).join('')}</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <input type="text" id="dash-budget-new-cat-input" placeholder="${L?'ej. Decoración floral':'e.g. Floral decor'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();dashboardAddBudgetCategory();}">
+      <button class="btn-account" onclick="dashboardAddBudgetCategory()">+ ${L?'Agregar':'Add'}</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-3);margin-top:6px">${L?'Al agregar o quitar una categoría, el resto se ajusta solo para seguir sumando el 100%.':'Adding or removing a category automatically adjusts the rest to still add up to 100%.'}</p>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn-account" onclick="document.getElementById('budget-import-input-dash').click()">📥 ${L?'Importar gasto real':'Import actual spend'}</button>
+      <input type="file" id="budget-import-input-dash" accept=".xlsx,.xls" style="display:none" onchange="dashboardImportBudget(event)">
+    </div>
+  `;
+
+  const invitationTabHtml=inv?`
+    <div class="dash-stat-row"><span>${L?'Estado':'Status'}</span><b>${inv.is_published?(L?'Publicada':'Published'):(L?'Borrador':'Draft')}</b></div>
+    <div class="dash-stat-row"><span>${L?'Confirmaron':'Confirmed'}</span><b style="color:var(--teal-dark)">${rsvpYes}</b></div>
+    <div class="dash-stat-row"><span>${L?'No podrán ir':'Not attending'}</span><b>${rsvpNo}</b></div>
+    <div class="dash-stat-row"><span>${L?'Invitados en tu lista':'Guests on your list'}</span><b>${guestTotal}</b></div>
+    ${galleryUrls.length?`<div class="dash-stat-row"><span>${L?'Fotos subidas':'Photos uploaded'}</span><b>${galleryUrls.length}</b></div><div class="dash-gallery-thumbs">${galleryUrls.slice(0,6).map(u=>`<img src="${u}">`).join('')}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn-account" onclick="dashboardEditInvitation('${planId}')">✏️ ${L?'Editar invitación':'Edit invitation'}</button>
+      <button class="btn-account" onclick="showQRModal('${esc(inv.slug||'').replace(/'/g,"")}','${esc(inv.host_names||'').replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ ${L?'Ver/descargar QR':'View/download QR'}</button>
+    </div>
+  `:`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has creado tu invitación digital para este evento.':'You have not created your digital invitation for this event yet.'}</p>
+    <button class="btn-gen" style="margin-top:10px" onclick="dashboardEditInvitation('${planId}')">${L?'Crear mi invitación':'Create my invitation'}</button>`;
+
+  const ideasTabHtml=`
+    <div class="dash-subcard-title">📷 ${L?'Ideas basadas en tus fotos':'Ideas based on your photos'}</div>
+    <p style="font-size:12.5px;color:var(--text-3);margin-bottom:10px">${L?'Sube 2-3 fotos que te inspiren y Belu te sugiere ideas para tu estilo.':'Upload 2-3 inspiring photos and Belu suggests ideas for your style.'}</p>
+    <input type="file" id="dash-inspo-input" accept="image/*" multiple style="display:none" onchange="dashboardInspoFilesSelected(event)">
+    <button class="btn-account" onclick="document.getElementById('dash-inspo-input').click()">📷 ${L?'Elegir fotos':'Choose photos'}</button>
+    <div id="dash-inspo-preview" style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap"></div>
+    <button class="btn-gen" id="dash-inspo-generate-btn" style="display:none;margin-top:6px" onclick="dashboardGenerateInspoIdeas()">${L?'✨ Generar ideas':'✨ Generate ideas'}</button>
+    <div id="dash-inspo-ideas" contenteditable="true" class="dash-editable-text" style="margin-top:12px;font-size:13.5px;color:var(--text-2);line-height:1.6" onblur="dashboardSaveInspoIdeasEdit(this)" data-placeholder="${L?'Aquí aparecerán las ideas generadas — también puedes escribir o editar libremente.':'Generated ideas will appear here — you can also type or edit freely.'}"></div>
+
+    <div class="dash-subcard-title" style="margin-top:22px;padding-top:18px;border-top:1px solid var(--cream-3)">💡 ${L?'Ideas para ahorrar':'Ways to save'}</div>
+    <ul class="dash-tips-list">
+      ${(L?budgetTipsForType(savedPlan.eventTypeRaw).es:budgetTipsForType(savedPlan.eventTypeRaw).en).map(t=>`<li>${esc(t)}</li>`).join('')}
+    </ul>
+    <div id="dash-custom-tips-list"></div>
+    <div class="dash-tip-add-row">
+      <input type="text" id="dash-new-tip-input" placeholder="${L?'Agrega tu propia idea…':'Add your own idea…'}" onkeydown="if(event.key==='Enter') dashboardAddBudgetTip()">
+      <button class="btn-account" onclick="dashboardAddBudgetTip()">${L?'Agregar':'Add'}</button>
+    </div>
+  `;
+
   detailEl.innerHTML=`
-    <div class="dash-card">
-      <div class="dash-event-name">${esc(planRow.title)}</div>
-      <div class="dash-event-meta">${esc(planRow.event_type||'')}</div>
-      ${daysUntilEvent!==null?`<div class="dash-countdown">${daysUntilEvent>0?(L?`Faltan <b>${daysUntilEvent}</b> días para tu evento`:`<b>${daysUntilEvent}</b> days until your event`):(daysUntilEvent===0?(L?'¡Hoy es tu evento! 🎉':'Today is your event! 🎉'):(L?'Tu evento ya pasó':'Your event has passed'))}</div>`:''}
-    </div>
-
-    <div class="dash-card">
-      <div class="dash-card-title">${L?'Checklist':'Checklist'}</div>
-      <div style="height:8px;background:var(--cream-3);border-radius:100px;overflow:hidden;margin-bottom:8px">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--teal),var(--violet))"></div>
+    <div class="dash-cover" style="background:linear-gradient(135deg,${theme.teal},${theme.violet})">
+      <div class="dash-cover-actions">
+        <button onclick="loadSavedPlan('${planId}')" title="${L?'Abrir plan completo':'Open full plan'}">✏️</button>
+        <button onclick="deleteSavedPlan('${planId}')" title="${L?'Borrar evento':'Delete event'}">🗑️</button>
       </div>
-      <div class="dash-stat-row"><span>${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}</span><b>${pct}%</b></div>
-      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
-      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+      <div class="dash-cover-eventtype">${esc(planRow.event_type||'')}</div>
+      <div class="dash-cover-name">${esc(planRow.title)}</div>
+      ${countdownHtml?`<div class="dash-cover-countdown">${countdownHtml}</div>`:''}
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">${L?'Presupuesto':'Budget'}</div>
-      <div class="dash-stat-row"><span>${L?'Total planeado':'Total planned'}</span><b>$${budgetTotal.toLocaleString(L?'es-MX':'en-US')}</b></div>
-      ${budgetTop.map(b=>`<div class="dash-stat-row" style="font-size:13px"><span>${esc(b.category||b.name||'')}</span><span>$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}</span></div>`).join('')}
+    <div class="dash-stats-row">
+      <div class="dash-stat-block"><div class="dsb-num">${pct}%</div><div class="dsb-label">${L?'Checklist':'Checklist'}</div></div>
+      <div class="dash-stat-block"><div class="dsb-num">${daysUntilEvent!==null?Math.max(daysUntilEvent,0):'—'}</div><div class="dsb-label">${L?'Días':'Days'}</div></div>
+      <div class="dash-stat-block"><div class="dsb-num">${rsvpYes}</div><div class="dsb-label">${L?'Confirmados':'Confirmed'}</div></div>
+      <div class="dash-stat-block"><div class="dsb-num">$${(hasSpentData?spentTotal:budgetTotal).toLocaleString(L?'es-MX':'en-US',{notation:'compact'})}</div><div class="dsb-label">${hasSpentData?(L?'Gastado':'Spent'):(L?'Presupuesto':'Budget')}</div></div>
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">${L?'Invitación':'Invitation'}</div>
-      ${inv?`
-        <div class="dash-stat-row"><span>${L?'Estado':'Status'}</span><b>${inv.is_published?(L?'Publicada':'Published'):(L?'Borrador':'Draft')}</b></div>
-        <div class="dash-stat-row"><span>${L?'Confirmaron':'Confirmed'}</span><b style="color:var(--teal-dark)">${rsvpYes}</b></div>
-        <div class="dash-stat-row"><span>${L?'No podrán ir':'Not attending'}</span><b>${rsvpNo}</b></div>
-        <div class="dash-stat-row"><span>${L?'Invitados en tu lista':'Guests on your list'}</span><b>${guestTotal}</b></div>
-        ${galleryUrls.length?`<div class="dash-stat-row"><span>${L?'Fotos subidas':'Photos uploaded'}</span><b>${galleryUrls.length}</b></div><div class="dash-gallery-thumbs">${galleryUrls.slice(0,6).map(u=>`<img src="${u}">`).join('')}</div>`:''}
-      `:`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has creado tu invitación digital para este evento.':'You have not created your digital invitation for this event yet.'}</p>`}
+    <div class="dash-tabs">
+      <button class="dash-tab active" data-tab="checklist" onclick="dashboardSwitchTab('checklist')">📋 ${L?'Checklist':'Checklist'}</button>
+      <button class="dash-tab" data-tab="budget" onclick="dashboardSwitchTab('budget')">💰 ${L?'Presupuesto':'Budget'}</button>
+      <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
+      <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
     </div>
 
-    <div class="dash-card">
-      <div class="dash-card-title">${L?'Ideas basadas en tus fotos':'Ideas based on your photos'}</div>
-      <p style="font-size:12.5px;color:var(--text-3);margin-bottom:10px">${L?'Sube 2-3 fotos que te inspiren (Pinterest, otra boda que te gustó, etc.) y Belu te sugiere ideas para tu estilo.':'Upload 2-3 photos that inspire you (Pinterest, another wedding you liked, etc.) and Belu suggests ideas for your style.'}</p>
-      <input type="file" id="dash-inspo-input" accept="image/*" multiple style="display:none" onchange="dashboardInspoFilesSelected(event)">
-      <button class="btn-account" onclick="document.getElementById('dash-inspo-input').click()">📷 ${L?'Elegir fotos':'Choose photos'}</button>
-      <div id="dash-inspo-preview" style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap"></div>
-      <button class="btn-gen" id="dash-inspo-generate-btn" style="display:none;margin-top:6px" onclick="dashboardGenerateInspoIdeas()">${L?'✨ Generar ideas':'✨ Generate ideas'}</button>
-      <div id="dash-inspo-ideas" style="margin-top:12px;font-size:13.5px;color:var(--text-2);line-height:1.6"></div>
-    </div>
-
-    <div class="dash-card">
-      <div class="dash-card-title">${L?'Ideas para ahorrar':'Ways to save'}</div>
-      <ul class="dash-tips-list">
-        ${budgetTipsForType(planRow.event_type).es && (L?budgetTipsForType(planRow.event_type).es:budgetTipsForType(planRow.event_type).en).map(t=>`<li>${esc(t)}</li>`).join('')}
-      </ul>
-      <div id="dash-custom-tips-list"></div>
-      <div class="dash-tip-add-row">
-        <input type="text" id="dash-new-tip-input" placeholder="${L?'Agrega tu propia idea…':'Add your own idea…'}" onkeydown="if(event.key==='Enter') dashboardAddBudgetTip()">
-        <button class="btn-account" onclick="dashboardAddBudgetTip()">${L?'Agregar':'Add'}</button>
-      </div>
-    </div>
-
-    <div class="dash-card-actions">
-      <button class="btn-account" onclick="loadSavedPlan('${planId}')">${L?'Abrir plan completo':'Open full plan'}</button>
-      <button class="btn-account" onclick="deleteSavedPlan('${planId}')">🗑️ ${L?'Borrar':'Delete'}</button>
-    </div>
+    <div class="dash-tab-panel dash-card" data-panel="checklist">${checklistTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="budget" style="display:none">${budgetTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="invitation" style="display:none">${invitationTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="ideas" style="display:none">${ideasTabHtml}</div>
   `;
   dashboardCurrentPlanId=planId;
   dashboardCurrentPlanData=planRow.plan_data||{plan:{}};
@@ -6160,7 +6390,10 @@ function renderBudget(items,tips,paquete){
   if(!Array.isArray(items)||!items.length) return '';
   const L=plan.lang==='es';
   const canRemove=items.length>1;
-  const cards=items.map((b,bi)=>`<div class="bcard${b.isReal?' bcard-real':''}" style="position:relative">${canRemove?`<span onclick="removeBudgetCategory(${bi})" style="position:absolute;top:6px;right:8px;color:var(--text-3);font-size:13px;cursor:pointer" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}<div class="bcard-label">${esc(b.label)}${b.isReal?` <span class="bcard-real-tag">✓ ${L?'Real':'Actual'}</span>`:''}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div></div>`).join('');
+  const cards=items.map((b,bi)=>{
+    const spentHtml=(b.spent!==undefined&&b.spent!==null)?`<div class="bcard-spent${b.spent>b.amount?' bcard-over':''}">${L?'Gastado':'Spent'}: $${Number(b.spent).toLocaleString()}</div>`:'';
+    return `<div class="bcard${b.isReal?' bcard-real':''}" style="position:relative">${canRemove?`<span onclick="removeBudgetCategory(${bi})" style="position:absolute;top:6px;right:8px;color:var(--text-3);font-size:13px;cursor:pointer" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}<div class="bcard-label">${esc(b.label)}${b.isReal?` <span class="bcard-real-tag">✓ ${L?'Real':'Actual'}</span>`:''}</div><div class="bcard-amt">$${Number(b.amount||0).toLocaleString()}</div><div class="bcard-pct">${Number(b.pct||0)}% ${L?'del total':'of total'}</div>${spentHtml}</div>`;
+  }).join('');
   const tipsHtml=(tips||[]).map(t=>`<li>${esc(t)}</li>`).join('');
   return `<div class="bcards">${cards}</div>
     <div style="display:flex;gap:8px;margin:.75rem 0 1.25rem">
@@ -6168,6 +6401,11 @@ function renderBudget(items,tips,paquete){
     <button type="button" onclick="addBudgetCategory()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ ${L?'Agregar':'Add'}</button>
   </div>
     <p style="font-size:11px;color:var(--text-3);margin:-1rem 0 1rem">${L?'Al agregar o quitar una categoría, el resto se ajusta solo para que siga sumando el 100% de tu presupuesto.':'Adding or removing a category automatically adjusts the rest so it still adds up to 100% of your budget.'}</p>
+    <div style="display:flex;gap:8px;margin-bottom:1.25rem">
+      <button type="button" class="btn-account" onclick="document.getElementById('budget-import-input').click()">📥 ${L?'Importar gasto real desde Excel':'Import actual spend from Excel'}</button>
+      <input type="file" id="budget-import-input" accept=".xlsx,.xls" style="display:none" onchange="importBudgetFromExcel(event)">
+    </div>
+    <p style="font-size:11px;color:var(--text-3);margin:-1rem 0 1rem">${L?'Descarga tu Excel, llena la columna "Gastado" conforme pagues a proveedores, y vuelve a subirlo aquí para ver planeado vs. real.':'Download your Excel, fill in the "Actual" column as you pay vendors, and upload it back here to see planned vs. actual.'}</p>
     <h2>${L?'Consejos de presupuesto':'Budget tips'}</h2><ul>${tipsHtml}</ul><h2>${L?'Opción paquete todo incluido':'All-inclusive package option'}</h2><p>${esc(paquete||'')}</p>`;
 }
 
@@ -6425,6 +6663,49 @@ async function loadChecklistProgressFromServer(planId){
     setTabHTML('checklist',renderChecklist(plan.checklistData));
     return true;
   }catch(e){ console.error('No se pudo cargar el progreso del checklist:',e); return false; }
+}
+
+async function importBudgetFromExcel(event){
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file) return;
+  const L=plan.lang==='es';
+  if(!Array.isArray(plan.budgetData)||!plan.budgetData.length){
+    showToast(L?'Genera tu presupuesto primero':'Generate your budget first',true);
+    return;
+  }
+  try{
+    const wb=new ExcelJS.Workbook();
+    await wb.xlsx.load(await file.arrayBuffer());
+    const ws=wb.getWorksheet(L?'Presupuesto':'Budget');
+    if(!ws){ showToast(L?'No se encontró la hoja "Presupuesto" en ese archivo':'Could not find a "Budget" sheet in that file',true); return; }
+
+    const index={};
+    plan.budgetData.forEach(b=>{ index[b.label.toLowerCase()]=b; });
+
+    let matched=0,unmatched=0;
+    ws.eachRow((row,rowNumber)=>{
+      if(rowNumber===1) return; // encabezado
+      const label=row.getCell(1).text?.trim();
+      const spentCell=row.getCell(3).value;
+      const spent=typeof spentCell==='number'?spentCell:parseFloat(spentCell)||0;
+      if(!label||label.toUpperCase()==='TOTAL') return;
+      const item=index[label.toLowerCase()];
+      if(!item){ unmatched++; return; }
+      item.spent=spent;
+      matched++;
+    });
+
+    schedulePlanResave();
+    if(document.getElementById('user-dashboard')&&document.getElementById('user-dashboard').style.display!=='none') dashboardSelectPlan(dashboardCurrentPlanId);
+
+    showToast(unmatched
+      ?(L?`✅ ${matched} categorías actualizadas — ${unmatched} filas no coincidieron`:`✅ ${matched} categories updated — ${unmatched} rows didn't match`)
+      :(L?`✅ Gasto real actualizado para ${matched} categorías`:`✅ Actual spend updated for ${matched} categories`));
+  }catch(err){
+    console.error('Error importando presupuesto desde Excel:',err);
+    showToast(L?'No se pudo leer ese archivo — confirma que sea el Excel exportado desde aquí':'Could not read that file — make sure it\'s the Excel exported from here',true);
+  }
 }
 
 async function importChecklistFromExcel(event){
@@ -6874,6 +7155,8 @@ async function loadSavedPlan(id){
   if(dash && dash.style.display!=='none'){
     dash.style.display='none';
     document.getElementById('main-planner-view').style.display='block';
+    const backLink=document.getElementById('back-to-dashboard-link');
+    if(backLink) backLink.style.display='block';
   }
   document.getElementById('res-section').style.display='block';
   document.getElementById('res-section').scrollIntoView({behavior:'smooth',block:'start'});
@@ -6881,9 +7164,27 @@ async function loadSavedPlan(id){
 }
 
 async function deleteSavedPlan(id){
+  const L=lang==='es';
+  // Antes borraba solo la fila de "plans" y confiaba en que Supabase
+  // tuviera una regla de borrado en cascada para la invitación vinculada
+  // — pero eso no está confirmado, así que lo hacemos explícito aquí:
+  // si hay una invitación ligada a este plan, se borra también (con su
+  // lista de invitados y confirmaciones), para no dejarla huérfana pero
+  // públicamente accesible.
+  const {data:linkedInv}=await sb.from('invitations').select('id').eq('plan_id',id).eq('user_id',currentUser.id).maybeSingle();
+  const warnMsg=linkedInv
+    ?(L?'Esto borra el plan Y tu invitación digital (con confirmaciones y fotos). No se puede deshacer. ¿Seguro?':'This deletes the plan AND your digital invitation (with RSVPs and photos). This cannot be undone. Are you sure?')
+    :(L?'Esto borra el plan por completo. No se puede deshacer. ¿Seguro?':'This permanently deletes the plan. This cannot be undone. Are you sure?');
+  if(!confirm(warnMsg)) return;
+
+  if(linkedInv){
+    await sb.from('rsvps').delete().eq('invitation_id',linkedInv.id);
+    await sb.from('guest_list').delete().eq('invitation_id',linkedInv.id);
+    await sb.from('invitations').delete().eq('id',linkedInv.id);
+  }
   const {error}=await sb.from('plans').delete().eq('id',id);
-  if(error){ showToast(lang==='es'?'No se pudo borrar':'Could not delete',true); return; }
-  showToast(lang==='es'?'🗑️ Plan borrado':'🗑️ Plan deleted');
+  if(error){ showToast(L?'No se pudo borrar':'Could not delete',true); return; }
+  showToast(L?'🗑️ Plan borrado':'🗑️ Plan deleted');
   loadMyPlans();
   if(document.getElementById('user-dashboard')) loadDashboardPlans();
 }
