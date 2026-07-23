@@ -63,6 +63,44 @@ export default {
       return new Response(null, { headers: CORS });
     }
 
+    // ── WEBHOOK DE RESEND (correo entrante a hola@dragonflaievents.com) ──
+    // Resend firma sus webhooks con el estándar Svix (encabezados svix-*,
+    // no Stripe-Signature). Aquí solo reenviamos el correo recibido a la
+    // bandeja real — no lo procesamos ni guardamos nada.
+    if (url.pathname === '/resend-inbound' && request.method === 'POST') {
+      const svixId = request.headers.get('svix-id');
+      const svixTimestamp = request.headers.get('svix-timestamp');
+      const svixSignature = request.headers.get('svix-signature');
+      const rawBody = await request.text();
+
+      const valid = await verifyResendWebhook(rawBody, svixId, svixTimestamp, svixSignature, env.RESEND_WEBHOOK_SECRET);
+      if (!valid) {
+        return new Response('Invalid signature', { status: 401, headers: CORS });
+      }
+
+      let event;
+      try { event = JSON.parse(rawBody); } catch { return new Response('Bad JSON', { status: 400, headers: CORS }); }
+
+      if (event.type === 'email.received') {
+        try {
+          const fwd = await fetch(`https://api.resend.com/emails/receiving/${event.data.email_id}/forward`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ to: [env.INBOUND_FORWARD_TO] })
+          });
+          if (!fwd.ok) {
+            console.error('Error reenviando correo de Resend:', await fwd.text());
+          }
+        } catch (err) {
+          console.error('Error llamando a la API de Resend:', err);
+        }
+      }
+      return new Response('OK', { status: 200, headers: CORS });
+    }
+
     // ── WEBHOOK DE STRIPE (lo llama Stripe, no el navegador) ──
     if (url.pathname === '/stripe-webhook' && request.method === 'POST') {
       const signature = request.headers.get('Stripe-Signature');
@@ -590,6 +628,39 @@ function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invit
 }
 
 // Verificación manual de la firma de Stripe usando Web Crypto API
+// Resend firma con el estándar Svix — distinto formato al de Stripe:
+// el secreto viene como "whsec_XXXX" (hay que quitar el prefijo y
+// decodificar de base64), la firma es base64 (no hex), y el contenido
+// firmado es "id.timestamp.payload", no solo "timestamp.payload".
+async function verifyResendWebhook(payload, svixId, svixTimestamp, svixSignature, secret) {
+  if (!svixId || !svixTimestamp || !svixSignature || !secret) return false;
+
+  const ts = parseInt(svixTimestamp, 10);
+  if (!Number.isFinite(ts) || Math.abs(Date.now() / 1000 - ts) > 300) return false;
+
+  const secretBytes = Uint8Array.from(atob(secret.replace(/^whsec_/, '')), c => c.charCodeAt(0));
+  const signedContent = `${svixId}.${svixTimestamp}.${payload}`;
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw', secretBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const sigBuffer = await crypto.subtle.sign('HMAC', key, enc.encode(signedContent));
+  const expected = btoa(String.fromCharCode(...new Uint8Array(sigBuffer)));
+
+  const safeEq = (a, b) => {
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    return diff === 0;
+  };
+  // svix-signature trae varias firmas separadas por espacio, cada una
+  // con el prefijo de versión "v1,".
+  return svixSignature.split(' ').some(part => {
+    const [version, sig] = part.split(',');
+    return version === 'v1' && sig && safeEq(expected, sig);
+  });
+}
+
 async function verifyStripeSignature(payload, sigHeader, secret) {
   if (!sigHeader || !secret) return false;
   // El header puede traer VARIOS v1 (p. ej. durante rotación de secretos) —
