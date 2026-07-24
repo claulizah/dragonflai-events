@@ -131,7 +131,7 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-cover-name{font-family:'Cormorant Garamond',serif;font-size:2.4rem;line-height:1.1;margin:4px 0 8px}
 .dash-cover-countdown{font-size:15px;font-weight:600;background:rgba(255,255,255,.2);display:inline-block;padding:6px 14px;border-radius:100px}
 
-.dash-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem}
+.dash-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
 .dash-stat-block{
   background:var(--white);border:1.5px solid var(--border-gray);border-radius:16px;
   padding:14px 8px;text-align:center;animation:dashCoverIn .5s ease-out .1s backwards;
@@ -139,10 +139,11 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dsb-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--violet);line-height:1.1}
 .dsb-label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
 @media (max-width:480px){
-  .dash-stats-row{grid-template-columns:repeat(2,1fr)}
   .dash-cover-name{font-size:1.9rem}
   .btn-account{white-space:normal;text-align:center;padding:8px 12px}
   .cl-status-select,.dash-vendor-status-select{max-width:100%}
+  .dbt-spent-input{width:70px}
+  .dash-budget-table{font-size:12px}
 }
 
 .dash-tabs{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:2px}
@@ -155,6 +156,11 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-tab-panel{animation:dashCoverIn .3s ease-out}
 .dash-subcard-title{font-size:13px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px}
 .dash-editable-text{border:1.5px dashed transparent;border-radius:10px;padding:8px;transition:border-color .2s;min-height:1.6em}
+.dash-ideas-heading{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--violet);margin:10px 0 4px}
+.dash-ideas-heading:first-child{margin-top:0}
+.dash-ideas-list{margin:0 0 8px;padding-left:20px}
+.dash-ideas-list li{margin-bottom:4px;line-height:1.5}
+.dash-ideas-para{margin:0 0 8px;line-height:1.5}
 .dash-editable-text:hover,.dash-editable-text:focus{border-color:var(--border-gray);outline:none}
 .dash-editable-text:empty::before{content:attr(data-placeholder);color:var(--text-3);font-style:italic}
 .dash-budget-table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -244,9 +250,10 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-tips-list{margin:0 0 10px;padding-left:20px;font-size:13.5px;color:var(--text-2);line-height:1.7}
 .dash-custom-tip-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13.5px;color:var(--text);border-top:1px solid var(--cream-3)}
 .dash-custom-tip-row button{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:13px}
-.dash-tip-add-row{display:flex;gap:8px;margin-top:10px}
-.dash-tip-add-row input{flex:1;padding:.6rem .8rem;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13.5px}
+.dash-tip-add-row{display:flex;gap:8px;margin-top:10px;align-items:stretch}
+.dash-tip-add-row input{flex:1;padding:.6rem .8rem;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13.5px;box-sizing:border-box}
 .dash-tip-add-row input:focus{outline:none;border-color:var(--teal)}
+.dash-tip-add-row .btn-account{white-space:nowrap}
 @media (max-width:480px){
   .launcher-content{padding:2rem 1.5rem}
   .launcher-belu-img{height:100px}
@@ -3716,6 +3723,7 @@ let dashboardCurrentPlanId=null;
 let dashboardCurrentPlanData={};
 let dashboardRsvpLists={confirmed:[],declined:[],pending:[]};
 let dashboardVendorSignedUrls={};
+let dashboardSelectPlanToken=0;
 let dashboardInspoFiles=[];
 function dashboardInspoFilesSelected(event){
   const L=lang==='es';
@@ -3789,7 +3797,7 @@ async function dashboardGenerateInspoIdeas(){
     const data=await res.json();
     const ideasText=data.content?.[0]?.text||'';
 
-    ideasEl.innerHTML=esc(ideasText).replace(/\n/g,'<br>');
+    ideasEl.innerHTML=formatIdeasText(ideasText);
 
     // Guardamos solo el texto de las ideas — las fotos en sí no se
     // suben a almacenamiento permanente en esta primera versión, solo
@@ -3844,7 +3852,9 @@ function showUserDashboard(){
   loadDashboardPlans();
 }
 
+let dashboardActiveTab='checklist';
 function dashboardSwitchTab(tabName){
+  dashboardActiveTab=tabName;
   document.querySelectorAll('.dash-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabName));
   document.querySelectorAll('.dash-tab-panel').forEach(p=>{ p.style.display=(p.dataset.panel===tabName)?'block':'none'; });
 }
@@ -3913,7 +3923,7 @@ function renderDashboardChecklistDetail(sections){
       const statusSelect=`<select class="cl-status-select" onchange="dashboardUpdateChecklistStatus(${si},${ii},this.value,this)">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
       const assigneeInput=`<input type="text" class="cl-assignee-input" placeholder="${L?'Responsable':'Assigned to'}" value="${esc(i.assignedTo||'')}" oninput="dashboardUpdateChecklistAssignee(${si},${ii},this.value)">`;
       const catTag=(i.cat&&i.cat!==s.section)?`<span class="cl-cat">${esc(i.cat)}</span>`:'';
-      const removeBtn=`<span onclick="dashboardExcludeChecklistItem(${si},${ii})" class="cl-remove-btn" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
+      const removeBtn=`<span onclick="dashboardExcludeChecklistItem(${si},${ii},this.closest('.cl-item'))" class="cl-remove-btn" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
       return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
         <div style="flex:1;min-width:0">
           <div class="cl-text">${esc(i.text)}</div>
@@ -4019,8 +4029,8 @@ function renderDashboardVendorCard(v,vi){
   return `<div class="dash-vendor-card">
     <div class="dash-vendor-head">
       <div>
-        <div class="dash-vendor-name">${esc(v.name||'')}</div>
-        <div class="dash-vendor-cat">${esc(v.type||'')}</div>
+        <div class="dash-vendor-name">${esc(v.type||'')}</div>
+        <div class="dash-vendor-cat">${esc(v.name||'')}</div>
       </div>
       <span onclick="dashboardRemoveVendor(${vi})" style="color:var(--text-3);cursor:pointer" title="${L?'Quitar proveedor':'Remove vendor'}">✕</span>
     </div>
@@ -4111,13 +4121,72 @@ async function dashboardRemoveVendorAttachment(vi,ai){
   dashboardSelectPlan(dashboardCurrentPlanId);
 }
 
-function dashboardExcludeChecklistItem(si,ii){
+function dashboardExcludeChecklistItem(si,ii,rowEl){
   const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
   if(!item) return;
   item.selected=false;
-  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
-    dashboardSelectPlan(dashboardCurrentPlanId);
-  });
+  if(rowEl) rowEl.remove(); // quitamos solo esta tarjeta, sin reconstruir el resto del checklist
+  dashboardRefreshChecklistStatsLocal();
+  Promise.all([
+    sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id),
+    dashboardSaveChecklistProgress()
+  ]);
+}
+
+// plan_checklist_progress es una tabla APARTE de plan_data, y al leer el
+// checklist se le da prioridad a esta tabla si ya tiene algo guardado —
+// sin esto, cualquier cambio hecho desde el dashboard (estado, "no
+// aplica", responsable) se guardaba en plan_data pero podía quedar
+// tapado por una versión más vieja aquí, si esta tabla ya tenía datos de
+// antes (ej. de cuando se usó el checklist desde la vista completa).
+async function dashboardSaveChecklistProgress(){
+  if(!sb||!currentUser||!dashboardCurrentPlanId) return;
+  const checklistData=dashboardCurrentPlanData.plan?.checklistData;
+  if(!Array.isArray(checklistData)) return;
+  try{
+    await sb.rpc('save_checklist_progress',{p_plan_id:dashboardCurrentPlanId,p_progress:checklistData});
+  }catch(e){ console.error('No se pudo sincronizar el progreso del checklist:',e); }
+}
+
+function dashboardRefreshChecklistStatsLocal(){
+  const L=lang==='es';
+  const savedPlan=dashboardCurrentPlanData.plan||{};
+  const sections=savedPlan.checklistData||[];
+  const totalTasks=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false).length,0);
+  const doneTasks=sections.reduce((s,sec)=>s+(sec.items||[]).filter(i=>i.selected!==false&&i.done===true).length,0);
+  const pct=totalTasks?Math.round((doneTasks/totalTasks)*100):0;
+
+  const today=new Date(); today.setHours(0,0,0,0);
+  const eventDateObj=savedPlan.rawDate?new Date(savedPlan.rawDate+'T12:00:00'):null;
+  let overdueSections=[],soonSections=[];
+  if(eventDateObj){
+    sections.forEach(sec=>{
+      const pending=(sec.items||[]).filter(i=>i.selected!==false&&i.done!==true&&i.status!=='postponed').length;
+      if(!pending) return;
+      const monthsBefore=CHECKLIST_SECTION_TIMING[sec.section];
+      if(monthsBefore===undefined) return;
+      const suggestedDate=new Date(eventDateObj); suggestedDate.setDate(suggestedDate.getDate()-Math.round(monthsBefore*30));
+      const daysUntilDue=Math.round((suggestedDate-today)/(1000*60*60*24));
+      if(daysUntilDue<0) overdueSections.push(sec.section);
+      else if(daysUntilDue<=30) soonSections.push(sec.section);
+    });
+  }
+
+  const barFill=document.getElementById('dash-checklist-bar-fill');
+  if(barFill) barFill.style.width=pct+'%';
+  const countText=document.getElementById('dash-checklist-count-text');
+  if(countText) countText.textContent=`${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}`;
+  const pctText=document.getElementById('dash-checklist-pct-text');
+  if(pctText) pctText.textContent=pct+'%';
+  const topPct=document.getElementById('dash-stat-checklist-pct');
+  if(topPct) topPct.textContent=pct+'%';
+  const urgencyEl=document.getElementById('dash-checklist-urgency');
+  if(urgencyEl){
+    urgencyEl.innerHTML=`
+      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
+      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+    `;
+  }
 }
 
 function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
@@ -4127,22 +4196,52 @@ function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
   item.done=(value==='done');
   const row=selectEl.closest('.cl-item');
   if(row) row.className='cl-item cl-status-'+value;
-  // También el % y las alertas de urgencia de arriba dependen de esto —
-  // recargamos toda la vista para que se reflejen sin tener que reabrir.
-  // IMPORTANTE: dashboardSelectPlan (que vuelve a LEER de la base de
-  // datos) tiene que ir DENTRO de este .then() — antes estaba fuera,
-  // así que a veces la relectura llegaba antes de que el guardado
-  // terminara, y el estado que acababas de cambiar se revertía solo.
-  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
-    dashboardSelectPlan(dashboardCurrentPlanId);
-  });
+  // Antes esto recargaba TODO el dashboard (reconstruía el HTML completo),
+  // lo que se sentía como un parpadeo entre pantallas distintas — ahora
+  // solo se actualizan los números que de verdad cambiaron (barra de
+  // progreso, alertas de urgencia), sin tocar nada más ni pedir datos de
+  // red otra vez.
+  dashboardRefreshChecklistStatsLocal();
+  // El guardado real y la sincronización con plan_checklist_progress
+  // siguen pasando en segundo plano, normal.
+  Promise.all([
+    sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id),
+    dashboardSaveChecklistProgress()
+  ]);
 }
 
 function dashboardUpdateChecklistAssignee(si,ii,value){
   const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
   if(!item) return;
   item.assignedTo=value;
-  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSaveChecklistProgress();
+  });
+}
+
+function formatIdeasText(text){
+  if(!text) return '';
+  const lines=esc(text).split('\n');
+  let html='';
+  let inList=false;
+  lines.forEach(line=>{
+    const trimmed=line.trim();
+    if(!trimmed){ if(inList){html+='</ul>';inList=false;} return; }
+    const bullet=trimmed.match(/^[-*]\s+(.*)/);
+    const heading=trimmed.match(/^#{1,3}\s+(.*)/);
+    if(heading){
+      if(inList){html+='</ul>';inList=false;}
+      html+=`<div class="dash-ideas-heading">${heading[1].replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    } else if(bullet){
+      if(!inList){html+='<ul class="dash-ideas-list">';inList=true;}
+      html+=`<li>${bullet[1].replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</li>`;
+    } else {
+      if(inList){html+='</ul>';inList=false;}
+      html+=`<p class="dash-ideas-para">${trimmed.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</p>`;
+    }
+  });
+  if(inList) html+='</ul>';
+  return html;
 }
 
 function dashboardSaveInspoIdeasEdit(el){
@@ -4358,11 +4457,21 @@ async function dashboardSelectPlan(planId){
     detailEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
   }
 
+  // Si cambias de evento rápido (o algo dispara 2 refrescos casi juntos),
+  // 2 llamadas a esta función pueden quedar "en vuelo" a la vez — y no hay
+  // garantía de que la más reciente en EMPEZAR sea también la más rápida
+  // en TERMINAR. Sin este candado, la respuesta más lenta de un plan viejo
+  // podía llegar después y pisar los datos del plan nuevo ya visible
+  // (por ejemplo, mostrando el QR o la invitación de otro evento).
+  const myRequestToken=++dashboardSelectPlanToken;
+
   const [{data:planRow,error:planErr},{data:progressRow},{data:invRows}]=await Promise.all([
     sb.from('plans').select('id,title,event_type,created_at,plan_data').eq('id',planId).eq('user_id',currentUser.id).single(),
     sb.from('plan_checklist_progress').select('progress').eq('plan_id',planId).maybeSingle(),
     sb.from('invitations').select('id,is_published,slug,gallery_urls,host_names,hashtag').eq('plan_id',planId).eq('user_id',currentUser.id)
   ]);
+
+  if(myRequestToken!==dashboardSelectPlanToken) return; // ya hay una llamada más nueva en curso — esta respuesta llegó tarde, se descarta
 
   if(planErr||!planRow){
     detailEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'No se pudo cargar este evento.':'Could not load this event.'}</p>`;
@@ -4441,11 +4550,13 @@ async function dashboardSelectPlan(planId){
 
   const checklistTabHtml=`
     <div style="height:10px;background:rgba(255,255,255,.3);border-radius:100px;overflow:hidden;margin-bottom:10px">
-      <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${theme.teal},${theme.violet})"></div>
+      <div id="dash-checklist-bar-fill" style="height:100%;width:${pct}%;background:linear-gradient(90deg,${theme.teal},${theme.violet})"></div>
     </div>
-    <div class="dash-stat-row"><span>${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}</span><b>${pct}%</b></div>
-    ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
-    ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+    <div class="dash-stat-row"><span id="dash-checklist-count-text">${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}</span><b id="dash-checklist-pct-text">${pct}%</b></div>
+    <div id="dash-checklist-urgency">
+      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
+      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+    </div>
     <div id="dash-checklist-detail" style="margin-top:14px">${renderDashboardChecklistDetail(sections)}</div>
   `;
 
@@ -4459,6 +4570,7 @@ async function dashboardSelectPlan(planId){
     </tr>`;
   }).join('');
   const budgetTabHtml=`
+    <div style="overflow-x:auto">
     <table class="dash-budget-table">
       <thead><tr><th>${L?'Categoría':'Category'}</th><th>${L?'Planeado':'Planned'}</th><th>${L?'Real':'Actual'}</th></tr></thead>
       <tbody>${budgetRowsHtml}</tbody>
@@ -4468,6 +4580,7 @@ async function dashboardSelectPlan(planId){
         <td class="${hasSpentData&&spentTotal>budgetTotal?'dbt-over':''}">${hasSpentData?'$'+spentTotal.toLocaleString(L?'es-MX':'en-US'):'—'}</td>
       </tr></tfoot>
     </table>
+    </div>
     <div style="display:flex;gap:8px;margin-top:14px">
       <input type="text" id="dash-budget-new-cat-input" placeholder="${L?'ej. Decoración floral':'e.g. Floral decor'}" style="flex:1;padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();dashboardAddBudgetCategory();}">
       <button class="btn-account" onclick="dashboardAddBudgetCategory()">+ ${L?'Agregar':'Add'}</button>
@@ -4568,10 +4681,12 @@ async function dashboardSelectPlan(planId){
     </div>
 
     <div class="dash-stats-row">
-      <div class="dash-stat-block"><div class="dsb-num">${pct}%</div><div class="dsb-label">${L?'Checklist':'Checklist'}</div></div>
-      <div class="dash-stat-block"><div class="dsb-num">${daysUntilEvent!==null?Math.max(daysUntilEvent,0):'—'}</div><div class="dsb-label">${L?'Días':'Days'}</div></div>
+      <div class="dash-stat-block"><div class="dsb-num" id="dash-stat-checklist-pct">${pct}%</div><div class="dsb-label">${L?'Checklist':'Checklist'}</div></div>
       <div class="dash-stat-block"><div class="dsb-num">${rsvpYes}</div><div class="dsb-label">${L?'Confirmados':'Confirmed'}</div></div>
-      <div class="dash-stat-block"><div class="dsb-num">$${(hasSpentData?spentTotal:budgetTotal).toLocaleString(L?'es-MX':'en-US',{notation:'compact'})}</div><div class="dsb-label">${hasSpentData?(L?'Gastado':'Spent'):(L?'Presupuesto':'Budget')}</div></div>
+      <div class="dash-stat-block dash-stat-budget">
+        <div class="dsb-num" style="font-size:1.3rem">$${budgetTotal.toLocaleString(L?'es-MX':'en-US',{notation:'compact'})}${hasSpentData?` / $${spentTotal.toLocaleString(L?'es-MX':'en-US',{notation:'compact'})}`:''}</div>
+        <div class="dsb-label">${hasSpentData?(L?'Planeado / Gastado':'Planned / Spent'):(L?'Presupuesto':'Budget')}</div>
+      </div>
     </div>
 
     <div class="dash-tabs">
@@ -4603,7 +4718,10 @@ async function dashboardSelectPlan(planId){
     document.getElementById('dash-inspo-generate-btn').style.display='none';
   }
   const savedIdeas=(dashboardCurrentPlanData.plan&&dashboardCurrentPlanData.plan.inspirationIdeas)||'';
-  document.getElementById('dash-inspo-ideas').innerHTML=savedIdeas?esc(savedIdeas).replace(/\n/g,'<br>'):'';
+  document.getElementById('dash-inspo-ideas').innerHTML=savedIdeas?formatIdeasText(savedIdeas):'';
+
+  if(switchedPlan) dashboardActiveTab='checklist'; // evento distinto: empezar limpio en Checklist
+  dashboardSwitchTab(dashboardActiveTab); // si solo se refrescó el mismo evento, se queda en la pestaña donde estabas
 
   detailEl.dataset.loadedOnce='true';
   detailEl.dataset.loadedPlanId=planId;
