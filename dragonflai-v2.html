@@ -140,6 +140,8 @@ input,textarea,[contenteditable="true"]{cursor:text}
 @media (max-width:480px){
   .dash-stats-row{grid-template-columns:repeat(2,1fr)}
   .dash-cover-name{font-size:1.9rem}
+  .btn-account{white-space:normal;text-align:center;padding:8px 12px}
+  .cl-status-select,.dash-vendor-status-select{max-width:100%}
 }
 
 .dash-tabs{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:2px}
@@ -162,6 +164,9 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dbt-amt{color:var(--text-2);font-variant-numeric:tabular-nums}
 .dbt-over{color:#C14A5E;font-weight:700}
 .dbt-remove{margin-left:8px;color:var(--text-3);cursor:pointer;font-size:12px}
+.dbt-spent-input{width:90px;text-align:right;border:1.5px solid var(--border-gray);border-radius:8px;padding:4px 8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.dbt-spent-input:focus{outline:none;border-color:var(--teal)}
+.dbt-spent-input.dbt-over{border-color:#C14A5E;color:#C14A5E}
 .dash-budget-table tfoot td{padding:10px 8px 4px;font-weight:700;color:var(--text);border-top:2px solid var(--text);font-variant-numeric:tabular-nums}
 
 .dash-inv-status{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px}
@@ -198,10 +203,24 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-vendor-add-form input,.dash-vendor-add-form select{padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px}
 .dash-vendor-add-form input{flex:1;min-width:140px}
 
+.dash-payments-toggle{font-size:12.5px;font-weight:700;color:var(--violet);margin-top:12px;padding-top:10px;border-top:1px dashed var(--border-gray);cursor:pointer;user-select:none}
+.dash-payments-body{margin-top:8px}
+.dash-payment-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;border-bottom:1px solid var(--cream-3)}
+.dash-payment-row.dash-payment-paid{opacity:.55}
+.dash-payment-row.dash-payment-paid .dash-payment-date,.dash-payment-row.dash-payment-paid .dash-payment-amt{text-decoration:line-through}
+.dash-payment-date{color:var(--text-2);min-width:80px}
+.dash-payment-amt{flex:1;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.dash-payment-att,.dash-payment-att-add{cursor:pointer;color:var(--violet);flex-shrink:0}
+.dash-payment-remove{cursor:pointer;color:var(--text-3);flex-shrink:0}
+.dash-payment-add-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.dash-payment-add-row input{padding:6px 8px;border:1.5px solid var(--border-gray);border-radius:8px;font-family:'Inter',sans-serif;font-size:12.5px}
+.dash-payment-add-row input[type="date"]{flex:1;min-width:110px}
+.dash-payment-add-row input[type="number"]{width:90px}
+
 .dashboard-header{text-align:center;margin-bottom:2rem}
 .dashboard-header h1{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--text);margin-bottom:.4rem}
 .dashboard-selector{
-  display:block;margin:.5rem auto 0;padding:.6rem 1rem;border-radius:12px;
+  display:block;margin:.5rem auto 1.25rem;padding:.6rem 1rem;border-radius:12px;
   border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:14px;
   color:var(--text);background:var(--white);max-width:320px;
 }
@@ -285,7 +304,7 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 
 /* ── CUENTA / LOGIN ── */
 .account-area{position:relative;display:flex;align-items:center}
-.btn-account{background:var(--cream-2);border:1px solid var(--border-gray);border-radius:100px;padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap}
+.btn-account{background:var(--cream-2);border:1px solid var(--border-gray);border-radius:100px;padding:7px 16px;font-size:12.5px;font-weight:600;color:var(--text-2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap;flex-shrink:0}
 .btn-account:hover{border-color:var(--teal);color:var(--teal-dark)}
 .account-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius);box-shadow:var(--shadow-md);min-width:170px;overflow:hidden;z-index:50}
 .account-dropdown button{display:block;width:100%;text-align:left;padding:10px 14px;font-size:13px;color:var(--text);background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
@@ -1801,6 +1820,25 @@ let access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,pla
 
 async function refreshPaidStatus(){
   if(!sb) return isPaid;
+
+  // init() y el listener de auth (más abajo) llaman a esta función por
+  // separado, cada uno con su propia verificación de sesión — antes eso
+  // significaba que TODO lo de aquí abajo (perfil, borrador del servidor)
+  // se disparaba 2 veces en cada carga. Este candado compartido asegura
+  // que sin importar cuál de los 2 llegue primero, la parte pesada solo
+  // corre una vez de verdad; el segundo que llegue simplemente espera el
+  // mismo resultado ya en curso.
+  if(refreshPaidStatusInFlight) return refreshPaidStatusInFlight;
+  refreshPaidStatusInFlight=(async()=>{
+    const result=await refreshPaidStatusInner();
+    refreshPaidStatusInFlight=null;
+    return result;
+  })();
+  return refreshPaidStatusInFlight;
+}
+let refreshPaidStatusInFlight=null;
+
+async function refreshPaidStatusInner(){
   const {data:{session}}=await sb.auth.getSession();
   currentUser=session?session.user:null;
   if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false}; updateAccountUI(); updateGenBadge(); return isPaid; }
@@ -3804,13 +3842,13 @@ function dashboardToggleRsvpList(category){
   el.dataset.showing=category;
   const rowsHtml=category==='pending'
     ? items.map(g=>`<div class="dash-stat-row" style="font-size:13px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;width:100%">
-          <input type="checkbox" ${g.sent?'checked':''} onchange="dashboardToggleInvitationSent(${g.id},this.checked)">
-          <span style="flex:1">${esc(g.name||'')}</span>
-          <span style="font-size:11px;color:var(--text-3)">${g.sent?(L?'Invitación enviada':'Invitation sent'):(L?'Sin enviar':'Not sent')}</span>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;width:100%;min-width:0">
+          <input type="checkbox" style="flex-shrink:0" ${g.sent?'checked':''} onchange="dashboardToggleInvitationSent(${g.id},this.checked)">
+          <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(g.name||'')}">${esc(g.name||'')}</span>
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0">${g.sent?(L?'Enviada':'Sent'):(L?'Sin enviar':'Not sent')}</span>
         </label>
       </div>`).join('')
-    : items.map(n=>`<div class="dash-stat-row" style="font-size:13px">${esc(n||'')}</div>`).join('');
+    : items.map(n=>`<div class="dash-stat-row" style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(n||'')}">${esc(n||'')}</div>`).join('');
   el.innerHTML=`<div class="dash-rsvp-namelist-box">
     <div class="dash-subcard-title" style="margin-bottom:8px">${labels[category]} (${items.length})</div>
     ${items.length?rowsHtml:`<p style="font-size:12.5px;color:var(--text-3)">${L?'Nadie en esta categoría todavía.':'No one in this category yet.'}</p>`}
@@ -3852,8 +3890,9 @@ function renderDashboardChecklistDetail(sections){
     const rows=visible.map(({i,ii})=>{
       if(i.status===undefined) i.status=i.done===true?'done':'pending';
       const statusSelect=`<select class="cl-status-select" onchange="dashboardUpdateChecklistStatus(${si},${ii},this.value,this)">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
-      const assigneeInput=`<input type="text" class="cl-assignee-input" placeholder="${L?'¿Quién?':'Who?'}" value="${esc(i.assignedTo||'')}" oninput="dashboardUpdateChecklistAssignee(${si},${ii},this.value)">`;
+      const assigneeInput=`<input type="text" class="cl-assignee-input" placeholder="${L?'Responsable':'Assigned to'}" value="${esc(i.assignedTo||'')}" oninput="dashboardUpdateChecklistAssignee(${si},${ii},this.value)">`;
       const catTag=(i.cat&&i.cat!==s.section)?`<span class="cl-cat">${esc(i.cat)}</span>`:'';
+      const removeBtn=`<span onclick="dashboardExcludeChecklistItem(${si},${ii})" class="cl-remove-btn" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
       return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
         <div style="flex:1;min-width:0">
           <div class="cl-text">${esc(i.text)}</div>
@@ -3863,9 +3902,10 @@ function renderDashboardChecklistDetail(sections){
             ${assigneeInput}
           </div>
         </div>
+        ${removeBtn}
       </div>`;
     }).join('');
-    return `<h2 style="font-size:13px;margin-top:14px;cursor:pointer;user-select:none" onclick="dashboardToggleChecklistSection(${si})">▾ ${esc(s.section)}</h2><div class="dash-cl-section-body" data-section="${si}">${rows}</div>`;
+    return `<h2 style="font-size:13px;margin-top:14px;cursor:pointer;user-select:none" onclick="dashboardToggleChecklistSection(${si})">▸ ${esc(s.section)}</h2><div class="dash-cl-section-body" data-section="${si}" style="display:none">${rows}</div>`;
   }).join('');
 }
 
@@ -3941,6 +3981,20 @@ function renderDashboardVendorCard(v,vi){
       <span onclick="dashboardRemoveVendorAttachment(${vi},${ai})" style="cursor:pointer;color:var(--text-3)">✕</span>
     </div>`;
   }).join('');
+  const payments=v.payments||[];
+  const paymentsRowsHtml=payments.map((p,pi)=>{
+    const pAttUrl=p.attachmentPath?dashboardVendorSignedUrls[p.attachmentPath]:null;
+    return `<div class="dash-payment-row${p.paid?' dash-payment-paid':''}">
+      <input type="checkbox" ${p.paid?'checked':''} onchange="dashboardTogglePaymentPaid(${vi},${pi},this.checked)" title="${L?'Pagado':'Paid'}">
+      <span class="dash-payment-date">${esc(p.date||'')}</span>
+      <span class="dash-payment-amt">$${Number(p.amount||0).toLocaleString(L?'es-MX':'en-US')}</span>
+      ${p.attachmentName?(pAttUrl?`<a href="${pAttUrl}" target="_blank" rel="noopener" class="dash-payment-att">📎</a>`:`<span class="dash-payment-att">📎</span>`):`<span onclick="document.getElementById('dash-payment-file-${vi}-${pi}').click()" class="dash-payment-att-add" title="${L?'Adjuntar comprobante':'Attach receipt'}">📎+</span>`}
+      <input type="file" id="dash-payment-file-${vi}-${pi}" style="display:none" onchange="dashboardUploadPaymentAttachment(event,${vi},${pi})">
+      <span onclick="dashboardRemovePayment(${vi},${pi})" class="dash-payment-remove">✕</span>
+    </div>`;
+  }).join('');
+  const paidCount=payments.filter(p=>p.paid).length;
+
   return `<div class="dash-vendor-card">
     <div class="dash-vendor-head">
       <div>
@@ -3949,7 +4003,6 @@ function renderDashboardVendorCard(v,vi){
       </div>
       <span onclick="dashboardRemoveVendor(${vi})" style="color:var(--text-3);cursor:pointer" title="${L?'Quitar proveedor':'Remove vendor'}">✕</span>
     </div>
-    ${v.tip?`<p style="font-size:12px;color:var(--text-3);margin:4px 0 0">${esc(v.tip)}</p>`:''}
     <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
       <select class="dash-vendor-status-select dash-vendor-status-${v.status||'pendiente'}" onchange="dashboardUpdateVendorField(${vi},'status',this.value,this)">
         <option value="pendiente"${v.status==='pendiente'?' selected':''}>${statusLabels.pendiente[L?'es':'en']}</option>
@@ -3963,6 +4016,16 @@ function renderDashboardVendorCard(v,vi){
     <div style="display:flex;gap:8px;margin-top:8px">
       <button class="btn-account" onclick="document.getElementById('dash-vendor-file-${vi}').click()">📎 ${L?'Adjuntar archivo':'Attach file'}</button>
       <input type="file" id="dash-vendor-file-${vi}" style="display:none" onchange="dashboardUploadVendorAttachment(event,${vi})">
+    </div>
+
+    <div class="dash-payments-toggle" onclick="dashboardTogglePayments(${vi})">▸ ${L?'Fechas de pago':'Payment schedule'} (${paidCount}/${payments.length})</div>
+    <div class="dash-payments-body" data-vendor="${vi}" style="display:none">
+      ${paymentsRowsHtml}
+      <div class="dash-payment-add-row">
+        <input type="date" id="dash-payment-new-date-${vi}">
+        <input type="number" id="dash-payment-new-amt-${vi}" placeholder="${L?'Monto':'Amount'}">
+        <button class="btn-account" onclick="dashboardAddPayment(${vi})">+ ${L?'Agregar':'Add'}</button>
+      </div>
     </div>
   </div>`;
 }
@@ -4027,6 +4090,15 @@ async function dashboardRemoveVendorAttachment(vi,ai){
   dashboardSelectPlan(dashboardCurrentPlanId);
 }
 
+function dashboardExcludeChecklistItem(si,ii){
+  const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.selected=false;
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
 function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
   const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
   if(!item) return;
@@ -4034,10 +4106,15 @@ function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
   item.done=(value==='done');
   const row=selectEl.closest('.cl-item');
   if(row) row.className='cl-item cl-status-'+value;
-  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
   // También el % y las alertas de urgencia de arriba dependen de esto —
   // recargamos toda la vista para que se reflejen sin tener que reabrir.
-  dashboardSelectPlan(dashboardCurrentPlanId);
+  // IMPORTANTE: dashboardSelectPlan (que vuelve a LEER de la base de
+  // datos) tiene que ir DENTRO de este .then() — antes estaba fuera,
+  // así que a veces la relectura llegaba antes de que el guardado
+  // terminara, y el estado que acababas de cambiar se revertía solo.
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
 }
 
 function dashboardUpdateChecklistAssignee(si,ii,value){
@@ -4052,6 +4129,77 @@ function dashboardSaveInspoIdeasEdit(el){
   if(!dashboardCurrentPlanData.plan) dashboardCurrentPlanData.plan={};
   dashboardCurrentPlanData.plan.inspirationIdeas=el.innerText;
   sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
+}
+
+function dashboardUpdateBudgetSpent(bi,value){
+  const item=dashboardCurrentPlanData.plan?.budgetData?.[bi];
+  if(!item) return;
+  item.spent=value===''?null:Number(value);
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+function dashboardTogglePayments(vi){
+  const body=document.querySelector(`.dash-payments-body[data-vendor="${vi}"]`);
+  if(!body) return;
+  const collapsed=body.style.display==='none';
+  body.style.display=collapsed?'block':'none';
+  const toggle=body.previousElementSibling;
+  if(toggle) toggle.textContent=(collapsed?'▾ ':'▸ ')+toggle.textContent.replace(/^[▾▸]\s*/,'');
+}
+
+function dashboardAddPayment(vi){
+  const L=lang==='es';
+  const dateInput=document.getElementById(`dash-payment-new-date-${vi}`);
+  const amtInput=document.getElementById(`dash-payment-new-amt-${vi}`);
+  const date=dateInput.value, amount=amtInput.value;
+  if(!date||!amount) return;
+  const vendor=dashboardCurrentPlanData.plan?.vendorsData?.[vi];
+  if(!vendor) return;
+  if(!Array.isArray(vendor.payments)) vendor.payments=[];
+  vendor.payments.push({date,amount:Number(amount),paid:false});
+  vendor.payments.sort((a,b)=>a.date.localeCompare(b.date));
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+function dashboardRemovePayment(vi,pi){
+  const vendor=dashboardCurrentPlanData.plan?.vendorsData?.[vi];
+  if(!vendor?.payments) return;
+  vendor.payments.splice(pi,1);
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+function dashboardTogglePaymentPaid(vi,pi,paid){
+  const payment=dashboardCurrentPlanData.plan?.vendorsData?.[vi]?.payments?.[pi];
+  if(!payment) return;
+  payment.paid=paid;
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
+    dashboardSelectPlan(dashboardCurrentPlanId);
+  });
+}
+
+async function dashboardUploadPaymentAttachment(event,vi,pi){
+  const L=lang==='es';
+  const file=event.target.files[0];
+  event.target.value='';
+  if(!file||!dashboardCurrentPlanId) return;
+  if(file.size>10*1024*1024){ showToast(L?'El archivo debe pesar menos de 10 MB':'File must be under 10 MB',true); return; }
+  showToast(L?'Subiendo comprobante…':'Uploading receipt…');
+  const path=`${currentUser.id}/${dashboardCurrentPlanId}/pago-${Date.now()}-${file.name}`;
+  const {error}=await sb.storage.from('vendor-documents').upload(path,file,{upsert:false});
+  if(error){ showToast(L?'No se pudo subir el comprobante':'Could not upload the receipt',true); console.error(error); return; }
+  const payment=dashboardCurrentPlanData.plan?.vendorsData?.[vi]?.payments?.[pi];
+  if(!payment) return;
+  payment.attachmentPath=path;
+  payment.attachmentName=file.name;
+  await sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+  showToast(L?'✅ Comprobante subido':'✅ Receipt uploaded');
+  dashboardSelectPlan(dashboardCurrentPlanId);
 }
 
 function dashboardRecalcBudgetAmounts(data,total){
@@ -4179,7 +4327,15 @@ async function loadDashboardPlans(){
 async function dashboardSelectPlan(planId){
   const L=lang==='es';
   const detailEl=document.getElementById('dashboard-event-detail');
-  detailEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
+  // Guardamos la posición del scroll — sin esto, cada edición (cambiar un
+  // estado, agregar un proveedor, etc.) volvía a armar todo el HTML y el
+  // navegador aventaba a la persona hasta arriba, sintiéndose como que
+  // "se iba hasta el plan" en vez de quedarse donde estaba trabajando.
+  const scrollY=window.scrollY;
+  const isFirstLoad=!detailEl.dataset.loadedOnce;
+  if(isFirstLoad){
+    detailEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
+  }
 
   const [{data:planRow,error:planErr},{data:progressRow},{data:invRows}]=await Promise.all([
     sb.from('plans').select('id,title,event_type,created_at,plan_data').eq('id',planId).eq('user_id',currentUser.id).single(),
@@ -4278,7 +4434,7 @@ async function dashboardSelectPlan(planId){
     return `<tr class="dash-budget-row">
       <td class="dbt-label">${esc(b.label||'')}${canRemoveBudget?`<span onclick="dashboardRemoveBudgetCategory(${bi})" class="dbt-remove" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}</td>
       <td class="dbt-amt">$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}</td>
-      <td class="dbt-amt${over?' dbt-over':''}">${(b.spent!==undefined&&b.spent!==null)?'$'+Number(b.spent).toLocaleString(L?'es-MX':'en-US'):'—'}</td>
+      <td class="dbt-amt${over?' dbt-over':''}"><input type="number" class="dbt-spent-input${over?' dbt-over':''}" placeholder="—" value="${(b.spent!==undefined&&b.spent!==null)?b.spent:''}" onchange="dashboardUpdateBudgetSpent(${bi},this.value)"></td>
     </tr>`;
   }).join('');
   const budgetTabHtml=`
@@ -4303,6 +4459,8 @@ async function dashboardSelectPlan(planId){
   `;
 
   const pendingCount=dashboardRsvpLists.pending.length;
+  const totalContacted=rsvpYes+rsvpNo+pendingCount;
+  const extraRsvps=totalContacted-guestTotal; // positivo = alguien confirmó/no-fue sin estar en tu lista original
   const invitationTabHtml=inv?`
     <div class="dash-inv-status">
       <span class="dash-inv-status-dot ${inv.is_published?'published':'draft'}"></span>
@@ -4314,7 +4472,8 @@ async function dashboardSelectPlan(planId){
       <div class="dash-rsvp-block dash-rsvp-pending" onclick="dashboardToggleRsvpList('pending')"><div class="drb-num">${pendingCount}</div><div class="drb-label">${L?'Faltan por confirmar':'Awaiting response'}</div></div>
     </div>
     <div id="dash-rsvp-namelist"></div>
-    <div class="dash-stat-row"><span>${L?'Invitados en tu lista':'Guests on your list'}</span><b>${guestTotal}</b></div>
+    <div class="dash-stat-row"><span>${L?'Invitados en tu lista original':'Guests on your original list'}</span><b>${guestTotal}</b></div>
+    ${extraRsvps>0?`<p style="font-size:11.5px;color:var(--text-3);margin:2px 0 0">${L?`${extraRsvps} de las respuestas son de alguien que no estaba en tu lista original — por eso los números no suman igual.`:`${extraRsvps} of the responses are from someone who wasn't on your original list — that's why the numbers don't add up evenly.`}</p>`:''}
     ${galleryUrls.length?`<div class="dash-stat-row"><span>${L?'Fotos subidas':'Photos uploaded'}</span><b>${galleryUrls.length}</b></div><div class="dash-gallery-thumbs">${galleryUrls.slice(0,6).map(u=>`<img src="${u}">`).join('')}</div>`:''}
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
       <button class="btn-account" onclick="dashboardEditInvitation('${planId}')">✏️ ${L?'Editar invitación':'Edit invitation'}</button>
@@ -4412,11 +4571,22 @@ async function dashboardSelectPlan(planId){
   dashboardCurrentPlanData=planRow.plan_data||{plan:{}};
   renderDashboardCustomTips();
 
-  dashboardInspoFiles=[];
-  document.getElementById('dash-inspo-preview').innerHTML='';
-  document.getElementById('dash-inspo-generate-btn').style.display='none';
+  // Solo reiniciamos las fotos de inspiración elegidas (aún sin subir) si
+  // de verdad se cambió de evento — si solo se está refrescando el mismo
+  // plan (ej. tras marcar una tarea), no tiene sentido perder lo que ya
+  // había seleccionado la persona.
+  const switchedPlan=detailEl.dataset.loadedPlanId!==planId;
+  if(switchedPlan){
+    dashboardInspoFiles=[];
+    document.getElementById('dash-inspo-preview').innerHTML='';
+    document.getElementById('dash-inspo-generate-btn').style.display='none';
+  }
   const savedIdeas=(dashboardCurrentPlanData.plan&&dashboardCurrentPlanData.plan.inspirationIdeas)||'';
   document.getElementById('dash-inspo-ideas').innerHTML=savedIdeas?esc(savedIdeas).replace(/\n/g,'<br>'):'';
+
+  detailEl.dataset.loadedOnce='true';
+  detailEl.dataset.loadedPlanId=planId;
+  window.scrollTo(0,scrollY);
 }
 
 function renderDashboardCustomTips(){
@@ -5379,7 +5549,7 @@ async function generate(){
     ?' | Contratando proveedores por separado':' | Tipo de venue: por definir';
   const stress=radios.stress||T.stress[lang][1];
   const exp=radios.exp||T.exp[lang][1];
-  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[T.priority[lang][0]];
+  const priorityList=(radios.priority&&radios.priority.length)?radios.priority:[(T.priority[eventType]||T.priority['Boda/Wedding'])[lang][0]];
   const priority=priorityList.join(', ');
 
   // ── Detalles adicionales (todos opcionales) ──
@@ -6898,7 +7068,7 @@ function renderChecklist(sections){
       i.done=(i.status==='done'); // mantener sincronizado para el resto del código
       const removeBtn=`<span onclick="event.stopPropagation();excludeChecklistItem(${si},${ii})" style="margin-left:8px;color:var(--text-3);font-size:13px;flex-shrink:0;white-space:nowrap" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
       const statusSelect=`<select class="cl-status-select" data-s="${si}" data-i="${ii}" onchange="updateChecklistItemStatus(this)" onclick="event.stopPropagation()">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
-      const assigneeInput=`<input type="text" class="cl-assignee-input" data-s="${si}" data-i="${ii}" placeholder="${L?'¿Quién?':'Who?'}" value="${esc(i.assignedTo||'')}" onclick="event.stopPropagation()" oninput="updateChecklistItemAssignee(this)">`;
+      const assigneeInput=`<input type="text" class="cl-assignee-input" data-s="${si}" data-i="${ii}" placeholder="${L?'Responsable':'Assigned to'}" value="${esc(i.assignedTo||'')}" onclick="event.stopPropagation()" oninput="updateChecklistItemAssignee(this)">`;
       const catTag=(i.cat&&i.cat!==s.section)?`<span class="cl-cat">${esc(i.cat)}</span>`:'';
       return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
         <div style="flex:1;min-width:0">
