@@ -83,16 +83,36 @@ export default {
 
       if (event.type === 'email.received') {
         try {
-          const fwd = await fetch(`https://api.resend.com/emails/receiving/${event.data.email_id}/forward`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ to: [env.INBOUND_FORWARD_TO] })
+          // Resend no expone un endpoint REST de "forward" para llamadas
+          // fetch directas (ese helper es exclusivo del SDK de Node.js).
+          // Su propia documentación recomienda, para este caso, reenviar
+          // manualmente: 1) obtener el correo recibido completo, 2) mandarlo
+          // de nuevo con el endpoint normal de envío.
+          const getResp = await fetch(`https://api.resend.com/emails/receiving/${event.data.email_id}`, {
+            headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}` }
           });
-          if (!fwd.ok) {
-            console.error('Error reenviando correo de Resend:', await fwd.text());
+          if (!getResp.ok) {
+            console.error('Error obteniendo el correo recibido de Resend:', await getResp.text());
+          } else {
+            const email = await getResp.json();
+            const fwd = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: 'DragonflAI Events <hola@dragonflaievents.com>',
+                to: [env.INBOUND_FORWARD_TO],
+                reply_to: email.from,
+                subject: `Fwd: ${email.subject || '(sin asunto)'}`,
+                html: email.html || undefined,
+                text: email.text || undefined
+              })
+            });
+            if (!fwd.ok) {
+              console.error('Error reenviando correo de Resend:', await fwd.text());
+            }
           }
         } catch (err) {
           console.error('Error llamando a la API de Resend:', err);
