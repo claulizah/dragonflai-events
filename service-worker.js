@@ -11,7 +11,7 @@
 //    IA, fuentes) va directo a la red, sin tocar el caché.
 // ══════════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'dflai-shell-v2';
+const CACHE_NAME = 'dflai-shell-v3';
 const SHELL_URLS = [
   '/dragonflai-v2.html',
   '/manifest.json',
@@ -46,8 +46,11 @@ self.addEventListener('fetch', (event) => {
 
   if (isHTML) {
     // RED PRIMERO: siempre la versión más nueva; caché solo sin conexión.
+    // cache:'no-store' es la pieza que faltaba — sin esto, el navegador
+    // podía seguir sirviendo una copia vieja de su caché HTTP normal
+    // aunque la estrategia "quisiera" ser red-primero.
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-store' })
         .then((response) => {
           if (response && response.ok) {
             const clone = response.clone();
