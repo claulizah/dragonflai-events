@@ -336,7 +336,7 @@ footer a:hover{color:var(--teal-dark)}
 </section>
 
 <!-- FEATURES -->
-<section class="features-section" id="como-funciona">
+<section class="features-section">
   <p class="section-eyebrow" data-es="Funcionalidades" data-en="Features">Funcionalidades</p>
   <h2 class="section-title" data-es="Todo lo que creamos juntos" data-en="Everything we create together">Todo lo que creamos juntos</h2>
   <p class="section-sub" data-es="8 tipos de evento · Español e inglés · Modo personal y profesional" data-en="8 event types · Spanish &amp; English · Personal &amp; professional mode">8 tipos de evento · Español e inglés · Modo personal y profesional</p>
@@ -390,7 +390,7 @@ footer a:hover{color:var(--teal-dark)}
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="how-section">
+<section class="how-section" id="como-funciona">
   <p class="section-eyebrow" data-es="Cómo funciona" data-en="How it works">Cómo funciona</p>
   <h2 class="section-title" data-es="Tu evento completo<br>en 4 pasos" data-en="Your complete event<br>in 4 steps">Tu evento completo<br>en 4 pasos</h2>
   <div class="steps">
@@ -753,6 +753,8 @@ function setLang(l){
   updateNavLogin();
   updateUnlockBannerText();
   updatePriceUSDHints();
+  document.getElementById('auth-email').placeholder = l === 'es' ? 'tu@correo.com' : 'you@email.com';
+  document.getElementById('bug-report-message').placeholder = l === 'es' ? "ej. El botón de 'Generar plan gratis' no hizo nada…" : "e.g. The 'Generate free plan' button didn't do anything…";
 }
 
 // Tipo de cambio aproximado (referencia informativa) — Stripe siempre cobra
