@@ -112,6 +112,7 @@ input,textarea,[contenteditable="true"]{cursor:text}
 }
 .launcher-email-input:focus{outline:none;border-color:var(--teal)}
 .launcher-email-status{font-size:13px;margin-top:1rem;line-height:1.5;min-height:1.2em}
+.launcher-session-notice{background:var(--gold-light);color:#8a6b1e;font-size:12.5px;padding:10px 14px;border-radius:12px;margin-bottom:1rem;line-height:1.5;text-align:left}
 .dashboard-wrap{max-width:700px;margin:2.5rem auto;padding:0 1.5rem}
 
 .dash-cover{
@@ -882,6 +883,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
     <div id="launcher-email-step" style="display:none">
       <img src="/assets/belu/belu-senalando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+      <div id="launcher-session-expired-notice" class="launcher-session-notice" style="display:none">🔒 <span data-es="Tu sesión terminó por inactividad. Por seguridad, vuelve a iniciar sesión." data-en="Your session ended due to inactivity. For security, please log in again.">Tu sesión terminó por inactividad. Por seguridad, vuelve a iniciar sesión.</span></div>
       <h2 data-es="¿Cuál es tu correo?" data-en="What's your email?">¿Cuál es tu correo?</h2>
       <p data-es="Así sabemos si ya tienes planes guardados con nosotros" data-en="This way we know if you already have saved plans with us">Así sabemos si ya tienes planes guardados con nosotros</p>
       <input type="email" id="launcher-email-input" class="launcher-email-input" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter') launcherSubmitEmail()">
@@ -1866,6 +1868,7 @@ async function refreshPaidStatusInner(){
 
   const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in').eq('id',currentUser.id).single();
   userProfile=data||{};
+  localStorage.setItem('dflai_was_logged_in','1'); // para detectar "sesión expiró por inactividad" más adelante
   currentUserName=userProfile.full_name||'';
 
   const {data:accessData,error:accessError}=await sb.rpc('get_my_access_summary');
@@ -1937,6 +1940,12 @@ function launcherNextSlide(){
     launcherShowEmailStep();
   }
 }
+function showSessionExpiredNotice(){
+  launcherShowEmailStep();
+  const notice=document.getElementById('launcher-session-expired-notice');
+  if(notice) notice.style.display='block';
+}
+
 function launcherShowEmailStep(){
   document.getElementById('launcher-carousel').style.display='none';
   document.getElementById('launcher-email-step').style.display='block';
@@ -3650,6 +3659,7 @@ async function exportRsvpsToExcel(invId,hostNames){
 async function logout(){
   if(sb) await sb.auth.signOut();
   currentUser=null; isPaid=false; currentUserName=''; userProfile={};
+  localStorage.removeItem('dflai_was_logged_in'); // fue un logout a propósito, no una sesión expirada
   updateAccountUI();
   updateGenBadge();
   showToast(lang==='es'?'Sesión cerrada':'Logged out');
@@ -3797,7 +3807,18 @@ async function dashboardGenerateInspoIdeas(){
 async function routeInitialScreen(){
   if(initialRoutingDone) return;
   initialRoutingDone=true;
-  if(!currentUser) return; // sin sesión: se queda el launcher tal cual
+  if(!currentUser){
+    // Si este navegador SÍ tuvo sesión antes pero ya no la tiene, lo más
+    // probable es que expiró por inactividad (no un logout explícito) —
+    // se lo decimos claro, en vez de tratarlo como si nunca hubiera usado
+    // la app, y lo mandamos derecho al paso de correo en vez del carrusel
+    // completo de bienvenida (ya conoce a Belu).
+    if(localStorage.getItem('dflai_was_logged_in')){
+      localStorage.removeItem('dflai_was_logged_in');
+      showSessionExpiredNotice();
+    }
+    return; // sin sesión: se queda el launcher tal cual
+  }
 
   // Importante: decidimos A DÓNDE vamos ANTES de cerrar el launcher — si
   // cerráramos el launcher primero y decidiéramos después (la consulta de
