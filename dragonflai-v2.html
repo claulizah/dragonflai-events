@@ -918,6 +918,17 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div id="launcher-email-status" class="launcher-email-status"></div>
     </div>
 
+    <!-- Paso de espera: solo aparece cuando ya hay sesión y estamos
+         trayendo los datos del dashboard. Mantiene el launcher tapando
+         la pantalla hasta que hay contenido real, en vez de destapar un
+         "Cargando…" vacío. Reusa .ldots/.ldot del bloque LOADING. -->
+    <div id="launcher-loading-step" style="display:none">
+      <img src="/assets/belu/belu-trabajando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+      <h2 data-es="Preparando tu evento…" data-en="Getting your event ready…">Preparando tu evento…</h2>
+      <p data-es="Belu está juntando tu checklist, tu invitación y tus confirmaciones" data-en="Belu is gathering your checklist, invitation, and RSVPs">Belu está juntando tu checklist, tu invitación y tus confirmaciones</p>
+      <div class="ldots"><span class="ldot"></span><span class="ldot"></span><span class="ldot"></span></div>
+    </div>
+
   </div>
 </div>
 
@@ -1665,7 +1676,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
-      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:96px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="if(this.parentElement){this.style.display='none';this.parentElement.textContent='🎉';this.parentElement.style.fontSize='36px'}"> </span>
+      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:96px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="const p=this.parentElement;if(p){p.textContent='🎉';p.style.fontSize='36px'}"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
@@ -1976,6 +1987,14 @@ function showSessionExpiredNotice(){
 function launcherShowEmailStep(){
   document.getElementById('launcher-carousel').style.display='none';
   document.getElementById('launcher-email-step').style.display='block';
+}
+function launcherShowLoadingStep(){
+  const carousel=document.getElementById('launcher-carousel');
+  const emailStep=document.getElementById('launcher-email-step');
+  const loadingStep=document.getElementById('launcher-loading-step');
+  if(carousel) carousel.style.display='none';
+  if(emailStep) emailStep.style.display='none';
+  if(loadingStep) loadingStep.style.display='block';
 }
 async function launcherSubmitEmail(){
   const emailEl=document.getElementById('launcher-email-input');
@@ -3295,7 +3314,9 @@ async function publishInvitation(){
   document.getElementById('publish-url').textContent=lastPublishedUrl;
   try{
     const dataUrl=await buildBrandedQRDataURL(hostNames,(plan.extra&&plan.extra.hashtag)||'',lastPublishedUrl);
-    document.getElementById('publish-qr-img').src=dataUrl;
+    const qrImgEl=document.getElementById('publish-qr-img');
+    qrImgEl.style.display=''; // por si un intento anterior lo ocultó vía onerror
+    qrImgEl.src=dataUrl;
     document.getElementById('publish-qr-download').href=dataUrl;
   }catch(err){
     console.error('Error generando el QR con diseño:',err);
@@ -3848,21 +3869,36 @@ async function routeInitialScreen(){
     return; // sin sesión: se queda el launcher tal cual
   }
 
-  // Importante: decidimos A DÓNDE vamos ANTES de cerrar el launcher — si
-  // cerráramos el launcher primero y decidiéramos después (la consulta de
-  // abajo tarda un poco), se alcanzaba a ver el formulario en blanco un
-  // instante antes de que apareciera el dashboard. Con el launcher tapando
-  // todo hasta que ya sabemos el destino final, no hay ningún parpadeo.
-  const {data,error}=await sb.from('plans').select('id').eq('user_id',currentUser.id).limit(1);
-  const hasPlans=!error && data && data.length;
+  // Ya sabemos que hay sesión: quien está aquí no necesita ver el carrusel
+  // de bienvenida. Cambiamos el launcher a modo espera y lo dejamos puesto
+  // hasta tener contenido real que mostrar.
+  launcherShowLoadingStep();
 
-  if(hasPlans){
-    document.getElementById('main-planner-view').style.display='none';
-    document.getElementById('user-dashboard').style.display='block';
-    loadDashboardPlans();
+  // Antes se preguntaba primero "¿tiene planes?" (select id, limit 1) y
+  // sólo DESPUÉS se pedía la lista completa: dos viajes seguidos a la misma
+  // tabla, cuando el segundo ya trae la respuesta del primero. Medido en
+  // producción, ese viaje de más costaba ~1.2s antes de ver nada.
+  document.getElementById('main-planner-view').style.display='none';
+  document.getElementById('user-dashboard').style.display='block';
+
+  const AGOTADO='timeout';
+  let resultado;
+  try{
+    resultado=await Promise.race([
+      loadDashboardPlans(true),
+      new Promise(r=>setTimeout(()=>r(AGOTADO),6000))
+    ]);
+  }catch(_){ resultado=AGOTADO; }
+
+  if(resultado===false){
+    // Cuenta nueva sin planes: de regreso al formulario en blanco.
+    document.getElementById('user-dashboard').style.display='none';
+    document.getElementById('main-planner-view').style.display='block';
   }
-  // si no tiene planes todavía (cuenta nueva), se queda el formulario
-  // normal, que ya está visible por default.
+  // true    -> el dashboard ya quedó poblado; se destapa con contenido real
+  // AGOTADO -> algo tardó de más: se deja el dashboard con su "Cargando…"
+  //            y se pinta solo cuando Supabase responda. Nadie se queda
+  //            atrapado viendo la intro.
   closeLauncher();
 }
 
@@ -4432,17 +4468,25 @@ function dashboardCreateNewEvent(){
   document.getElementById('main-planner-view').style.display='block';
   const backLink=document.getElementById('back-to-dashboard-link');
   if(backLink) backLink.style.display='block';
+  // Evento NUEVO: no heredar el id del que se estaba viendo. Sin esto,
+  // "Guardar plan" hacía UPDATE sobre el evento anterior y lo destruía.
+  plan._savedId=null;
+  if(currentUser) localStorage.removeItem('dflai_last_plan_id_'+currentUser.id);
 }
 
-async function loadDashboardPlans(){
+async function loadDashboardPlans(esArranqueInicial=false){
   const L=lang==='es';
   const {data,error}=await sb.from('plans').select('id,title,event_type,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!data||!data.length){
-    // Ya no quedan planes (ej. se acaba de borrar el último) — no dejamos
-    // la tarjeta del plan ya borrado en pantalla, mandamos al formulario.
-    dashboardCreateNewEvent();
-    showToast(L?'Ya no tienes eventos guardados — crea uno nuevo':'You have no saved events left — create a new one');
-    return;
+    if(!esArranqueInicial){
+      // Ya no quedan planes (ej. se acaba de borrar el último) — no dejamos
+      // la tarjeta del plan ya borrado en pantalla, mandamos al formulario.
+      // En el arranque, cero planes sólo significa cuenta nueva: ahí este
+      // aviso sería falso y quien enruta es routeInitialScreen.
+      dashboardCreateNewEvent();
+      showToast(L?'Ya no tienes eventos guardados — crea uno nuevo':'You have no saved events left — create a new one');
+    }
+    return false;
   }
 
   const sel=document.getElementById('dashboard-event-selector');
@@ -4461,7 +4505,10 @@ async function loadDashboardPlans(){
     initialId=userProfile.main_plan_id;
   }
   sel.value=initialId;
-  dashboardSelectPlan(initialId);
+  // Con await, quien llama sabe que el contenido real ya está en pantalla
+  // — es lo que permite cerrar el launcher sin mostrar el "Cargando…".
+  await dashboardSelectPlan(initialId);
+  return true;
 }
 
 async function dashboardSelectPlan(planId){
@@ -5331,6 +5378,10 @@ function setLang(l){
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
   renderPublishPickers();
+  // El dashboard se arma con L=lang==='es' congelado al momento de pintar,
+  // así que cambiar de idioma no lo tocaba: se quedaba todo en español.
+  const dashEl=document.getElementById('user-dashboard');
+  if(dashEl && dashEl.style.display!=='none' && dashboardCurrentPlanId) dashboardSelectPlan(dashboardCurrentPlanId);
   if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_lang:l});
 }
 
@@ -5611,7 +5662,13 @@ function validateRequiredFields(){
     el.classList.add('f-required-error');
     el.addEventListener('input',function clearErr(){ el.classList.remove('f-required-error'); el.removeEventListener('input',clearErr); },{once:true});
   });
-  if(missing.length) missing[0].scrollIntoView({behavior:'smooth',block:'center'});
+  if(missing.length){
+    // 'instant' en vez de 'smooth': la animación suave no siempre corre
+    // (pestaña en segundo plano, "reducir movimiento" del sistema) y sin
+    // ella la persona lee "están marcados en rojo" sin ver ningún campo.
+    missing[0].scrollIntoView({behavior:'instant',block:'center'});
+    missing[0].focus({preventScroll:true});
+  }
   return missing.length===0;
 }
 
@@ -5755,7 +5812,13 @@ async function generate(){
   // regenerar — si no, cada clic en "Generar" crearía una fila nueva en
   // vez de reusar el acceso ya desbloqueado, rompiendo la promesa de
   // "sin límite de regeneraciones" para quien ya pagó/canjeó un código.
-  const _previousSavedId=plan._savedId||localStorage.getItem('dflai_last_plan_id_'+currentUser.id)||null;
+  // Antes esto usaba, como respaldo, el id guardado en localStorage. Ese
+  // respaldo sobrevivia a recargas y a eventos COMPLETAMENTE distintos: al
+  // guardar un evento nuevo se hacia UPDATE sobre el anterior y se perdia.
+  // Ahora solo se hereda el id si el plan CARGADO en memoria ya tiene uno
+  // (regenerar este mismo evento), y dashboardCreateNewEvent() lo limpia
+  // al empezar uno nuevo.
+  const _previousSavedId=plan._savedId||null;
 
   plan={name,date:dateStr,rawDate:date,location,time,timeStartRaw,timeEndRaw,budget,vibe,notes,venueStatus,vendorStatus,mustHaves,mustHaveTags,guests,typeName,eventTypeRaw:eventType,mode,stress,exp,priority,priorityList,proCtx,clientName:mode==='pro'?document.getElementById('f-client').value:'',lang,paqueteInfo,extra};
   if(_previousSavedId) plan._savedId=_previousSavedId;
@@ -5921,8 +5984,15 @@ function toTitleCase(s){
 function buildCtx(){
   const p=plan,e=p.extra||{};
   const outLang=p.lang==='es'?'Spanish (warm, natural Mexican Spanish)':'English';
+  // En Graduación y Corporativo el campo de nombre pide la INSTITUCIÓN o la
+  // EMPRESA, no una persona (ver NAME_LABELS). Sin esta distinción el plan
+  // saludaba así: "Hola, Universidad Autónoma, entiendo que te sientes un
+  // poco abrumado/a…".
+  const nombreEsOrganizacion=['Graduación/Graduation','Corporativo/Corporate'].includes(p.eventTypeRaw);
   const persona=p.mode==='diy'
-    ?`Planning for: ${p.name} (planning their OWN ${p.typeName}). Stress: "${p.stress}". Exp: "${p.exp}". Priority: "${p.priority}". Venue: ${p.venueStatus}. Vendors: ${p.vendorStatus}.`
+    ?(nombreEsOrganizacion
+      ?`Planning a ${p.typeName} hosted by the organization "${p.name}". IMPORTANT: "${p.name}" is the hosting institution/company, NOT a person — never greet it by name and never address it as if it were the reader. Address the reader directly as the organizer, without using any personal name. Stress: "${p.stress}". Exp: "${p.exp}". Priority: "${p.priority}". Venue: ${p.venueStatus}. Vendors: ${p.vendorStatus}.`
+      :`Planning for: ${p.name} (planning their OWN ${p.typeName}). Stress: "${p.stress}". Exp: "${p.exp}". Priority: "${p.priority}". Venue: ${p.venueStatus}. Vendors: ${p.vendorStatus}.`)
     :`PROFESSIONAL PLANNER. Planner: ${p.name}.${p.proCtx}. Exp: "${p.exp}".`;
   let ctx=`${persona}\nEvent: ${p.typeName} | Date: ${p.date} | Location: ${p.location} | Guests: ${p.guests} | Budget: $${parseInt(p.budget).toLocaleString()} ${e.currency||'MXN'} | Vibe: ${p.vibe} | Time: ${p.time} | Must-haves: ${p.mustHaves}${p.paqueteInfo||''}${p.notes?' | Details: '+p.notes:''}`;
   // Detalles adicionales opcionales — solo se agregan si el usuario los llenó
@@ -6083,7 +6153,7 @@ function buildSTDPrompt(){
   const dresscodeLine=showDresscode?`<div class="std-detail-item"><span class="std-icon">👔</span><span class="std-field" data-field="dresscode">${dresscodeText}</span></div>`:'';
   const hashtagText=e.hashtag?esc(e.hashtag):(p.lang==='es'?'#TuHashtag':'#YourHashtag');
   return `Return ONLY clean HTML. No markdown, no code fences. Write ALL text in ${outLang}.
-You are an elegant wedding stationer and copywriter. Create a beautiful Save the Date card.
+You are an elegant event stationer and copywriter specializing in ${p.typeName}. Create a beautiful Save the Date card.
 ${ctx}
 Create an elegant, emotional, personalized Save the Date. Use this EXACT HTML structure (do not change or omit the hashtag line below — use it exactly as given, it contains real user data). Return ONLY this single block below, nothing before or after it — no buttons, no theme picker, no extra wrapper:
 <div class="std-card">
@@ -7697,6 +7767,17 @@ async function ensurePlanSaved(){
   // distintas se probaban en el mismo navegador, la segunda "heredaba" por
   // accidente el plan_id de la primera (fuga de datos entre cuentas).
   const planIdKey='dflai_last_plan_id_'+currentUser.id;
+
+  if(plan._savedId){
+    // Último candado antes de sobrescribir: si la fila guardada es de otro
+    // TIPO de evento, esto no es una regeneración sino un evento nuevo que
+    // heredó el id por error. Insertar, nunca pisar.
+    const {data:filaPrevia}=await sb.from('plans').select('event_type').eq('id',plan._savedId).maybeSingle();
+    if(filaPrevia&&filaPrevia.event_type&&filaPrevia.event_type!==plan.typeName){
+      console.warn('_savedId apunta a un evento de otro tipo — se inserta uno nuevo en vez de sobrescribir');
+      plan._savedId=null;
+    }
+  }
 
   if(plan._savedId){
     // Ya existía (se preservó al regenerar) — actualizamos el contenido
