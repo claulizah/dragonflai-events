@@ -142,7 +142,6 @@ input,textarea,[contenteditable="true"]{cursor:text}
   .dash-cover-name{font-size:1.9rem}
   .btn-account{white-space:normal;text-align:center;padding:8px 12px}
   .cl-status-select,.dash-vendor-status-select{max-width:100%}
-  .dbt-spent-input{width:70px}
   .dash-budget-table{font-size:12px}
 }
 
@@ -175,6 +174,27 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dbt-spent-input:focus{outline:none;border-color:var(--teal)}
 .dbt-spent-input.dbt-over{border-color:#C14A5E;color:#C14A5E}
 .dash-budget-table tfoot td{padding:10px 8px 4px;font-weight:700;color:var(--text);border-top:2px solid var(--text);font-variant-numeric:tabular-nums}
+
+/* En pantallas angostas, la tabla de 3 columnas (categoría/planeado/real)
+   no cabe y obligaba a hacer scroll horizontal para ver o editar el campo
+   "Real" — aquí la convertimos en un layout apilado: el nombre de la
+   categoría ocupa su propia línea, y planeado + real quedan uno junto al
+   otro debajo, siempre dentro del ancho de la pantalla. */
+@media (max-width:480px){
+  .dash-budget-table,.dash-budget-table tbody,.dash-budget-table tfoot{display:block;width:100%}
+  .dash-budget-table thead{display:none}
+  .dash-budget-row,.dash-budget-table tfoot tr{
+    display:flex;flex-wrap:wrap;align-items:center;column-gap:10px;
+    padding:8px 0;border-bottom:1px solid var(--cream-3);
+  }
+  .dash-budget-table tfoot tr{border-top:2px solid var(--text);border-bottom:none;margin-top:4px;padding-top:10px}
+  .dash-budget-row td,.dash-budget-table tfoot td{border:none;padding:2px 0}
+  .dash-budget-table tfoot td{border-top:none}
+  .dbt-label{flex:1 1 100%}
+  .dash-budget-row td:nth-child(2),.dash-budget-table tfoot td:nth-child(2){flex:1 1 auto;text-align:left}
+  .dash-budget-row td:nth-child(3),.dash-budget-table tfoot td:nth-child(3){flex:0 0 auto;text-align:right;margin-left:auto}
+  .dbt-spent-input{width:100px}
+}
 
 .dash-inv-status{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px}
 .dash-inv-status-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
@@ -1654,7 +1674,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
       <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
         <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.6rem" data-es="Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos" data-en="Print this QR code and place it at your event — guests scan it to upload and see photos together">Imprime este código QR y ponlo en tu evento — tus invitados lo escanean para subir y ver fotos juntos</p>
-        <img id="publish-qr-img" src="" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-gray)">
+        <img id="publish-qr-img" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-gray)" onerror="this.style.display='none'">
         <a id="publish-qr-download" href="" download="qr-fotos-evento.png" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none;margin-top:.6rem" data-es="⬇️ Descargar QR" data-en="⬇️ Download QR">⬇️ Descargar QR</a>
       </div>
     </div>

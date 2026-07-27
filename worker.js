@@ -376,13 +376,18 @@ function buildPlanningReminderEmailHtml(row) {
       ? `Llevas <strong>${pct}%</strong> de tu checklist — todavía estás a tiempo de ponerte al día.`
       : `Todavía no has marcado tareas en tu checklist — es un buen momento para revisarlo.`;
 
+  // user_name y host_name los captura el usuario en su perfil/evento —
+  // se escapan antes de insertarse en el HTML del correo.
+  const userName = escapeHtml(row.user_name);
+  const hostName = escapeHtml(row.host_name);
+
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF9F7;padding:32px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
 <tr><td align="center">
 <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
 <tr><td style="height:6px;background:linear-gradient(90deg,#2EC4B6,#7B2FBE);font-size:0;line-height:0">&nbsp;</td></tr>
 <tr><td style="padding:36px 40px 8px;text-align:center">
 <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1A2332;margin:0 0 16px">🦋 ${reminderSubjectFor(row)}</h1>
-<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px">${row.user_name ? 'Hola ' + row.user_name + ',' : 'Hola,'} soy Belu — vengo a ver cómo va${row.host_name ? ' "' + row.host_name + '"' : ' tu evento'}.</p>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px">${userName ? 'Hola ' + userName + ',' : 'Hola,'} soy Belu — vengo a ver cómo va${hostName ? ' "' + hostName + '"' : ' tu evento'}.</p>
 <p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px">${milestoneCopy}</p>
 <p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 28px">${encouragement}</p>
 </td></tr>
@@ -400,6 +405,15 @@ function buildPlanningReminderEmailHtml(row) {
 // ══════════════════════════════════════════════════════════════
 //  Helpers
 // ══════════════════════════════════════════════════════════════
+
+// Escapa texto que viene de campos controlados por el usuario (nombre de
+// invitado, anfitrión, ubicación, etc.) antes de insertarlo en el HTML de
+// un correo. Sin esto, alguien podía poner "<img src=x onerror=...>" como
+// su nombre de invitado y quedaría incrustado tal cual en el correo de
+// recordatorio que reciben otras personas.
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 function corsHeadersFor(request) {
   const origin = request.headers.get('Origin') || '';
@@ -625,6 +639,13 @@ async function sendReminderEmails(env, invitationId) {
 }
 
 function buildReminderEmailHtml(guestName, hostNames, eventDate, location, invitationUrl) {
+  // Todo lo que viene de datos capturados por el usuario (nombre del
+  // invitado, nombres de anfitriones, ubicación, fecha guardada como texto)
+  // se escapa antes de insertarse en el HTML del correo.
+  guestName = escapeHtml(guestName);
+  hostNames = escapeHtml(hostNames);
+  eventDate = escapeHtml(eventDate);
+  location = escapeHtml(location);
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF9F7;padding:32px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
 <tr><td align="center">
 <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
