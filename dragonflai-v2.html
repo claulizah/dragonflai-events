@@ -1827,7 +1827,21 @@ if (location.hash.startsWith('##')) {
 }
 
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      // flowType:'pkce' — con el flujo implícito (el default), el link
+      // mágico traía la sesión completa en la URL: bastaba una visita GET
+      // para consumirla. Un escáner de seguridad del correo (Gmail, filtros
+      // corporativos, del proveedor) visita los links de un email en
+      // automático para revisarlos, y eso quemaba el token antes de que la
+      // persona alcanzara a tocarlo — confirmado en video: el link de las
+      // 9:51pm murió con "expiró o ya fue usado" sin haber sido tocado.
+      // Con PKCE el link solo trae un código de un solo uso que necesita el
+      // 'verifier' generado en ESTE navegador al pedir el link — un bot que
+      // visite la URL no lo tiene, así que su visita no gasta nada.
+      // Efecto colateral a tener presente: el link deja de funcionar si se
+      // pide en un dispositivo y se abre en otro (el verifier no viaja).
+      auth: { flowType: 'pkce' }
+    })
   : null;
 
 // ══════════════════════════════
