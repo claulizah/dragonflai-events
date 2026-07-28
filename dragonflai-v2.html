@@ -6132,7 +6132,13 @@ function esc(s){
 
 // Convierte a Title Case: "ana & juan" -> "Ana & Juan", "FAFIS" -> "Fafis"
 function toTitleCase(s){
-  return String(s??'').toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase());
+  const t=String(s??'');
+  // Misma regla que en invitacion.html: si ya viene capitalizado a propósito
+  // lo dejamos en paz. Normalizar a ciegas rompía "JC & Ana" -> "Jc & Ana" y
+  // "María de la Cruz" -> "María De La Cruz". Solo arreglamos cuando la
+  // persona escribió TODO IGUAL, que es cuando no eligió formato.
+  if(t!==t.toUpperCase() && t!==t.toLowerCase()) return t;
+  return t.toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase());
 }
 
 // ══════════════════════════════
