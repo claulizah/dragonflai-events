@@ -4037,13 +4037,17 @@ function showUserDashboard(){
 let dashboardActiveTab='checklist';
 function dashboardShowFullPlan(){
   const L=lang==='es';
-  const saved=dashboardCurrentPlanData?.plan;
-  if(!saved){ showToast(L?'Abre un evento primero':'Open an event first',true); return; }
+  // OJO: dashboardCurrentPlanData ES el plan_data completo -- {plan, tabsHtml,
+  // mode} como hermanos -- no solo el objeto `plan`. La primera versión de
+  // esta función leía dashboardCurrentPlanData.plan y buscaba .tabsHtml/.mode
+  // AHÍ ADENTRO (donde no existen), así que tabsHtml siempre salía vacío y
+  // la pestaña no mostraba nada. Mismo patrón que loadSavedPlan(), pero a
+  // partir de lo que el dashboard ya tiene en memoria -- sin viaje extra a
+  // la red, y sin tocar la visibilidad de user-dashboard/main-planner-view.
+  const saved=dashboardCurrentPlanData;
+  if(!saved || !saved.plan){ showToast(L?'Abre un evento primero':'Open an event first',true); return; }
 
-  // Mismo patrón que loadSavedPlan(), pero a partir de lo que el dashboard
-  // ya tiene en memoria (dashboardCurrentPlanData) -- sin viaje extra a la
-  // red, y sin tocar la visibilidad de user-dashboard/main-planner-view.
-  plan=saved;
+  plan=saved.plan;
   plan._savedId=dashboardCurrentPlanId; // igual que loadSavedPlan: reutilizar, no crear otro
   if(saved.mode) setMode(saved.mode);
 
@@ -4088,6 +4092,19 @@ function dashboardEditInvitation(planId){
   // formulario. Si la invitación ya existe, el botón llama directo a
   // openEditInvitationModal(), que nunca sale del dashboard.
   publishModalCameFromDashboard=true;
+  // BUG DE DATOS ENCONTRADO Y CORREGIDO: pendingDraftInvitationId es global
+  // y solo se limpia al PUBLICAR con éxito o al generar un plan nuevo desde
+  // el formulario -- nunca al abrir "Crear mi invitación" para OTRO evento
+  // desde el dashboard. Si antes se topó el paywall publicando el evento A
+  // (quedando pendingDraftInvitationId apuntando al borrador de A), y luego
+  // se entraba aquí para el evento B, "Publicar" hacía UPDATE sobre la
+  // invitación de A en vez de crear una de B -- pisando su host_names con
+  // los datos de B. Como este botón solo aparece cuando el evento actual
+  // TODAVÍA NO tiene ninguna fila de invitación (ni borrador ni publicada:
+  // si la tuviera, se usaría openEditInvitationModal en su lugar), nunca hay
+  // un borrador legítimo de ESTE plan que preservar -- siempre es seguro
+  // limpiarlo aquí.
+  pendingDraftInvitationId=null;
   loadSavedPlan(planId).then(()=>openPublishModal());
 }
 
@@ -4800,7 +4817,11 @@ async function dashboardSelectPlan(planId){
   const [{data:planRow,error:planErr},{data:progressRow},{data:invRows}]=await Promise.all([
     sb.from('plans').select('id,title,event_type,created_at,plan_data').eq('id',planId).eq('user_id',currentUser.id).single(),
     sb.from('plan_checklist_progress').select('progress').eq('plan_id',planId).maybeSingle(),
-    sb.from('invitations').select('id,is_published,slug,gallery_urls,host_names,hashtag').eq('plan_id',planId).eq('user_id',currentUser.id)
+    sb.from('invitations').select('id,is_published,slug,gallery_urls,host_names,hashtag').eq('plan_id',planId).eq('user_id',currentUser.id).order('created_at',{ascending:false})
+    // .order() es una segunda capa de resguardo -- por diseño debe haber una
+    // sola invitación por plan_id, pero si alguna vez se duplica (el bug de
+    // pendingDraftInvitationId de arriba ya cerrado era una forma de que
+    // pasara), invRows[0] toma la más reciente en vez de una al azar.
   ]);
 
   if(myRequestToken!==dashboardSelectPlanToken) return; // ya hay una llamada más nueva en curso — esta respuesta llegó tarde, se descarta
@@ -4923,7 +4944,7 @@ async function dashboardSelectPlan(planId){
   const budgetTabHtml=`
     <div style="overflow-x:auto">
     <table class="dash-budget-table">
-      <thead><tr><th>${L?'Categoría':'Category'}</th><th>${L?'Planeado':'Planned'}</th><th>${L?'Real':'Actual'}</th></tr></thead>
+      <thead><tr><th>${L?'Categoría':'Category'}</th><th>${L?'Planeado':'Planned'}</th><th style="text-align:center">${L?'Real':'Actual'}</th></tr></thead>
       <tbody>${budgetRowsHtml}</tbody>
       <tfoot><tr>
         <td>${L?'TOTAL':'TOTAL'}</td>
@@ -5026,7 +5047,7 @@ async function dashboardSelectPlan(planId){
         <button onclick="loadSavedPlan('${planId}')" title="${L?'Abrir plan completo':'Open full plan'}">✏️</button>
         <button onclick="deleteSavedPlan('${planId}')" title="${L?'Borrar evento':'Delete event'}">🗑️</button>
       </div>
-      <div class="dash-cover-eventtype">${esc(planRow.event_type||'')}</div>
+      <div class="dash-cover-eventtype">${esc(translateEventTypeName(planRow.event_type||''))}</div>
       <div class="dash-cover-name">${esc(planRow.title)}</div>
       ${countdownHtml?`<div class="dash-cover-countdown">${countdownHtml}</div>`:''}
     </div>
@@ -5046,7 +5067,7 @@ async function dashboardSelectPlan(planId){
       <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
       <button class="dash-tab" data-tab="vendors" onclick="dashboardSwitchTab('vendors')">🤝 ${L?'Proveedores':'Vendors'}</button>
       <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
-      <button class="dash-tab" data-tab="fullplan" onclick="dashboardSwitchTab('fullplan')">📄 ${L?'Plan completo (IA)':'Full plan (AI)'}</button>
+      <button class="dash-tab" data-tab="fullplan" onclick="dashboardSwitchTab('fullplan')">📄 ${L?'Tu plan completo':'Your full plan'}</button>
     </div>
 
     <!-- El Excel ya existía pero su botón vivía solo en la vista del plan
@@ -5427,6 +5448,20 @@ const T={
   }
 };
 
+// plan.typeName / event_type se calculan UNA VEZ, en el idioma activo al
+// generar (línea ~6149: T.eventTypes[lang][idx]), y quedan guardados como
+// texto plano -- "Boda" se queda "Boda" para siempre, aunque la interfaz
+// cambie a inglés. Mismo problema que ya resolvimos para las secciones del
+// checklist; aquí la tabla sale de T.eventTypes en vez de mantenerse aparte.
+const EVENT_TYPE_ES_EN=Object.fromEntries(T.eventTypes.es.map((es,i)=>[
+  es.replace(/^\S+\s/,''), T.eventTypes.en[i].replace(/^\S+\s/,'')
+]));
+const EVENT_TYPE_EN_ES=Object.fromEntries(Object.entries(EVENT_TYPE_ES_EN).map(([es,en])=>[en,es]));
+function translateEventTypeName(name){
+  if(lang==='en') return EVENT_TYPE_ES_EN[name]||name;
+  return EVENT_TYPE_EN_ES[name]||name;
+}
+
 const tabKeys=['overview','timeline','dayitinerary','budget','checklist','vendors','ideas','savethedate','proposal'];
 
 // Formato/tipo de ceremonia y otros campos condicionales — solo aplican a
@@ -5702,6 +5737,14 @@ function setLang(l){
   // así que cambiar de idioma no lo tocaba: se quedaba todo en español.
   const dashEl=document.getElementById('user-dashboard');
   if(dashEl && dashEl.style.display!=='none' && dashboardCurrentPlanId) dashboardSelectPlan(dashboardCurrentPlanId);
+  // Mismo problema, para "Tu plan completo": título, cuenta regresiva y las
+  // pestañas Cronograma/Presupuesto/etc (rtab) SÍ pueden recalcularse con el
+  // idioma nuevo -- son controles de interfaz, no el texto que escribió la
+  // IA. Lo que NO se retraduce aquí es el contenido narrado por Belu dentro
+  // de cada pestaña (párrafos, tablas ya redactadas): eso quedó fijo en el
+  // idioma en que se generó, y solo cambiaría con una regeneración real.
+  const resEl=document.getElementById('res-section');
+  if(resEl && getComputedStyle(resEl).display!=='none' && dashboardCurrentPlanId) dashboardShowFullPlan();
   if(currentUser&&sb&&!suppressPrefSave) sb.rpc('update_my_profile',{new_lang:l});
 }
 
