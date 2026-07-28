@@ -430,7 +430,16 @@ function setLang(l){
 }
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function toTitleCase(s){ return String(s??'').toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase()); }
+function toTitleCase(s){
+  const t=String(s??'');
+  // Si ya viene capitalizado a propósito lo dejamos en paz: normalizar a
+  // ciegas rompía "JC & Ana" -> "Jc & Ana" y "María de la Cruz" ->
+  // "María De La Cruz", y esto va en la línea más visible de la invitación.
+  // Solo arreglamos cuando la persona escribió TODO IGUAL (mayúsculas o
+  // minúsculas), que es cuando de verdad no eligió formato.
+  if(t!==t.toUpperCase() && t!==t.toLowerCase()) return t;
+  return t.toLowerCase().replace(/(^|\s|&|-)\S/g,c=>c.toUpperCase());
+}
 
 // ── Agregar a mi calendario ──
 // La hora se guarda como texto de exhibición ("6:00 PM – 11:00 PM"), no en
@@ -552,7 +561,9 @@ async function submitBugReport(){
   const {error}=await sb.from('bug_reports').insert({
     page: 'invitacion',
     message,
-    browser_info: navigator.userAgent
+    // Sin el slug, un reporte como "no me deja confirmar" no dice de qué
+    // evento habla. Se cuelga de browser_info para no pedir migración.
+    browser_info: navigator.userAgent+' | '+location.pathname
   });
 
   if(error){ showToast(L?'No se pudo enviar el reporte, intenta de nuevo':'Could not send the report, try again'); return; }

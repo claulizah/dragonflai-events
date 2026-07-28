@@ -1,0 +1,16 @@
+# robots.txt — DragonflAI Events
+# Antes esta ruta no existía y el catch-all de Netlify devolvía el HTML del
+# landing con status 200, que es justo lo que un rastreador no espera.
+
+User-agent: *
+Allow: /
+
+# Las invitaciones publicadas son privadas de facto: la liga se comparte solo
+# con los invitados. No queremos que aparezcan en resultados de búsqueda.
+Disallow: /i/
+
+# La app requiere sesión; indexarla no aporta nada y gasta presupuesto de rastreo.
+Disallow: /app
+Disallow: /dragonflai-v2.html
+
+Sitemap: https://dragonflaievents.com/sitemap.xml

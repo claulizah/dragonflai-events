@@ -11,8 +11,13 @@
 //    IA, fuentes) va directo a la red, sin tocar el caché.
 // ══════════════════════════════════════════════════════════════
 
-const CACHE_NAME = 'dflai-shell-v3';
+// v4: se subió la versión a propósito. El listener 'activate' borra todo
+// caché cuyo nombre no sea el actual, así que renombrar es el ÚNICO
+// mecanismo para invalidar el shell viejo. Súbelo cada vez que cambies
+// SHELL_URLS, o quien ya tenga el SW instalado se queda con lo anterior.
+const CACHE_NAME = 'dflai-shell-v4';
 const SHELL_URLS = [
+  '/app',                  // start_url del PWA — sin esto la app instalada no abre sin señal
   '/dragonflai-v2.html',
   '/manifest.json',
   '/icon-192.png',

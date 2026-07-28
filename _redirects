@@ -4,6 +4,15 @@
 # Atajo a la app
 /app  /dragonflai-v2.html  200
 
+# Assets faltantes: 404 de verdad, no la landing disfrazada.
+# Tiene que ir ANTES del catch-all — Netlify evalúa de arriba abajo y la
+# primera regla que coincide gana. Sin esto, un asset que falte respondía
+# 200 con el HTML del landing y fallaba en silencio: así se nos fueron a
+# producción belu-celebrando.png y og-image.png sin que nada los marcara.
+# SIN "!" al final: los archivos que sí existen tienen prioridad sobre las
+# reglas, así que esta solo se aplica cuando de verdad falta el archivo.
+/assets/*  /404.html  404
+
 # Catch-all: cualquier URL desconocida (typos, links rotos) cae a la landing.
 # Antes caía a invitacion.html y mostraba "invitación no encontrada", lo cual
 # confundía a cualquiera que solo escribió mal la dirección.

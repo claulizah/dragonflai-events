@@ -3,12 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+  // Red de seguridad para los links mágicos YA enviados, que siguen
+  // apuntando a "/". Si la URL trae el token de sesión, ocultamos todo antes
+  // del primer pintado: el rebote a /app tarda un viaje de red y en ese rato
+  // se alcanza a leer "Probar gratis", que es justo lo que no le quieres
+  // decir a alguien que acaba de iniciar sesión.
+  // Cuando ya no queden links viejos circulando, esto se puede quitar.
+  if (/[#&](access_token|refresh_token)=|type=(magiclink|recovery|signup)/.test(location.hash)) {
+    document.documentElement.style.visibility = "hidden";
+  }
+</script>
 <title>DragonflAI Events — Belu, tu asistente personal de eventos</title>
 <!-- Vista previa al compartir la landing (WhatsApp, redes) -->
 <meta property="og:title" content="DragonflAI Events — Belu, tu asistente personal de eventos">
 <meta property="og:description" content="Cuéntale a Belu tu evento y ella genera el plan completo: cronograma, presupuesto, checklist, proveedores e invitación con RSVP.">
 <meta property="og:image" content="https://dragonflaievents.com/assets/belu/og-image.png">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://dragonflaievents.com/">
+<meta property="og:site_name" content="DragonflAI Events">
+<!-- Las dimensiones hacen que WhatsApp y Facebook rendericen la tarjeta
+     grande en el PRIMER scrapeo, sin caer a la miniatura chica. -->
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<!-- Evita que los links con ?ref= se cuenten como páginas distintas. -->
+<link rel="canonical" href="https://dragonflaievents.com/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://dragonflaievents.com/assets/belu/og-image.png">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -683,8 +702,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Netlify en vez del dominio de marca. Ahora siempre apunta al canónico.
 function canonicalRedirectUrl(){
   const CANONICAL='https://dragonflaievents.com';
-  if(/\.netlify\.app$/.test(location.hostname)) return CANONICAL+location.pathname;
-  return location.origin+location.pathname;
+  const base=/\.netlify\.app$/.test(location.hostname)?CANONICAL:location.origin;
+  // Siempre a /app. Antes devolvía la ruta desde donde se pidió el link, así
+  // que quien lo pedía desde la landing volvía a la landing: se pintaba la
+  // página de venta completa (con "Probar gratis") durante ~750ms mientras
+  // Supabase resolvía la sesión y recién entonces rebotaba. Medido en video:
+  // 1.25s de pantalla equivocada justo después de iniciar sesión.
+  return base+'/app';
 }
 
 if (location.hash.startsWith('##')) {

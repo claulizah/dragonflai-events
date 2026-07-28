@@ -149,7 +149,14 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-tab{
   flex-shrink:0;padding:9px 16px;border-radius:100px;border:1.5px solid var(--border-gray);
   background:var(--white);color:var(--text-2);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
-  cursor:pointer;white-space:nowrap;transition:all .2s;
+  cursor:pointer;white-space:nowrap;
+  /* Antes: transition:all .2s — 'all' incluye color y border-color, así que el
+     estado seleccionado se DESVANECÍA en 200ms en vez de cambiar de golpe.
+     Tocar una pestaña además dispara el repintado del panel, y con el hilo
+     principal ocupado la transición se atora: queda el degradado puesto pero
+     con el texto gris y el aro de borde gris encima. Un indicador de selección
+     tiene que ser instantáneo. */
+  transition:box-shadow .2s;
 }
 .dash-tab.active{background:linear-gradient(135deg,var(--teal),var(--violet));border-color:transparent;color:#fff}
 .dash-tab-panel{animation:dashCoverIn .3s ease-out}
@@ -271,9 +278,12 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-custom-tip-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13.5px;color:var(--text);border-top:1px solid var(--cream-3)}
 .dash-custom-tip-row button{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:13px}
 .dash-tip-add-row{display:flex;gap:8px;margin-top:10px;align-items:stretch}
-.dash-tip-add-row input{flex:1;padding:.6rem .8rem;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13.5px;box-sizing:border-box}
+/* min-width:0 es la pieza clave: un <input> en flex trae min-width:auto y se
+   niega a encogerse bajo su ancho natural (~175px), así que en tarjetas
+   angostas empujaba el botón "Agregar" fuera del recuadro. */
+.dash-tip-add-row input{flex:1 1 0;min-width:0;padding:.6rem .8rem;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13.5px;box-sizing:border-box}
 .dash-tip-add-row input:focus{outline:none;border-color:var(--teal)}
-.dash-tip-add-row .btn-account{white-space:nowrap}
+.dash-tip-add-row .btn-account{white-space:nowrap;flex-shrink:0}
 @media (max-width:480px){
   .launcher-content{padding:2rem 1.5rem}
   .launcher-belu-img{height:100px}
@@ -292,14 +302,17 @@ input,textarea,[contenteditable="true"]{cursor:text}
   .logo-sub{display:none}
   .logo-name{font-size:17px;white-space:nowrap}
   .mode-pill{font-size:10px;padding:3px 10px;white-space:nowrap}
-  .btn-account{max-width:110px;overflow:hidden;text-overflow:ellipsis;padding:7px 12px}
+  /* Acotado por id a propósito: .btn-account la usan 26 botones en toda la
+     app, y el tope de ancho solo tiene sentido para el correo del header.
+     Cuando aplicaba a la clase, salían "Elegi…", "Edita…", "Desc…". */
+  #btn-account-email{max-width:110px;overflow:hidden;text-overflow:ellipsis;padding:7px 12px}
   header{gap:8px}
 }
 @media(max-width:430px){
   /* En teléfonos angostos ni el nombre cabe junto a la pill y la cuenta —
      se queda solo la libélula, patrón estándar de apps en mobile. */
   .logo-name{display:none}
-  .btn-account{max-width:96px}
+  #btn-account-email{max-width:96px}
 .btn-regen-ideas{max-width:none;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.3}
 }
 
@@ -1676,7 +1689,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="publish-success" style="display:none;text-align:center">
-      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:96px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="const p=this.parentElement;if(p){p.textContent='🎉';p.style.fontSize='36px'}"> </span>
+      <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:118px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="const p=this.parentElement;if(p){p.textContent='🎉';p.style.fontSize='36px'}"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
@@ -3831,9 +3844,16 @@ async function dashboardGenerateInspoIdeas(){
         messages:[{role:'user',content:[...imageBlocks,{type:'text',text:promptText}]}]
       })
     });
+    // Mismo patrón que el chat de ayuda: nunca mostrar el mensaje crudo del
+    // servidor. Sin esto, el toast podía decirle a la persona
+    // "free_limit_reached" o un aviso de facturación de la API.
+    if(res.status===402){
+      showToast(L?'Alcanzaste tu límite de generaciones — revisa tus planes disponibles':'You reached your generation limit — check your available plans',true);
+      return;
+    }
     if(!res.ok){
-      const e=await res.json().catch(()=>({}));
-      throw new Error(e.error?.message||`Error ${res.status}`);
+      showToast(L?'No se pudieron generar ideas — intenta de nuevo en un momento':'Could not generate ideas — try again in a moment',true);
+      return;
     }
     const data=await res.json();
     const ideasText=data.content?.[0]?.text||'';
@@ -4307,13 +4327,43 @@ function dashboardSaveInspoIdeasEdit(el){
   sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{});
 }
 
-function dashboardUpdateBudgetSpent(bi,value){
+function dashboardUpdateBudgetSpent(bi,value,inputEl){
   const item=dashboardCurrentPlanData.plan?.budgetData?.[bi];
   if(!item) return;
   item.spent=value===''?null:Number(value);
-  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
-    dashboardSelectPlan(dashboardCurrentPlanId);
-  });
+
+  // Mismo criterio que en dashboardUpdateChecklistStatus: no reconstruir el
+  // dashboard entero. Aquí el repintado además tiraba el foco al <body>, así
+  // que no se podía llenar la columna tabulando hacia abajo — había que
+  // hacer clic en cada campo.
+  dashboardRefreshBudgetTotalsLocal(bi,inputEl);
+
+  // El guardado sigue en segundo plano, igual que en el checklist.
+  sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id);
+}
+
+function dashboardRefreshBudgetTotalsLocal(bi,inputEl){
+  const L=lang==='es';
+  const filas=dashboardCurrentPlanData.plan?.budgetData||[];
+
+  // 1) marcar o desmarcar el sobregiro de la fila que se acaba de tocar
+  const item=filas[bi];
+  if(item&&inputEl){
+    const over=item.spent!==undefined&&item.spent!==null&&item.spent>item.amount;
+    inputEl.classList.toggle('dbt-over',over);
+    const celda=inputEl.closest('td');
+    if(celda) celda.classList.toggle('dbt-over',over);
+  }
+
+  // 2) recalcular el total real y si excede lo planeado
+  const conGasto=filas.filter(b=>b.spent!==undefined&&b.spent!==null);
+  const gastado=conGasto.reduce((s,b)=>s+(b.spent||0),0);
+  const planeado=filas.reduce((s,b)=>s+(b.amount||0),0);
+  const celdaTotal=document.querySelector('.dash-budget-table tfoot td:last-child');
+  if(celdaTotal){
+    celdaTotal.textContent=conGasto.length?'$'+gastado.toLocaleString(L?'es-MX':'en-US'):'—';
+    celdaTotal.classList.toggle('dbt-over',conGasto.length>0&&gastado>planeado);
+  }
 }
 
 function dashboardTogglePayments(vi){
@@ -4588,17 +4638,25 @@ async function dashboardSelectPlan(planId){
 
   // Invitación: puede no existir todavía si nunca la publicó.
   const inv=(invRows&&invRows[0])||null;
-  let rsvpYes=0,rsvpNo=0,guestTotal=0;
+  // rsvpYes cuenta RESPUESTAS (para la lista de quién falta por contestar);
+  // personasConfirmadas cuenta GENTE, que es de lo que cuelgan catering,
+  // sillas y presupuesto.
+  let rsvpYes=0,rsvpNo=0,guestTotal=0,personasConfirmadas=0;
   dashboardRsvpLists={confirmed:[],declined:[],pending:[]};
   if(inv){
     const [{data:rsvpRows},{data:guestRows}]=await Promise.all([
-      sb.from('rsvps').select('guest_name,attending').eq('invitation_id',inv.id),
+      sb.from('rsvps').select('guest_name,attending,guest_count').eq('invitation_id',inv.id),
       sb.from('guest_list').select('id,guest_name,invitation_sent').eq('invitation_id',inv.id)
     ]);
     const responded=new Set();
     (rsvpRows||[]).forEach(r=>{
       responded.add((r.guest_name||'').toLowerCase().trim());
-      if(r.attending) dashboardRsvpLists.confirmed.push(r.guest_name);
+      if(r.attending){
+        dashboardRsvpLists.confirmed.push(r.guest_name);
+        // guest_count son acompañantes ADICIONALES (el campo del RSVP
+        // arranca en 0), así que quien responde suma 1 aparte.
+        personasConfirmadas+=1+(r.guest_count||0);
+      }
       else dashboardRsvpLists.declined.push(r.guest_name);
     });
     (guestRows||[]).forEach(g=>{
@@ -4633,7 +4691,7 @@ async function dashboardSelectPlan(planId){
     return `<tr class="dash-budget-row">
       <td class="dbt-label">${esc(b.label||'')}${canRemoveBudget?`<span onclick="dashboardRemoveBudgetCategory(${bi})" class="dbt-remove" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}</td>
       <td class="dbt-amt">$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}</td>
-      <td class="dbt-amt${over?' dbt-over':''}"><input type="number" class="dbt-spent-input${over?' dbt-over':''}" placeholder="—" value="${(b.spent!==undefined&&b.spent!==null)?b.spent:''}" onchange="dashboardUpdateBudgetSpent(${bi},this.value)"></td>
+      <td class="dbt-amt${over?' dbt-over':''}"><input type="number" class="dbt-spent-input${over?' dbt-over':''}" placeholder="—" value="${(b.spent!==undefined&&b.spent!==null)?b.spent:''}" onchange="dashboardUpdateBudgetSpent(${bi},this.value,this)"></td>
     </tr>`;
   }).join('');
   const budgetTabHtml=`
@@ -4749,7 +4807,7 @@ async function dashboardSelectPlan(planId){
 
     <div class="dash-stats-row">
       <div class="dash-stat-block"><div class="dsb-num" id="dash-stat-checklist-pct">${pct}%</div><div class="dsb-label">${L?'Checklist':'Checklist'}</div></div>
-      <div class="dash-stat-block"><div class="dsb-num">${rsvpYes}</div><div class="dsb-label">${L?'Confirmados':'Confirmed'}</div></div>
+      <div class="dash-stat-block"><div class="dsb-num">${personasConfirmadas}</div><div class="dsb-label">${L?'Confirmados':'Confirmed'}</div></div>
       <div class="dash-stat-block dash-stat-budget">
         <div class="dsb-num" style="font-size:1.3rem">$${budgetTotal.toLocaleString(L?'es-MX':'en-US',{notation:'compact'})}${hasSpentData?` / $${spentTotal.toLocaleString(L?'es-MX':'en-US',{notation:'compact'})}`:''}</div>
         <div class="dsb-label">${hasSpentData?(L?'Planeado / Gastado':'Planned / Spent'):(L?'Presupuesto':'Budget')}</div>
@@ -7204,7 +7262,7 @@ function renderTimeline(items){
   const addForm=`<div style="display:flex;gap:8px;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray);flex-wrap:wrap">
     <input type="text" id="tl-new-when" placeholder="${L?'ej. Sábado 5:00 PM':'e.g. Saturday 5:00 PM'}" style="width:150px;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px">
     <input type="text" id="tl-new-what" placeholder="${L?'ej. Corte de pastel':'e.g. Cake cutting'}" style="flex:1;min-width:140px;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addTimelineItem();}">
-    <button type="button" onclick="addTimelineItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
+    <button type="button" onclick="addTimelineItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ ${L?'Agregar':'Add'}</button>
   </div>`;
   if(!Array.isArray(items)||!items.length) return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p>${addForm}`;
   return `<p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem">${hint}</p><div class="timeline">${rows}</div>${addForm}`;
@@ -7315,7 +7373,7 @@ function renderChecklist(sections){
   }).join('');
   const addForm=`<div style="display:flex;gap:8px;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
     <input type="text" id="checklist-new-item-input" placeholder="${L?'ej. Confirmar con el florista':'e.g. Confirm with the florist'}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomChecklistItem();}">
-    <button type="button" onclick="addCustomChecklistItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap">+ ${L?'Agregar':'Add'}</button>
+    <button type="button" onclick="addCustomChecklistItem()" style="padding:9px 18px;border-radius:var(--radius);border:none;background:var(--teal);color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ ${L?'Agregar':'Add'}</button>
   </div>`;
   const importExportRow=`<div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
     <button type="button" class="btn-account" onclick="document.getElementById('checklist-import-input').click()">📥 ${L?'Importar Excel':'Import Excel'}</button>
@@ -8807,7 +8865,10 @@ async function submitBugReport(){
     user_email: currentUser?currentUser.email:null,
     page: 'app',
     message,
-    browser_info: navigator.userAgent
+    // Se cuelga del campo que ya existe para no pedir migración: sin la ruta
+    // ni el plan, un reporte como "no me deja publicar" no dice de qué evento
+    // habla. Si algún día agregas una columna 'context', muévelo ahí.
+    browser_info: navigator.userAgent+' | '+location.pathname+(dashboardCurrentPlanId?' | plan:'+String(dashboardCurrentPlanId).slice(0,8):'')
   });
 
   if(error){ showToast(lang==='es'?'No se pudo enviar el reporte, intenta de nuevo':'Could not send the report, try again',true); return; }

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página no encontrada — DragonflAI Events</title>
+<meta name="theme-color" content="#2EC4B6">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════
+   Esta página la sirve Netlify con status 404 real.
+
+   IMPORTANTE: no referencia NINGÚN archivo de /assets/. Es a propósito.
+   La regla de _redirects manda aquí justamente cuando falta un asset, así
+   que si esta página dependiera de uno, se rompería exactamente cuando más
+   se necesita. La libélula es SVG en línea y las fuentes vienen de Google.
+   ══════════════════════════════════════════════════════════════ */
+:root{
+  --cream:#FAF9F7; --teal:#2EC4B6; --teal-dark:#1A9E92;
+  --violet:#7B2FBE; --text:#1A1A2E; --text-2:#4A4A6A; --text-3:#8A8AAA;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:32px 24px; font-family:'Inter',sans-serif; color:var(--text-2);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(46,196,182,.12) 0%, rgba(46,196,182,0) 60%),
+    linear-gradient(160deg, #FFFFFF 0%, var(--cream) 45%, #EFF7F5 100%);
+}
+.caja{max-width:440px; text-align:center}
+.marca{display:inline-flex; align-items:center; gap:10px; margin-bottom:36px; text-decoration:none}
+.marca span{font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--text)}
+.marca em{font-style:normal; color:var(--teal)}
+.libelula{margin-bottom:20px; opacity:.9}
+h1{font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:700; color:var(--text); line-height:1.15; margin-bottom:12px}
+p{font-size:15px; line-height:1.6; margin-bottom:28px}
+.acciones{display:flex; gap:10px; justify-content:center; flex-wrap:wrap}
+.btn{
+  padding:12px 24px; border-radius:100px; font-size:14px; font-weight:600;
+  text-decoration:none; display:inline-block; transition:box-shadow .2s, transform .2s;
+}
+.btn-principal{background:linear-gradient(135deg, var(--teal), var(--violet)); color:#fff; box-shadow:0 4px 16px rgba(46,196,182,.28)}
+.btn-principal:hover{transform:translateY(-1px); box-shadow:0 6px 20px rgba(46,196,182,.36)}
+.btn-suave{background:#fff; color:var(--text-2); border:1.5px solid rgba(0,0,0,.08)}
+.btn-suave:hover{border-color:var(--teal)}
+.nota{margin-top:32px; font-size:12.5px; color:var(--text-3)}
+.nota a{color:var(--teal-dark); text-decoration:none}
+@media(max-width:430px){
+  h1{font-size:28px}
+  .acciones{flex-direction:column}
+  .btn{width:100%}
+}
+</style>
+</head>
+<body>
+  <div class="caja">
+    <a class="marca" href="/">
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6" opacity=".9"/>
+        <ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/>
+        <ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".3" transform="rotate(-20 10 14)"/>
+        <ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".3" transform="rotate(20 26 14)"/>
+        <ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".2" transform="rotate(-10 9 18)"/>
+        <ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".2" transform="rotate(10 27 18)"/>
+      </svg>
+      <span>Dragonfl<em>AI</em> Events</span>
+    </a>
+
+    <div class="libelula">
+      <svg width="72" height="72" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6" opacity=".9"/>
+        <ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/>
+        <ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".3" transform="rotate(-20 10 14)"/>
+        <ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".3" transform="rotate(20 26 14)"/>
+        <ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".2" transform="rotate(-10 9 18)"/>
+        <ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".2" transform="rotate(10 27 18)"/>
+      </svg>
+    </div>
+
+    <h1>Esta página se nos voló</h1>
+    <p>La liga que seguiste no existe o cambió de lugar. Si llegaste aquí desde una invitación, pídele a quien te invitó que te la comparta de nuevo.</p>
+
+    <div class="acciones">
+      <a class="btn btn-principal" href="/app">Ir a mi evento</a>
+      <a class="btn btn-suave" href="/">Volver al inicio</a>
+    </div>
+
+    <p class="nota">¿Crees que es un error nuestro? <a href="mailto:hola@dragonflaievents.com">Cuéntanos</a>.</p>
+  </div>
+</body>
+</html>
