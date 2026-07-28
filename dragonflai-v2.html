@@ -137,7 +137,12 @@ input,textarea,[contenteditable="true"]{cursor:text}
   padding:14px 8px;text-align:center;animation:dashCoverIn .5s ease-out .1s backwards;
 }
 .dsb-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:700;color:var(--violet);line-height:1.1}
-.dsb-label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
+/* Antes usaba var(--text-3) (#8A8AAA), que da 3.34:1 de contraste sobre
+   blanco -- no alcanza el mínimo WCAG AA de 4.5:1 para texto de este tamaño
+   (10.5px, no cuenta como "texto grande"). #6E6E88 da 4.94:1, mismo matiz
+   gris-azulado, ya cumple. var(--text-3) NO se tocó: la usan 97 lugares
+   más y no quiero un cambio con ese alcance sin poder probarlo todo. */
+.dsb-label{font-size:10.5px;color:#6E6E88;text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
 @media (max-width:480px){
   .dash-cover-name{font-size:1.9rem}
   .btn-account{white-space:normal;text-align:center;padding:8px 12px}
@@ -181,7 +186,9 @@ input,textarea,[contenteditable="true"]{cursor:text}
    el JS sí le ponía la clase. Esta regla (0,2,2) desempata. */
 .dash-budget-table tfoot td.dbt-over{color:#C14A5E}
 .dbt-remove{margin-left:8px;color:var(--text-3);cursor:pointer;font-size:12px}
-.dbt-spent-input{width:90px;text-align:right;border:1.5px solid var(--border-gray);border-radius:8px;padding:4px 8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.dbt-spent-wrap{position:relative;display:inline-block}
+.dbt-currency-prefix{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-3);pointer-events:none}
+.dbt-spent-input{width:90px;text-align:right;border:1.5px solid var(--border-gray);border-radius:8px;padding:4px 8px 4px 18px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);font-variant-numeric:tabular-nums}
 .dbt-spent-input:focus{outline:none;border-color:var(--teal)}
 /* La fila solo insinúa con el borde: el grito se lo dejamos al total. Saber
    QUÉ categoría se pasó sigue siendo la mitad accionable del dato. */
@@ -223,7 +230,8 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-rsvp-declined .drb-num{color:#C14A5E}
 .dash-rsvp-pending .drb-num{color:var(--gold)}
 .drb-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;line-height:1.1}
-.drb-label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.02em;margin-top:2px}
+/* Mismo caso que .dsb-label: 10.5px con var(--text-3) no llega a 4.5:1. */
+.drb-label{font-size:10.5px;color:#6E6E88;text-transform:uppercase;letter-spacing:.02em;margin-top:2px}
 .dash-rsvp-namelist-box{background:var(--cream);border-radius:12px;padding:12px 14px;margin-bottom:14px;max-height:220px;overflow-y:auto}
 
 .dash-vendor-card{background:var(--cream);border-radius:14px;padding:14px 16px;margin-bottom:12px}
@@ -1057,10 +1065,15 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 
 <!-- Envuelve hero + selector de modo + formulario para poder ocultarlo
      por completo cuando se muestra el dashboard de "mis planes". -->
-<div id="main-planner-view">
+<!-- Antes vivía como primer hijo de #main-planner-view: si se ocultaba
+     el formulario completo (que es justo lo que hace falta para dejar de
+     mostrar el "onboarding" debajo del reporte generado), este link
+     desaparecía con él. Ahora es hermano de ambos bloques, siempre visible
+     arriba de cualquiera que esté activo. -->
 <div id="back-to-dashboard-link" style="display:none;text-align:center;padding:.75rem 0">
   <button onclick="showUserDashboard()" style="background:none;border:none;color:var(--violet);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:underline">← <span data-es="Volver a mi evento" data-en="Back to my event">Volver a mi evento</span></button>
 </div>
+<div id="main-planner-view">
 <!-- HERO -->
 <section class="hero">
   <span class="hero-tag">✦ <span data-es="Planeemos tu evento juntos" data-en="Let's plan your event together">Planeemos tu evento juntos</span></span>
@@ -1965,6 +1978,21 @@ async function refreshPaidStatusInner(){
   // generaciones ilimitadas y para no seguir contando contra el límite gratis.
   isPaid=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
 
+  // gensUsed vivía SOLO en localStorage, sin distinguir de qué cuenta era.
+  // Cambiar de cuenta en el mismo navegador heredaba el contador de la
+  // cuenta anterior, y podía bloquear a alguien con generaciones gratis
+  // disponibles de verdad en el servidor (el límite real, del lado del
+  // servidor, siempre estuvo bien — esto solo corregía lo que la interfaz
+  // mostraba). get_my_free_gens() lee de profiles.free_gens_used, que es
+  // la misma fuente que ya usa worker_authorize_ai para autorizar o no.
+  if(!isPaid){
+    const {data:freeGens,error:freeGensErr}=await sb.rpc('get_my_free_gens');
+    if(!freeGensErr&&freeGens){
+      gensUsed=freeGens.free_gens_used;
+      localStorage.setItem('dflai_gens',gensUsed); // ahora es solo caché, no la fuente de verdad
+    }
+  }
+
   // Aplicar idioma/modo guardados — solo una vez por carga de página, para no
   // pelearse con cambios que el usuario haga manualmente después.
   if(!prefsApplied){
@@ -2139,9 +2167,29 @@ document.addEventListener('click',e=>{
 async function openProfileModal(){
   document.getElementById('account-dropdown').style.display='none';
   if(!currentUser){ openAuthModal(); return; }
+  const L=lang==='es';
+
+  // Antes el modal se quedaba invisible durante los ~1-2s que tardaban estas
+  // dos consultas (saldo de créditos + lista de eventos), sin ningún indicador
+  // — el clic parecía no haber funcionado. Ahora el modal se abre YA, con los
+  // campos que no dependen de red (vienen de userProfile, ya en memoria) y un
+  // estado de "Cargando…" en las dos partes que sí esperan al servidor.
+  document.getElementById('pf-name').value=userProfile.full_name||'';
+  document.getElementById('pf-phone').value=userProfile.phone||'';
+  document.getElementById('pf-lang').value=userProfile.preferred_lang||lang;
+  document.getElementById('pf-mode').value=userProfile.preferred_mode||mode;
+  document.getElementById('pf-company-name').value=userProfile.company_name||'';
+  document.getElementById('pf-company-phone').value=userProfile.company_phone||'';
+  document.getElementById('pf-company-website').value=userProfile.company_website||'';
+  document.getElementById('pf-reminders').checked=!!userProfile.email_reminders_opt_in;
+  document.getElementById('pf-access-summary').innerHTML=L?'Cargando tu acceso…':'Loading your access…';
+  const sel=document.getElementById('pf-main-plan');
+  sel.innerHTML=`<option value="">${L?'Cargando…':'Loading…'}</option>`;
+
+  document.getElementById('profile-modal').classList.add('open');
+  document.body.style.overflow='hidden';
 
   await refreshPaidStatus(); // traer el saldo de créditos más reciente
-  const L=lang==='es';
   const diyLine=access.diyUnlimitedActive
     ? (L?'✅ Haz tu propio evento: ilimitado activo':'✅ DIY: unlimited active')
     : access.diyEventCredits>0
@@ -2155,18 +2203,8 @@ async function openProfileModal(){
   document.getElementById('pf-access-summary').innerHTML=
     `<strong>${L?'Tu acceso':'Your access'}</strong><br>${diyLine}<br>${plannerLine}`;
 
-  document.getElementById('pf-name').value=userProfile.full_name||'';
-  document.getElementById('pf-phone').value=userProfile.phone||'';
-  document.getElementById('pf-lang').value=userProfile.preferred_lang||lang;
-  document.getElementById('pf-mode').value=userProfile.preferred_mode||mode;
-  document.getElementById('pf-company-name').value=userProfile.company_name||'';
-  document.getElementById('pf-company-phone').value=userProfile.company_phone||'';
-  document.getElementById('pf-company-website').value=userProfile.company_website||'';
-  document.getElementById('pf-reminders').checked=!!userProfile.email_reminders_opt_in;
-
   // Llenar el selector de "evento principal" con los planes guardados
-  const sel=document.getElementById('pf-main-plan');
-  sel.innerHTML=`<option value="">${lang==='es'?'Ninguno seleccionado':'None selected'}</option>`;
+  sel.innerHTML=`<option value="">${L?'Ninguno seleccionado':'None selected'}</option>`;
   if(sb){
     const {data}=await sb.from('plans').select('id,title').eq('user_id',currentUser.id).order('created_at',{ascending:false});
     (data||[]).forEach(p=>{
@@ -2176,9 +2214,6 @@ async function openProfileModal(){
       sel.appendChild(opt);
     });
   }
-
-  document.getElementById('profile-modal').classList.add('open');
-  document.body.style.overflow='hidden';
 }
 
 function closeProfileModal(){
@@ -2644,6 +2679,20 @@ async function showQRModal(slug,hostNames,hashtag){
 function closePublishModal(){
   document.getElementById('publish-modal').classList.remove('open');
   document.body.style.overflow='';
+  // Si se llegó aquí vía dashboardEditInvitation (primer publish desde el
+  // dashboard), loadSavedPlan() había cambiado la vista visible al plan
+  // completo — hay que regresar al dashboard, no dejar a la persona ahí.
+  if(publishModalCameFromDashboard){
+    publishModalCameFromDashboard=false;
+    const dashEl=document.getElementById('user-dashboard');
+    const mainView=document.getElementById('main-planner-view');
+    if(dashEl && mainView){
+      mainView.style.display='none';
+      dashEl.style.display='block';
+      const backLink=document.getElementById('back-to-dashboard-link');
+      if(backLink) backLink.style.display='none';
+    }
+  }
   // Si veníamos de EDITAR una invitación, plan._savedId quedó apuntando al
   // plan de ESA invitación (lo enlazamos en openEditInvitationModal). Hay
   // que soltarlo aquí — si no, generar un plan nuevo después heredaría ese
@@ -2675,6 +2724,12 @@ let pendingDraftInvitationId=null;
 // Datos para generar los mensajes de compartir por invitado (hallazgo V7 #3)
 let lastPublishedGuests=[], lastPublishedHost='', lastPublishedType='';
 let editingInvitationId=null;
+// true solo cuando dashboardEditInvitation() (primer publish, sin invitación
+// aún) cambió la vista visible del dashboard a main-planner-view para poder
+// hidratar `plan`. closePublishModal() la usa para saber si tiene que
+// regresar a esa vista — sin esto, "Cancelar" dejaba a la persona viendo
+// el plan completo generado por IA en vez de su dashboard.
+let publishModalCameFromDashboard=false;
 
 // Retomar un borrador (invitación nunca publicada por falta de crédito).
 // Reutiliza TODO el llenado de campos de openEditInvitationModal (ya
@@ -3968,18 +4023,71 @@ async function routeInitialScreen(){
 
 function showUserDashboard(){
   document.getElementById('main-planner-view').style.display='none';
+  // res-section (el reporte completo) es HERMANO de main-planner-view, no
+  // hijo -- nunca se ocultaba aquí. No se notaba antes porque de cualquier
+  // forma solían convivir los tres bloques a la vez; ahora que quedaron
+  // mutuamente excluyentes, hay que cerrar este último caso o el reporte
+  // se queda visible detrás del dashboard al volver.
+  document.getElementById('res-section').style.display='none';
   document.getElementById('user-dashboard').style.display='block';
+  window.scrollTo({top:0,behavior:'instant'});
   loadDashboardPlans();
 }
 
 let dashboardActiveTab='checklist';
+function dashboardShowFullPlan(){
+  const L=lang==='es';
+  const saved=dashboardCurrentPlanData?.plan;
+  if(!saved){ showToast(L?'Abre un evento primero':'Open an event first',true); return; }
+
+  // Mismo patrón que loadSavedPlan(), pero a partir de lo que el dashboard
+  // ya tiene en memoria (dashboardCurrentPlanData) -- sin viaje extra a la
+  // red, y sin tocar la visibilidad de user-dashboard/main-planner-view.
+  plan=saved;
+  plan._savedId=dashboardCurrentPlanId; // igual que loadSavedPlan: reutilizar, no crear otro
+  if(saved.mode) setMode(saved.mode);
+
+  tabKeys.forEach(k=>setTabHTML(k,''));
+  Object.keys(saved.tabsHtml||{}).forEach(k=>setTabHTML(k,saved.tabsHtml[k]));
+  // El checklist se re-renderiza siempre con la lógica actual en vez del
+  // HTML guardado como snapshot -- mismo motivo que en loadSavedPlan().
+  if(Array.isArray(plan.checklistData)) setTabHTML('checklist',renderChecklist(plan.checklistData));
+  attachSTDBlurGuard();
+  attachSTDSyncToPlan();
+  const ideasEl=document.getElementById('content-ideas');
+  if(ideasEl && ideasEl.innerHTML.trim() && !ideasEl.querySelector('.ideas-refine')) ideasEl.innerHTML=ideasToolbar()+ideasEl.innerHTML;
+
+  renderTabs(); // reconstruye la barra rtab (Overview/Cronograma/...) y sus paneles vacíos si hace falta
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-overview')?.classList.add('active');
+  document.querySelectorAll('.rtab').forEach((t,i)=>t.classList.toggle('active',i===0));
+
+  document.getElementById('res-title').textContent=(mode==='diy'?(L?'Tu Plan de ':'Your '):(L?'Propuesta — ':'Proposal — '))+(plan.typeName||'');
+  document.getElementById('res-section').style.display='block';
+}
+
 function dashboardSwitchTab(tabName){
   dashboardActiveTab=tabName;
   document.querySelectorAll('.dash-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tabName));
   document.querySelectorAll('.dash-tab-panel').forEach(p=>{ p.style.display=(p.dataset.panel===tabName)?'block':'none'; });
+  // "Plan completo (IA)" no es un .dash-tab-panel más: es el mismo reporte
+  // generado por IA (res-section), que antes solo se veía saliendo por
+  // completo del dashboard (botón ✏️ "Abrir plan completo"). Ahora vive
+  // como una pestaña más, sin cambiar de vista ni perder el contexto.
+  const resSection=document.getElementById('res-section');
+  if(tabName==='fullplan'){
+    dashboardShowFullPlan();
+  } else if(resSection){
+    resSection.style.display='none';
+  }
 }
 
 function dashboardEditInvitation(planId){
+  // Solo se usa para el PRIMER publish de un evento (todavía sin invitación):
+  // hace falta poblar `plan` con los datos guardados para prellenar el
+  // formulario. Si la invitación ya existe, el botón llama directo a
+  // openEditInvitationModal(), que nunca sale del dashboard.
+  publishModalCameFromDashboard=true;
   loadSavedPlan(planId).then(()=>openPublishModal());
 }
 
@@ -4061,7 +4169,7 @@ function renderDashboardChecklistDetail(sections){
         ${removeBtn}
       </div>`;
     }).join('');
-    return `<h2 style="font-size:13px;margin-top:14px;cursor:pointer;user-select:none" onclick="dashboardToggleChecklistSection(${si})">▸ ${esc(s.section)}</h2><div class="dash-cl-section-body" data-section="${si}" style="display:none">${rows}</div>`;
+    return `<h2 style="font-size:13px;margin-top:14px;cursor:pointer;user-select:none" onclick="dashboardToggleChecklistSection(${si})">▸ ${esc(translateSectionName(s.section))}</h2><div class="dash-cl-section-body" data-section="${si}" style="display:none">${rows}</div>`;
   }).join('');
 }
 
@@ -4142,7 +4250,7 @@ function renderDashboardVendorCard(v,vi){
     const pAttUrl=p.attachmentPath?dashboardVendorSignedUrls[p.attachmentPath]:null;
     return `<div class="dash-payment-row${p.paid?' dash-payment-paid':''}">
       <input type="checkbox" ${p.paid?'checked':''} onchange="dashboardTogglePaymentPaid(${vi},${pi},this.checked)" title="${L?'Pagado':'Paid'}">
-      <span class="dash-payment-date">${esc(p.date||'')}</span>
+      <span class="dash-payment-date">${p.date?new Date(p.date+'T12:00:00').toLocaleDateString(L?'es-MX':'en-US',{day:'numeric',month:'short',year:'numeric'}):''}</span>
       <span class="dash-payment-amt">$${Number(p.amount||0).toLocaleString(L?'es-MX':'en-US')}</span>
       ${p.attachmentName?(pAttUrl?`<a href="${pAttUrl}" target="_blank" rel="noopener" class="dash-payment-att">📎</a>`:`<span class="dash-payment-att">📎</span>`):`<span onclick="document.getElementById('dash-payment-file-${vi}-${pi}').click()" class="dash-payment-att-add" title="${L?'Adjuntar comprobante':'Attach receipt'}">📎+</span>`}
       <input type="file" id="dash-payment-file-${vi}-${pi}" style="display:none" onchange="dashboardUploadPaymentAttachment(event,${vi},${pi})">
@@ -4209,7 +4317,10 @@ async function dashboardAddVendor(){
   const name=document.getElementById('dash-vendor-new-name').value.trim();
   const type=document.getElementById('dash-vendor-new-category').value.trim();
   const status=document.getElementById('dash-vendor-new-status').value;
-  if(!name||!dashboardCurrentPlanId) return;
+  // Antes esto salía en silencio si faltaba el nombre — el clic no hacía
+  // nada visible y no había forma de saber por qué no se agregó.
+  if(!name){ showToast(L?'Escribe el nombre del proveedor':'Enter the vendor name',true); return; }
+  if(!dashboardCurrentPlanId) return;
   if(!dashboardCurrentPlanData.plan) dashboardCurrentPlanData.plan={};
   if(!Array.isArray(dashboardCurrentPlanData.plan.vendorsData)) dashboardCurrentPlanData.plan.vendorsData=[];
   dashboardCurrentPlanData.plan.vendorsData.push({name,type,status,selected:true,custom:true,quotedPrice:'',notes:'',attachments:[]});
@@ -4221,6 +4332,10 @@ async function dashboardAddVendor(){
 function dashboardRemoveVendor(vi){
   const vendors=dashboardCurrentPlanData.plan?.vendorsData;
   if(!vendors) return;
+  const L=lang==='es';
+  // Se lleva también las notas y el historial de pagos de este proveedor --
+  // se avisa antes, igual que al borrar un evento completo.
+  if(!confirm(L?`¿Quitar "${vendors[vi].name||'este proveedor'}"? Se borran también sus notas y pagos registrados. No se puede deshacer.`:`Remove "${vendors[vi].name||'this vendor'}"? Its notes and payment history will be deleted too. This cannot be undone.`)) return;
   vendors.splice(vi,1);
   sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id).then(()=>{
     dashboardSelectPlan(dashboardCurrentPlanId);
@@ -4337,8 +4452,8 @@ function dashboardRefreshChecklistStatsLocal(){
   const urgencyEl=document.getElementById('dash-checklist-urgency');
   if(urgencyEl){
     urgencyEl.innerHTML=`
-      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
-      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(x=>esc(translateSectionName(x))).join(', ')}</div>`:''}
+      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(x=>esc(translateSectionName(x))).join(', ')}</div>`:''}
     `;
   }
 }
@@ -4555,6 +4670,7 @@ function dashboardRemoveBudgetCategory(bi){
   const budgetData=dashboardCurrentPlanData.plan?.budgetData;
   if(!Array.isArray(budgetData)||budgetData.length<=1) return;
   const L=lang==='es';
+  if(!confirm(L?`¿Quitar "${budgetData[bi].label}" del presupuesto? No se puede deshacer.`:`Remove "${budgetData[bi].label}" from the budget? This cannot be undone.`)) return;
   const total=parseInt(dashboardCurrentPlanData.plan.budget)||budgetData.reduce((s,b)=>s+b.amount,0);
   const removedPct=budgetData[bi].pct;
   budgetData.splice(bi,1);
@@ -4610,6 +4726,10 @@ async function dashboardImportBudget(event){
 
 function dashboardCreateNewEvent(){
   document.getElementById('user-dashboard').style.display='none';
+  // Por si venía de ver un reporte completo (res-section es hermano, no se
+  // oculta solo). Barato de más como resguardo aunque hoy este botón solo
+  // se alcance desde el dashboard, donde ya estaría oculto.
+  document.getElementById('res-section').style.display='none';
   document.getElementById('main-planner-view').style.display='block';
   const backLink=document.getElementById('back-to-dashboard-link');
   if(backLink) backLink.style.display='block';
@@ -4785,8 +4905,8 @@ async function dashboardSelectPlan(planId){
     </div>
     <div class="dash-stat-row"><span id="dash-checklist-count-text">${doneTasks}/${totalTasks} ${L?'tareas completadas':'tasks completed'}</span><b id="dash-checklist-pct-text">${pct}%</b></div>
     <div id="dash-checklist-urgency">
-      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(esc).join(', ')}</div>`:''}
-      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(esc).join(', ')}</div>`:''}
+      ${overdueSections.length?`<div class="dash-urgency-alert dash-urgency-overdue">🔴 ${L?'Atrasado':'Overdue'}: ${overdueSections.map(x=>esc(translateSectionName(x))).join(', ')}</div>`:''}
+      ${soonSections.length?`<div class="dash-urgency-alert dash-urgency-soon">🟡 ${L?'Esta semana/mes':'This week/month'}: ${soonSections.map(x=>esc(translateSectionName(x))).join(', ')}</div>`:''}
     </div>
     <div id="dash-checklist-detail" style="margin-top:14px">${renderDashboardChecklistDetail(sections)}</div>
   `;
@@ -4797,7 +4917,7 @@ async function dashboardSelectPlan(planId){
     return `<tr class="dash-budget-row">
       <td class="dbt-label">${esc(b.label||'')}${canRemoveBudget?`<span onclick="dashboardRemoveBudgetCategory(${bi})" class="dbt-remove" title="${L?'Quitar categoría':'Remove category'}">✕</span>`:''}</td>
       <td class="dbt-amt">$${(b.amount||0).toLocaleString(L?'es-MX':'en-US')}</td>
-      <td class="dbt-amt${over?' dbt-over':''}"><input type="number" class="dbt-spent-input${over?' dbt-over':''}" placeholder="—" value="${(b.spent!==undefined&&b.spent!==null)?b.spent:''}" onchange="dashboardUpdateBudgetSpent(${bi},this.value,this)"></td>
+      <td class="dbt-amt${over?' dbt-over':''}"><span class="dbt-spent-wrap"><span class="dbt-currency-prefix">$</span><input type="number" class="dbt-spent-input${over?' dbt-over':''}" placeholder="—" value="${(b.spent!==undefined&&b.spent!==null)?b.spent:''}" onchange="dashboardUpdateBudgetSpent(${bi},this.value,this)"></span></td>
     </tr>`;
   }).join('');
   const budgetTabHtml=`
@@ -4841,7 +4961,7 @@ async function dashboardSelectPlan(planId){
     ${extraRsvps>0?`<p style="font-size:11.5px;color:var(--text-3);margin:2px 0 0">${L?`${extraRsvps} de las respuestas son de alguien que no estaba en tu lista original — por eso los números no suman igual.`:`${extraRsvps} of the responses are from someone who wasn't on your original list — that's why the numbers don't add up evenly.`}</p>`:''}
     ${galleryUrls.length?`<div class="dash-stat-row"><span>${L?'Fotos subidas':'Photos uploaded'}</span><b>${galleryUrls.length}</b></div><div class="dash-gallery-thumbs">${galleryUrls.slice(0,6).map(u=>`<img src="${u}">`).join('')}</div>`:''}
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-      <button class="btn-account" onclick="dashboardEditInvitation('${planId}')">✏️ ${L?'Editar invitación':'Edit invitation'}</button>
+      <button class="btn-account" onclick="openEditInvitationModal('${inv.id}')">✏️ ${L?'Editar invitación':'Edit invitation'}</button>
       <button class="btn-account" onclick="showQRModal('${esc(inv.slug||'').replace(/'/g,"")}','${esc(inv.host_names||'').replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ ${L?'Ver/descargar QR':'View/download QR'}</button>
       <button class="btn-account" onclick="dashboardDownloadGuestList()">📥 ${L?'Descargar lista de invitados':'Download guest list'}</button>
     </div>
@@ -4926,6 +5046,7 @@ async function dashboardSelectPlan(planId){
       <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
       <button class="dash-tab" data-tab="vendors" onclick="dashboardSwitchTab('vendors')">🤝 ${L?'Proveedores':'Vendors'}</button>
       <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
+      <button class="dash-tab" data-tab="fullplan" onclick="dashboardSwitchTab('fullplan')">📄 ${L?'Plan completo (IA)':'Full plan (AI)'}</button>
     </div>
 
     <!-- El Excel ya existía pero su botón vivía solo en la vista del plan
@@ -5361,6 +5482,34 @@ const CHECKLIST_SECTION_TIMING={
   'Detalles Finales':1,'Final Details':1,
   'Dia del Evento':0.25,'Event Day':0.25
 };
+
+// Las secciones del checklist se generan UNA VEZ, en el idioma activo al
+// crear el plan, y quedan guardadas como texto plano -- a diferencia del
+// resto de la interfaz, cambiar el idioma nunca las volvía a traducir
+// ("Lugar y Logística" se quedaba así aunque todo lo demás pasara a
+// inglés). Mismo conjunto cerrado de categorías que ya vive arriba, aquí
+// como tabla explícita es→en.
+const CHECKLIST_SECTION_ES_EN={
+  'Lugar y Logística':'Venue & Logistics',
+  'Catering y Menu':'Catering & Menu',
+  'Entretenimiento':'Entertainment',
+  'Fotografía y Video':'Photography & Video',
+  'Invitados e Invitaciones':'Guests & Invitations',
+  'Ceremonia':'Ceremony',
+  'Ceremonia y Vals':'Ceremony & Waltz',
+  'Diplomas y Ceremonia':'Diplomas & Ceremony',
+  'Registro y Material Corporativo':'Registration & Corporate Materials',
+  'Decoración':'Decor',
+  'Detalles Finales':'Final Details',
+  'Dia del Evento':'Event Day'
+};
+const CHECKLIST_SECTION_EN_ES=Object.fromEntries(Object.entries(CHECKLIST_SECTION_ES_EN).map(([es,en])=>[en,es]));
+function translateSectionName(name){
+  // Si el nombre no está en la lista (p. ej. la persona lo personalizó, o
+  // el plan es muy viejo), se devuelve tal cual -- nunca truena.
+  if(lang==='en') return CHECKLIST_SECTION_ES_EN[name]||name;
+  return CHECKLIST_SECTION_EN_ES[name]||name;
+}
 
 // Ícono del tab "Save the Date": sobre con corazón solo para eventos
 // románticos (Boda/Aniversario) — el resto usa un ícono neutral. Antes era
@@ -5997,8 +6146,13 @@ async function generate(){
   clearDraft();
 
   document.getElementById('res-title').textContent=(mode==='diy'?(lang==='es'?'Tu Plan de ':'Your '):(lang==='es'?'Propuesta — ':'Proposal — '))+typeName;
+  // El formulario ya cumplió su función -- antes se quedaba visible
+  // completo arriba del reporte generado, hasta duplicar el largo de la
+  // página. No hay ningún otro flujo que dependa de verlo (regen() lee los
+  // valores del DOM aunque esté oculto; nada usa "editar mis respuestas").
+  document.getElementById('main-planner-view').style.display='none';
   document.getElementById('res-section').style.display='block';
-  document.getElementById('res-section').scrollIntoView({behavior:'smooth',block:'start'});
+  window.scrollTo({top:0,behavior:'instant'});
 
   tabKeys.forEach(k=>{const el=document.getElementById('content-'+k);if(el)el.innerHTML='';});
   document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('active'));
@@ -7358,6 +7512,9 @@ function addBudgetCategory(){
 function removeBudgetCategory(bi){
   if(!Array.isArray(plan.budgetData)||plan.budgetData.length<=1) return;
   const L=plan.lang==='es';
+  // "Borrar evento" sí pedía confirmación; esto se borraba al instante sin
+  // ninguna -- misma familia de acción irreversible, mismo resguardo.
+  if(!confirm(L?`¿Quitar "${plan.budgetData[bi].label}" del presupuesto? No se puede deshacer.`:`Remove "${plan.budgetData[bi].label}" from the budget? This cannot be undone.`)) return;
   const total=parseInt(plan.budget)||plan.budgetData.reduce((s,b)=>s+b.amount,0);
   const removedPct=plan.budgetData[bi].pct;
   plan.budgetData.splice(bi,1);
@@ -7488,7 +7645,7 @@ function renderChecklist(sections){
         ${removeBtn}
       </div>`;
     }).join('');
-    return `<h2>${esc(s.section)}</h2>${items}`;
+    return `<h2>${esc(translateSectionName(s.section))}</h2>${items}`;
   }).join('');
   const addForm=`<div style="display:flex;gap:8px;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
     <input type="text" id="checklist-new-item-input" placeholder="${L?'ej. Confirmar con el florista':'e.g. Confirm with the florist'}" style="flex:1;padding:9px 12px;border:1.5px solid var(--border-gray);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:13.5px" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomChecklistItem();}">
@@ -8082,12 +8239,16 @@ async function loadSavedPlan(id){
   const dash=document.getElementById('user-dashboard');
   if(dash && dash.style.display!=='none'){
     dash.style.display='none';
-    document.getElementById('main-planner-view').style.display='block';
+    // Antes también mostraba main-planner-view (el formulario completo) --
+    // sin sentido para solo VER un reporte ya generado, y era la causa de
+    // aterrizar en la pantalla de "Tu evento perfecto, lo creamos juntos"
+    // al abrir un plan guardado o al cancelar el editor de invitación.
+    document.getElementById('main-planner-view').style.display='none';
     const backLink=document.getElementById('back-to-dashboard-link');
     if(backLink) backLink.style.display='block';
   }
   document.getElementById('res-section').style.display='block';
-  document.getElementById('res-section').scrollIntoView({behavior:'smooth',block:'start'});
+  window.scrollTo({top:0,behavior:'instant'});
   showToast(lang==='es'?'📂 Plan cargado':'📂 Plan loaded');
 }
 

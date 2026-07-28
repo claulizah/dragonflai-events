@@ -851,7 +851,13 @@ function renderInvitation(inv){
             <label>${t.messageLabel}</label>
             <textarea id="r-message" placeholder="${t.messagePh}"></textarea>
           </div>`:''}
-          <button type="submit" class="btn-submit" id="btn-submit" disabled>${t.confirmBtn}</button>
+          <!-- Antes llevaba el atributo disabled desde el inicio: si la persona
+     nunca tocaba ¿Asistes?, el botón se quedaba deshabilitado y el clic no
+     hacía absolutamente nada -- ni el aviso de "elige si asistes" llegaba a
+     mostrarse, porque un botón disabled no dispara el submit del form.
+     Ahora el botón siempre puede presionarse, y submitRSVP() es quien
+     valida nombre y asistencia con un mensaje claro en cada caso. -->
+<button type="submit" class="btn-submit" id="btn-submit">${t.confirmBtn}</button>
         </div>
       </form>
       </div>
