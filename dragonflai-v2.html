@@ -176,10 +176,16 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dbt-label{color:var(--text);position:relative}
 .dbt-amt{color:var(--text-2);font-variant-numeric:tabular-nums}
 .dbt-over{color:#C14A5E;font-weight:700}
+/* '.dash-budget-table tfoot td' (0,1,2) le ganaba a '.dbt-over' (0,1,0) y le
+   devolvía el color oscuro, así que el total nunca se pintaba de rojo aunque
+   el JS sí le ponía la clase. Esta regla (0,2,2) desempata. */
+.dash-budget-table tfoot td.dbt-over{color:#C14A5E}
 .dbt-remove{margin-left:8px;color:var(--text-3);cursor:pointer;font-size:12px}
 .dbt-spent-input{width:90px;text-align:right;border:1.5px solid var(--border-gray);border-radius:8px;padding:4px 8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text-2);font-variant-numeric:tabular-nums}
 .dbt-spent-input:focus{outline:none;border-color:var(--teal)}
-.dbt-spent-input.dbt-over{border-color:#C14A5E;color:#C14A5E}
+/* La fila solo insinúa con el borde: el grito se lo dejamos al total. Saber
+   QUÉ categoría se pasó sigue siendo la mitad accionable del dato. */
+.dbt-spent-input.dbt-over{border-color:#C14A5E;color:var(--text-2);font-weight:600}
 .dash-budget-table tfoot td{padding:10px 8px 4px;font-weight:700;color:var(--text);border-top:2px solid var(--text);font-variant-numeric:tabular-nums}
 
 /* En pantallas angostas, la tabla de 3 columnas (categoría/planeado/real)
@@ -237,8 +243,18 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .dash-vendor-add-form input,.dash-vendor-add-form select{padding:8px 10px;border:1.5px solid var(--border-gray);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px}
 .dash-vendor-add-form input{flex:1;min-width:140px}
 
+.cl-due-input{padding:4px 8px;border:1.5px solid var(--border-gray);border-radius:8px;font-family:'Inter',sans-serif;font-size:11.5px;color:var(--text-2);background:var(--white)}
+.cl-due-input:focus{outline:none;border-color:var(--teal)}
+.cl-due-input.cl-due-vencida{border-color:#C14A5E;color:#C14A5E}
 .dash-payments-toggle{font-size:12.5px;font-weight:700;color:var(--violet);margin-top:12px;padding-top:10px;border-top:1px dashed var(--border-gray);cursor:pointer;user-select:none}
 .dash-payments-body{margin-top:8px}
+.dash-payment-summary{margin-top:10px;padding-top:8px;border-top:1px dashed var(--border-gray);display:flex;gap:16px;flex-wrap:wrap;font-size:12px}
+.dash-payment-summary>div{display:flex;flex-direction:column;gap:1px}
+.dash-payment-summary span{color:var(--text-3);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+.dash-payment-summary b{font-variant-numeric:tabular-nums;color:var(--text)}
+.dash-payment-summary .dpsum-ok{color:var(--teal-dark)}
+.dash-payment-summary .dpsum-due{color:var(--violet)}
+.dash-payment-summary .dpsum-warn{flex:1 1 100%;color:#9A6B00;font-size:11px;line-height:1.4}
 .dash-payment-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;border-bottom:1px solid var(--cream-3)}
 .dash-payment-row.dash-payment-paid{opacity:.55}
 .dash-payment-row.dash-payment-paid .dash-payment-date,.dash-payment-row.dash-payment-paid .dash-payment-amt{text-decoration:line-through}
@@ -3381,7 +3397,9 @@ async function loadMyInvitations(){
     return;
   }
   listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Cargando…':'Loading…'}</p>`;
-  const {data:invs,error}=await sb.from('invitations').select('id,slug,host_names,event_date,created_at,is_published').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  // hashtag va aquí porque showQRModal lo recibe como parámetro: sin él llegaba
+  // siempre vacío y el QR salía sin el hashtag del evento.
+  const {data:invs,error}=await sb.from('invitations').select('id,slug,host_names,event_date,created_at,is_published,hashtag').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!invs||!invs.length){
     listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Todavía no has publicado ninguna invitación.':'You have not published any invitations yet.'}</p>`;
     return;
@@ -3406,15 +3424,27 @@ async function loadMyInvitations(){
       listEl.appendChild(draftDiv);
       continue;
     }
-    const {count:yesCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',true);
-    const {count:noCount}=await sb.from('rsvps').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id).eq('attending',false);
-    const {count:guestListTotal}=await sb.from('guest_list').select('id',{count:'exact',head:true}).eq('invitation_id',inv.id);
-    const pending=guestListTotal?Math.max(0,guestListTotal-(yesCount||0)-(noCount||0)):null;
+    // Antes esto contaba RESPUESTAS y restaba aritméticamente, mientras el
+    // dashboard contaba PERSONAS y cruzaba por nombre: los dos números nunca
+    // coincidían. Aquí se usan los mismos criterios que allá.
+    const {data:rsvpRows}=await sb.from('rsvps').select('guest_name,attending,guest_count').eq('invitation_id',inv.id);
+    const {data:guestRows}=await sb.from('guest_list').select('guest_name').eq('invitation_id',inv.id);
+    const respondieron=new Set();
+    let yesCount=0,noCount=0;
+    (rsvpRows||[]).forEach(r=>{
+      respondieron.add((r.guest_name||'').toLowerCase().trim());
+      // Quien responde cuenta como 1, más sus acompañantes.
+      if(r.attending) yesCount+=1+(r.guest_count||0);
+      else noCount+=1;
+    });
+    const pending=(guestRows&&guestRows.length)
+      ? guestRows.filter(g=>!respondieron.has((g.guest_name||'').toLowerCase().trim())).length
+      : null;
 
     const div=document.createElement('div');
     div.style.cssText='padding:14px 0;border-bottom:1px solid var(--border-gray)';
     div.innerHTML=`
-      <div style="margin-bottom:8px">
+      <div style="margin-bottom:8px;position:sticky;top:0;background:var(--white);padding:4px 0;z-index:1">
         <div style="font-weight:600;font-size:15px;word-break:break-word">${esc(toTitleCase(inv.host_names))}</div>
         <div style="font-size:11.5px;color:var(--text-3);word-break:break-all">${invitationHost()}/i/${esc(inv.slug)}</div>
       </div>
@@ -3998,6 +4028,10 @@ function renderDashboardChecklistDetail(sections){
       if(i.status===undefined) i.status=i.done===true?'done':'pending';
       const statusSelect=`<select class="cl-status-select" onchange="dashboardUpdateChecklistStatus(${si},${ii},this.value,this)">${statusOpts.map(o=>`<option value="${o.value}"${i.status===o.value?' selected':''}>${o.label}</option>`).join('')}</select>`;
       const assigneeInput=`<input type="text" class="cl-assignee-input" placeholder="${L?'Responsable':'Assigned to'}" value="${esc(i.assignedTo||'')}" oninput="dashboardUpdateChecklistAssignee(${si},${ii},this.value)">`;
+      // Fecha propia de la tarea. Si se deja vacía, la urgencia sigue saliendo
+      // de CHECKLIST_SECTION_TIMING como siempre — nadie tiene que llenarlas.
+      const vencida=i.dueDate && i.status!=='done' && i.status!=='postponed' && new Date(i.dueDate+'T12:00:00')<new Date(new Date().toDateString());
+      const dueInput=`<input type="date" class="cl-due-input${vencida?' cl-due-vencida':''}" value="${esc(i.dueDate||'')}" title="${L?'Fecha límite de esta tarea':'Due date for this task'}" onchange="dashboardUpdateChecklistDue(${si},${ii},this.value,this)">`;
       const catTag=(i.cat&&i.cat!==s.section)?`<span class="cl-cat">${esc(i.cat)}</span>`:'';
       const removeBtn=`<span onclick="dashboardExcludeChecklistItem(${si},${ii},this.closest('.cl-item'))" class="cl-remove-btn" title="${L?'No aplica — quitar de mi plan':'Not applicable — remove from my plan'}">${L?'No aplica ✕':'N/A ✕'}</span>`;
       return `<div class="cl-item cl-status-${i.status}" data-s="${si}" data-i="${ii}">
@@ -4007,6 +4041,7 @@ function renderDashboardChecklistDetail(sections){
             ${catTag}
             ${statusSelect}
             ${assigneeInput}
+            ${dueInput}
           </div>
         </div>
         ${removeBtn}
@@ -4101,6 +4136,23 @@ function renderDashboardVendorCard(v,vi){
     </div>`;
   }).join('');
   const paidCount=payments.filter(p=>p.paid).length;
+  // Programado vs pagado vs restante. El "acordado" sale del precio cotizado
+  // del proveedor; si no hay, usamos la suma de lo programado como referencia.
+  const totalProgramado=payments.reduce((s,p)=>s+Number(p.amount||0),0);
+  const totalPagado=payments.filter(p=>p.paid).reduce((s,p)=>s+Number(p.amount||0),0);
+  const acordado=Number(v.quotedPrice||0)||totalProgramado;
+  const restante=acordado-totalPagado;
+  const dinero=n=>'$'+Number(n||0).toLocaleString(L?'es-MX':'en-US');
+  // Si lo programado no cuadra con el precio acordado, más vale decirlo que
+  // dejar que se descubra el día del pago.
+  const descuadre=Number(v.quotedPrice||0)>0 && totalProgramado!==Number(v.quotedPrice);
+  const resumenPagosHtml=payments.length?`
+    <div class="dash-payment-summary">
+      <div><span>${L?'Acordado':'Agreed'}</span><b>${dinero(acordado)}</b></div>
+      <div><span>${L?'Pagado':'Paid'}</span><b class="dpsum-ok">${dinero(totalPagado)}</b></div>
+      <div><span>${L?'Falta':'Remaining'}</span><b class="${restante>0?'dpsum-due':''}">${dinero(restante)}</b></div>
+      ${descuadre?`<div class="dpsum-warn">${L?`⚠️ Las fechas suman ${dinero(totalProgramado)}, pero el precio dice ${dinero(v.quotedPrice)}`:`⚠️ Scheduled payments total ${dinero(totalProgramado)}, but the price says ${dinero(v.quotedPrice)}`}</div>`:''}
+    </div>`:'';
 
   return `<div class="dash-vendor-card">
     <div class="dash-vendor-head">
@@ -4128,6 +4180,7 @@ function renderDashboardVendorCard(v,vi){
     <div class="dash-payments-toggle" onclick="dashboardTogglePayments(${vi})">▸ ${L?'Fechas de pago':'Payment schedule'} (${paidCount}/${payments.length})</div>
     <div class="dash-payments-body" data-vendor="${vi}" style="display:none">
       ${paymentsRowsHtml}
+      ${resumenPagosHtml}
       <div class="dash-payment-add-row">
         <input type="date" id="dash-payment-new-date-${vi}">
         <input type="number" id="dash-payment-new-amt-${vi}" placeholder="${L?'Monto':'Amount'}">
@@ -4237,12 +4290,23 @@ function dashboardRefreshChecklistStatsLocal(){
   let overdueSections=[],soonSections=[];
   if(eventDateObj){
     sections.forEach(sec=>{
-      const pending=(sec.items||[]).filter(i=>i.selected!==false&&i.done!==true&&i.status!=='postponed').length;
-      if(!pending) return;
       const monthsBefore=CHECKLIST_SECTION_TIMING[sec.section];
-      if(monthsBefore===undefined) return;
-      const suggestedDate=new Date(eventDateObj); suggestedDate.setDate(suggestedDate.getDate()-Math.round(monthsBefore*30));
-      const daysUntilDue=Math.round((suggestedDate-today)/(1000*60*60*24));
+      let sugeridaSeccion=null;
+      if(monthsBefore!==undefined){
+        sugeridaSeccion=new Date(eventDateObj);
+        sugeridaSeccion.setDate(sugeridaSeccion.getDate()-Math.round(monthsBefore*30));
+      }
+      // La fecha que puso la persona en una tarea manda sobre la sugerida de la
+      // sección. La sección se juzga por su tarea pendiente MÁS urgente.
+      let masUrgente=null;
+      (sec.items||[]).forEach(i=>{
+        if(i.selected===false||i.done===true||i.status==='postponed') return;
+        const f=i.dueDate?new Date(i.dueDate+'T12:00:00'):sugeridaSeccion;
+        if(!f) return;
+        if(masUrgente===null||f<masUrgente) masUrgente=f;
+      });
+      if(!masUrgente) return; // sin pendientes, o sección no reconocida y sin fechas propias
+      const daysUntilDue=Math.round((masUrgente-today)/(1000*60*60*24));
       if(daysUntilDue<0) overdueSections.push(sec.section);
       else if(daysUntilDue<=30) soonSections.push(sec.section);
     });
@@ -4280,6 +4344,23 @@ function dashboardUpdateChecklistStatus(si,ii,value,selectEl){
   dashboardRefreshChecklistStatsLocal();
   // El guardado real y la sincronización con plan_checklist_progress
   // siguen pasando en segundo plano, normal.
+  Promise.all([
+    sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id),
+    dashboardSaveChecklistProgress()
+  ]);
+}
+
+function dashboardUpdateChecklistDue(si,ii,value,inputEl){
+  const item=dashboardCurrentPlanData.plan?.checklistData?.[si]?.items?.[ii];
+  if(!item) return;
+  item.dueDate=value||null;
+  // Sin repintar: se marca el campo y se recalculan las alertas de urgencia,
+  // igual que hace dashboardUpdateChecklistStatus.
+  if(inputEl){
+    const vencida=!!value && item.status!=='done' && item.status!=='postponed' && new Date(value+'T12:00:00')<new Date(new Date().toDateString());
+    inputEl.classList.toggle('cl-due-vencida',vencida);
+  }
+  dashboardRefreshChecklistStatsLocal();
   Promise.all([
     sb.from('plans').update({plan_data:dashboardCurrentPlanData}).eq('id',dashboardCurrentPlanId).eq('user_id',currentUser.id),
     dashboardSaveChecklistProgress()
@@ -4617,12 +4698,23 @@ async function dashboardSelectPlan(planId){
   let overdueSections=[],soonSections=[];
   if(eventDateObj){
     sections.forEach(sec=>{
-      const pending=(sec.items||[]).filter(i=>i.selected!==false&&i.done!==true&&i.status!=='postponed').length;
-      if(!pending) return;
       const monthsBefore=CHECKLIST_SECTION_TIMING[sec.section];
-      if(monthsBefore===undefined) return; // sección no reconocida — no adivinamos
-      const suggestedDate=new Date(eventDateObj); suggestedDate.setDate(suggestedDate.getDate()-Math.round(monthsBefore*30));
-      const daysUntilDue=Math.round((suggestedDate-today)/(1000*60*60*24));
+      let sugeridaSeccion=null;
+      if(monthsBefore!==undefined){
+        sugeridaSeccion=new Date(eventDateObj);
+        sugeridaSeccion.setDate(sugeridaSeccion.getDate()-Math.round(monthsBefore*30));
+      }
+      // La fecha que puso la persona en una tarea manda sobre la sugerida de la
+      // sección. La sección se juzga por su tarea pendiente MÁS urgente.
+      let masUrgente=null;
+      (sec.items||[]).forEach(i=>{
+        if(i.selected===false||i.done===true||i.status==='postponed') return;
+        const f=i.dueDate?new Date(i.dueDate+'T12:00:00'):sugeridaSeccion;
+        if(!f) return;
+        if(masUrgente===null||f<masUrgente) masUrgente=f;
+      });
+      if(!masUrgente) return; // sin pendientes, o sección no reconocida y sin fechas propias
+      const daysUntilDue=Math.round((masUrgente-today)/(1000*60*60*24));
       if(daysUntilDue<0) overdueSections.push(sec.section);
       else if(daysUntilDue<=30) soonSections.push(sec.section);
     });
@@ -4820,6 +4912,13 @@ async function dashboardSelectPlan(planId){
       <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
       <button class="dash-tab" data-tab="vendors" onclick="dashboardSwitchTab('vendors')">🤝 ${L?'Proveedores':'Vendors'}</button>
       <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
+    </div>
+
+    <!-- El Excel ya existía pero su botón vivía solo en la vista del plan
+         recién generado, así que desde el dashboard no había forma de llegar.
+         Una hoja por pestaña, en un mismo archivo. -->
+    <div style="display:flex;justify-content:flex-end;margin:-6px 0 12px">
+      <button class="btn-account" onclick="dashboardExportExcel()" title="${L?'Descargar todo el evento en Excel':'Download the whole event as Excel'}">📊 ${L?'Descargar Excel':'Download Excel'}</button>
     </div>
 
     <div class="dash-tab-panel dash-card" data-panel="checklist">${checklistTabHtml}</div>
@@ -8110,6 +8209,19 @@ function xlAddSheet(wb,name,header,rows,widths){
   rows.forEach((r,i)=>xlStyleDataRow(ws.addRow(r),i%2===1));
   ws.views=[{state:'frozen',ySplit:1}];
   return ws;
+}
+
+async function dashboardExportExcel(){
+  const L=lang==='es';
+  const guardado=dashboardCurrentPlanData?.plan;
+  if(!guardado||!dashboardCurrentPlanId){ showToast(L?'Abre un evento primero':'Open an event first',true); return; }
+  // exportSpreadsheet() ya arma todas las hojas (Overview, Presupuesto,
+  // Proveedores, Checklist...), pero lee de `plan`, que en el dashboard puede
+  // estar vacío. Lo hidratamos con el plan guardado antes de llamarla.
+  // _savedId es CRÍTICO: sin él, el guardado interno insertaría una fila nueva
+  // en vez de actualizar esta — que es justo el bug de pérdida de datos.
+  plan={...guardado,_savedId:dashboardCurrentPlanId};
+  await exportSpreadsheet();
 }
 
 async function exportSpreadsheet(){
