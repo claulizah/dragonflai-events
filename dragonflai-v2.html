@@ -1573,6 +1573,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <span data-es="Quiero recibir recordatorios de mi evento por correo" data-en="I want to receive event reminders by email">Quiero recibir recordatorios de mi evento por correo</span>
     </label>
 
+    <!-- Consentimiento SEPARADO del de arriba a propósito: recordatorios de
+         TU evento es un aviso operativo: promociones y novedades es
+         mercadotecnia -- bajo la LFPDPPP conviene pedirlos por separado, no
+         reutilizar el mismo "sí" para las dos cosas. Sin marcar por
+         defecto, igual que el consentimiento del testimonio. -->
+    <label style="display:flex;align-items:center;gap:8px;margin:0 0 1rem;font-size:13px;color:var(--text-2);cursor:pointer">
+      <input type="checkbox" id="pf-marketing" style="width:16px;height:16px;cursor:pointer">
+      <span data-es="Quiero recibir promociones y novedades de DragonflAI Events" data-en="I want to receive DragonflAI Events promotions and updates">Quiero recibir promociones y novedades de DragonflAI Events</span>
+    </label>
+
     <a class="btn-excel-unlock" href="#" onclick="saveProfile();return false" data-es="Guardar cambios" data-en="Save changes" style="display:block;text-align:center;text-decoration:none">Guardar cambios</a>
     <button class="btn-excel-close" onclick="closeProfileModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
   </div>
@@ -1732,6 +1742,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <span style="display:block;margin-bottom:.5rem"><img src="/assets/belu/belu-celebrando.png" alt="Belu" style="height:118px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="const p=this.parentElement;if(p){p.textContent='🎉';p.style.fontSize='36px'}"> </span>
       <p style="font-size:14px;margin-bottom:.75rem" data-es="¡Tu invitación ya está en línea!" data-en="Your invitation is live!">¡Tu invitación ya está en línea!</p>
       <div style="background:var(--cream-2);border-radius:var(--radius);padding:12px;font-size:13px;word-break:break-all;margin-bottom:1rem" id="publish-url"></div>
+
+      <!-- Momento de mayor entusiasmo con el producto: justo después de
+           publicar. Por eso además del checkbox permanente en "Mi perfil",
+           se ofrece una vez aquí -- sin marcar por defecto, y se guarda de
+           inmediato al marcarla, sin pedir un "Guardar" aparte. -->
+      <label style="display:flex;align-items:flex-start;gap:8px;margin-bottom:1rem;font-size:12px;color:var(--text-2);cursor:pointer;text-align:left">
+        <input type="checkbox" id="publish-success-marketing" onchange="saveMarketingOptInQuick(this.checked)" style="margin-top:2px;flex-shrink:0">
+        <span data-es="Quiero recibir promociones y novedades de DragonflAI Events" data-en="I want to receive DragonflAI Events promotions and updates">Quiero recibir promociones y novedades de DragonflAI Events</span>
+      </label>
+
       <a class="btn-excel-unlock" href="#" onclick="if(lastPublishedUrl){const w=window.open(lastPublishedUrl,'_blank'); if(!w) location.href=lastPublishedUrl;} return false" data-es="👁️ Ver mi invitación →" data-en="👁️ View my invitation →" style="display:block;text-align:center;text-decoration:none;margin-bottom:.6rem">👁️ Ver mi invitación →</a>
       <a class="btn-excel-close" href="#" onclick="copyPublishUrl();return false" data-es="📋 Copiar link" data-en="📋 Copy link" style="display:block;text-align:center;text-decoration:none">📋 Copiar link</a>
       <div id="publish-share-msgs" style="margin-top:1rem"></div>
@@ -1983,7 +2003,7 @@ async function refreshPaidStatusInner(){
   // borrador local no sobrevive el salto — este es el respaldo del servidor.
   restoreDraftFromServer();
 
-  const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in').eq('id',currentUser.id).single();
+  const {data}=await sb.from('profiles').select('paid,full_name,preferred_lang,preferred_mode,phone,company_name,company_phone,company_website,main_plan_id,email_reminders_opt_in,marketing_opt_in').eq('id',currentUser.id).single();
   userProfile=data||{};
   localStorage.setItem('dflai_was_logged_in','1'); // para detectar "sesión expiró por inactividad" más adelante
   currentUserName=userProfile.full_name||'';
@@ -2213,6 +2233,7 @@ async function openProfileModal(){
   document.getElementById('pf-company-phone').value=userProfile.company_phone||'';
   document.getElementById('pf-company-website').value=userProfile.company_website||'';
   document.getElementById('pf-reminders').checked=!!userProfile.email_reminders_opt_in;
+  document.getElementById('pf-marketing').checked=!!userProfile.marketing_opt_in;
   document.getElementById('pf-access-summary').innerHTML=L?'Cargando tu acceso…':'Loading your access…';
   const sel=document.getElementById('pf-main-plan');
   sel.innerHTML=`<option value="">${L?'Cargando…':'Loading…'}</option>`;
@@ -2252,6 +2273,24 @@ function closeProfileModal(){
   document.body.style.overflow='';
 }
 
+async function saveMarketingOptInQuick(checked){
+  if(!sb||!currentUser) return;
+  const L=lang==='es';
+  // Reutiliza update_my_profile (mismo camino que "Mi perfil") en vez de
+  // escribir la tabla directo, para no depender de una política de RLS que
+  // no he verificado. Solo se manda este parámetro -- el resto se queda
+  // como estaba, siempre que update_my_profile conserve el patrón de
+  // "coalesce(nuevo_valor, valor_actual)" para los parámetros que llegan
+  // vacíos, que es como está diseñada la versión que propusimos.
+  const {error}=await sb.rpc('update_my_profile',{new_marketing_opt_in:checked});
+  if(error){
+    showToast(L?'No se pudo guardar tu preferencia':'Could not save your preference',true);
+    document.getElementById('publish-success-marketing').checked=!checked; // revertir visualmente
+    return;
+  }
+  userProfile.marketing_opt_in=checked;
+}
+
 async function saveProfile(){
   if(!sb||!currentUser) return;
   const payload={
@@ -2262,7 +2301,8 @@ async function saveProfile(){
     new_company_name:document.getElementById('pf-company-name').value.trim(),
     new_company_phone:document.getElementById('pf-company-phone').value.trim(),
     new_company_website:document.getElementById('pf-company-website').value.trim(),
-    new_email_reminders:document.getElementById('pf-reminders').checked
+    new_email_reminders:document.getElementById('pf-reminders').checked,
+    new_marketing_opt_in:document.getElementById('pf-marketing').checked
   };
   const mainPlanVal=document.getElementById('pf-main-plan').value;
   if(mainPlanVal) payload.new_main_plan_id=mainPlanVal;
@@ -2274,7 +2314,8 @@ async function saveProfile(){
   Object.assign(userProfile,{
     full_name:payload.new_name, preferred_lang:payload.new_lang, preferred_mode:payload.new_mode,
     phone:payload.new_phone, company_name:payload.new_company_name, company_phone:payload.new_company_phone,
-    company_website:payload.new_company_website, email_reminders_opt_in:payload.new_email_reminders
+    company_website:payload.new_company_website, email_reminders_opt_in:payload.new_email_reminders,
+    marketing_opt_in:payload.new_marketing_opt_in
   });
   if(mainPlanVal) userProfile.main_plan_id=mainPlanVal;
   currentUserName=userProfile.full_name;
@@ -3457,6 +3498,10 @@ async function publishInvitation(){
   pendingDraftInvitationId=null;
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
+  // Reflejar el valor real (userProfile ya está en memoria) -- si ya dijo
+  // que sí desde "Mi perfil", no tiene sentido volver a mostrarlo sin marcar.
+  const mktChk=document.getElementById('publish-success-marketing');
+  if(mktChk) mktChk.checked=!!userProfile.marketing_opt_in;
   // El formulario es mucho más alto que la pantalla de éxito — si el
   // usuario llegó a "Publicar" habiendo hecho scroll hasta abajo (común en
   // celular, donde el form es largo), el modal se quedaba en esa misma
@@ -5756,7 +5801,25 @@ function checkReturnFromPayment(){
   const L=lang==='es';
   const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
   if(hasAnyAccess){
-    showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
+    // Promo de inauguración: "compra tu evento, te regalamos el segundo".
+    // Solo aplica a quien compró el evento individual (diyEventCredits>0) --
+    // quien compró el anual ya tiene acceso ilimitado, un evento de regalo
+    // no le suma nada. redeem_code() ya protege contra doble-canje por su
+    // cuenta (lo vimos con los testers), así que aunque este código se
+    // ejecute más de una vez por accidente, nunca se regala dos veces.
+    // Cuando el código venza (controlado 100% desde SQL, sin tocar esto),
+    // simplemente deja de otorgar nada y el mensaje normal de abajo se ve.
+    if(access.diyEventCredits>0 && sb){
+      sb.rpc('redeem_code',{p_code:'SEGUNDOGRATIS'}).then(({data})=>{
+        if(data?.success){
+          showToast(L?'🎉 ¡Pago confirmado! De regalo de inauguración, te dimos un segundo evento gratis.':"🎉 Payment confirmed! As a launch gift, we added a second event, on us.");
+        } else {
+          showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
+        }
+      });
+    } else {
+      showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
+    }
   } else {
     showToast(L
       ?'🕐 Recibimos tu pago. Si fue con tarjeta, actualiza en unos segundos; si fue OXXO o transferencia, puede tardar unas horas en confirmarse.'
