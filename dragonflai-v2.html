@@ -929,7 +929,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div class="launcher-slide" data-slide="1" style="display:none">
         <img src="/assets/belu/belu-trabajando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
         <h2 data-es="Cuéntame tu evento" data-en="Tell me about your event">Cuéntame tu evento</h2>
-        <p data-es="Cronograma, presupuesto y checklist, armados en segundos" data-en="Timeline, budget, and checklist, built in seconds">Cronograma, presupuesto y checklist, armados en segundos</p>
+        <p data-es="Cronograma, presupuesto y checklist, armados contigo en menos de 90 segundos" data-en="Timeline, budget, and checklist, built with you in under 90 seconds">Cronograma, presupuesto y checklist, armados contigo en menos de 90 segundos</p>
       </div>
       <div class="launcher-slide" data-slide="2" style="display:none">
         <img src="/assets/belu/belu-exitosa.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
@@ -1461,6 +1461,13 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div class="cd-date" id="cd-date-display"></div>
     </div>
 
+    <!-- Aclaración chica: el texto que escribe la IA (párrafos, ideas,
+         encabezados dentro de cada pestaña) se generó una sola vez, en el
+         idioma activo en ese momento, y no se vuelve a traducir solo -- a
+         diferencia de los botones y títulos de esta página, que sí cambian
+         de idioma. Volver a escribirlo necesitaría una generación nueva. -->
+    <p style="text-align:center;font-size:11.5px;color:var(--text-3);margin:-4px 0 12px" data-es="El contenido redactado por Belu se generó en un solo idioma y no se traduce al cambiar el idioma de la página." data-en="The content written by Belu was generated in one language and doesn't translate when you change the page language.">El contenido redactado por Belu se generó en un solo idioma y no se traduce al cambiar el idioma de la página.</p>
+
     <div class="res-card">
       <div class="res-tabs" id="res-tabs"></div>
       <div class="loading" id="loading">
@@ -1478,7 +1485,11 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   <div class="excel-modal">
     <span style="font-size:36px;display:block;text-align:center;margin-bottom:.75rem" id="paywall-icon">📊🔒</span>
     <h3 id="paywall-title" data-es="Descarga tu Excel editable" data-en="Download your editable Excel">Descarga tu Excel editable</h3>
-    <p id="paywall-text" data-es="La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre." data-en="Excel export (budget with formulas, guest list, timeline, checklist and more) is part of full access — one payment, yours forever.">La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso completo — un solo pago, tuyo para siempre.</p>
+    <!-- Este texto estático solo se ve una fracción de segundo antes de que
+         openExcelPaywall() lo sobrescriba con PAYWALL_CONTENT -- nunca lo ve
+         nadie de verdad, pero se deja igual a la versión viva para no tener
+         dos redacciones distintas del mismo mensaje conviviendo en el código. -->
+    <p id="paywall-text" data-es="La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso Haz tu propio evento — desde $179 por evento, o ilimitado por un año." data-en="Excel export (budget with formulas, guest list, timeline, checklist and more) is part of DIY access — from $179 MXN per event, or unlimited for a year.">La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso Haz tu propio evento — desde $179 por evento, o ilimitado por un año.</p>
     <a class="btn-excel-unlock" href="index.html#precios" data-es="Ver planes →" data-en="See plans →">Ver planes →</a>
     <button class="btn-excel-close" onclick="closeExcelPaywall()" data-es="Ahora no" data-en="Not now">Ahora no</button>
 
@@ -1805,6 +1816,18 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     <h3 style="text-align:center" data-es="💌 ¿Nos regalas tu opinión?" data-en="💌 Mind sharing your thoughts?">💌 ¿Nos regalas tu opinión?</h3>
     <p style="font-size:13px;color:var(--text-2);text-align:center;margin-bottom:1rem" data-es="Eres de los primeros en probar DragonflAI Events — tu opinión nos ayuda muchísimo, y con tu permiso, nos encantaría compartirla en la página principal." data-en="You're one of the first to try DragonflAI Events — your feedback helps a lot, and with your permission, we'd love to feature it on the homepage.">Eres de los primeros en probar DragonflAI Events — tu opinión nos ayuda muchísimo, y con tu permiso, nos encantaría compartirla en la página principal.</p>
     <textarea id="testimonial-message" class="profile-input" style="min-height:110px;resize:vertical" placeholder="ej. Lo que más me sorprendió fue..."></textarea>
+
+    <!-- El texto de arriba YA decía "con tu permiso, nos encantaría
+         compartirla" -- pero nunca se pedía ese permiso de verdad. Esta
+         casilla es el permiso real, y arranca SIN marcar a propósito. -->
+    <label style="display:flex;align-items:flex-start;gap:8px;margin-top:.85rem;font-size:12.5px;color:var(--text-2);cursor:pointer;text-align:left">
+      <input type="checkbox" id="testimonial-consent" style="margin-top:2px;flex-shrink:0">
+      <span data-es="Sí, pueden publicar mi opinión en la página principal" data-en="Yes, you can publish my feedback on the homepage">Sí, pueden publicar mi opinión en la página principal</span>
+    </label>
+    <div id="testimonial-name-row" style="display:none;margin-top:.6rem">
+      <input type="text" id="testimonial-display-name" class="profile-input" placeholder="ej. Ana M. — o déjalo vacío para aparecer como Anónimo" data-es-placeholder="ej. Ana M. — o déjalo vacío para aparecer como Anónimo" data-en-placeholder="e.g. Ana M. — or leave blank to appear as Anonymous">
+    </div>
+
     <button class="btn-excel-unlock" style="margin-top:.75rem" onclick="submitTestimonial()" data-es="Enviar mi opinión" data-en="Send my feedback">Enviar mi opinión</button>
     <button class="btn-excel-close" onclick="closeTestimonialModal()" data-es="Ahora no" data-en="Not now">Ahora no</button>
   </div>
@@ -2089,7 +2112,13 @@ async function launcherSubmitEmail(){
 
   if(!error){
     statusEl.style.color='var(--teal-dark)';
-    statusEl.textContent=lang==='es'?'✉️ Te mandamos un link a tu correo — ábrelo para entrar a tus planes.':"✉️ We've sent you a link — open it to access your plans.";
+    // La segunda línea, más chica, es la aclaración de PKCE: el link solo
+    // funciona en el mismo navegador/dispositivo donde se pidió -- sin este
+    // aviso, alguien que lo pide en la compu y lo abre desde el correo del
+    // celular ve el link fallar sin ningún mensaje de error que lo explique.
+    statusEl.innerHTML=lang==='es'
+      ?'✉️ Te mandamos un link a tu correo — ábrelo para entrar a tus planes.<div style="font-size:11px;color:var(--text-3);margin-top:4px">Ábrelo desde este mismo dispositivo — si lo abres desde otro, no va a funcionar.</div>'
+      :"✉️ We've sent you a link — open it to access your plans.<div style=\"font-size:11px;color:var(--text-3);margin-top:4px\">Open it on this same device — it won't work if opened from a different one.</div>";
     return;
   }
   if(error.message && error.message.toLowerCase().includes('signups not allowed')){
@@ -2147,7 +2176,9 @@ async function sendMagicLink(){
   if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; btn.textContent=originalLabel; }
 
   if(error){ showToast(error.message,true); return; }
-  showToast(lang==='es'?'✉️ Revisa tu correo — te mandamos un link':'✉️ Check your email — we sent you a link');
+  // Mismo aviso que en el paso de correo del launcher: el link solo
+  // funciona en el mismo navegador/dispositivo donde se pidió.
+  showToast(lang==='es'?'✉️ Revisa tu correo y ábrelo desde este mismo dispositivo':'✉️ Check your email and open it on this same device');
   closeAuthModal();
 }
 
@@ -3474,7 +3505,7 @@ async function loadMyInvitations(){
   // siempre vacío y el QR salía sin el hashtag del evento.
   const {data:invs,error}=await sb.from('invitations').select('id,slug,host_names,event_date,created_at,is_published,hashtag').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(error||!invs||!invs.length){
-    listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Todavía no has publicado ninguna invitación.':'You have not published any invitations yet.'}</p>`;
+    listEl.innerHTML=`<p style="text-align:center;color:var(--text-3);font-size:13px">${L?'Ninguna invitación publicada todavía — cuando lances la primera, aparece aquí.':"No invitations published yet — once you launch your first one, it'll show up here."}</p>`;
     return;
   }
   listEl.innerHTML='';
@@ -3822,11 +3853,13 @@ async function exportRsvpsToExcel(invId,hostNames){
 
 async function logout(){
   if(sb) await sb.auth.signOut();
-  currentUser=null; isPaid=false; currentUserName=''; userProfile={};
   localStorage.removeItem('dflai_was_logged_in'); // fue un logout a propósito, no una sesión expirada
-  updateAccountUI();
-  updateGenBadge();
-  showToast(lang==='es'?'Sesión cerrada':'Logged out');
+  // Antes esto solo limpiaba variables y actualizaba el botón de cuenta --
+  // el dashboard (con datos privados del evento: invitación publicada,
+  // presupuesto, checklist) se quedaba pintado en pantalla, completamente
+  // funcional, aunque ya no hubiera sesión. Redirigir a la landing es más
+  // confiable que tratar de ocultar/limpiar cada pieza de estado en vivo.
+  window.location.href='/';
 }
 
 // ── Medición de origen (?ref=tiktok / ?ref=ig) ──
@@ -4130,9 +4163,9 @@ function dashboardToggleRsvpList(category){
   const rowsHtml=category==='pending'
     ? items.map(g=>`<div class="dash-stat-row" style="font-size:13px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;width:100%;min-width:0">
-          <input type="checkbox" style="flex-shrink:0" ${g.sent?'checked':''} onchange="dashboardToggleInvitationSent(${g.id},this.checked)">
+          <input type="checkbox" style="flex-shrink:0" ${g.sent?'checked':''} onchange="dashboardToggleInvitationSent('${g.id}',this.checked,this)">
           <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(g.name||'')}">${esc(g.name||'')}</span>
-          <span style="font-size:11px;color:var(--text-3);flex-shrink:0">${g.sent?(L?'Enviada':'Sent'):(L?'Sin enviar':'Not sent')}</span>
+          <span style="font-size:11px;color:var(--text-3);flex-shrink:0" data-sent-label="${g.id}">${g.sent?(L?'Enviada':'Sent'):(L?'Sin enviar':'Not sent')}</span>
         </label>
       </div>`).join('')
     : items.map(n=>`<div class="dash-stat-row" style="font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(n||'')}">${esc(n||'')}</div>`).join('');
@@ -4142,9 +4175,24 @@ function dashboardToggleRsvpList(category){
   </div>`;
 }
 
-async function dashboardToggleInvitationSent(guestId,sent){
+async function dashboardToggleInvitationSent(guestId,sent,checkboxEl){
+  const L=lang==='es';
   const {error}=await sb.from('guest_list').update({invitation_sent:sent}).eq('id',guestId);
-  if(error){ showToast(lang==='es'?'No se pudo actualizar':'Could not update',true); console.error(error); }
+  if(error){
+    showToast(L?'No se pudo actualizar':'Could not update',true);
+    console.error(error);
+    // Falló en el servidor: el checkbox no puede quedarse marcado como si
+    // hubiera funcionado -- lo regresamos a su estado anterior.
+    if(checkboxEl) checkboxEl.checked=!sent;
+    return;
+  }
+  // Antes esto solo tocaba la base de datos -- la etiqueta "Sin enviar" de
+  // al lado nunca se enteraba del cambio, así que marcar el check no daba
+  // ninguna confirmación visible de que algo había pasado de verdad.
+  const label=document.querySelector(`[data-sent-label="${guestId}"]`);
+  if(label) label.textContent=sent?(L?'Enviada':'Sent'):(L?'Sin enviar':'Not sent');
+  const g=dashboardRsvpLists.pending.find(x=>x.id===guestId);
+  if(g) g.sent=sent;
 }
 
 async function dashboardDownloadGuestList(){
@@ -4997,7 +5045,7 @@ async function dashboardSelectPlan(planId){
       <button class="btn-account" onclick="showQRModal('${esc(inv.slug||'').replace(/'/g,"")}','${esc(inv.host_names||'').replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ ${L?'Ver/descargar QR':'View/download QR'}</button>
       <button class="btn-account" onclick="dashboardDownloadGuestList()">📥 ${L?'Descargar lista de invitados':'Download guest list'}</button>
     </div>
-  `:`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has creado tu invitación digital para este evento.':'You have not created your digital invitation for this event yet.'}</p>
+  `:`<p style="font-size:13px;color:var(--text-3)">${L?'Aquí va a vivir tu invitación digital — créala cuando estés listo/a.':"Your digital invitation will live here — create it whenever you're ready."}</p>
     <button class="btn-gen" style="margin-top:10px" onclick="dashboardEditInvitation('${planId}')">${L?'Crear mi invitación':'Create my invitation'}</button>`;
 
   const vendors=(savedPlan.vendorsData||[]).map((v,vi)=>({v,vi})).filter(({v})=>v.selected!==false);
@@ -5015,7 +5063,7 @@ async function dashboardSelectPlan(planId){
   }
 
   const vendorsTabHtml=`
-    <div id="dash-vendors-list">${vendors.map(({v,vi})=>renderDashboardVendorCard(v,vi)).join('')||`<p style="font-size:13px;color:var(--text-3)">${L?'Todavía no has agregado proveedores.':'You have not added any vendors yet.'}</p>`}</div>
+    <div id="dash-vendors-list">${vendors.map(({v,vi})=>renderDashboardVendorCard(v,vi)).join('')||`<p style="font-size:13px;color:var(--text-3)">${L?'Aún no tienes proveedores en tu lista — agrega el primero cuando quieras.':'You don\'t have any vendors on your list yet — add your first one whenever you like.'}</p>`}</div>
     <div class="dash-vendor-add-form">
       <input type="text" id="dash-vendor-new-name" placeholder="${L?'Nombre del proveedor':'Vendor name'}">
       <input type="text" id="dash-vendor-new-category" placeholder="${L?'Categoría (ej. Fotografía)':'Category (e.g. Photography)'}">
@@ -9226,6 +9274,18 @@ async function submitBugReport(){
 function openTestimonialModal(){
   document.getElementById('testimonial-modal').classList.add('open');
   document.body.style.overflow='hidden';
+  // Reiniciar cada vez que se abre -- nunca debe quedar marcada de una
+  // sesión anterior ni mostrando un nombre que ya no aplica.
+  const consent=document.getElementById('testimonial-consent');
+  const nameRow=document.getElementById('testimonial-name-row');
+  const nameInput=document.getElementById('testimonial-display-name');
+  if(consent) consent.checked=false;
+  if(nameRow) nameRow.style.display='none';
+  if(nameInput){
+    nameInput.value='';
+    nameInput.placeholder=nameInput.getAttribute(lang==='es'?'data-es-placeholder':'data-en-placeholder')||nameInput.placeholder;
+  }
+  if(consent) consent.onchange=()=>{ if(nameRow) nameRow.style.display=consent.checked?'block':'none'; };
 }
 
 function closeTestimonialModal(){
@@ -9239,8 +9299,15 @@ async function submitTestimonial(){
   const L=lang==='es';
   const message=document.getElementById('testimonial-message').value.trim();
   if(!message){ showToast(L?'Escribe tu opinión primero':'Write your feedback first',true); return; }
+  const consent=document.getElementById('testimonial-consent')?.checked||false;
+  const displayName=document.getElementById('testimonial-display-name')?.value.trim()||null;
 
-  const {data,error}=await sb.rpc('submit_testimonial',{p_message:message,p_event_type:plan.typeName||null});
+  const {data,error}=await sb.rpc('submit_testimonial',{
+    p_message:message,
+    p_event_type:plan.typeName||null,
+    p_consent:consent,
+    p_display_name:consent?displayName:null // sin consentimiento, ningún nombre se guarda para mostrar
+  });
   if(error||!data?.success){ showToast(L?'No se pudo enviar, intenta de nuevo':'Could not send, try again',true); return; }
   closeTestimonialModal();
   showToast(L?'💌 ¡Gracias por tu tiempo!':'💌 Thanks for your time!');
