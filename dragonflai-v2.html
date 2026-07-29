@@ -5794,12 +5794,31 @@ function init(){
 // que pagó con OXXO/SPEI (que tarda en confirmarse) regresa y no ve
 // ningún crédito todavía, lo cual parece que algo falló cuando en
 // realidad solo está pendiente de que se confirme el pago.
-function checkReturnFromPayment(){
+async function checkReturnFromPayment(){
   const params=new URLSearchParams(location.search);
   const sessionId=params.get('session_id');
   if(!sessionId) return;
   const L=lang==='es';
-  const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+
+  // BUG REAL, encontrado con una compra con dinero real: Stripe redirige de
+  // vuelta casi al instante tras el pago, pero el webhook que le avisa a nuestro
+  // backend (y que este escribe el crédito en Supabase) es una llamada aparte,
+  // servidor a servidor, que puede tardar unos segundos. Antes, esta función
+  // revisaba `access` UNA sola vez, en ese instante -- si el webhook aún no
+  // aterrizaba, veía 0 créditos y cae al mensaje de "tu pago sigue pendiente"
+  // (el pensado para OXXO/transferencia), aunque momentos después el crédito
+  // sí llegaba. Como el regalo del segundo evento vive adentro de la rama de
+  // "sí hay acceso", esa carrera también se comía el regalo en silencio.
+  // Ahora se reintenta por unos segundos antes de darse por vencido.
+  let hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+  let intentos=0;
+  while(!hasAnyAccess && intentos<5){
+    await new Promise(r=>setTimeout(r,2000));
+    await refreshPaidStatus();
+    hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+    intentos++;
+  }
+
   if(hasAnyAccess){
     // Promo de inauguración: "compra tu evento, te regalamos el segundo".
     // Solo aplica a quien compró el evento individual (diyEventCredits>0) --
