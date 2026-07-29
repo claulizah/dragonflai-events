@@ -2340,9 +2340,13 @@ async function openPublishModal(){
   document.getElementById('pub-time-end').value=plan.timeEndRaw||'';
   document.getElementById('pub-hashtag').value=(plan.extra&&plan.extra.hashtag)||'';
   document.getElementById('pub-vibe').value=plan.vibe||'';
-  document.getElementById('pub-message').value=(plan.stdMessage
-    ||document.querySelector('#content-savethedate .std-card [data-field="message"]')?.textContent
-    ||'').trim();
+  // Antes prellenaba con el mensaje del Save the Date -- pero ese texto está
+  // escrito para avisar "guarda la fecha, la invitación formal llega
+  // después", y aquí SÍ es la invitación formal. Publicado tal cual, decía
+  // literalmente "invitación formal próximamente" dentro de la invitación
+  // formal. Se deja vacío a propósito -- el placeholder ya da un ejemplo,
+  // y forzar un mensaje propio evita este tipo de contradicción.
+  document.getElementById('pub-message').value='';
   document.getElementById('pub-dresscode').value=(plan.extra&&plan.extra.dresscode)||'';
   document.getElementById('pub-organizer-name').value='';
   document.getElementById('pub-organizer-phone').value='';
@@ -2550,7 +2554,7 @@ function showInvitationPreview(){
   const previewHtml=`
     <div class="std-card${photoClass}"${cardStyle}>
       <div class="std-content${pubFontClass?' '+pubFontClass:''}">
-        <div class="std-eyebrow">— ${p.typeName?esc(p.typeName):(L?'Estás invitado':'Invited')} —</div>
+        <div class="std-eyebrow">— ${p.typeName?esc(translateEventTypeName(p.typeName)):(L?'Estás invitado':'Invited')} —</div>
         <div class="std-names">${esc(toTitleCase(previewHostNames))}</div>
         <div class="std-divider"><span class="std-divider-icon">◆</span></div>
         <div class="std-details">
@@ -3855,6 +3859,13 @@ if(sb){
     const newUserId=session?session.user.id:null;
     currentUser=session?session.user:null;
     updateAccountUI();
+    // Antes, alguien con sesión seguía viendo el carrusel completo de
+    // bienvenida ("Conoce a Belu...") mientras refreshPaidStatus() -- una
+    // llamada de red real, 2 consultas -- terminaba. Ya sabemos que hay
+    // sesión desde ESTA línea, sin esperar nada de red, así que cambiamos
+    // al spinner ligero de inmediato; el carrusel completo ahora solo lo ve
+    // alguien sin sesión (que sí lo necesita).
+    if(session) launcherShowLoadingStep();
     if(newUserId===lastAuthListenerUserId){
       routeInitialScreen(); // sigue corriendo — es barato y solo actúa una vez (initialRoutingDone)
       return;
