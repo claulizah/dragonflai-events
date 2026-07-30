@@ -429,6 +429,18 @@ header{z-index:10;background:var(--white);border-bottom:1px solid var(--border-g
 /* ── FIELDS ── */
 .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .time-range-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+/* Los elementos de grid heredan min-width:auto por defecto -- "nunca me
+   encojo más chico que mi contenido natural". Si algo adentro no puede
+   encoger solo (como un <input>, que ya trae width:100% pero calculado
+   sobre el ancho que SU columna debería tener), la columna entera se niega
+   a encoger y empuja a su contenido fuera del formulario. Así se encontró,
+   en vivo y medido con números reales, tanto en el slider de presupuesto
+   (.fgrid) como en "Hora de fin" (.time-range-grid) en pantallas angostas.
+   Mismo patrón que ya se había arreglado antes en un contenedor flex (la
+   tarjeta de "Agregar idea"); aquí se cubre de una vez en los 10
+   contenedores grid del archivo, en vez de ir descubriéndolos uno por uno. */
+.dash-stats-row>*,.dash-rsvp-row>*,.mode-grid>*,.fgrid>*,.time-range-grid>*,
+.bcards>*,.vcards>*,.line-editor-row>*,.combo-grid>*,.ps-grid>*{min-width:0}
 .sublabel{display:block;font-size:10.5px;color:var(--text-3);margin-bottom:4px}
 .fcol{grid-column:1/-1}
 .field label{display:block;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}
@@ -922,6 +934,9 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .profile-section-divider{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-dark);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
 .btn-excel-close:hover{color:var(--text);border-color:var(--teal)}
 </style>
+<!-- Cloudflare Web Analytics -->
+<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c5f0d811fd8e4eb19d11a9e0cc4bab53"}'></script>
+<!-- End Cloudflare Web Analytics -->
 </head>
 <body>
 
