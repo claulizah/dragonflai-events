@@ -6103,11 +6103,35 @@ function updateProgress(){
 
 function updateGenBadge(){
   const b=document.getElementById('gen-badge');
-  const labelEl=document.getElementById('gens-left').nextElementSibling;
+  const numEl=document.getElementById('gens-left');
+  const labelEl=numEl.nextElementSibling;
   b.style.border='none';
-  if(isPaid){
-    document.getElementById('gens-left').textContent='∞';
+  // isPaid es "¿tiene CUALQUIER acceso pagado?" -- eso incluye a alguien con
+  // 1 solo crédito de evento, que no tiene nada de ilimitado. Antes, ese
+  // caso también mostraba el símbolo ∞ y "planes ilimitados", igual que
+  // quien sí pagó el acceso anual -- "Mi perfil" siempre distinguió bien
+  // las dos cosas; este badge no.
+  const esRealmenteIlimitado=access.diyUnlimitedActive||access.plannerUnlimitedActive;
+  if(esRealmenteIlimitado){
+    numEl.textContent='∞';
     if(labelEl){ labelEl.setAttribute('data-es','planes ilimitados'); labelEl.setAttribute('data-en','unlimited plans'); labelEl.textContent=lang==='es'?'planes ilimitados':'unlimited plans'; }
+    b.style.background='linear-gradient(135deg,var(--teal),var(--violet))';
+    b.style.color='#fff';
+    b.style.boxShadow='0 2px 8px rgba(123,47,190,.3)';
+    return;
+  }
+  if(isPaid){
+    // Acceso pagado, pero contado (créditos de evento) -- mostrar el
+    // número real en vez de fingir que es ilimitado.
+    const total=(access.diyEventCredits||0)+(access.plannerEventCredits||0);
+    numEl.textContent=String(total);
+    if(labelEl){
+      const textoEs=total===1?'evento disponible':'eventos disponibles';
+      const textoEn=total===1?'event available':'events available';
+      labelEl.setAttribute('data-es',textoEs);
+      labelEl.setAttribute('data-en',textoEn);
+      labelEl.textContent=lang==='es'?textoEs:textoEn;
+    }
     b.style.background='linear-gradient(135deg,var(--teal),var(--violet))';
     b.style.color='#fff';
     b.style.boxShadow='0 2px 8px rgba(123,47,190,.3)';
