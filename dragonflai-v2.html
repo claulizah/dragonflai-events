@@ -779,7 +779,22 @@ textarea.vcard-input{height:auto}
 .l-dragonfly{font-size:36px;margin-bottom:1rem;display:block;animation:float 2s ease-in-out infinite}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:100px;font-size:13px;font-weight:500;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:opacity .3s;white-space:nowrap;pointer-events:none;color:#fff;backdrop-filter:blur(10px)}
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  padding:10px 22px;border-radius:100px;font-size:13px;font-weight:500;
+  z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:opacity .3s;
+  pointer-events:none;color:#fff;backdrop-filter:blur(10px);
+  /* Antes: white-space:nowrap sin max-width -- funcionaba bien para los
+     mensajes cortos ("Plan guardado"), pero el aviso de "ya usaste tus
+     planes gratis..." es una frase larga que en móvil se salía del ancho
+     de la pantalla en vez de acomodarse. max-width lo limita al viewport
+     (con aire a los lados) y white-space:normal deja que envuelva a una
+     segunda línea solo cuando de verdad hace falta -- los mensajes cortos
+     siguen cabiendo en una sola línea, sin cambio visible para ellos. */
+  max-width:calc(100vw - 32px);
+  white-space:normal;
+  text-align:center;
+}
 
 /* ── FOOTER ── */
 footer{position:relative;z-index:1;text-align:center;padding:2rem;font-size:12px;color:var(--text-3);border-top:1px solid var(--border-gray);background:var(--white)}
