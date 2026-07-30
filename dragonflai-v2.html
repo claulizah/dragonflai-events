@@ -5820,25 +5820,15 @@ async function checkReturnFromPayment(){
   }
 
   if(hasAnyAccess){
-    // Promo de inauguración: "compra tu evento, te regalamos el segundo".
-    // Solo aplica a quien compró el evento individual (diyEventCredits>0) --
-    // quien compró el anual ya tiene acceso ilimitado, un evento de regalo
-    // no le suma nada. redeem_code() ya protege contra doble-canje por su
-    // cuenta (lo vimos con los testers), así que aunque este código se
-    // ejecute más de una vez por accidente, nunca se regala dos veces.
-    // Cuando el código venza (controlado 100% desde SQL, sin tocar esto),
-    // simplemente deja de otorgar nada y el mensaje normal de abajo se ve.
-    if(access.diyEventCredits>0 && sb){
-      sb.rpc('redeem_code',{p_code:'SEGUNDOGRATIS'}).then(({data})=>{
-        if(data?.success){
-          showToast(L?'🎉 ¡Pago confirmado! De regalo de inauguración, te dimos un segundo evento gratis.':"🎉 Payment confirmed! As a launch gift, we added a second event, on us.");
-        } else {
-          showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
-        }
-      });
-    } else {
-      showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
-    }
+    // Promo de inauguración: ya NO se entrega vía redeem_code (SEGUNDOGRATIS).
+    // Encontramos, con dinero real, que el crédito de una compra podía no
+    // aplicarse por una causa que no logramos aislar del todo -- añadir una
+    // llamada aparte y asíncrona encima de eso era una pieza más que podía
+    // fallar en silencio. Ahora el "regalo" vive directo en la metadata del
+    // producto de Stripe (credits:2 en vez de 1 durante el mes de promo) --
+    // llega en la MISMA escritura que ya hace el webhook por cada compra,
+    // sin ningún paso adicional del lado del cliente.
+    showToast(L?'✅ ¡Pago confirmado! Ya tienes acceso.':'✅ Payment confirmed! You now have access.');
   } else {
     showToast(L
       ?'🕐 Recibimos tu pago. Si fue con tarjeta, actualiza en unos segundos; si fue OXXO o transferencia, puede tardar unas horas en confirmarse.'
