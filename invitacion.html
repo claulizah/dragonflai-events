@@ -277,7 +277,38 @@ function getUploaderToken(){
   }
   return tok;
 }
-let lang='es';
+// ══════════════════════════════════════════════════════════════
+//  RESOLUCIÓN DE IDIOMA — misma lógica que la landing y la app.
+//  Prioridad: ?lang= en la URL → localStorage → navegador → es
+//  NOTA DE PRODUCTO: hoy el idioma de esta página lo decide el INVITADO
+//  (su navegador o su preferencia guardada), no el anfitrión. Para que la
+//  invitación herede el idioma de quien la creó haría falta guardar el
+//  idioma en la tabla `invitations` al publicar y leerlo aquí — pendiente,
+//  documentado aparte.
+// ══════════════════════════════════════════════════════════════
+const DFLAI_LANG_KEY='dflai_lang';
+let dflaiLangForcedByUrl=false;
+function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
+function dflaiResolveLang(){
+  let q='';
+  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
+  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
+  const cands=[navigator.language].concat(navigator.languages||[]);
+  for(const c of cands){
+    if(!c) continue;
+    const b=String(c).toLowerCase();
+    if(b.indexOf('es')===0) return 'es';
+    if(b.indexOf('en')===0) return 'en';
+  }
+  return 'es';
+}
+let lang=dflaiResolveLang();
+// Qué se está mostrando ahora mismo en #content. Antes setLang() solo sabía
+// repintar cuando había una invitación cargada, así que la pantalla de
+// "no encontrada" se quedaba en español para siempre aunque el diccionario
+// `en` sí tuviera las traducciones.
+let currentView='loading';
 
 const T={
   es:{
@@ -428,6 +459,7 @@ const T={
 
 function setLang(l){
   lang=l;
+  dflaiRememberLang(l);
   document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
   document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
   document.documentElement.lang=l;
@@ -439,8 +471,11 @@ function setLang(l){
   document.getElementById('bug-modal-text').textContent=lang==='es'?'Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos.':'Tell us what happened — the more detail, the easier it is for us to find it.';
   document.getElementById('bug-modal-send').textContent=lang==='es'?'Enviar reporte':'Send report';
   document.getElementById('bug-modal-cancel').textContent=lang==='es'?'Cancelar':'Cancel';
-  // Si ya hay una invitación cargada, volver a pintarla en el nuevo idioma
-  if(invitation) renderInvitation(invitation);
+  document.title=(l==='es'?'Invitación':'Invitation')+' — DragonflAI Events';
+  // Repintar lo que sea que esté en pantalla, no solo la invitación.
+  if(currentView==='notfound') renderNotFound();
+  else if(invitation) renderInvitation(invitation);
+  else if(currentView==='loading' && document.getElementById('loading-text')) document.getElementById('loading-text').textContent=T[lang].loading;
 }
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -599,6 +634,7 @@ function getSlug(){
 }
 
 function renderNotFound(){
+  currentView='notfound';
   document.getElementById('content').innerHTML=`
     <div class="state-msg">
       <h2>${T[lang].notFoundTitle}</h2>
@@ -702,6 +738,7 @@ function hexToRgba(hex,alpha){
 }
 
 function renderInvitation(inv){
+  currentView='invitation';
   const days=daysUntil(inv.event_date_raw);
   const t=T[lang];
   const restricted=!!inv.restrict_to_guest_list;
@@ -1455,6 +1492,10 @@ if('serviceWorker' in navigator){
   }).catch(()=>{});
 }
 
+// Aplicar el idioma resuelto antes de pedir la invitación, para que el
+// estado de carga y un posible "no encontrada" ya salgan en el idioma
+// correcto en el primer pintado.
+setLang(lang);
 init();
 </script>
 </body>

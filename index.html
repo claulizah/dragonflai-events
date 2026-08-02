@@ -802,10 +802,62 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 const gensUsed = parseInt(localStorage.getItem('dflai_gens') || '0');
 let currentUser = null;
 let isPaid = false;
-let lang = 'es';
+// ══════════════════════════════════════════════════════════════
+//  RESOLUCIÓN DE IDIOMA — compartida entre landing, app, invitación y legales
+//  Prioridad: ?lang= en la URL → localStorage → idioma del navegador → es
+//  La clave es GLOBAL a propósito (no va scoped por cuenta como plan_id):
+//  el idioma no es un dato de la cuenta ni revela nada de otro usuario, y
+//  necesita sobrevivir cuando todavía no hay sesión — que es justo el caso
+//  de alguien que llega desde un anuncio o desde la bio de TikTok.
+// ══════════════════════════════════════════════════════════════
+const DFLAI_LANG_KEY='dflai_lang';
+let dflaiLangForcedByUrl=false;
+function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
+function dflaiResolveLang(){
+  let q='';
+  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
+  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
+  const cands=[navigator.language].concat(navigator.languages||[]);
+  for(const c of cands){
+    if(!c) continue;
+    const b=String(c).toLowerCase();
+    if(b.indexOf('es')===0) return 'es';
+    if(b.indexOf('en')===0) return 'en';
+  }
+  return 'es';
+}
+// Título y descripción para la pestaña del navegador. Ojo: los robots de
+// vista previa (WhatsApp, TikTok, Facebook) NO ejecutan JavaScript, así que
+// esto NO arregla la tarjeta al compartir — eso se resuelve en el edge.
+const DFLAI_META={
+  es:{
+    title:'DragonflAI Events — Belu, tu asistente personal de eventos',
+    desc:'Genera en menos de 90 segundos un plan completo para tu boda, quinceañera o evento. Cronograma, presupuesto, checklist, proveedores, Save the Date — creado junto contigo, con acceso completo y descarga en Excel editable.'
+  },
+  en:{
+    title:'DragonflAI Events — Belu, your personal event assistant',
+    desc:'Generate a complete plan for your wedding, quinceañera or party in under 90 seconds. Timeline, budget, checklist, vendors and Save the Date — built together with you, with full access and an editable Excel download.'
+  }
+};
+function dflaiApplyMeta(l){
+  const m=DFLAI_META[l];
+  if(!m) return;
+  document.title=m.title;
+  const set=(sel,v)=>{ const el=document.querySelector(sel); if(el) el.setAttribute('content',v); };
+  set('meta[name="description"]',m.desc);
+  set('meta[property="og:title"]',m.title);
+  set('meta[property="og:description"]',m.desc);
+  set('meta[name="twitter:title"]',m.title);
+  set('meta[name="twitter:description"]',m.desc);
+}
+
+let lang = dflaiResolveLang();
 
 function setLang(l){
   lang = l;
+  dflaiRememberLang(l);
+  dflaiApplyMeta(l);
   document.getElementById('btn-es').className = 'lang-btn' + (l === 'es' ? ' active' : '');
   document.getElementById('btn-en').className = 'lang-btn' + (l === 'en' ? ' active' : '');
   document.documentElement.lang = l;
@@ -980,8 +1032,12 @@ function goToPay(productKey) {
   }
   // Mandamos el UUID real del usuario como client_reference_id — así el
   // Worker sabe a qué cuenta aplicarle los créditos cuando Stripe confirme el pago.
+  // locale= le dice a Stripe en qué idioma pintar el checkout. Sin esto,
+  // alguien que vio todo el sitio en inglés aterriza en "Pagar / Correo
+  // electrónico" justo en el paso donde menos conviene dudar.
   const sep = link.includes('?') ? '&' : '?';
-  window.location.href = link + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
+  const params = 'client_reference_id=' + encodeURIComponent(currentUser.id) + '&locale=' + (lang === 'en' ? 'en' : 'es');
+  window.location.href = link + sep + params;
 }
 
 // ══════════════════════════════
@@ -1058,6 +1114,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     location.replace('/app#link-expirado');
   }
 })();
+
+// ── Aplicar el idioma resuelto al cargar ──
+// Va al final a propósito: setLang() toca elementos y funciones que se
+// definen más arriba en este mismo script.
+setLang(lang);
 </script>
 </body>
 </html>

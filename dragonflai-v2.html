@@ -1970,7 +1970,41 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 // ══════════════════════════════
 //  STATE
 // ══════════════════════════════
-let lang='es', mode='diy', eventType='Boda/Wedding', guests=50, plan={};
+// ══════════════════════════════════════════════════════════════
+//  RESOLUCIÓN DE IDIOMA — misma lógica que la landing y la invitación.
+//  Prioridad: ?lang= en la URL → localStorage → navegador → es
+//  El perfil de Supabase (preferred_lang) se aplica encima cuando hay
+//  sesión, SALVO que la URL lo haya forzado explícitamente.
+//  Clave global a propósito: sin sesión todavía no hay cuenta a la cual
+//  amarrarla, y el idioma no revela nada de nadie.
+// ══════════════════════════════════════════════════════════════
+const DFLAI_LANG_KEY='dflai_lang';
+let dflaiLangForcedByUrl=false;
+function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
+function dflaiResolveLang(){
+  let q='';
+  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
+  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
+  const cands=[navigator.language].concat(navigator.languages||[]);
+  for(const c of cands){
+    if(!c) continue;
+    const b=String(c).toLowerCase();
+    if(b.indexOf('es')===0) return 'es';
+    if(b.indexOf('en')===0) return 'en';
+  }
+  return 'es';
+}
+const DFLAI_META={
+  es:{title:'DragonflAI Events — Planeemos tu evento juntos'},
+  en:{title:"DragonflAI Events — Let's plan your event together"}
+};
+function dflaiApplyMeta(l){
+  const m=DFLAI_META[l];
+  if(m) document.title=m.title;
+}
+
+let lang=dflaiResolveLang(), mode='diy', eventType='Boda/Wedding', guests=50, plan={};
 let lastGenId=null; // agrupa regeneraciones parciales con la generación original (no cobra doble)
 
 // ══════════════════════════════
@@ -2071,7 +2105,11 @@ async function refreshPaidStatusInner(){
   if(!prefsApplied){
     prefsApplied=true;
     suppressPrefSave=true;
-    if(userProfile.preferred_lang && userProfile.preferred_lang!==lang) setLang(userProfile.preferred_lang);
+    // Si la persona llegó con ?lang= explícito (por ejemplo desde un link
+    // en inglés en la bio de TikTok), esa elección gana sobre el perfil en
+    // ESTA carga. Sin esto, un usuario con perfil en español que abre un
+    // link en inglés ve la app rebotar a español a media carga.
+    if(userProfile.preferred_lang && !dflaiLangForcedByUrl && userProfile.preferred_lang!==lang) setLang(userProfile.preferred_lang);
     if(userProfile.preferred_mode && userProfile.preferred_mode!==mode) setMode(userProfile.preferred_mode);
     suppressPrefSave=false;
   }
@@ -5817,6 +5855,10 @@ function init(){
   document.getElementById('f-date').value=d.toISOString().split('T')[0];
   document.getElementById('f-date').min=new Date().toISOString().split('T')[0];
   ['f-name','f-name-1','f-name-2','f-location','f-notes'].forEach(id=>document.getElementById(id).addEventListener('input',updateProgress));
+  // Aplicar el idioma resuelto sobre el marcado estático (data-es/data-en).
+  // Va al final de init(): setLang() re-renderiza secciones que las líneas
+  // de arriba acaban de construir.
+  setLang(lang);
 }
 
 // Si el usuario acaba de volver de pagar en Stripe (Payment Link con
@@ -5872,6 +5914,8 @@ async function checkReturnFromPayment(){
 
 function setLang(l){
   lang=l;
+  dflaiRememberLang(l);
+  dflaiApplyMeta(l);
   const btnEs=document.getElementById('btn-es'), btnEn=document.getElementById('btn-en');
   if(btnEs) btnEs.className='lang-btn'+(l==='es'?' active':'');
   if(btnEn) btnEn.className='lang-btn'+(l==='en'?' active':'');
