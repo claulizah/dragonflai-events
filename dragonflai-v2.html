@@ -1986,12 +1986,21 @@ function dflaiResolveLang(){
   try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
   if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
   try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
-  const cands=[navigator.language].concat(navigator.languages||[]);
-  for(const c of cands){
-    if(!c) continue;
-    const b=String(c).toLowerCase();
-    if(b.indexOf('es')===0) return 'es';
-    if(b.indexOf('en')===0) return 'en';
+  // Detección por navegador: APAGADA a propósito.
+  // El público real es hispanohablante, pero muchos traen el teléfono
+  // configurado en inglés — y el embudo en inglés (plan generado y
+  // correos del worker) todavía no está validado. Mandarlos a inglés
+  // los deja a medio camino. Se reactiva poniendo esto en true, cuando
+  // la generación y los correos en inglés estén confirmados.
+  const DFLAI_AUTODETECT = false;
+  if(DFLAI_AUTODETECT){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      const b=String(c).toLowerCase();
+      if(b.indexOf('es')===0) return 'es';
+      if(b.indexOf('en')===0) return 'en';
+    }
   }
   return 'es';
 }

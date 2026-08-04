@@ -37,6 +37,9 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2EC4B6">
 <meta name="description" content="Genera en menos de 90 segundos un plan completo para tu boda, quinceañera o evento. Cronograma, presupuesto, checklist, proveedores, Save the Date — creado junto contigo, con acceso completo y descarga en Excel editable.">
+<!-- belu-optimista.png es el elemento LCP medido (3.5 s en P75). El preload
+     hace que el navegador lo pida de inmediato, sin esperar a parsear el body. -->
+<link rel="preload" as="image" href="/assets/belu/belu-optimista.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -296,7 +299,7 @@ footer a:hover{color:var(--teal-dark)}
 <!-- HERO -->
 <section class="hero">
   <span class="hero-tag" data-es="✦ Conoce a Belu — tu asistente personal de eventos" data-en="✦ Meet Belu — your personal event assistant">✦ Conoce a Belu — tu asistente personal de eventos</span>
-  <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><img src="/assets/belu/belu-optimista.png" alt="Belu" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></span>
+  <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><picture><source type="image/webp" srcset="/assets/belu/belu-optimista-1x.webp 1x, /assets/belu/belu-optimista.webp 2x, /assets/belu/belu-optimista-3x.webp 3x"><img src="/assets/belu/belu-optimista-2x.png" alt="Belu" width="182" height="140" fetchpriority="high" decoding="sync" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></picture></span>
   <h1 data-es="Tu evento <em>perfecto,</em><br>planeado en segundos" data-en="Your <em>perfect</em> event,<br>planned in seconds">Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
   <p class="hero-sub" data-es="Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable." data-en="Tell Belu the details of your wedding, quinceañera, or party and she generates your complete plan — timeline, budget, checklist, vendors, and Save the Date. With full access, download it as an editable Excel too.">Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable.</p>
   <div class="hero-cta">
@@ -818,12 +821,21 @@ function dflaiResolveLang(){
   try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
   if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
   try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
-  const cands=[navigator.language].concat(navigator.languages||[]);
-  for(const c of cands){
-    if(!c) continue;
-    const b=String(c).toLowerCase();
-    if(b.indexOf('es')===0) return 'es';
-    if(b.indexOf('en')===0) return 'en';
+  // Detección por navegador: APAGADA a propósito.
+  // El público real es hispanohablante, pero muchos traen el teléfono
+  // configurado en inglés — y el embudo en inglés (plan generado y
+  // correos del worker) todavía no está validado. Mandarlos a inglés
+  // los deja a medio camino. Se reactiva poniendo esto en true, cuando
+  // la generación y los correos en inglés estén confirmados.
+  const DFLAI_AUTODETECT = false;
+  if(DFLAI_AUTODETECT){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      const b=String(c).toLowerCase();
+      if(b.indexOf('es')===0) return 'es';
+      if(b.indexOf('en')===0) return 'en';
+    }
   }
   return 'es';
 }
