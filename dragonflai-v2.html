@@ -932,6 +932,24 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .profile-label{display:block;font-size:11px;font-weight:600;color:var(--text-3);margin:.6rem 0 .3rem}
 .profile-input{width:100%;padding:11px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:15px;box-sizing:border-box;margin-bottom:.4rem;background:var(--white)}
 .profile-section-divider{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-dark);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
+
+/* ── Secciones opcionales del editor de invitación, colapsables ──
+   Antes las 7 secciones "(opcional)" estaban abiertas todo el tiempo:
+   itinerario, hospedaje, mesa de regalos, historia, FAQ, galería y
+   contacto. Alguien que solo quería publicar rápido tenía que desplazarse
+   por 13 secciones para llegar al botón. Con <details> nativo, lo esencial
+   queda abierto y lo opcional se agrega solo si se necesita — sin tocar
+   ningún id ni handler: los campos siguen ahí, solo empiezan ocultos.
+   El texto del summary sigue el mismo patrón data-es/data-en que el
+   resto del archivo, así que setLang() lo traduce sin cambios aparte. */
+.opt-section{margin-top:1rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
+.opt-section summary{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--teal-dark);cursor:pointer;list-style:none;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;padding:2px 0}
+.opt-section summary::-webkit-details-marker{display:none}
+.opt-section summary::after{content:'+';font-size:16px;font-weight:400;color:var(--text-3);flex-shrink:0}
+.opt-section[open] summary::after{content:'–'}
+.opt-section .opt-body{padding-top:.5rem}
 .btn-excel-close:hover{color:var(--text);border-color:var(--teal)}
 </style>
 <!-- Cloudflare Web Analytics -->
@@ -1623,6 +1641,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   <div class="excel-modal" style="max-width:920px;text-align:left;max-height:88vh;overflow-y:auto">
     <h3 style="text-align:center" id="publish-modal-title" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
     <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" id="publish-modal-sub" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
+    <p style="font-size:11px;color:var(--text-3);text-align:center;margin:-.6rem 0 1rem" data-es="Lo esencial va abierto abajo. Lo demás (itinerario, hospedaje, FAQ, galería…) es opcional — ábrelo solo si lo necesitas, y puedes agregarlo después aunque ya hayas publicado." data-en="What's essential is open below. Everything else (schedule, lodging, FAQ, gallery…) is optional — open it only if you need it, and you can add it later even after publishing.">Lo esencial va abierto abajo. Lo demás (itinerario, hospedaje, FAQ, galería…) es opcional — ábrelo solo si lo necesitas, y puedes agregarlo después aunque ya hayas publicado.</p>
 
     <div class="publish-layout">
     <div id="publish-form" class="publish-form-col">
@@ -1674,12 +1693,16 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <label class="profile-label" data-es="Dress code (opcional)" data-en="Dress code (optional)">Dress code (opcional)</label>
       <input type="text" id="pub-dresscode" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Formal, casual elegante, blanco y negro...">
 
-      <div class="profile-section-divider" data-es="Contacto para dudas (opcional)" data-en="Contact for questions (optional)">Contacto para dudas (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Contacto para dudas (opcional)" data-en="Contact for questions (optional)">Contacto para dudas (opcional)</summary>
+      <div class="opt-body">
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem" data-es="Tus invitados verán un botón de WhatsApp para escribirte directo." data-en="Your guests will see a WhatsApp button to message you directly.">Tus invitados verán un botón de WhatsApp para escribirte directo.</p>
       <div style="display:flex;gap:10px">
         <input type="text" id="pub-organizer-name" class="profile-input" style="flex:1" placeholder="ej. Ana (organizadora)">
         <input type="text" id="pub-organizer-phone" class="profile-input" style="flex:1" placeholder="ej. 442 123 4567">
       </div>
+      </div>
+      </details>
 
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
@@ -1732,29 +1755,53 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span data-es="Solo las personas de esta lista pueden confirmar asistencia" data-en="Only people on this list can confirm attendance">Solo las personas de esta lista pueden confirmar asistencia</span>
       </label>
 
-      <div class="profile-section-divider" data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">Itinerario de eventos (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">Itinerario de eventos (opcional)</summary>
+      <div class="opt-body">
       <div id="pub-events-editor" class="line-editor"></div>
       <textarea id="pub-events" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia&#10;Ceremonia | Sábado 4:00 PM | Iglesia San Miguel&#10;Recepción | Sábado 6:00 PM | Salón Las Rosas"></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</summary>
+      <div class="opt-body">
       <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="mirrorToSTD('pub-lodging','std-lodging');debouncedLivePreview()" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
       <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" oninput="mirrorToSTD('pub-map-url','std-map-url');debouncedLivePreview()" placeholder="Link de Google Maps (opcional)">
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</summary>
+      <div class="opt-body">
       <div id="pub-registry-editor" class="line-editor"></div>
       <textarea id="pub-registry" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" id="pub-story-title" data-es="📝 Información (opcional)" data-en="📝 Information (optional)">📝 Información (opcional)</div>
+      <details class="opt-section">
+      <summary id="pub-story-title" data-es="📝 Información (opcional)" data-en="📝 Information (optional)">📝 Información (opcional)</summary>
+      <div class="opt-body">
       <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('pub-story','std-story');debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</summary>
+      <div class="opt-body">
       <div id="pub-faq-editor" class="line-editor"></div>
       <textarea id="pub-faq" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="¿Qué me pongo? | Formal, colores neutros&#10;¿Puedo llevar niños? | Sí, hay área de juegos"></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">Galería de fotos (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">Galería de fotos (opcional)</summary>
+      <div class="opt-body">
       <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-gallery-input').click()" data-es="📷 Agregar fotos" data-en="📷 Add photos">📷 Agregar fotos</button>
       <input type="file" id="pub-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
       <div id="pub-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
+      </div>
+      </details>
 
       <div style="display:flex;gap:10px;margin-top:1rem">
         <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:0;flex:2">Publicar →</button>
@@ -2463,6 +2510,10 @@ async function openPublishModal(){
   if(!plan.typeName){ showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true); return; }
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para publicar tu invitación':'Log in to publish your invitation',true); return; }
+  // El modal se reutiliza entre "crear" y "editar" — si una edición previa
+  // dejó abiertas secciones opcionales, un evento nuevo debe arrancar con
+  // todo cerrado otra vez.
+  document.querySelectorAll('#publish-form .opt-section').forEach(det=>det.open=false);
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
   await refreshPaidStatus(); // trae el saldo real de créditos, sin gastar nada todavía
   const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
@@ -2914,6 +2965,28 @@ async function continueDraftInvitation(invId){
   }catch(err){ console.error('No se pudo recuperar la lista del borrador:',err); }
 }
 
+// Abre solas las secciones opcionales del editor que ya tengan contenido
+// guardado — para que editar una invitación existente no dé la impresión
+// de que el itinerario, la FAQ o la mesa de regalos desaparecieron.
+function abrirSeccionesConContenido(){
+  const conValor=id=>{ const el=document.getElementById(id); return !!el && String(el.value||'').trim()!==''; };
+  // Un id representativo por sección — basta con que ESE campo (o su
+  // pareja, como lodging+map-url) tenga algo para abrir todo el bloque.
+  const disparador={
+    'pub-organizer-name': conValor('pub-organizer-name')||conValor('pub-organizer-phone'),
+    'pub-events':         conValor('pub-events'),
+    'pub-lodging':        conValor('pub-lodging')||conValor('pub-map-url'),
+    'pub-registry':       conValor('pub-registry'),
+    'pub-story':          conValor('pub-story'),
+    'pub-faq':            conValor('pub-faq'),
+    'pub-gallery-input':  (typeof pubGalleryUrls!=='undefined' && pubGalleryUrls.length>0)
+  };
+  document.querySelectorAll('#publish-form .opt-section').forEach(det=>{
+    const abre=Object.entries(disparador).some(([id,tiene])=>tiene && det.querySelector('#'+id));
+    if(abre) det.open=true;
+  });
+}
+
 async function openEditInvitationModal(invId){
   if(!sb||!currentUser) return;
   loadExtraFontsIfNeeded();
@@ -3009,6 +3082,11 @@ async function openEditInvitationModal(invId){
   updatePubThemeLabel();
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
+  // Las secciones opcionales empiezan cerradas para no abrumar — pero si
+  // ESTA invitación ya tiene algo guardado ahí (itinerario, hospedaje,
+  // FAQ...), se abren solas. Si no, alguien podría pensar que su
+  // itinerario se borró solo porque el acordeón nació cerrado.
+  abrirSeccionesConContenido();
 
   // La vista previa (showInvitationPreview) lee del objeto "plan" de la
   // sesión actual — si nunca generaste un plan en esta sesión (ej. entraste
@@ -4200,7 +4278,7 @@ function showUserDashboard(){
   loadDashboardPlans();
 }
 
-let dashboardActiveTab='checklist';
+let dashboardActiveTab='invitation';
 function dashboardShowFullPlan(){
   const L=lang==='es';
   // OJO: dashboardCurrentPlanData ES el plan_data completo -- {plan, tabsHtml,
@@ -5243,9 +5321,9 @@ async function dashboardSelectPlan(planId){
     </div>
 
     <div class="dash-tabs">
-      <button class="dash-tab active" data-tab="checklist" onclick="dashboardSwitchTab('checklist')">📋 ${L?'Checklist':'Checklist'}</button>
+      <button class="dash-tab active" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
+      <button class="dash-tab" data-tab="checklist" onclick="dashboardSwitchTab('checklist')">📋 ${L?'Checklist':'Checklist'}</button>
       <button class="dash-tab" data-tab="budget" onclick="dashboardSwitchTab('budget')">💰 ${L?'Presupuesto':'Budget'}</button>
-      <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
       <button class="dash-tab" data-tab="vendors" onclick="dashboardSwitchTab('vendors')">🤝 ${L?'Proveedores':'Vendors'}</button>
       <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
       <button class="dash-tab" data-tab="fullplan" onclick="dashboardSwitchTab('fullplan')">📄 ${L?'Tu plan completo':'Your full plan'}</button>
@@ -5258,9 +5336,9 @@ async function dashboardSelectPlan(planId){
       <button class="btn-account" onclick="dashboardExportExcel()" title="${L?'Descargar todo el evento en Excel':'Download the whole event as Excel'}">📊 ${L?'Descargar Excel':'Download Excel'}</button>
     </div>
 
-    <div class="dash-tab-panel dash-card" data-panel="checklist">${checklistTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="invitation">${invitationTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="checklist" style="display:none">${checklistTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="budget" style="display:none">${budgetTabHtml}</div>
-    <div class="dash-tab-panel dash-card" data-panel="invitation" style="display:none">${invitationTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="vendors" style="display:none">${vendorsTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="ideas" style="display:none">${ideasTabHtml}</div>
   `;
@@ -5281,7 +5359,7 @@ async function dashboardSelectPlan(planId){
   const savedIdeas=(dashboardCurrentPlanData.plan&&dashboardCurrentPlanData.plan.inspirationIdeas)||'';
   document.getElementById('dash-inspo-ideas').innerHTML=savedIdeas?formatIdeasText(savedIdeas):'';
 
-  if(switchedPlan) dashboardActiveTab='checklist'; // evento distinto: empezar limpio en Checklist
+  if(switchedPlan) dashboardActiveTab='invitation'; // evento distinto: empezar limpio en Invitación
   dashboardSwitchTab(dashboardActiveTab); // si solo se refrescó el mismo evento, se queda en la pestaña donde estabas
 
   detailEl.dataset.loadedOnce='true';

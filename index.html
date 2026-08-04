@@ -14,10 +14,10 @@
     document.documentElement.style.visibility = "hidden";
   }
 </script>
-<title>DragonflAI Events — La app que planea tu evento en 90 segundos</title>
+<title>DragonflAI Events — Invitaciones digitales con RSVP</title>
 <!-- Vista previa al compartir la landing (WhatsApp, redes) -->
-<meta property="og:title" content="DragonflAI Events — La app que planea tu evento en 90 segundos">
-<meta property="og:description" content="Cuéntale a Belu tu evento y ella genera el plan completo: cronograma, presupuesto, checklist, proveedores e invitación con RSVP.">
+<meta property="og:title" content="DragonflAI Events — Invitaciones digitales con RSVP">
+<meta property="og:description" content="Crea tu invitación digital con RSVP que se confirma solo — y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento.">
 <meta property="og:image" content="https://dragonflaievents.com/assets/belu/og-image.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dragonflaievents.com/">
@@ -36,7 +36,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2EC4B6">
-<meta name="description" content="App de planeación de eventos: le das 4 datos y en 90 segundos tienes cronograma, presupuesto, checklist e invitación con RSVP. Para bodas, XV años, cumpleaños y eventos de empresa. Pruébala gratis.">
+<meta name="description" content="Crea tu invitación digital con foto, colores y QR — tus invitados confirman solos. Y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento. Pruébalo gratis.">
 <!-- belu-optimista.png es el elemento LCP medido (3.5 s en P75). El preload
      hace que el navegador lo pida de inmediato, sin esperar a parsear el body. -->
 <link rel="preload" as="image" href="/assets/belu/belu-optimista.webp" type="image/webp" fetchpriority="high">
@@ -298,10 +298,10 @@ footer a:hover{color:var(--teal-dark)}
 
 <!-- HERO -->
 <section class="hero">
-  <span class="hero-tag" data-es="🪰 Belu te ayuda a planearlo tú misma" data-en="🪰 Belu helps you plan it yourself">🪰 Belu te ayuda a planearlo tú misma</span>
+  <span class="hero-tag" data-es="🪰 Invitaciones con RSVP · Belu planea el resto" data-en="🪰 RSVP invitations · Belu plans the rest">🪰 Invitaciones con RSVP · Belu planea el resto</span>
   <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><picture><source type="image/webp" srcset="/assets/belu/belu-optimista-1x.webp 1x, /assets/belu/belu-optimista.webp 2x, /assets/belu/belu-optimista-3x.webp 3x"><img src="/assets/belu/belu-optimista-2x.png" alt="Belu" width="182" height="140" fetchpriority="high" decoding="sync" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></picture></span>
-  <h1 data-es="Tu evento <em>perfecto,</em><br>planeado en 90 segundos" data-en="Your <em>perfect</em> event,<br>planned in 90 seconds">Tu evento <em>perfecto,</em><br>planeado en 90 segundos</h1>
-  <p class="hero-sub" data-es="Cuéntale a Belu los datos de tu boda, quinceañera o fiesta, y en 90 segundos tienes el cronograma, el presupuesto, el checklist y la invitación con RSVP — listos para que tú los ejecutes." data-en="Tell Belu about your wedding, quinceañera or party, and in 90 seconds you get the timeline, budget, checklist and RSVP invitation — ready for you to run with.">Cuéntale a Belu los datos de tu boda, quinceañera o fiesta, y en 90 segundos tienes el cronograma, el presupuesto, el checklist y la invitación con RSVP — listos para que tú los ejecutes.</p>
+  <h1 data-es="Tu invitación digital,<br><em>con RSVP que se confirma solo</em>" data-en="Your digital invitation,<br><em>with RSVP that confirms itself</em>">Tu invitación digital,<br><em>con RSVP que se confirma solo</em></h1>
+  <p class="hero-sub" data-es="Créala en minutos con tu foto y tus colores, y mándala con un link o un QR. Y ya que estás, Belu te arma también el cronograma, el presupuesto y el checklist del resto del evento." data-en="Build it in minutes with your photo and colors, then share it by link or QR. And since you're at it, Belu also builds the timeline, budget and checklist for the rest of your event.">Créala en minutos con tu foto y tus colores, y mándala con un link o un QR. Y ya que estás, Belu te arma también el cronograma, el presupuesto y el checklist del resto del evento.</p>
   <div class="hero-cta">
     <a href="/app" class="btn-primary">
       <span>✦</span> <span data-es="Generar mi plan gratis" data-en="Generate my free plan">Generar mi plan gratis</span>
@@ -313,7 +313,7 @@ footer a:hover{color:var(--teal-dark)}
     <span class="proof-dot"></span>
     <span class="proof-item" data-es="✓ Sin tarjeta" data-en="✓ No card needed">✓ Sin tarjeta</span>
     <span class="proof-dot"></span>
-    <span class="proof-item" data-es="✓ Belu te acompaña, tú decides" data-en="✓ Belu guides you, you decide">✓ Belu te acompaña, tú decides</span>
+    <span class="proof-item" data-es="✓ Confirman solos, sin perseguir a nadie" data-en="✓ They RSVP themselves — no chasing anyone">✓ Confirman solos, sin perseguir a nadie</span>
   </div>
 </section>
 
@@ -842,12 +842,12 @@ function dflaiResolveLang(){
 // esto NO arregla la tarjeta al compartir — eso se resuelve en el edge.
 const DFLAI_META={
   es:{
-    title:'DragonflAI Events — La app que planea tu evento en 90 segundos',
-    desc:'App de planeación de eventos: le das 4 datos y en 90 segundos tienes cronograma, presupuesto, checklist e invitación con RSVP. Para bodas, XV años, cumpleaños y eventos de empresa. Pruébala gratis.'
+    title:'DragonflAI Events — Invitaciones digitales con RSVP',
+    desc:'Crea tu invitación digital con foto, colores y QR — tus invitados confirman solos. Y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento. Para bodas, XV años, cumpleaños y eventos de empresa. Pruébalo gratis.'
   },
   en:{
-    title:'DragonflAI Events — The app that plans your event in 90 seconds',
-    desc:'Event planning app: give it 4 details and in 90 seconds you get a timeline, budget, checklist and RSVP invitation. For weddings, quinceañeras, birthdays and company events. Free to try.'
+    title:'DragonflAI Events — Digital invitations with RSVP',
+    desc:'Create your digital invitation with photo, colors and QR — guests RSVP themselves. Belu also builds the timeline, budget and checklist for the rest of your event. For weddings, quinceañeras, birthdays and company events. Free to try.'
   }
 };
 function dflaiApplyMeta(l){
