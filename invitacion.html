@@ -445,6 +445,8 @@ const T={
     rsvpTitle:'Confirma tu asistencia',
     addToCalendar:'Agregar a mi calendario',
     calendarIcsOption:'Apple / Outlook (.ics)',
+    shareBtn:'Compartir invitación',
+    shareLinkCopied:'Link copiado — ya lo puedes pegar donde quieras',
     organizerContactBtn:'¿Dudas? Escríbele',
     yourName:'Tu nombre',
     yourEmail:'Tu correo (opcional, para recordatorios)',
@@ -517,6 +519,8 @@ const T={
     rsvpTitle:'Confirm your attendance',
     addToCalendar:'Add to my calendar',
     calendarIcsOption:'Apple / Outlook (.ics)',
+    shareBtn:'Share invitation',
+    shareLinkCopied:'Link copied — paste it anywhere you like',
     organizerContactBtn:'Questions? Message',
     yourName:'Your name',
     yourEmail:'Your email (optional, for reminders)',
@@ -714,6 +718,46 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── Compartir ──
+// navigator.share() abre el share sheet nativo del sistema — en iOS y
+// Android eso trae WhatsApp, Mensajes, Correo, etc. ya instalados, sin
+// que el invitado tenga que copiar y pegar nada. Es soportado en Safari
+// iOS y Chrome Android desde hace años, pero NO en desktop Chrome/Firefox
+// — de ahí el respaldo a portapapeles, que sí funciona en todos lados.
+async function compartirInvitacion(){
+  const tt=T[lang];
+  const url=location.href;
+  const titulo=(invitation && toTitleCase(invitation.host_names))
+    ? `${toTitleCase(invitation.host_names)} — ${tt.invitedFallback}`
+    : document.title;
+
+  if(navigator.share){
+    try{
+      await navigator.share({title:titulo, text:tt.invitedFallback, url});
+      return;   // el share sheet ya hizo su trabajo; nada más que avisar
+    }catch(e){
+      // AbortError = el invitado cerró el share sheet sin elegir nada.
+      // No es un error real, así que no se le muestra nada.
+      if(e && e.name==='AbortError') return;
+      // Cualquier otro fallo cae al respaldo de copiar.
+    }
+  }
+
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast(tt.shareLinkCopied);
+  }catch(e){
+    // Último recorrido: seleccionar el texto manualmente. Pasa sobre todo
+    // en navegadores viejos o páginas sin HTTPS, donde el portapapeles
+    // moderno está bloqueado.
+    const ta=document.createElement('textarea');
+    ta.value=url; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); showToast(tt.shareLinkCopied); }catch(e2){}
+    ta.remove();
+  }
 }
 
 function openBugReportModal(){
@@ -916,15 +960,33 @@ function montarSobre(inv){
   const t=T[lang];
   const ini=iniciales(inv.host_names)||'✦';
   const color=inv.text_color||'#0D6E65';
-  // El papel del sobre cambia según el tipo de evento: crema cálido para
-  // boda, rosado empolvado para XV, claro y vivo para infantil, gris
-  // perla para corporativo.
+  // El sobre es lo único que TODOS ven antes de entrar — por eso lleva el
+  // color fuerte. La tarjeta de adentro puede quedarse neutra; el sobre
+  // es la portada, y una portada tímida no invita a tocarla.
   const fam=familiaEvento(inv.event_type);
   const PAPEL={
-    boda:    {a:'#FFFDF8', b:'#F2EADB', fondo:'linear-gradient(150deg,#FBF8F2 0%,#EFF7F4 48%,#F3EAF6 100%)'},
-    xv:      {a:'#FFFAFB', b:'#F5E2E8', fondo:'linear-gradient(150deg,#FDF6F8 0%,#F6E9F2 50%,#EDE6F7 100%)'},
-    infantil:{a:'#FFFEFA', b:'#E9F3EA', fondo:'linear-gradient(150deg,#FDFBF2 0%,#E8F7F0 50%,#F0EDFA 100%)'},
-    formal:  {a:'#FFFFFF', b:'#E8EBEF', fondo:'linear-gradient(150deg,#FAFBFC 0%,#EDF4F5 50%,#EEEDF5 100%)'}
+    boda:    {cA:'#2EC4B6', cB:'#0D6E65', flapA:'#5AD8CB', flapB:'#1FA79B',
+              sealA:'#F2B544', sealB:'#D4972A', decor:'#FFFFFF',
+              fondo:'radial-gradient(120% 90% at 50% 0%, rgba(46,196,182,.5) 0%, rgba(46,196,182,0) 60%), linear-gradient(150deg,#0D6E65 0%,#1FA79B 55%,#2EC4B6 100%)'},
+    xv:      {cA:'#E85D9E', cB:'#8A3B8F', flapA:'#F08BC0', flapB:'#B0559E',
+              sealA:'#F2B544', sealB:'#E8825F', decor:'#FFFFFF',
+              fondo:'radial-gradient(120% 90% at 50% 0%, rgba(232,93,158,.5) 0%, rgba(232,93,158,0) 60%), linear-gradient(150deg,#7B2FBE 0%,#B0559E 55%,#E85D9E 100%)'},
+    infantil:{cA:'#F2B544', cB:'#E8825F', flapA:'#FFD27A', flapB:'#F2A15E',
+              sealA:'#2EC4B6', sealB:'#7B2FBE', decor:'#FFFFFF',
+              fondo:'radial-gradient(120% 90% at 50% 0%, rgba(242,181,68,.55) 0%, rgba(242,181,68,0) 60%), linear-gradient(150deg,#2EC4B6 0%,#F2B544 55%,#E8825F 100%)'},
+    formal:  {cA:'#4A5FAE', cB:'#232B4D', flapA:'#6E7FC4', flapB:'#3A4790',
+              sealA:'#F2B544', sealB:'#C9922E', decor:'#FFFFFF',
+              fondo:'radial-gradient(120% 90% at 50% 0%, rgba(74,95,174,.5) 0%, rgba(74,95,174,0) 60%), linear-gradient(150deg,#232B4D 0%,#3A4790 55%,#4A5FAE 100%)'}
+  }[fam];
+  // Confeti/ribete propios del sobre: distinto según la familia, para que
+  // no se sienta genérico entre una boda y un cumpleaños.
+  const DECOR={
+    boda:`<circle cx="30" cy="70" r="3.4" fill="#fff" opacity=".55"/><circle cx="308" cy="66" r="2.6" fill="#fff" opacity=".45"/>`,
+    xv:`<circle cx="28" cy="66" r="2.8" fill="#fff" opacity=".55"/><circle cx="312" cy="72" r="3.6" fill="#fff" opacity=".4"/>
+        <circle cx="60" cy="200" r="2.2" fill="#fff" opacity=".4"/>`,
+    infantil:`<circle cx="26" cy="64" r="3.2" fill="#fff" opacity=".65"/><rect x="298" y="60" width="7" height="7" rx="1.8" fill="#fff" opacity=".55" transform="rotate(18 301 63)"/>
+        <circle cx="300" cy="196" r="2.6" fill="#fff" opacity=".5"/><rect x="24" y="196" width="6" height="6" rx="1.6" fill="#fff" opacity=".5" transform="rotate(-14 27 199)"/>`,
+    formal:`<circle cx="30" cy="66" r="2" fill="#fff" opacity=".4"/><circle cx="310" cy="66" r="2" fill="#fff" opacity=".4"/>`
   }[fam];
 
   const el=document.createElement('div');
@@ -939,22 +1001,23 @@ function montarSobre(inv){
       <svg class="sobre-svg" viewBox="0 0 340 232" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="sbCuerpo" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="${PAPEL.a}"/><stop offset="1" stop-color="${PAPEL.b}"/></linearGradient>
+            <stop offset="0" stop-color="${PAPEL.cA}"/><stop offset="1" stop-color="${PAPEL.cB}"/></linearGradient>
           <linearGradient id="sbSolapa" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="${PAPEL.a}"/><stop offset="1" stop-color="${PAPEL.b}"/></linearGradient>
+            <stop offset="0" stop-color="${PAPEL.flapA}"/><stop offset="1" stop-color="${PAPEL.flapB}"/></linearGradient>
           <linearGradient id="sbSello" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#2EC4B6"/><stop offset="1" stop-color="#7B2FBE"/></linearGradient>
+            <stop offset="0" stop-color="${PAPEL.sealA}"/><stop offset="1" stop-color="${PAPEL.sealB}"/></linearGradient>
         </defs>
-        <rect x="4" y="30" width="332" height="198" rx="14" fill="url(#sbCuerpo)" stroke="#E1DCD2" stroke-width="1.5"/>
-        <path d="M4 226 L170 122 L336 226 Z" fill="#F7F4EE" stroke="#E1DCD2" stroke-width="1.2"/>
-        <path d="M4 44 L170 150 L336 44" fill="none" stroke="#E1DCD2" stroke-width="1.2" opacity=".7"/>
+        <rect x="4" y="30" width="332" height="198" rx="14" fill="url(#sbCuerpo)"/>
+        <path d="M4 226 L170 122 L336 226 Z" fill="${PAPEL.cB}" opacity=".9"/>
+        <path d="M4 44 L170 150 L336 44" fill="none" stroke="#fff" stroke-width="1.4" opacity=".35"/>
+        ${DECOR}
         <g class="solapa">
           <path d="M4 44 C4 34 12 30 22 30 L318 30 C328 30 336 34 336 44 L170 152 Z"
-                fill="url(#sbSolapa)" stroke="#E1DCD2" stroke-width="1.5"/>
+                fill="url(#sbSolapa)"/>
         </g>
         <g class="sello">
           <circle cx="170" cy="150" r="30" fill="url(#sbSello)"/>
-          <circle cx="170" cy="150" r="24" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.4"/>
+          <circle cx="170" cy="150" r="24" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.4"/>
           <text x="170" y="150" text-anchor="middle" dominant-baseline="central"
                 font-family="Cormorant Garamond, serif" font-size="21" font-weight="600"
                 fill="#fff" letter-spacing="1">${esc(ini)}</text>
@@ -971,7 +1034,9 @@ function montarSobre(inv){
     'font-caveat':"'Caveat',cursive",'font-round':"'Poppins',sans-serif",
     'font-comic':"'Comic Neue',cursive",'font-playful':"'Chewy',cursive"};
   if(FF[inv.title_font_family]) el.style.setProperty('--title-font', FF[inv.title_font_family]);
-  if(inv.text_color) el.querySelector('.sobre-nombres').style.color=inv.text_color;
+  // Sobre fondo de color fuerte, el nombre siempre en blanco — nunca en el
+  // color propio de la anfitriona, que podía perderse contra el degradado.
+  el.querySelector('.sobre-nombres').style.color='#fff';
   document.body.appendChild(el);
   document.body.style.overflow='hidden';
 
@@ -1287,7 +1352,6 @@ function renderInvitation(inv){
     <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
       ${renderMarco(inv)}
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
-      ${renderMonograma(inv)}
       <div class="names">${esc(toTitleCase(inv.host_names))}</div>
       <div class="divider"></div>
       <div class="details">
@@ -1313,6 +1377,11 @@ function renderInvitation(inv){
         <a href="#" onclick="downloadIcsFile();return false" style="display:block;padding:12px 16px;font-size:13.5px;color:var(--text);text-decoration:none">${t.calendarIcsOption}</a>
       </div>
     </div>
+
+    <!-- Compartir: usa el share sheet nativo del teléfono cuando existe
+         (WhatsApp, Mensajes, etc. aparecen solos, sin que el invitado
+         copie y pegue nada). Sin eso, cae a copiar el link al portapapeles. -->
+    <button type="button" id="share-btn" onclick="compartirInvitacion()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:-.75rem 0 1.5rem;background:var(--cream-2);color:var(--text-2);border:1.5px solid var(--border-gray);border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer">📤 ${t.shareBtn}</button>
 
     ${inv.organizer_phone?`<a href="${buildOrganizerWhatsAppLink(inv,t)}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;border:none;border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;margin:-.75rem 0 1.5rem;box-sizing:border-box">💬 ${t.organizerContactBtn}${inv.organizer_name?': '+esc(inv.organizer_name):''}</a>`:''}
 
