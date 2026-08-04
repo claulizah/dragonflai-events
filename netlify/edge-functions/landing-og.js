@@ -24,9 +24,9 @@
 const BOT_PATTERN = /facebookexternalhit|WhatsApp|Twitterbot|Slackbot|LinkedInBot|TelegramBot|Discordbot|Pinterest|SkypeUriPreview|W3C_Validator|redditbot|Googlebot|bingbot|TikTok|Bytespider|Instagram/i;
 
 const EN = {
-  title: 'DragonflAI Events — Belu, your personal event assistant',
+  title: 'DragonflAI Events — Digital invitations with RSVP',
   description:
-    'Tell Belu about your event and she generates the complete plan: timeline, budget, checklist, vendors, and an invitation with RSVP. Ready in under 90 seconds.',
+    'Create your digital invitation with photo, colors and QR — guests RSVP themselves. Belu also builds the timeline, budget and checklist for the rest of your event.',
   image: 'https://dragonflaievents.com/assets/belu/og-image.png'
 };
 
