@@ -1707,6 +1707,19 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
       <div id="pub-combo-picker" style="margin-bottom:1rem"></div>
+
+      <p style="font-size:12px;font-weight:600;color:var(--text-2);margin:0 0 .5rem" data-es="Estilo de sobre" data-en="Envelope style">Estilo de sobre</p>
+      <div style="display:flex;gap:10px;margin-bottom:1rem">
+        <button type="button" id="env-style-clasico" class="envelope-style-btn active" onclick="setEnvelopeStyle('clasico')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:12px;border:2px solid var(--teal);background:var(--teal-light);cursor:pointer">
+          <svg width="40" height="28" viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" rx="3" fill="#FCFAF5" stroke="#B8862F" stroke-width="1"/><circle cx="20" cy="16" r="6" fill="#E8C77E"/></svg>
+          <span style="font-size:11.5px;font-weight:600;color:var(--text)" data-es="Clásico — sello de cera" data-en="Classic — wax seal">Clásico — sello de cera</span>
+        </button>
+        <button type="button" id="env-style-moderno" class="envelope-style-btn" onclick="setEnvelopeStyle('moderno')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:12px;border:2px solid var(--border-gray);background:var(--cream-2);cursor:pointer">
+          <svg width="40" height="28" viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" rx="3" fill="#FCFAF5" stroke="#7C8A6B" stroke-width="1"/><rect x="16" y="10" width="8" height="8" rx="1.5" fill="none" stroke="#7C8A6B" stroke-width="1.3" transform="rotate(45 20 14)"/></svg>
+          <span style="font-size:11.5px;font-weight:600;color:var(--text)" data-es="Moderno — trazo lineal" data-en="Modern — line art">Moderno — trazo lineal</span>
+        </button>
+      </div>
+
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
         <input type="file" id="pub-bg-photo-input" accept="image/*" style="display:none" onchange="uploadPublishBackground(event)">
@@ -2557,6 +2570,7 @@ async function openPublishModal(){
   pubBgColor='#FAF9F7';
   pubFontClass='';
   pubTitleFontClass='';
+  setEnvelopeStyle('clasico');
   pubTextColor=null;
   const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
@@ -2582,6 +2596,19 @@ let pubBackgroundImageUrl=null;
 let pubGuestEmails={};
 let pubFontClass='';
 let pubTitleFontClass='';
+// 'clasico' (sello de cera) o 'moderno' (trazo lineal) -- se resetea a
+// 'clasico' en cada evento nuevo, igual que el resto de estos campos.
+let pubEnvelopeStyle='clasico';
+function setEnvelopeStyle(v){
+  pubEnvelopeStyle=v;
+  document.getElementById('env-style-clasico').classList.toggle('active', v==='clasico');
+  document.getElementById('env-style-moderno').classList.toggle('active', v==='moderno');
+  document.getElementById('env-style-clasico').style.borderColor = v==='clasico' ? 'var(--teal)' : 'var(--border-gray)';
+  document.getElementById('env-style-clasico').style.background = v==='clasico' ? 'var(--teal-light)' : 'var(--cream-2)';
+  document.getElementById('env-style-moderno').style.borderColor = v==='moderno' ? 'var(--teal)' : 'var(--border-gray)';
+  document.getElementById('env-style-moderno').style.background = v==='moderno' ? 'var(--teal-light)' : 'var(--cream-2)';
+  debouncedLivePreview();
+}
 let pubTextColor=null;
 
 // Convierte "rgb(250, 249, 247)" (lo que el navegador reporta) de vuelta
@@ -3076,6 +3103,7 @@ async function openEditInvitationModal(invId){
   renderGalleryPreview();
   pubFontClass=inv.font_family||'';
   pubTitleFontClass=inv.title_font_family||'';
+  setEnvelopeStyle(inv.envelope_style==='moderno' ? 'moderno' : 'clasico');
   pubTextColor=inv.text_color||null;
   pubBackgroundImageUrl=inv.background_image_url||null;
   renderPublishPickers();
@@ -3403,6 +3431,7 @@ async function publishInvitation(){
       custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
       font_family: pubFontClass||null,
       title_font_family: pubTitleFontClass||null,
+      envelope_style: pubEnvelopeStyle||'clasico',
       text_color: pubTextColor
     };
 
@@ -3528,6 +3557,7 @@ async function publishInvitation(){
       custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
       font_family: pubFontClass||null,
       title_font_family: pubTitleFontClass||null,
+      envelope_style: pubEnvelopeStyle||'clasico',
       text_color: pubTextColor
     };
   }
@@ -6389,6 +6419,7 @@ async function generate(){
   pubGalleryUrls=[];
   pubFontClass='';
   pubTitleFontClass='';
+  setEnvelopeStyle('clasico');
   pubTextColor=null;
   pubBackgroundImageUrl=null;
   pubBgColor='#FAF9F7';
