@@ -704,6 +704,35 @@ function setLang(l){
 }
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── Utilidades de color: para que el sobre pueda derivar sus tonos del
+//    color que la anfitriona ya eligió para su tarjeta, en vez de una
+//    paleta fija por tipo de evento. ──
+function hexAcolor(hex){
+  const h=String(hex||'').replace('#','');
+  const full=h.length===3 ? h.split('').map(c=>c+c).join('') : h;
+  const n=parseInt(full,16);
+  if(isNaN(n) || full.length!==6) return [46,196,182]; // teal de respaldo si el hex viene mal formado
+  return [(n>>16)&255,(n>>8)&255,n&255];
+}
+function colorAhex([r,g,b]){
+  const h=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+  return '#'+h(r)+h(g)+h(b);
+}
+// Mezcla hacia blanco (para tonos de papel) o hacia negro (para sombras) --
+// ratio 0 = color original, 1 = destino puro.
+function hexMezclar(hex, destino, ratio){
+  const [r,g,b]=hexAcolor(hex);
+  return colorAhex([r+(destino[0]-r)*ratio, g+(destino[1]-g)*ratio, b+(destino[2]-b)*ratio]);
+}
+function hexAclarar(hex, ratio){ return hexMezclar(hex, [255,255,255], ratio); }
+function hexOscurecer(hex, ratio){ return hexMezclar(hex, [0,0,0], ratio); }
+// ¿Este color es tan claro que el texto oscuro por defecto se perdería
+// encima? Luminancia percibida simple, umbral generoso.
+function hexEsClaro(hex){
+  const [r,g,b]=hexAcolor(hex);
+  return (0.299*r+0.587*g+0.114*b) > 200;
+}
 function toTitleCase(s){
   const t=String(s??'');
   // Si ya viene capitalizado a propósito lo dejamos en paz: normalizar a
@@ -1072,7 +1101,7 @@ function sobreActivo(inv){
 //    'clasico': solapa sólida + sello de cera circular (el de antes)
 //    'moderno': trazo lineal + marca geométrica con las iniciales
 // ══════════════════════════════════════════════════════════════
-function sobreSvgClasico(PAPEL, DECOR, ini){
+function sobreSvgClasico(PAPEL, ini){
   return `
     <defs>
       <linearGradient id="sbCuerpo" x1="0" y1="0" x2="1" y2="1">
@@ -1082,13 +1111,12 @@ function sobreSvgClasico(PAPEL, DECOR, ini){
       <linearGradient id="sbSello" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="${PAPEL.sealA}"/><stop offset="1" stop-color="${PAPEL.sealB}"/></linearGradient>
     </defs>
-    <!-- Sobre papel claro necesita borde propio para definirse -- antes
-         el color saturado del cuerpo hacía de borde solo. -->
+    <!-- Sobre papel claro necesita borde propio para definirse -- el color
+         del cuerpo ya no es saturado, así que no hace de borde solo. -->
     <rect x="4" y="30" width="332" height="198" rx="14" fill="url(#sbCuerpo)"
           stroke="${PAPEL.acento}" stroke-opacity=".22" stroke-width="1.2"/>
     <path d="M4 226 L170 122 L336 226 Z" fill="${PAPEL.cB}" opacity=".55"/>
     <path d="M4 44 L170 150 L336 44" fill="none" stroke="${PAPEL.acento}" stroke-width="1" opacity=".22"/>
-    ${DECOR}
     <g class="solapa">
       <path d="M4 44 C4 34 12 30 22 30 L318 30 C328 30 336 34 336 44 L170 152 Z"
             fill="url(#sbSolapa)" stroke="${PAPEL.acento}" stroke-opacity=".2" stroke-width="1"/>
@@ -1103,26 +1131,22 @@ function sobreSvgClasico(PAPEL, DECOR, ini){
 }
 
 function sobreSvgModerno(PAPEL, ini){
-  // Sin solapa sólida ni sello relleno: todo en línea fina, y la marca
-  // con las iniciales es un rombo hueco, no un círculo de color. Mismo
-  // papel y mismo acento que la versión clásica -- cambia el trazo, no
-  // la paleta.
+  // Trazo lineal en vez de solapa sólida -- pero AMBOS estilos llevan un
+  // sello real (círculo con iniciales). Aquí el sello es de contorno, no
+  // relleno, para que se note la diferencia con el clásico sin dejar de
+  // ser, de verdad, un sello.
   return `
-    <rect x="4" y="16" width="332" height="200" rx="10" fill="${PAPEL.cA}"
-          stroke="${PAPEL.acento}" stroke-opacity=".38" stroke-width="1.3"/>
-    <path d="M4 26 L170 118 L336 26" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".38" stroke-width="1.1"/>
-    <path d="M4 26 L170 118" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".22" stroke-width="1" stroke-dasharray="1 5"/>
-    <path d="M336 26 L170 118" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".22" stroke-width="1" stroke-dasharray="1 5"/>
-    <line x1="28" y1="196" x2="28" y2="206" stroke="${PAPEL.acento}" stroke-opacity=".3" stroke-width="1"/>
-    <line x1="312" y1="196" x2="312" y2="206" stroke="${PAPEL.acento}" stroke-opacity=".3" stroke-width="1"/>
-    <g class="sello" transform="translate(170,158) rotate(45)">
-      <rect x="-27" y="-27" width="54" height="54" rx="8" fill="${PAPEL.cA}"
-            stroke="${PAPEL.acento}" stroke-width="1.6"/>
-      <rect x="-19" y="-19" width="38" height="38" rx="5" fill="none"
-            stroke="${PAPEL.acento}" stroke-opacity=".4" stroke-width="1"/>
-      <text x="0" y="1" text-anchor="middle" dominant-baseline="central"
-            font-family="Cormorant Garamond, serif" font-size="17" font-weight="600"
-            fill="${PAPEL.ink}" letter-spacing="1" transform="rotate(-45)">${esc(ini)}</text>
+    <rect x="4" y="18" width="332" height="196" rx="12" fill="${PAPEL.cA}"
+          stroke="${PAPEL.acento}" stroke-opacity=".35" stroke-width="1.3"/>
+    <path d="M14 28 L170 114 L326 28" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".35" stroke-width="1.1"/>
+    <line x1="30" y1="196" x2="30" y2="204" stroke="${PAPEL.acento}" stroke-opacity=".28" stroke-width="1"/>
+    <line x1="310" y1="196" x2="310" y2="204" stroke="${PAPEL.acento}" stroke-opacity=".28" stroke-width="1"/>
+    <g class="sello">
+      <circle cx="170" cy="150" r="27" fill="${PAPEL.cA}" stroke="${PAPEL.acento}" stroke-width="1.6"/>
+      <circle cx="170" cy="150" r="20" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".4" stroke-width="1"/>
+      <text x="170" y="150" text-anchor="middle" dominant-baseline="central"
+            font-family="Cormorant Garamond, serif" font-size="18" font-weight="600"
+            fill="${PAPEL.ink}" letter-spacing="1">${esc(ini)}</text>
     </g>`;
 }
 
@@ -1131,69 +1155,26 @@ function montarSobre(inv){
   const t=T[lang];
   const ini=iniciales(inv.host_names)||'✦';
   const color=inv.text_color||'#0D6E65';
-  // El sobre es lo único que TODOS ven antes de entrar. Antes era un
-  // degradado saturado de marca — llamativo, pero se leía más a "app"
-  // que a papelería fina. Ahora es papel: tonos crema/blanco roto con un
-  // acento de color sutil y el sello de cera como único punto de color
-  // fuerte — el mismo lenguaje que una invitación impresa de verdad.
+  // El sobre es papel: base clara y tono a tono, con el color que la
+  // anfitriona YA eligió para su tarjeta (custom_color_hex) como acento y
+  // como color del sello -- no una paleta fija por tipo de evento. Así el
+  // sobre combina con lo que sea que haya elegido, sin excepciones.
+  const elegido = inv.custom_color_hex || inv.text_color || '#7C8A6B';
   const fam=familiaEvento(inv.event_type);
-  // 'clasico' (sello de cera) o 'moderno' (trazo lineal). Si la
-  // invitación es de antes de este campo, cae en 'clasico' -- el look
-  // que ya tenía todo mundo, para no cambiarle el diseño a nadie sin
-  // que lo haya elegido.
   const estilo = inv.envelope_style==='moderno' ? 'moderno' : 'clasico';
-  const PAPEL={
-    // Boda: marfil con un dejo de salvia. El acento vive en líneas finas
-    // y en el sello — nunca en el cuerpo del sobre.
-    boda:    {cA:'#FCFAF5', cB:'#F3EEE1', flapA:'#FEFDF9', flapB:'#F6F1E5',
-              acento:'#7C8A6B', sealA:'#E8C77E', sealB:'#B8862F', ink:'#2E2A22',
-              fondo:'linear-gradient(150deg,#FBF8F1 0%,#F3EFE3 55%,#EAE4D3 100%)'},
-    // XV: el mismo marfil, con acento en polvo rosa en vez de salvia.
-    xv:      {cA:'#FDF9F7', cB:'#F5E9E3', flapA:'#FEFCFA', flapB:'#F7EEE8',
-              acento:'#B0837A', sealA:'#E8C77E', sealB:'#C77E6B', ink:'#3A2B26',
-              fondo:'linear-gradient(150deg,#FCF7F4 0%,#F6EAE4 55%,#EFDCD3 100%)'},
-    // Infantil: la única familia que conserva color de verdad en el
-    // cuerpo -- pero pastel, no saturado. Los globos siguen ahí, en tonos
-    // suaves en vez de blanco puro sobre fondo intenso.
-    infantil:{cA:'#FDFAF0', cB:'#EAF3E4', flapA:'#FEFCF3', flapB:'#F0F7EA',
-              acento:'#D99A4E', sealA:'#7EC9BC', sealB:'#4E9A8C', ink:'#3A3020',
-              fondo:'linear-gradient(150deg,#FDFBF3 0%,#F3F6EC 55%,#E9F1DF 100%)'},
-    // Cumpleaños de adulto: marfil con acento caramelo, discreto.
-    cumpleanos:{cA:'#FCF9F3', cB:'#F1E6D8', flapA:'#FEFCF7', flapB:'#F4EBDF',
-              acento:'#A9713F', sealA:'#E8C77E', sealB:'#B8862F', ink:'#332619',
-              fondo:'linear-gradient(150deg,#FBF7F0 0%,#F2E9DC 55%,#E9DAC4 100%)'},
-    // Formal: marfil con acento azul grisáceo, la opción más fría del set.
-    formal:  {cA:'#FBFBFA', cB:'#E9EBEE', flapA:'#FDFDFC', flapB:'#EDEFF2',
-              acento:'#5A6B87', sealA:'#E8C77E', sealB:'#B8862F', ink:'#242A33',
-              fondo:'linear-gradient(150deg,#FAFBFC 0%,#EEF0F3 55%,#E3E7EC 100%)'}
-  }[fam];
-  // Decoración: líneas y trazos finos en el color de acento -- nunca
-  // blanco sólido, porque el fondo ya es claro. La única familia con
-  // formas "de fiesta" (globos) sigue siendo infantil, pero en tono
-  // pastel en vez de blanco sobre saturado. Solo la usa el estilo clásico
-  // -- el moderno es deliberadamente sin ornamento.
-  const DECOR={
-    boda:`<circle cx="24" cy="60" r="1.6" fill="${PAPEL.acento}" opacity=".38"/><circle cx="314" cy="60" r="1.6" fill="${PAPEL.acento}" opacity=".38"/>
-        <path d="M18 190 q6 -8 12 0" stroke="${PAPEL.acento}" stroke-width="1" fill="none" opacity=".3"/>
-        <path d="M310 190 q6 -8 12 0" stroke="${PAPEL.acento}" stroke-width="1" fill="none" opacity=".3"/>`,
-    xv:`<circle cx="28" cy="66" r="2" fill="${PAPEL.acento}" opacity=".4"/><circle cx="312" cy="72" r="2.6" fill="${PAPEL.acento}" opacity=".32"/>
-        <circle cx="60" cy="200" r="1.8" fill="${PAPEL.acento}" opacity=".3"/>`,
-    infantil:`
-        <g opacity=".8">
-          <ellipse cx="40" cy="58" rx="14" ry="18" fill="${PAPEL.acento}" opacity=".28"/>
-          <path d="M40 76 L37 81 L43 81 Z" fill="${PAPEL.acento}" opacity=".28"/>
-          <path d="M40 81 C35 91 46 95 40 107" stroke="${PAPEL.acento}" stroke-width="1.1" fill="none" opacity=".26"/>
-        </g>
-        <g opacity=".65">
-          <ellipse cx="304" cy="52" rx="11" ry="14.5" fill="${PAPEL.sealA}" opacity=".3"/>
-          <path d="M304 66.5 L301.5 70.5 L306.5 70.5 Z" fill="${PAPEL.sealA}" opacity=".3"/>
-          <path d="M304 70.5 C300 78 308 81 304 89" stroke="${PAPEL.sealA}" stroke-width="1" fill="none" opacity=".26"/>
-        </g>
-        <circle cx="26" cy="180" r="2.6" fill="${PAPEL.acento}" opacity=".35"/>
-        <circle cx="170" cy="200" r="2" fill="${PAPEL.acento}" opacity=".3"/>`,
-    cumpleanos:`<circle cx="24" cy="60" r="1.6" fill="${PAPEL.acento}" opacity=".38"/><circle cx="314" cy="60" r="1.6" fill="${PAPEL.acento}" opacity=".38"/>`,
-    formal:`<circle cx="30" cy="66" r="1.6" fill="${PAPEL.acento}" opacity=".35"/><circle cx="310" cy="66" r="1.6" fill="${PAPEL.acento}" opacity=".35"/>`
-  }[fam];
+
+  const acento = elegido;
+  const ink = hexEsClaro(elegido) ? '#2E2A22' : hexOscurecer(elegido, 0.55);
+  const PAPEL = {
+    // El papel se queda casi blanco -- solo una insinuación del color
+    // elegido, para que siga leyéndose como papel fino y no como la
+    // tarjeta saturada de adentro repetida en el sobre.
+    cA: hexAclarar(elegido, 0.94), cB: hexAclarar(elegido, 0.85),
+    flapA: hexAclarar(elegido, 0.97), flapB: hexAclarar(elegido, 0.90),
+    sealA: hexAclarar(elegido, 0.15), sealB: hexOscurecer(elegido, 0.12),
+    acento, ink,
+    fondo: `linear-gradient(150deg, ${hexAclarar(elegido,0.96)} 0%, ${hexAclarar(elegido,0.90)} 55%, ${hexAclarar(elegido,0.80)} 100%)`
+  };
 
   const el=document.createElement('div');
   el.id='sobre';
@@ -1201,7 +1182,7 @@ function montarSobre(inv){
   el.setAttribute('role','button');
   el.setAttribute('tabindex','0');
   el.setAttribute('aria-label', L3('Abrir la invitación','Open the invitation','Ouvrir l\u2019invitation'));
-  const svgInner = estilo==='moderno' ? sobreSvgModerno(PAPEL, ini) : sobreSvgClasico(PAPEL, DECOR, ini);
+  const svgInner = estilo==='moderno' ? sobreSvgModerno(PAPEL, ini) : sobreSvgClasico(PAPEL, ini);
   el.innerHTML=`
     <div class="sobre-nombres">${esc(toTitleCase(inv.host_names||''))}</div>
     <div class="sobre-wrap sobre-wrap--${estilo}">
@@ -1219,9 +1200,8 @@ function montarSobre(inv){
     'font-caveat':"'Caveat',cursive",'font-round':"'Poppins',sans-serif",
     'font-comic':"'Comic Neue',cursive",'font-playful':"'Chewy',cursive"};
   if(FF[inv.title_font_family]) el.style.setProperty('--title-font', FF[inv.title_font_family]);
-  // El fondo del sobre ahora es papel claro, así que el nombre va en tinta
-  // oscura propia de cada familia -- blanco fijo se perdería aquí. Antes
-  // era al revés (fondo saturado, texto siempre blanco).
+  // El fondo del sobre es papel claro, así que el nombre va en tinta
+  // oscura -- blanco fijo se perdería aquí.
   el.querySelector('.sobre-nombres').style.color=PAPEL.ink;
   document.body.appendChild(el);
   document.body.style.overflow='hidden';
