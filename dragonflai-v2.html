@@ -2886,6 +2886,26 @@ function invitationOrigin(){
 }
 function invitationHost(){ return invitationOrigin().replace(/^https?:\/\//,''); }
 
+// Copia el link de la invitación con ?lang= ya puesto, para que el
+// anfitrión pueda mandarle a cada grupo de invitados (México, Inglaterra,
+// Francia...) el link en el idioma correcto sin escribirlo a mano.
+async function dashboardCopyInvLink(slug, langCode){
+  const url=`${invitationOrigin()}/i/${slug}?lang=${langCode}`;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast(lang==='es'?'Link copiado':'Link copied');
+  }catch(e){
+    // Respaldo para navegadores donde el portapapeles moderno está
+    // bloqueado (típico en http, o webviews viejos).
+    const ta=document.createElement('textarea');
+    ta.value=url; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); showToast(lang==='es'?'Link copiado':'Link copied'); }
+    catch(e2){ showToast(lang==='es'?'No se pudo copiar':'Could not copy',true); }
+    ta.remove();
+  }
+}
+
 async function showQRModal(slug,hostNames,hashtag){
   const L=lang==='es';
   const invUrl=`${invitationOrigin()}/i/${slug}`;
@@ -5275,6 +5295,28 @@ async function dashboardSelectPlan(planId){
       <button class="btn-account" onclick="showQRModal('${esc(inv.slug||'').replace(/'/g,"")}','${esc(inv.host_names||'').replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ ${L?'Ver/descargar QR':'View/download QR'}</button>
       <button class="btn-account" onclick="dashboardDownloadGuestList()">📥 ${L?'Descargar lista de invitados':'Download guest list'}</button>
     </div>
+    ${inv.is_published?`
+    <!-- La invitación ya sabe leer ?lang=es|en|fr y quedarse en ese idioma
+         (no vuelve a autodetectar mientras la URL lo diga) -- esto solo le
+         da al anfitrión los tres links ya armados, sin que tenga que
+         escribir el parámetro a mano cada vez que quiera mandarlo a un
+         grupo de invitados distinto. -->
+    <div class="dash-share-langs" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--cream-3)">
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">${L?'Comparte en cada idioma':'Share in each language'}</div>
+      ${[
+        ['es', L?'Español':'Spanish', '🇲🇽'],
+        ['en', 'English', '🇬🇧'],
+        ['fr', 'Français', '🇫🇷']
+      ].map(([code,label,flag])=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+          <span style="font-size:12.5px;color:var(--text-2);width:90px;flex-shrink:0">${flag} ${label}</span>
+          <span style="flex:1;font-size:11px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace">${invitationOrigin()}/i/${esc(inv.slug||'')}?lang=${code}</span>
+          <button class="btn-account" style="padding:4px 10px;font-size:11px;flex-shrink:0" onclick="dashboardCopyInvLink('${esc(inv.slug||'').replace(/'/g,"")}','${code}')">${L?'Copiar':'Copy'}</button>
+        </div>
+      `).join('')}
+      <p style="font-size:10.5px;color:var(--text-3);margin-top:6px">${L?'Cada invitado ve la página en ese idioma, sin importar el de su navegador.':'Each guest sees the page in that language, regardless of their browser.'}</p>
+    </div>
+    `:''}
   `:`<p style="font-size:13px;color:var(--text-3)">${L?'Aquí va a vivir tu invitación digital — créala cuando estés listo/a.':"Your digital invitation will live here — create it whenever you're ready."}</p>
     <button class="btn-gen" style="margin-top:10px" onclick="dashboardEditInvitation('${planId}')">${L?'Crear mi invitación':'Create my invitation'}</button>`;
 

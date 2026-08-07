@@ -256,6 +256,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
   <div class="lang-toggle">
     <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
     <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+    <button class="lang-btn" onclick="setLang('fr')" id="btn-fr">FR</button>
   </div>
 
   <div id="content">
@@ -406,9 +407,23 @@ function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }cat
 function dflaiResolveLang(){
   let q='';
   try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
-  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
-  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
-  // Detección por navegador: APAGADA a propósito.
+  if(q==='es'||q==='en'||q==='fr'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en'||st==='fr') return st; }catch(e){}
+  // Detección por navegador: apagada para es/en (ver nota abajo), pero
+  // ENCENDIDA para francés. Esta página es de solo lectura + un formulario
+  // de RSVP -- no hay generación de IA ni correos del worker de por medio,
+  // así que detectar francés aquí no arriesga nada del embudo de venta.
+  // Es justo lo que resuelve el caso real: invitados en México, Inglaterra
+  // y Francia abriendo el MISMO link, cada quien viendo su idioma solo.
+  const DFLAI_AUTODETECT_FR = true;
+  if(DFLAI_AUTODETECT_FR){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      if(String(c).toLowerCase().indexOf('fr')===0) return 'fr';
+    }
+  }
+  // Detección por navegador para es/en: APAGADA a propósito.
   // El público real es hispanohablante, pero muchos traen el teléfono
   // configurado en inglés — y el embudo en inglés (plan generado y
   // correos del worker) todavía no está validado. Mandarlos a inglés
@@ -426,6 +441,10 @@ function dflaiResolveLang(){
   }
   return 'es';
 }
+
+// Atajo de traducción para los textos sueltos que viven fuera del
+// diccionario T{} (mensajes de calendario, sobre, cuenta regresiva...).
+function L3(es,en,fr){ return lang==='fr'?fr : lang==='en'?en : es; }
 let lang=dflaiResolveLang();
 // Qué se está mostrando ahora mismo en #content. Antes setLang() solo sabía
 // repintar cuando había una invitación cargada, así que la pantalla de
@@ -581,6 +600,80 @@ const T={
     galleryTitle:'Gallery',
     registryTitle:'Gift Registry',
     faqTitle:'FAQ'
+  },
+  fr:{
+    loading:'Chargement…',
+    notFoundTitle:"😕 Nous n'avons pas trouvé cette invitation",
+    notFoundText:"Le lien est peut-être incomplet, ou l'invitation n'est plus disponible.",
+    notFoundHint:'Vérifiez que le lien est complet, exactement comme il vous a été partagé.',
+    notFoundCta:'✨ Découvrez DragonflAI Events',
+    invitedFallback:'Vous êtes invité(e)',
+    daysLabel:'Jours',
+    rsvpTitle:'Confirmez votre présence',
+    addToCalendar:'Ajouter à mon calendrier',
+    calendarIcsOption:'Apple / Outlook (.ics)',
+    shareBtn:"Partager l'invitation",
+    shareLinkCopied:'Lien copié — vous pouvez le coller où vous voulez',
+    organizerContactBtn:'Des questions ? Écrivez-nous',
+    yourName:'Votre nom',
+    yourEmail:'Votre e-mail (facultatif, pour les rappels)',
+    attendingQ:'Serez-vous présent(e) ?',
+    yesAttend:'Oui, je serai là 🎉',
+    noAttend:'Je ne pourrai pas venir',
+    guestCount:"Nombre d'accompagnants",
+    dietary:'Restriction alimentaire (facultatif)',
+    dietaryPh:'ex. Végétarien, sans gluten…',
+    songRequest:'Une chanson à ne pas manquer (facultatif)',
+    songPh:'ex. Uptown Funk — Bruno Mars',
+    lodgingQ:"Avez-vous besoin d'aide pour l'hébergement ?",
+    yes:'Oui',
+    no:'Non',
+    messageLabel:'Message pour les hôtes (facultatif)',
+    messagePh:'Félicitations ! 💌',
+    confirmBtn:'Confirmer',
+    sendingBtn:'Envoi en cours…',
+    toastNoName:'Écrivez votre nom',
+    toastNoAttend:'Indiquez si vous serez présent(e) ou non',
+    toastError:"Échec de l'envoi, veuillez réessayer",
+    thanksYesTitle:'Merci pour votre confirmation !',
+    thanksNoTitle:"Merci de nous avoir prévenus",
+    thanksYesText:'À bientôt — ça va être incroyable.',
+    thanksNoText:'Vous allez nous manquer, mais merci de nous l\u2019avoir dit.',
+    footerTerms:'Conditions',
+    footerPrivacy:'Avis de confidentialité',
+    searchNamePlaceholder:'Écrivez votre nom pour vous retrouver…',
+    searchHint:"Seuls les invités sur la liste de l'hôte peuvent confirmer leur présence pour cet événement.",
+    searchNoResults:"🔍 Nous n'avons pas trouvé ce nom dans la liste. Essayez seulement votre prénom ou seulement votre nom de famille — parfois, moins c'est mieux. S'il n'apparaît toujours pas, l'hôte peut vous aider directement.",
+    searchAreYouThisPerson:"Est-ce vous ?",
+    changeNameLink:"Ce n'est pas moi, chercher un autre nom",
+    alreadyResponded:'Vous avez déjà confirmé votre présence — merci !',
+    editMyResponse:'✏️ Modifier ma réponse',
+    eventPhotosTitle:"Photos de l'événement",
+    eventPhotosHint:"Partagez des photos des préparatifs, des jours précédents et du jour de l'événement — ajoutez les vôtres et téléchargez celles des autres invités",
+    uploadPhotoBtn:'Ajouter des photos',
+    noPhotosYet:'Pas encore de photos — soyez le premier à en ajouter une !',
+    photoUploaded:'✅ Photo(s) ajoutée(s) à la galerie',
+    downloadAllBtn:'Tout télécharger',
+    downloadingZip:'Préparation de votre téléchargement…',
+    downloadZipProgress:n=>`Compression des photos… ${n}%`,
+    downloadZipDone:'✅ Téléchargement prêt',
+    downloadZipError:'Impossible de préparer le téléchargement — réessayez',
+    confirmDeletePhoto:'Supprimer cette photo ? Cette action est irréversible.',
+    photoDeleted:'🗑️ Photo supprimée',
+    photoDeleteError:'Impossible de supprimer la photo — réessayez',
+
+    yourResponseWas:'Votre réponse actuelle :',
+    respondingYes:'Présent(e)',
+    respondingNo:'Absent(e)',
+    editSaved:'✅ Votre réponse a été mise à jour',
+
+    maxCompanionsNote:"Vous pouvez venir avec jusqu'à {n} accompagnant(s).",
+    scheduleTitle:'Programme',
+    lodgingTitle:'Hébergement et itinéraire',
+    seeOnMap:'Voir sur la carte',
+    galleryTitle:'Galerie',
+    registryTitle:'Liste de cadeaux',
+    faqTitle:'FAQ'
   }
 };
 
@@ -589,16 +682,20 @@ function setLang(l){
   dflaiRememberLang(l);
   document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
   document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+  document.getElementById('btn-fr').className='lang-btn'+(l==='fr'?' active':'');
   document.documentElement.lang=l;
   const loadingText=document.getElementById('loading-text');
   if(loadingText) loadingText.textContent=T[lang].loading;
   document.getElementById('footer-terms').textContent=T[lang].footerTerms;
   document.getElementById('footer-privacy').textContent=T[lang].footerPrivacy;
+  // Estos cuatro se quedan en es/en -- son el modal de "reportar un
+  // problema", que usan tú y quien pruebe, no un invitado en Francia.
+  // Si algún día importa, es una traducción de cuatro líneas más.
   document.getElementById('bug-modal-title').textContent=lang==='es'?'🐞 Reportar un problema':'🐞 Report a problem';
   document.getElementById('bug-modal-text').textContent=lang==='es'?'Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos.':'Tell us what happened — the more detail, the easier it is for us to find it.';
   document.getElementById('bug-modal-send').textContent=lang==='es'?'Enviar reporte':'Send report';
   document.getElementById('bug-modal-cancel').textContent=lang==='es'?'Cancelar':'Cancel';
-  document.title=(l==='es'?'Invitación':'Invitation')+' — DragonflAI Events';
+  document.title=L3('Invitación','Invitation','Invitation')+' — DragonflAI Events';
   // Repintar lo que sea que esté en pantalla, no solo la invitación.
   if(cdTimer && invitation) pintarCuenta();
   if(currentView==='notfound') renderNotFound();
@@ -667,9 +764,9 @@ document.addEventListener('click',()=>{ const m=document.getElementById('cal-add
 
 function openGoogleCalendar(){
   const dates=getEventDatesForCalendar();
-  if(!dates||!invitation){ showToast(lang==='es'?'No se pudo generar el evento':'Could not generate the event'); return; }
-  const title=encodeURIComponent(invitation.host_names||(lang==='es'?'Evento':'Event'));
-  const details=encodeURIComponent(lang==='es'?`Invitación de ${invitation.host_names||''}`:`Invitation from ${invitation.host_names||''}`);
+  if(!dates||!invitation){ showToast(L3('No se pudo generar el evento','Could not generate the event','Impossible de générer l\u2019événement')); return; }
+  const title=encodeURIComponent(invitation.host_names||L3('Evento','Event','Événement'));
+  const details=encodeURIComponent(L3(`Invitación de ${invitation.host_names||''}`,`Invitation from ${invitation.host_names||''}`,`Invitation de ${invitation.host_names||''}`));
   const location=encodeURIComponent(invitation.location||'');
   const datesParam=`${fmtICSDate(dates.startDate)}/${fmtICSDate(dates.endDate)}`;
   // ctz asume zona horaria de México por default — la mayoría de los eventos
@@ -682,7 +779,7 @@ function openGoogleCalendar(){
 
 function downloadIcsFile(){
   const dates=getEventDatesForCalendar();
-  if(!dates||!invitation){ showToast(lang==='es'?'No se pudo generar el evento':'Could not generate the event'); return; }
+  if(!dates||!invitation){ showToast(L3('No se pudo generar el evento','Could not generate the event','Impossible de générer l\u2019événement')); return; }
   const uid=`${invitation.slug||'evento'}-${Date.now()}@dragonflaievents.com`;
   const ics=[
     'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DragonflAI Events//ES','CALSCALE:GREGORIAN',
@@ -691,9 +788,9 @@ function downloadIcsFile(){
     `DTSTAMP:${fmtICSDate(new Date())}`,
     `DTSTART:${fmtICSDate(dates.startDate)}`,
     `DTEND:${fmtICSDate(dates.endDate)}`,
-    `SUMMARY:${icsEscape(invitation.host_names||(lang==='es'?'Evento':'Event'))}`,
+    `SUMMARY:${icsEscape(invitation.host_names||L3('Evento','Event','Événement'))}`,
     invitation.location?`LOCATION:${icsEscape(invitation.location)}`:'',
-    `DESCRIPTION:${icsEscape(lang==='es'?`Invitación de ${invitation.host_names||''}`:`Invitation from ${invitation.host_names||''}`)}`,
+    `DESCRIPTION:${icsEscape(L3(`Invitación de ${invitation.host_names||''}`,`Invitation from ${invitation.host_names||''}`,`Invitation de ${invitation.host_names||''}`))}`,
     'END:VEVENT','END:VCALENDAR'
   ].filter(Boolean).join('\r\n');
   const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
@@ -708,9 +805,11 @@ function downloadIcsFile(){
 // ── Contacto del organizador ──
 function buildOrganizerWhatsAppLink(inv,t){
   const digits=String(inv.organizer_phone||'').replace(/\D/g,'');
-  const greeting=lang==='es'
-    ?`¡Hola! Tengo una duda sobre ${inv.host_names||'el evento'}.`
-    :`Hi! I have a question about ${inv.host_names||'the event'}.`;
+  const greeting=L3(
+    `¡Hola! Tengo una duda sobre ${inv.host_names||'el evento'}.`,
+    `Hi! I have a question about ${inv.host_names||'the event'}.`,
+    `Bonjour ! J\u2019ai une question \u00e0 propos de ${inv.host_names||'l\u2019événement'}.`
+  );
   return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
 }
 
@@ -1101,7 +1200,7 @@ function montarSobre(inv){
   el.style.setProperty('--sobre-bg', PAPEL.fondo);
   el.setAttribute('role','button');
   el.setAttribute('tabindex','0');
-  el.setAttribute('aria-label', lang==='es'?'Abrir la invitación':'Open the invitation');
+  el.setAttribute('aria-label', L3('Abrir la invitación','Open the invitation','Ouvrir l\u2019invitation'));
   const svgInner = estilo==='moderno' ? sobreSvgModerno(PAPEL, ini) : sobreSvgClasico(PAPEL, DECOR, ini);
   el.innerHTML=`
     <div class="sobre-nombres">${esc(toTitleCase(inv.host_names||''))}</div>
@@ -1110,7 +1209,7 @@ function montarSobre(inv){
         ${svgInner}
       </svg>
     </div>
-    <div class="sobre-hint">${lang==='es'?'Toca para abrir':'Tap to open'}</div>`;
+    <div class="sobre-hint">${L3('Toca para abrir','Tap to open','Touchez pour ouvrir')}</div>`;
   // La fuente elegida se aplica a la tarjeta, no a :root — así que aquí
   // se resuelve directo desde el dato, no leyendo el DOM.
   const FF={'':"'Cormorant Garamond',serif",'font-classic':"'Playfair Display',serif",
@@ -1240,7 +1339,7 @@ function pintarCuenta(){
   if(ms<=0){
     // El día del evento, y hasta 12 h después, celebra en vez de mostrar ceros
     cont.innerHTML = ms > -12*3600*1000
-      ? `<div class="cd-today">${lang==='es'?'¡Hoy es el día! 🎉':'Today is the day! 🎉'}</div>`
+      ? `<div class="cd-today">${L3('¡Hoy es el día! 🎉','Today is the day! 🎉','C\u2019est le grand jour ! 🎉')}</div>`
       : '';
     if(cdTimer){ clearInterval(cdTimer); cdTimer=null; }
     return;
@@ -1249,7 +1348,9 @@ function pintarCuenta(){
   const seg=Math.floor(ms/1000);
   const d=Math.floor(seg/86400), h=Math.floor(seg%86400/3600),
         mi=Math.floor(seg%3600/60), sg=seg%60;
-  const L = lang==='es'
+  const L = lang==='fr'
+    ? ['jours','h','min','sec']
+    : lang==='es'
     ? ['días','horas','min','seg']
     : ['days','hours','min','sec'];
   const u=(n,l)=>`<div class="cd-unit"><div class="cd-num">${String(n).padStart(2,'0')}</div><div class="cd-lbl">${l}</div></div>`;
@@ -1279,7 +1380,9 @@ async function pintarConfirmaciones(inv){
     const r=Array.isArray(data)?data[0]:data;
     const si=Number(r?.attending_count||0), tot=Number(r?.total_guests||0);
     if(si<1) return;   // con 0 o 1 confirmación el dato juega en contra
-    const txt = lang==='es'
+    const txt = lang==='fr'
+      ? `<b>${si}</b> ${si===1?'personne a confirmé':'personnes ont confirmé'}`
+      : lang==='es'
       ? `<b>${si}</b> ${si===1?'persona ya confirmó':'personas ya confirmaron'}`
       : `<b>${si}</b> ${si===1?'guest has confirmed':'guests have confirmed'}`;
     const pct = tot>0 ? Math.min(100, Math.round(si/tot*100)) : 0;
@@ -1323,7 +1426,7 @@ function renderExtraSections(inv,t){
 
   if(inv.couple_story){
     sections.push(`<div class="extra-card reveal">
-      <div class="extra-title">📝 ${esc(lang==='es'?'Información':'Information')}</div>
+      <div class="extra-title">📝 ${esc(L3('Información','Information','Informations'))}</div>
       <p class="extra-story">${esc(inv.couple_story).replace(/\n/g,'<br>')}</p>
     </div>`);
   }
@@ -1898,7 +2001,7 @@ async function loadEventPhotos(){
     const L=lang==='es';
     if(data.length>0){
       viewAllBtn.style.display='inline-block';
-      viewAllBtn.textContent=L?`🖼️ Ver todas las fotos (${data.length})`:`🖼️ View all photos (${data.length})`;
+      viewAllBtn.textContent=L3(`🖼️ Ver todas las fotos (${data.length})`,`🖼️ View all photos (${data.length})`,`🖼️ Voir toutes les photos (${data.length})`);
     } else {
       viewAllBtn.style.display='none';
     }
@@ -2017,9 +2120,9 @@ function openFullGalleryView(){
   overlay.innerHTML=`
     <div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:900px;width:100%;max-height:88vh;overflow-y:auto;box-sizing:border-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:10px;flex-wrap:wrap">
-        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin:0">${L?'Todas las fotos':'All photos'} (${eventPhotosList.length})</h3>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin:0">${L3('Todas las fotos','All photos','Toutes les photos')} (${eventPhotosList.length})</h3>
         <div style="display:flex;align-items:center;gap:8px">
-          <button type="button" class="extra-link-btn photos-downloadall-btn" style="border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap" onclick="downloadAllEventPhotos()">⬇️ ${L?'Descargar todas':'Download all'}</button>
+          <button type="button" class="extra-link-btn photos-downloadall-btn" style="border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap" onclick="downloadAllEventPhotos()">⬇️ ${L3('Descargar todas','Download all','Tout télécharger')}</button>
           <button type="button" onclick="closeFullGalleryView()" style="background:var(--cream-2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;flex-shrink:0">✕</button>
         </div>
       </div>
