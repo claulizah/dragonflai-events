@@ -2,7 +2,8 @@ name: Deploy Worker
 
 # Se dispara solo cuando cambian archivos relacionados con el Worker —
 # subir un cambio al frontend (dragonflai-v2.html, index.html, etc.) NO
-# vuelve a desplegar el Worker innecesariamente.
+# vuelve a desplegar el Worker innecesariamente. workflow_dispatch permite
+# correrlo a mano desde la pestaña Actions, para probar sin tocar código.
 on:
   push:
     branches:
@@ -12,6 +13,7 @@ on:
       - 'worker.js'
       - 'package.json'
       - 'wrangler.toml'
+  workflow_dispatch: {}
 
 jobs:
   deploy:
