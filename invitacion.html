@@ -70,9 +70,123 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 .detail-item{display:flex;align-items:center;justify-content:center;gap:6px}
 .msg{font-size:14.5px;color:var(--text-2);font-style:italic;margin-top:.5rem}
 .hashtag{font-size:14.5px;color:var(--custom-text-color,var(--teal-dark));font-weight:700;margin-top:.6rem}
-.countdown{display:flex;justify-content:center;gap:1.5rem;margin-top:1.5rem}
-.cd-num{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;color:var(--teal-dark)}
-.cd-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3)}
+.countdown{display:flex;justify-content:center;gap:1.1rem;margin-top:1.5rem;flex-wrap:wrap}
+.cd-unit{min-width:56px}
+.cd-num{font-family:var(--title-font,'Cormorant Garamond',serif);font-size:1.9rem;font-weight:600;
+        color:var(--custom-text-color,var(--teal-dark));line-height:1;font-variant-numeric:tabular-nums}
+.cd-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-top:3px}
+.cd-sep{font-size:1.4rem;color:var(--text-3);opacity:.4;align-self:flex-start;line-height:1.3}
+.cd-today{font-family:var(--title-font,'Cormorant Garamond',serif);font-size:1.5rem;
+          color:var(--custom-text-color,var(--teal-dark));font-weight:600}
+
+/* ── Contador público de confirmaciones ──
+   Prueba social para el invitado, y empujón suave para el que no ha contestado. */
+.rsvp-count{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:1.1rem;
+            font-size:13px;color:var(--text-2)}
+.rsvp-count .dotc{width:8px;height:8px;border-radius:50%;background:var(--teal);
+                  box-shadow:0 0 0 4px rgba(46,196,182,.18)}
+.rsvp-count b{color:var(--custom-text-color,var(--teal-dark));font-weight:700}
+.rsvp-bar{height:5px;background:rgba(26,35,50,.08);border-radius:100px;overflow:hidden;margin-top:.55rem}
+.rsvp-bar i{display:block;height:100%;border-radius:100px;
+            background:linear-gradient(90deg,var(--teal),var(--violet));transition:width 1.1s ease}
+
+/* ══════════════════════════════════════════════════════════════
+   LEGIBILIDAD SOBRE FOTO
+   Una foto clara vuelve el texto ilegible; una oscura se come el crema.
+   El velo se calibra según el brillo real de la imagen, así que la
+   anfitriona puede subir la foto que quiera sin arruinar la lectura.
+   ══════════════════════════════════════════════════════════════ */
+.card.theme-custom-photo::before{
+  content:'';position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:var(--velo, linear-gradient(180deg, rgba(255,255,255,.72) 0%, rgba(255,255,255,.55) 45%, rgba(255,255,255,.78) 100%));
+  transition:background .4s ease}
+.card > *:not(.marco){position:relative;z-index:1}
+.card.velo-oscuro{--velo:linear-gradient(180deg, rgba(14,20,28,.62) 0%, rgba(14,20,28,.44) 45%, rgba(14,20,28,.70) 100%)}
+.card.velo-oscuro .detail-item,.card.velo-oscuro .msg,.card.velo-oscuro .cd-lbl,
+.card.velo-oscuro .eyebrow,.card.velo-oscuro .rsvp-count{color:rgba(255,255,255,.90)!important}
+.card.velo-oscuro .names,.card.velo-oscuro .cd-num,.card.velo-oscuro .monograma,
+.card.velo-oscuro .hashtag,.card.velo-oscuro .cd-today{color:#fff!important}
+.card.velo-oscuro .divider{background:rgba(255,255,255,.45)!important}
+.card.velo-oscuro .rsvp-bar{background:rgba(255,255,255,.22)}
+
+/* Parallax: la foto se mueve más lento que el scroll. Sutil a propósito
+   — pasado de 0.3 marea en celular. */
+.card.parallax{background-attachment:scroll}
+
+/* ══════════════════════════════════════════════════════════════
+   MARCO DECORATIVO POR TIPO DE EVENTO
+   Las esquinas cambian según sea boda, XV, infantil o corporativo.
+   Es lo que más se percibe como "hecho para mi evento".
+   ══════════════════════════════════════════════════════════════ */
+.marco{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.marco svg{position:absolute;width:96px;height:96px;opacity:.42;color:var(--custom-text-color,var(--teal-dark))}
+.marco .e1{top:12px;left:12px}
+.marco .e2{top:12px;right:12px;transform:scaleX(-1)}
+.marco .e3{bottom:12px;left:12px;transform:scaleY(-1)}
+.marco .e4{bottom:12px;right:12px;transform:scale(-1,-1)}
+.card.velo-oscuro .marco svg{opacity:.55;color:rgba(255,255,255,.9)}
+@media(max-width:420px){ .marco svg{width:66px;height:66px} }
+
+/* ══════════════════════════════════════════════════════════════
+   EL SOBRE
+   Un link de WhatsApp se abre y se juzga en un segundo. El sobre
+   convierte ese segundo en un gesto: hay que tocarlo para entrar.
+   Además resuelve un problema técnico — iOS y Chrome bloquean el
+   audio automático, pero SÍ lo permiten después de que la persona
+   toca algo. El sobre es ese toque.
+   ══════════════════════════════════════════════════════════════ */
+#sobre{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;
+       align-items:center;justify-content:center;gap:1.6rem;cursor:pointer;
+       background:var(--sobre-bg,linear-gradient(150deg,#FAF9F7 0%,#E9F6F4 45%,#EDE6F7 100%));
+       transition:opacity .75s ease, visibility .75s}
+#sobre.abierto{opacity:0;visibility:hidden;pointer-events:none}
+.sobre-wrap{width:min(78vw,330px);perspective:1400px;transition:transform .8s cubic-bezier(.4,0,.2,1)}
+#sobre.abierto .sobre-wrap{transform:scale(1.5) translateY(-14px)}
+.sobre-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 18px 40px rgba(26,35,50,.22))}
+/* La solapa gira sobre su borde superior — el gesto de abrir de verdad */
+.solapa{transform-origin:50% 0%;transition:transform .85s cubic-bezier(.55,-0.3,.35,1.3)}
+#sobre.abierto .solapa{transform:rotateX(-172deg)}
+.sobre-hint{font-family:'Inter',sans-serif;font-size:13px;letter-spacing:.16em;
+            text-transform:uppercase;color:var(--text-3);transition:opacity .3s}
+#sobre.abierto .sobre-hint{opacity:0}
+.sobre-nombres{font-family:var(--title-font,'Cormorant Garamond',serif);font-size:clamp(22px,5.6vw,30px);
+               color:var(--teal-dark);text-align:center;padding:0 1.4rem;line-height:1.25}
+@keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.sello{animation:latir 2.4s ease-in-out infinite;transform-origin:center}
+#sobre.abierto .sello{animation:none;opacity:0;transition:opacity .35s}
+
+/* Pétalos al abrir: caen una vez y se limpian solos */
+#petalos{position:fixed;inset:0;z-index:399;pointer-events:none;overflow:hidden}
+@keyframes caer{to{transform:translateY(108vh) rotate(var(--giro,420deg));opacity:0}}
+.petalo{position:absolute;top:-8vh;will-change:transform;animation:caer linear forwards}
+
+/* Monograma: las iniciales de los anfitriones, sin pedirle nada a nadie */
+.monograma{display:flex;align-items:center;justify-content:center;gap:.55rem;
+           font-family:var(--title-font,'Cormorant Garamond',serif);
+           font-size:1.45rem;letter-spacing:.06em;color:var(--custom-text-color,var(--teal-dark));
+           opacity:.85;margin-bottom:.7rem}
+.monograma .mline{width:34px;height:1px;background:currentColor;opacity:.4}
+
+/* ── Animación de entrada ──
+   Un link de WhatsApp se juzga en el primer segundo. Esto es lo que
+   pasa en ese segundo. Se apaga solo si el sistema pide menos movimiento. */
+@keyframes dfSubir{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes dfEscala{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:none}}
+@keyframes dfAla{0%{opacity:0;transform:translateY(-14px) rotate(-8deg)}
+                 60%{opacity:1;transform:translateY(3px) rotate(3deg)}
+                 100%{opacity:1;transform:none}}
+.anim .card{animation:dfEscala .85s cubic-bezier(.22,.68,.36,1) both}
+.anim .card .names{animation:dfSubir .8s cubic-bezier(.22,.68,.36,1) .28s both}
+.anim .card .event-label{animation:dfSubir .7s cubic-bezier(.22,.68,.36,1) .18s both}
+.anim .card .details{animation:dfSubir .8s cubic-bezier(.22,.68,.36,1) .44s both}
+.anim .card .countdown{animation:dfSubir .8s cubic-bezier(.22,.68,.36,1) .60s both}
+.anim .card .rsvp-count{animation:dfSubir .8s cubic-bezier(.22,.68,.36,1) .72s both}
+.anim .card .bug-fab,.anim .card .df-wing{animation:dfAla 1s cubic-bezier(.22,.68,.36,1) .5s both}
+.reveal{opacity:0;transform:translateY(24px)}
+.reveal.in{animation:dfSubir .7s cubic-bezier(.22,.68,.36,1) both}
+@media (prefers-reduced-motion:reduce){
+  .anim .card,.anim .card *,.reveal,.reveal.in{animation:none!important;opacity:1!important;transform:none!important}
+}
 
 /* ── RSVP ── */
 .rsvp-card{background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-md)}
@@ -142,6 +256,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
   <div class="lang-toggle">
     <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
     <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
+    <button class="lang-btn" onclick="setLang('fr')" id="btn-fr">FR</button>
   </div>
 
   <div id="content">
@@ -277,7 +392,65 @@ function getUploaderToken(){
   }
   return tok;
 }
-let lang='es';
+// ══════════════════════════════════════════════════════════════
+//  RESOLUCIÓN DE IDIOMA — misma lógica que la landing y la app.
+//  Prioridad: ?lang= en la URL → localStorage → navegador → es
+//  NOTA DE PRODUCTO: hoy el idioma de esta página lo decide el INVITADO
+//  (su navegador o su preferencia guardada), no el anfitrión. Para que la
+//  invitación herede el idioma de quien la creó haría falta guardar el
+//  idioma en la tabla `invitations` al publicar y leerlo aquí — pendiente,
+//  documentado aparte.
+// ══════════════════════════════════════════════════════════════
+const DFLAI_LANG_KEY='dflai_lang';
+let dflaiLangForcedByUrl=false;
+function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
+function dflaiResolveLang(){
+  let q='';
+  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
+  if(q==='es'||q==='en'||q==='fr'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en'||st==='fr') return st; }catch(e){}
+  // Detección por navegador: apagada para es/en (ver nota abajo), pero
+  // ENCENDIDA para francés. Esta página es de solo lectura + un formulario
+  // de RSVP -- no hay generación de IA ni correos del worker de por medio,
+  // así que detectar francés aquí no arriesga nada del embudo de venta.
+  // Es justo lo que resuelve el caso real: invitados en México, Inglaterra
+  // y Francia abriendo el MISMO link, cada quien viendo su idioma solo.
+  const DFLAI_AUTODETECT_FR = true;
+  if(DFLAI_AUTODETECT_FR){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      if(String(c).toLowerCase().indexOf('fr')===0) return 'fr';
+    }
+  }
+  // Detección por navegador para es/en: APAGADA a propósito.
+  // El público real es hispanohablante, pero muchos traen el teléfono
+  // configurado en inglés — y el embudo en inglés (plan generado y
+  // correos del worker) todavía no está validado. Mandarlos a inglés
+  // los deja a medio camino. Se reactiva poniendo esto en true, cuando
+  // la generación y los correos en inglés estén confirmados.
+  const DFLAI_AUTODETECT = false;
+  if(DFLAI_AUTODETECT){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      const b=String(c).toLowerCase();
+      if(b.indexOf('es')===0) return 'es';
+      if(b.indexOf('en')===0) return 'en';
+    }
+  }
+  return 'es';
+}
+
+// Atajo de traducción para los textos sueltos que viven fuera del
+// diccionario T{} (mensajes de calendario, sobre, cuenta regresiva...).
+function L3(es,en,fr){ return lang==='fr'?fr : lang==='en'?en : es; }
+let lang=dflaiResolveLang();
+// Qué se está mostrando ahora mismo en #content. Antes setLang() solo sabía
+// repintar cuando había una invitación cargada, así que la pantalla de
+// "no encontrada" se quedaba en español para siempre aunque el diccionario
+// `en` sí tuviera las traducciones.
+let currentView='loading';
 
 const T={
   es:{
@@ -291,6 +464,8 @@ const T={
     rsvpTitle:'Confirma tu asistencia',
     addToCalendar:'Agregar a mi calendario',
     calendarIcsOption:'Apple / Outlook (.ics)',
+    shareBtn:'Compartir invitación',
+    shareLinkCopied:'Link copiado — ya lo puedes pegar donde quieras',
     organizerContactBtn:'¿Dudas? Escríbele',
     yourName:'Tu nombre',
     yourEmail:'Tu correo (opcional, para recordatorios)',
@@ -363,6 +538,8 @@ const T={
     rsvpTitle:'Confirm your attendance',
     addToCalendar:'Add to my calendar',
     calendarIcsOption:'Apple / Outlook (.ics)',
+    shareBtn:'Share invitation',
+    shareLinkCopied:'Link copied — paste it anywhere you like',
     organizerContactBtn:'Questions? Message',
     yourName:'Your name',
     yourEmail:'Your email (optional, for reminders)',
@@ -423,27 +600,139 @@ const T={
     galleryTitle:'Gallery',
     registryTitle:'Gift Registry',
     faqTitle:'FAQ'
+  },
+  fr:{
+    loading:'Chargement…',
+    notFoundTitle:"😕 Nous n'avons pas trouvé cette invitation",
+    notFoundText:"Le lien est peut-être incomplet, ou l'invitation n'est plus disponible.",
+    notFoundHint:'Vérifiez que le lien est complet, exactement comme il vous a été partagé.',
+    notFoundCta:'✨ Découvrez DragonflAI Events',
+    invitedFallback:'Vous êtes invité(e)',
+    daysLabel:'Jours',
+    rsvpTitle:'Confirmez votre présence',
+    addToCalendar:'Ajouter à mon calendrier',
+    calendarIcsOption:'Apple / Outlook (.ics)',
+    shareBtn:"Partager l'invitation",
+    shareLinkCopied:'Lien copié — vous pouvez le coller où vous voulez',
+    organizerContactBtn:'Des questions ? Écrivez-nous',
+    yourName:'Votre nom',
+    yourEmail:'Votre e-mail (facultatif, pour les rappels)',
+    attendingQ:'Serez-vous présent(e) ?',
+    yesAttend:'Oui, je serai là 🎉',
+    noAttend:'Je ne pourrai pas venir',
+    guestCount:"Nombre d'accompagnants",
+    dietary:'Restriction alimentaire (facultatif)',
+    dietaryPh:'ex. Végétarien, sans gluten…',
+    songRequest:'Une chanson à ne pas manquer (facultatif)',
+    songPh:'ex. Uptown Funk — Bruno Mars',
+    lodgingQ:"Avez-vous besoin d'aide pour l'hébergement ?",
+    yes:'Oui',
+    no:'Non',
+    messageLabel:'Message pour les hôtes (facultatif)',
+    messagePh:'Félicitations ! 💌',
+    confirmBtn:'Confirmer',
+    sendingBtn:'Envoi en cours…',
+    toastNoName:'Écrivez votre nom',
+    toastNoAttend:'Indiquez si vous serez présent(e) ou non',
+    toastError:"Échec de l'envoi, veuillez réessayer",
+    thanksYesTitle:'Merci pour votre confirmation !',
+    thanksNoTitle:"Merci de nous avoir prévenus",
+    thanksYesText:'À bientôt — ça va être incroyable.',
+    thanksNoText:'Vous allez nous manquer, mais merci de nous l\u2019avoir dit.',
+    footerTerms:'Conditions',
+    footerPrivacy:'Avis de confidentialité',
+    searchNamePlaceholder:'Écrivez votre nom pour vous retrouver…',
+    searchHint:"Seuls les invités sur la liste de l'hôte peuvent confirmer leur présence pour cet événement.",
+    searchNoResults:"🔍 Nous n'avons pas trouvé ce nom dans la liste. Essayez seulement votre prénom ou seulement votre nom de famille — parfois, moins c'est mieux. S'il n'apparaît toujours pas, l'hôte peut vous aider directement.",
+    searchAreYouThisPerson:"Est-ce vous ?",
+    changeNameLink:"Ce n'est pas moi, chercher un autre nom",
+    alreadyResponded:'Vous avez déjà confirmé votre présence — merci !',
+    editMyResponse:'✏️ Modifier ma réponse',
+    eventPhotosTitle:"Photos de l'événement",
+    eventPhotosHint:"Partagez des photos des préparatifs, des jours précédents et du jour de l'événement — ajoutez les vôtres et téléchargez celles des autres invités",
+    uploadPhotoBtn:'Ajouter des photos',
+    noPhotosYet:'Pas encore de photos — soyez le premier à en ajouter une !',
+    photoUploaded:'✅ Photo(s) ajoutée(s) à la galerie',
+    downloadAllBtn:'Tout télécharger',
+    downloadingZip:'Préparation de votre téléchargement…',
+    downloadZipProgress:n=>`Compression des photos… ${n}%`,
+    downloadZipDone:'✅ Téléchargement prêt',
+    downloadZipError:'Impossible de préparer le téléchargement — réessayez',
+    confirmDeletePhoto:'Supprimer cette photo ? Cette action est irréversible.',
+    photoDeleted:'🗑️ Photo supprimée',
+    photoDeleteError:'Impossible de supprimer la photo — réessayez',
+
+    yourResponseWas:'Votre réponse actuelle :',
+    respondingYes:'Présent(e)',
+    respondingNo:'Absent(e)',
+    editSaved:'✅ Votre réponse a été mise à jour',
+
+    maxCompanionsNote:"Vous pouvez venir avec jusqu'à {n} accompagnant(s).",
+    scheduleTitle:'Programme',
+    lodgingTitle:'Hébergement et itinéraire',
+    seeOnMap:'Voir sur la carte',
+    galleryTitle:'Galerie',
+    registryTitle:'Liste de cadeaux',
+    faqTitle:'FAQ'
   }
 };
 
 function setLang(l){
   lang=l;
+  dflaiRememberLang(l);
   document.getElementById('btn-es').className='lang-btn'+(l==='es'?' active':'');
   document.getElementById('btn-en').className='lang-btn'+(l==='en'?' active':'');
+  document.getElementById('btn-fr').className='lang-btn'+(l==='fr'?' active':'');
   document.documentElement.lang=l;
   const loadingText=document.getElementById('loading-text');
   if(loadingText) loadingText.textContent=T[lang].loading;
   document.getElementById('footer-terms').textContent=T[lang].footerTerms;
   document.getElementById('footer-privacy').textContent=T[lang].footerPrivacy;
+  // Estos cuatro se quedan en es/en -- son el modal de "reportar un
+  // problema", que usan tú y quien pruebe, no un invitado en Francia.
+  // Si algún día importa, es una traducción de cuatro líneas más.
   document.getElementById('bug-modal-title').textContent=lang==='es'?'🐞 Reportar un problema':'🐞 Report a problem';
   document.getElementById('bug-modal-text').textContent=lang==='es'?'Cuéntanos qué pasó — entre más detalle, más fácil lo encontramos.':'Tell us what happened — the more detail, the easier it is for us to find it.';
   document.getElementById('bug-modal-send').textContent=lang==='es'?'Enviar reporte':'Send report';
   document.getElementById('bug-modal-cancel').textContent=lang==='es'?'Cancelar':'Cancel';
-  // Si ya hay una invitación cargada, volver a pintarla en el nuevo idioma
-  if(invitation) renderInvitation(invitation);
+  document.title=L3('Invitación','Invitation','Invitation')+' — DragonflAI Events';
+  // Repintar lo que sea que esté en pantalla, no solo la invitación.
+  if(cdTimer && invitation) pintarCuenta();
+  if(currentView==='notfound') renderNotFound();
+  else if(invitation) renderInvitation(invitation);
+  else if(currentView==='loading' && document.getElementById('loading-text')) document.getElementById('loading-text').textContent=T[lang].loading;
 }
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── Utilidades de color: para que el sobre pueda derivar sus tonos del
+//    color que la anfitriona ya eligió para su tarjeta, en vez de una
+//    paleta fija por tipo de evento. ──
+function hexAcolor(hex){
+  const h=String(hex||'').replace('#','');
+  const full=h.length===3 ? h.split('').map(c=>c+c).join('') : h;
+  const n=parseInt(full,16);
+  if(isNaN(n) || full.length!==6) return [46,196,182]; // teal de respaldo si el hex viene mal formado
+  return [(n>>16)&255,(n>>8)&255,n&255];
+}
+function colorAhex([r,g,b]){
+  const h=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+  return '#'+h(r)+h(g)+h(b);
+}
+// Mezcla hacia blanco (para tonos de papel) o hacia negro (para sombras) --
+// ratio 0 = color original, 1 = destino puro.
+function hexMezclar(hex, destino, ratio){
+  const [r,g,b]=hexAcolor(hex);
+  return colorAhex([r+(destino[0]-r)*ratio, g+(destino[1]-g)*ratio, b+(destino[2]-b)*ratio]);
+}
+function hexAclarar(hex, ratio){ return hexMezclar(hex, [255,255,255], ratio); }
+function hexOscurecer(hex, ratio){ return hexMezclar(hex, [0,0,0], ratio); }
+// ¿Este color es tan claro que el texto oscuro por defecto se perdería
+// encima? Luminancia percibida simple, umbral generoso.
+function hexEsClaro(hex){
+  const [r,g,b]=hexAcolor(hex);
+  return (0.299*r+0.587*g+0.114*b) > 200;
+}
 function toTitleCase(s){
   const t=String(s??'');
   // Si ya viene capitalizado a propósito lo dejamos en paz: normalizar a
@@ -504,9 +793,9 @@ document.addEventListener('click',()=>{ const m=document.getElementById('cal-add
 
 function openGoogleCalendar(){
   const dates=getEventDatesForCalendar();
-  if(!dates||!invitation){ showToast(lang==='es'?'No se pudo generar el evento':'Could not generate the event'); return; }
-  const title=encodeURIComponent(invitation.host_names||(lang==='es'?'Evento':'Event'));
-  const details=encodeURIComponent(lang==='es'?`Invitación de ${invitation.host_names||''}`:`Invitation from ${invitation.host_names||''}`);
+  if(!dates||!invitation){ showToast(L3('No se pudo generar el evento','Could not generate the event','Impossible de générer l\u2019événement')); return; }
+  const title=encodeURIComponent(invitation.host_names||L3('Evento','Event','Événement'));
+  const details=encodeURIComponent(L3(`Invitación de ${invitation.host_names||''}`,`Invitation from ${invitation.host_names||''}`,`Invitation de ${invitation.host_names||''}`));
   const location=encodeURIComponent(invitation.location||'');
   const datesParam=`${fmtICSDate(dates.startDate)}/${fmtICSDate(dates.endDate)}`;
   // ctz asume zona horaria de México por default — la mayoría de los eventos
@@ -519,7 +808,7 @@ function openGoogleCalendar(){
 
 function downloadIcsFile(){
   const dates=getEventDatesForCalendar();
-  if(!dates||!invitation){ showToast(lang==='es'?'No se pudo generar el evento':'Could not generate the event'); return; }
+  if(!dates||!invitation){ showToast(L3('No se pudo generar el evento','Could not generate the event','Impossible de générer l\u2019événement')); return; }
   const uid=`${invitation.slug||'evento'}-${Date.now()}@dragonflaievents.com`;
   const ics=[
     'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DragonflAI Events//ES','CALSCALE:GREGORIAN',
@@ -528,9 +817,9 @@ function downloadIcsFile(){
     `DTSTAMP:${fmtICSDate(new Date())}`,
     `DTSTART:${fmtICSDate(dates.startDate)}`,
     `DTEND:${fmtICSDate(dates.endDate)}`,
-    `SUMMARY:${icsEscape(invitation.host_names||(lang==='es'?'Evento':'Event'))}`,
+    `SUMMARY:${icsEscape(invitation.host_names||L3('Evento','Event','Événement'))}`,
     invitation.location?`LOCATION:${icsEscape(invitation.location)}`:'',
-    `DESCRIPTION:${icsEscape(lang==='es'?`Invitación de ${invitation.host_names||''}`:`Invitation from ${invitation.host_names||''}`)}`,
+    `DESCRIPTION:${icsEscape(L3(`Invitación de ${invitation.host_names||''}`,`Invitation from ${invitation.host_names||''}`,`Invitation de ${invitation.host_names||''}`))}`,
     'END:VEVENT','END:VCALENDAR'
   ].filter(Boolean).join('\r\n');
   const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
@@ -545,9 +834,11 @@ function downloadIcsFile(){
 // ── Contacto del organizador ──
 function buildOrganizerWhatsAppLink(inv,t){
   const digits=String(inv.organizer_phone||'').replace(/\D/g,'');
-  const greeting=lang==='es'
-    ?`¡Hola! Tengo una duda sobre ${inv.host_names||'el evento'}.`
-    :`Hi! I have a question about ${inv.host_names||'the event'}.`;
+  const greeting=L3(
+    `¡Hola! Tengo una duda sobre ${inv.host_names||'el evento'}.`,
+    `Hi! I have a question about ${inv.host_names||'the event'}.`,
+    `Bonjour ! J\u2019ai une question \u00e0 propos de ${inv.host_names||'l\u2019événement'}.`
+  );
   return `https://wa.me/${digits}?text=${encodeURIComponent(greeting)}`;
 }
 
@@ -555,6 +846,46 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── Compartir ──
+// navigator.share() abre el share sheet nativo del sistema — en iOS y
+// Android eso trae WhatsApp, Mensajes, Correo, etc. ya instalados, sin
+// que el invitado tenga que copiar y pegar nada. Es soportado en Safari
+// iOS y Chrome Android desde hace años, pero NO en desktop Chrome/Firefox
+// — de ahí el respaldo a portapapeles, que sí funciona en todos lados.
+async function compartirInvitacion(){
+  const tt=T[lang];
+  const url=location.href;
+  const titulo=(invitation && toTitleCase(invitation.host_names))
+    ? `${toTitleCase(invitation.host_names)} — ${tt.invitedFallback}`
+    : document.title;
+
+  if(navigator.share){
+    try{
+      await navigator.share({title:titulo, text:tt.invitedFallback, url});
+      return;   // el share sheet ya hizo su trabajo; nada más que avisar
+    }catch(e){
+      // AbortError = el invitado cerró el share sheet sin elegir nada.
+      // No es un error real, así que no se le muestra nada.
+      if(e && e.name==='AbortError') return;
+      // Cualquier otro fallo cae al respaldo de copiar.
+    }
+  }
+
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast(tt.shareLinkCopied);
+  }catch(e){
+    // Último recorrido: seleccionar el texto manualmente. Pasa sobre todo
+    // en navegadores viejos o páginas sin HTTPS, donde el portapapeles
+    // moderno está bloqueado.
+    const ta=document.createElement('textarea');
+    ta.value=url; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); showToast(tt.shareLinkCopied); }catch(e2){}
+    ta.remove();
+  }
 }
 
 function openBugReportModal(){
@@ -598,7 +929,333 @@ function getSlug(){
   return qs.get('slug')||qs.get('i')||'';
 }
 
+// ══════════════════════════════════════════════════════════════
+//  Familia de evento
+//  event_type llega con texto libre ("Boda/Wedding", "XV de Regina",
+//  "Fiesta Infantil"). Se normaliza a una familia para elegir marco
+//  y sobre.
+// ══════════════════════════════════════════════════════════════
+function familiaEvento(tipo){
+  const t=String(tipo||'').toLowerCase();
+  if(/boda|wedding|aniversario|anniversary/.test(t)) return 'boda';
+  if(/xv|quince|sweet\s*16/.test(t)) return 'xv';
+  // Fiesta infantil = juguetona (globos, confeti). Cumpleaños a secas, sin
+  // señal de "niños", se trata como celebración de adulto: sobria, no
+  // infantil — un cumpleaños de 40 años no debería llegar con globos.
+  if(/infantil|kids|ni[ñn]o|baby|bautizo|christening|comuni[oó]n/.test(t)) return 'infantil';
+  if(/cumplea|birthday/.test(t)) return 'cumpleanos';
+  if(/corporat|empresa|business|graduaci|graduation/.test(t)) return 'formal';
+  return 'formal';   // ante un tipo desconocido, geometría neutra: nunca desentona
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Marco decorativo
+//  Una esquina por familia; las otras tres son la misma reflejada,
+//  que es como se construyen los marcos de papelería de verdad.
+// ══════════════════════════════════════════════════════════════
+const ESQUINAS={
+  // Boda: rama con hojas y capullos — sobria, sin puntos sueltos
+  boda:`<path d="M4 92 C4 52 22 24 60 10" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M18 62 C30 56 40 60 44 70 C32 76 22 72 18 62Z" fill="currentColor" opacity=".65"/>
+        <path d="M30 40 C42 34 52 38 56 48 C44 54 34 50 30 40Z" fill="currentColor" opacity=".5"/>
+        <path d="M50 20 C60 15 68 18 71 26 C61 31 53 28 50 20Z" fill="currentColor" opacity=".4"/>`,
+  // XV: voluta clásica de papelería
+  xv:`<path d="M6 94 C6 50 26 22 66 8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M14 88 C14 54 30 32 62 18" stroke="currentColor" stroke-width="1" fill="none" opacity=".55" stroke-linecap="round"/>
+      <path d="M20 56 C34 50 40 34 30 26 C22 20 12 28 18 38" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <path d="M52 26 C64 22 70 12 62 6" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+      <circle cx="30" cy="26" r="2.6" fill="currentColor"/><circle cx="62" cy="6" r="2.2" fill="currentColor" opacity=".8"/>`,
+  // Infantil: globos con hilo, y confeti alrededor — la única familia
+  // que se permite sentirse "de fiesta" sin medias tintas
+  infantil:`<circle cx="16" cy="82" r="5" fill="currentColor" opacity=".6"/>
+      <circle cx="38" cy="60" r="3.4" fill="currentColor" opacity=".45"/>
+      <rect x="24" y="36" width="9" height="9" rx="2" fill="currentColor" opacity=".45" transform="rotate(24 28 40)"/>
+      <ellipse cx="58" cy="26" rx="12" ry="15" fill="currentColor" opacity=".7"/>
+      <path d="M58 41 L55 46 L61 46 Z" fill="currentColor" opacity=".7"/>
+      <path d="M58 46 C54 54 62 58 58 66" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".5"/>
+      <ellipse cx="80" cy="16" rx="9" ry="11.5" fill="currentColor" opacity=".5"/>
+      <path d="M80 27.5 L78 31 L82 31 Z" fill="currentColor" opacity=".5"/>
+      <path d="M80 31 C77 37 83 40 80 46" stroke="currentColor" stroke-width="1.1" fill="none" opacity=".4"/>`,
+  // Cumpleaños de adulto: mismo lenguaje sobrio que la boda, pero sin
+  // ramas — una sola línea con un punto, para que se sienta festivo sin
+  // ser infantil
+  cumpleanos:`<path d="M4 88 C4 48 24 18 64 6" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <circle cx="64" cy="6" r="2.6" fill="currentColor" opacity=".75"/>
+      <circle cx="10" cy="70" r="2" fill="currentColor" opacity=".5"/>`,
+  // Formal: geometría limpia, nada orgánico
+  formal:`<path d="M4 60 L4 12 C4 7 7 4 12 4 L60 4" stroke="currentColor" stroke-width="1.7" fill="none"/>
+      <path d="M14 56 L14 20 C14 17 16 15 19 15 L56 15" stroke="currentColor" stroke-width="1" fill="none" opacity=".5"/>
+      <circle cx="12" cy="12" r="2.6" fill="currentColor"/>`
+};
+
+function renderMarco(inv){
+  const fam=familiaEvento(inv && inv.event_type);
+  const d=ESQUINAS[fam]; if(!d) return '';
+  const svg=c=>`<svg class="${c}" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">${d}</svg>`;
+  return `<div class="marco">${svg('e1')}${svg('e2')}${svg('e3')}${svg('e4')}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Velo de legibilidad
+//  Mide el brillo real de la foto en un canvas pequeño y decide si el
+//  texto va oscuro sobre velo claro, o blanco sobre velo oscuro.
+//  Si el navegador bloquea la lectura del canvas (CORS), se queda con
+//  el velo claro por defecto — que nunca deja el texto ilegible.
+// ══════════════════════════════════════════════════════════════
+function calibrarVelo(url, card){
+  if(!url || !card) return;
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=()=>{
+    try{
+      const n=24, cv=document.createElement('canvas');
+      cv.width=n; cv.height=n;
+      const ctx=cv.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(img,0,0,n,n);
+      const px=ctx.getImageData(0,0,n,n).data;
+      let suma=0, cuenta=0;
+      for(let i=0;i<px.length;i+=4){
+        // Luminancia percibida: el ojo no pesa igual los tres canales
+        suma+=0.2126*px[i]+0.7152*px[i+1]+0.0722*px[i+2];
+        cuenta++;
+      }
+      const brillo=suma/cuenta;
+      // Foto oscura → texto blanco. Foto clara → velo claro y texto normal.
+      if(brillo<118) card.classList.add('velo-oscuro');
+    }catch(e){ /* CORS: se queda el velo claro, que siempre es legible */ }
+  };
+  img.onerror=()=>{};
+  img.src=url;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Parallax de la foto de fondo
+//  0.28 es deliberado: más que eso marea en celular.
+// ══════════════════════════════════════════════════════════════
+let plxRaf=null;
+function activarParallax(card){
+  if(!card || !card.classList.contains('theme-custom-photo')) return;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  card.classList.add('parallax');
+  const mover=()=>{
+    plxRaf=null;
+    const r=card.getBoundingClientRect();
+    if(r.bottom<0 || r.top>window.innerHeight) return;
+    card.style.backgroundPosition='center calc(50% + '+(r.top*-0.28).toFixed(1)+'px)';
+  };
+  const onScroll=()=>{ if(!plxRaf) plxRaf=requestAnimationFrame(mover); };
+  window.addEventListener('scroll',onScroll,{passive:true});
+  mover();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Monograma — iniciales de los anfitriones
+//  Se deduce del nombre; no le pide nada extra a la anfitriona.
+//  "Ana & Diego" → A · D   ·   "Sofía" → S
+// ══════════════════════════════════════════════════════════════
+function iniciales(nombres){
+  let txt=String(nombres||'').trim();
+  if(!txt) return '';
+  // "XV de Regina" o "Boda de Ana y Luis" traen el tipo de evento pegado.
+  // El monograma es de las personas, no del tipo de fiesta.
+  txt=txt.replace(/^(mis\s+)?(xv|quince(añera)?s?|boda|bautizo|fiesta|cumplea(ñ|n)os|graduaci(ó|o)n|baby\s*shower|primera\s+comuni(ó|o)n)(\s+a(ñ|n)os)?\s*(de\s+|:)\s*/i,'').trim();
+  if(!txt) return '';
+  // Partir por separadores de pareja, no por cualquier espacio:
+  // "Ana María & Diego" son dos personas, no tres.
+  const partes=txt.split(/\s*(?:&|\+|\by\b|\band\b)\s*/i).filter(Boolean);
+  const ini=partes.map(p=>{
+    const w=p.trim().split(/\s+/)[0]||'';
+    return w.charAt(0).toUpperCase();
+  }).filter(c=>/[A-ZÁÉÍÓÚÑÜ]/.test(c));
+  return ini.slice(0,3).join(' · ');
+}
+
+function renderMonograma(inv){
+  const ini=iniciales(inv && inv.host_names);
+  if(!ini) return '';
+  return `<div class="monograma"><span class="mline"></span><span>${esc(ini)}</span><span class="mline"></span></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  El sobre
+//  Se muestra una vez por sesión y por invitación: quien vuelve a
+//  abrir el link para consultar la dirección no tiene que repetir
+//  el gesto. Se puede saltar con ?sobre=0.
+// ══════════════════════════════════════════════════════════════
+const PETALO_COLORES=['#2EC4B6','#7FD8CF','#B98BE0','#F2B544','#E8825F','#C9B8EA'];
+
+function sobreActivo(inv){
+  if(!inv) return false;
+  if(inv.envelope_enabled === false) return false;          // si algún día hay columna, manda
+  const qs=new URLSearchParams(location.search);
+  if(qs.get('sobre')==='0' || qs.get('envelope')==='0') return false;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  try{ if(sessionStorage.getItem('dflai_sobre_'+(inv.slug||inv.id))) return false; }catch(e){}
+  return true;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Dos siluetas de sobre, mismo papel y mismos colores por familia —
+//  la diferencia es puramente de tratamiento, no de paleta, para que
+//  cambiar de estilo nunca desentone con el resto de la invitación.
+//    'clasico': solapa sólida + sello de cera circular (el de antes)
+//    'moderno': trazo lineal + marca geométrica con las iniciales
+// ══════════════════════════════════════════════════════════════
+function sobreSvgClasico(PAPEL, ini){
+  return `
+    <defs>
+      <linearGradient id="sbCuerpo" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${PAPEL.cA}"/><stop offset="1" stop-color="${PAPEL.cB}"/></linearGradient>
+      <linearGradient id="sbSolapa" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${PAPEL.flapA}"/><stop offset="1" stop-color="${PAPEL.flapB}"/></linearGradient>
+      <linearGradient id="sbSello" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${PAPEL.sealA}"/><stop offset="1" stop-color="${PAPEL.sealB}"/></linearGradient>
+    </defs>
+    <!-- Sobre papel claro necesita borde propio para definirse -- el color
+         del cuerpo ya no es saturado, así que no hace de borde solo. -->
+    <rect x="4" y="30" width="332" height="198" rx="14" fill="url(#sbCuerpo)"
+          stroke="${PAPEL.acento}" stroke-opacity=".22" stroke-width="1.2"/>
+    <path d="M4 226 L170 122 L336 226 Z" fill="${PAPEL.cB}" opacity=".55"/>
+    <path d="M4 44 L170 150 L336 44" fill="none" stroke="${PAPEL.acento}" stroke-width="1" opacity=".22"/>
+    <g class="solapa">
+      <path d="M4 44 C4 34 12 30 22 30 L318 30 C328 30 336 34 336 44 L170 152 Z"
+            fill="url(#sbSolapa)" stroke="${PAPEL.acento}" stroke-opacity=".2" stroke-width="1"/>
+    </g>
+    <g class="sello">
+      <circle cx="170" cy="150" r="30" fill="url(#sbSello)"/>
+      <circle cx="170" cy="150" r="24" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.4"/>
+      <text x="170" y="150" text-anchor="middle" dominant-baseline="central"
+            font-family="Cormorant Garamond, serif" font-size="21" font-weight="600"
+            fill="#fff" letter-spacing="1">${esc(ini)}</text>
+    </g>`;
+}
+
+function sobreSvgModerno(PAPEL, ini){
+  // Trazo lineal en vez de solapa sólida -- pero AMBOS estilos llevan un
+  // sello real (círculo con iniciales). Aquí el sello es de contorno, no
+  // relleno, para que se note la diferencia con el clásico sin dejar de
+  // ser, de verdad, un sello.
+  return `
+    <rect x="4" y="18" width="332" height="196" rx="12" fill="${PAPEL.cA}"
+          stroke="${PAPEL.acento}" stroke-opacity=".35" stroke-width="1.3"/>
+    <path d="M14 28 L170 114 L326 28" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".35" stroke-width="1.1"/>
+    <line x1="30" y1="196" x2="30" y2="204" stroke="${PAPEL.acento}" stroke-opacity=".28" stroke-width="1"/>
+    <line x1="310" y1="196" x2="310" y2="204" stroke="${PAPEL.acento}" stroke-opacity=".28" stroke-width="1"/>
+    <g class="sello">
+      <circle cx="170" cy="150" r="27" fill="${PAPEL.cA}" stroke="${PAPEL.acento}" stroke-width="1.6"/>
+      <circle cx="170" cy="150" r="20" fill="none" stroke="${PAPEL.acento}" stroke-opacity=".4" stroke-width="1"/>
+      <text x="170" y="150" text-anchor="middle" dominant-baseline="central"
+            font-family="Cormorant Garamond, serif" font-size="18" font-weight="600"
+            fill="${PAPEL.ink}" letter-spacing="1">${esc(ini)}</text>
+    </g>`;
+}
+
+function montarSobre(inv){
+  if(!sobreActivo(inv)) return;
+  const t=T[lang];
+  const ini=iniciales(inv.host_names)||'✦';
+  const color=inv.text_color||'#0D6E65';
+  // El sobre es papel: base clara y tono a tono, con el color que la
+  // anfitriona YA eligió para su tarjeta (custom_color_hex) como acento y
+  // como color del sello -- no una paleta fija por tipo de evento. Así el
+  // sobre combina con lo que sea que haya elegido, sin excepciones.
+  const elegido = inv.custom_color_hex || inv.text_color || '#7C8A6B';
+  const fam=familiaEvento(inv.event_type);
+  const estilo = inv.envelope_style==='moderno' ? 'moderno' : 'clasico';
+
+  const acento = elegido;
+  const ink = hexEsClaro(elegido) ? '#2E2A22' : hexOscurecer(elegido, 0.55);
+  const PAPEL = {
+    // El papel se queda casi blanco -- solo una insinuación del color
+    // elegido, para que siga leyéndose como papel fino y no como la
+    // tarjeta saturada de adentro repetida en el sobre.
+    cA: hexAclarar(elegido, 0.94), cB: hexAclarar(elegido, 0.85),
+    flapA: hexAclarar(elegido, 0.97), flapB: hexAclarar(elegido, 0.90),
+    sealA: hexAclarar(elegido, 0.15), sealB: hexOscurecer(elegido, 0.12),
+    acento, ink,
+    fondo: `linear-gradient(150deg, ${hexAclarar(elegido,0.96)} 0%, ${hexAclarar(elegido,0.90)} 55%, ${hexAclarar(elegido,0.80)} 100%)`
+  };
+
+  const el=document.createElement('div');
+  el.id='sobre';
+  el.style.setProperty('--sobre-bg', PAPEL.fondo);
+  el.setAttribute('role','button');
+  el.setAttribute('tabindex','0');
+  el.setAttribute('aria-label', L3('Abrir la invitación','Open the invitation','Ouvrir l\u2019invitation'));
+  const svgInner = estilo==='moderno' ? sobreSvgModerno(PAPEL, ini) : sobreSvgClasico(PAPEL, ini);
+  el.innerHTML=`
+    <div class="sobre-nombres">${esc(toTitleCase(inv.host_names||''))}</div>
+    <div class="sobre-wrap sobre-wrap--${estilo}">
+      <svg class="sobre-svg" viewBox="0 0 340 232" xmlns="http://www.w3.org/2000/svg">
+        ${svgInner}
+      </svg>
+    </div>
+    <div class="sobre-hint">${L3('Toca para abrir','Tap to open','Touchez pour ouvrir')}</div>`;
+  // La fuente elegida se aplica a la tarjeta, no a :root — así que aquí
+  // se resuelve directo desde el dato, no leyendo el DOM.
+  const FF={'':"'Cormorant Garamond',serif",'font-classic':"'Playfair Display',serif",
+    'font-script':"'Dancing Script',cursive",'font-alexbrush':"'Alex Brush',cursive",
+    'font-soft':"'Libre Baskerville',serif",'font-editorial':"'Cinzel',serif",
+    'font-modern':"'Montserrat',sans-serif",'font-fun':"'Fredoka',sans-serif",
+    'font-caveat':"'Caveat',cursive",'font-round':"'Poppins',sans-serif",
+    'font-comic':"'Comic Neue',cursive",'font-playful':"'Chewy',cursive"};
+  if(FF[inv.title_font_family]) el.style.setProperty('--title-font', FF[inv.title_font_family]);
+  // El fondo del sobre es papel claro, así que el nombre va en tinta
+  // oscura -- blanco fijo se perdería aquí.
+  el.querySelector('.sobre-nombres').style.color=PAPEL.ink;
+  document.body.appendChild(el);
+  document.body.style.overflow='hidden';
+
+  const abrir=()=>{
+    if(el.classList.contains('abierto')) return;
+    el.classList.add('abierto');
+    lluviaPetalos(color);
+    try{ sessionStorage.setItem('dflai_sobre_'+(inv.slug||inv.id),'1'); }catch(e){}
+    setTimeout(()=>{ el.remove(); document.body.style.overflow=''; }, 900);
+  };
+  el.addEventListener('click',abrir);
+  el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); }});
+}
+
+function lluviaPetalos(){
+  const cont=document.createElement('div');
+  cont.id='petalos';
+  document.body.appendChild(cont);
+  const n=window.innerWidth<520?26:44;
+  for(let i=0;i<n;i++){
+    const p=document.createElement('span');
+    p.className='petalo';
+    const w=7+Math.random()*11, h=w*(0.5+Math.random()*0.7);
+    const c=PETALO_COLORES[(Math.random()*PETALO_COLORES.length)|0];
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.width=w+'px'; p.style.height=h+'px';
+    p.style.background=c;
+    p.style.opacity=(0.45+Math.random()*0.45).toFixed(2);
+    p.style.borderRadius=Math.random()>.5?'50% 50% 50% 50% / 60% 60% 40% 40%':'2px';
+    p.style.setProperty('--giro',(180+Math.random()*540)+'deg');
+    p.style.animationDuration=(2.6+Math.random()*2.6)+'s';
+    p.style.animationDelay=(Math.random()*0.7)+'s';
+    cont.appendChild(p);
+  }
+  setTimeout(()=>cont.remove(),6500);   // se limpia solo, no deja nodos colgando
+}
+
+// Se llama al final de renderInvitation: enciende lo que se mueve.
+function activarDinamicos(inv){
+  const card=document.querySelector('#content .card');
+  if(inv.background_image_url && card){
+    calibrarVelo(inv.background_image_url, card);
+    activarParallax(card);
+  }
+  montarSobre(inv);
+  document.body.classList.add('anim');
+  arrancarCuenta();
+  pintarConfirmaciones(inv);
+  activarRevelado();
+}
+
 function renderNotFound(){
+  currentView='notfound';
   document.getElementById('content').innerHTML=`
     <div class="state-msg">
       <h2>${T[lang].notFoundTitle}</h2>
@@ -616,6 +1273,127 @@ function daysUntil(dateStr){
   return diff>=0?diff:null;
 }
 
+// ══════════════════════════════════════════════════════════════
+//  Cuenta regresiva viva
+//  Antes solo mostraba los días. Un número que se mueve solo es lo que
+//  hace que la invitación se sienta viva en lugar de una imagen.
+// ══════════════════════════════════════════════════════════════
+let cdTimer=null;
+
+// Construye la fecha objetivo en hora local. Si event_time trae una hora
+// (ej. "18:00", "6:00 pm", "18:00 - 23:00"), la usa; si no, medianoche.
+function fechaObjetivo(inv){
+  if(!inv || !inv.event_date_raw) return null;
+  const base=new Date(inv.event_date_raw);
+  if(isNaN(base)) return null;
+  let hh=0, mm=0;
+  const txt=String(inv.event_time||'');
+  const m=txt.match(/(\d{1,2})\s*[:.]?\s*(\d{2})?\s*(a\.?m\.?|p\.?m\.?|am|pm)?/i);
+  if(m){
+    hh=parseInt(m[1],10)||0;
+    mm=m[2]?parseInt(m[2],10):0;
+    const suf=(m[3]||'').toLowerCase().replace(/\./g,'');
+    if(suf==='pm' && hh<12) hh+=12;
+    if(suf==='am' && hh===12) hh=0;
+    if(hh>23) hh=0;
+    if(mm>59) mm=0;
+  }
+  // event_date_raw viene como YYYY-MM-DD; se arma en local para no
+  // recorrer un día por la zona horaria del invitado.
+  const partes=String(inv.event_date_raw).slice(0,10).split('-').map(Number);
+  if(partes.length===3 && !partes.some(isNaN)){
+    return new Date(partes[0], partes[1]-1, partes[2], hh, mm, 0, 0);
+  }
+  base.setHours(hh,mm,0,0);
+  return base;
+}
+
+function pintarCuenta(){
+  const cont=document.getElementById('countdown');
+  if(!cont || !invitation) return;
+  const objetivo=fechaObjetivo(invitation);
+  if(!objetivo){ cont.innerHTML=''; return; }
+  const t=T[lang];
+  let ms=objetivo-new Date();
+
+  if(ms<=0){
+    // El día del evento, y hasta 12 h después, celebra en vez de mostrar ceros
+    cont.innerHTML = ms > -12*3600*1000
+      ? `<div class="cd-today">${L3('¡Hoy es el día! 🎉','Today is the day! 🎉','C\u2019est le grand jour ! 🎉')}</div>`
+      : '';
+    if(cdTimer){ clearInterval(cdTimer); cdTimer=null; }
+    return;
+  }
+
+  const seg=Math.floor(ms/1000);
+  const d=Math.floor(seg/86400), h=Math.floor(seg%86400/3600),
+        mi=Math.floor(seg%3600/60), sg=seg%60;
+  const L = lang==='fr'
+    ? ['jours','h','min','sec']
+    : lang==='es'
+    ? ['días','horas','min','seg']
+    : ['days','hours','min','sec'];
+  const u=(n,l)=>`<div class="cd-unit"><div class="cd-num">${String(n).padStart(2,'0')}</div><div class="cd-lbl">${l}</div></div>`;
+  cont.innerHTML = u(d,L[0])+'<span class="cd-sep">:</span>'+u(h,L[1])
+                 + '<span class="cd-sep">:</span>'+u(mi,L[2])
+                 + '<span class="cd-sep">:</span>'+u(sg,L[3]);
+}
+
+function arrancarCuenta(){
+  if(cdTimer) clearInterval(cdTimer);
+  pintarCuenta();
+  cdTimer=setInterval(pintarCuenta,1000);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Contador público de confirmaciones
+//  Requiere la función SQL get_rsvp_public_count (ver migración).
+//  Si todavía no existe en producción, esto no rompe nada: simplemente
+//  no pinta el contador.
+// ══════════════════════════════════════════════════════════════
+async function pintarConfirmaciones(inv){
+  const cont=document.getElementById('rsvp-count');
+  if(!cont || !inv) return;
+  try{
+    const {data,error}=await sb.rpc('get_rsvp_public_count',{p_invitation_id:inv.id});
+    if(error || !data) return;
+    const r=Array.isArray(data)?data[0]:data;
+    const si=Number(r?.attending_count||0), tot=Number(r?.total_guests||0);
+    if(si<1) return;   // con 0 o 1 confirmación el dato juega en contra
+    const txt = lang==='fr'
+      ? `<b>${si}</b> ${si===1?'personne a confirmé':'personnes ont confirmé'}`
+      : lang==='es'
+      ? `<b>${si}</b> ${si===1?'persona ya confirmó':'personas ya confirmaron'}`
+      : `<b>${si}</b> ${si===1?'guest has confirmed':'guests have confirmed'}`;
+    const pct = tot>0 ? Math.min(100, Math.round(si/tot*100)) : 0;
+    cont.innerHTML=`<span class="dotc"></span><span>${txt}</span>`
+      + (tot>0?`<div class="rsvp-bar" style="width:100%"><i style="width:0%"></i></div>`:'');
+    if(tot>0) requestAnimationFrame(()=>{
+      const b=cont.querySelector('.rsvp-bar i'); if(b) b.style.width=pct+'%';
+    });
+  }catch(e){ /* sin contador, la invitación funciona igual */ }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Revelado progresivo de las secciones de abajo
+// ══════════════════════════════════════════════════════════════
+function activarRevelado(){
+  const els=document.querySelectorAll('.reveal');
+  if(!els.length) return;
+  if(!('IntersectionObserver' in window)){
+    els.forEach(e=>e.classList.add('in')); return;
+  }
+  const io=new IntersectionObserver((ent,obs)=>{
+    ent.forEach((e,i)=>{
+      if(!e.isIntersecting) return;
+      e.target.style.animationDelay=(i*0.08)+'s';
+      e.target.classList.add('in');
+      obs.unobserve(e.target);
+    });
+  },{threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+  els.forEach(e=>io.observe(e));
+}
+
 let selectedGuest=null;
 let lastSearchResults=[];
 let guestSearchTimer=null;
@@ -627,8 +1405,8 @@ function renderExtraSections(inv,t){
   const sections=[];
 
   if(inv.couple_story){
-    sections.push(`<div class="extra-card">
-      <div class="extra-title">📝 ${esc(lang==='es'?'Información':'Information')}</div>
+    sections.push(`<div class="extra-card reveal">
+      <div class="extra-title">📝 ${esc(L3('Información','Information','Informations'))}</div>
       <p class="extra-story">${esc(inv.couple_story).replace(/\n/g,'<br>')}</p>
     </div>`);
   }
@@ -641,7 +1419,7 @@ function renderExtraSections(inv,t){
         ${ev.location?`<div class="schedule-meta">📍 ${esc(ev.location)}</div>`:''}
         ${ev.description?`<div class="schedule-desc">${esc(ev.description)}</div>`:''}
       </div>`).join('');
-    sections.push(`<div class="extra-card">
+    sections.push(`<div class="extra-card reveal">
       <div class="extra-title">🗓️ ${t.scheduleTitle}</div>
       ${rows}
     </div>`);
@@ -649,14 +1427,14 @@ function renderExtraSections(inv,t){
 
   if(Array.isArray(inv.gallery_urls)&&inv.gallery_urls.length){
     const imgs=inv.gallery_urls.map(url=>`<img src="${esc(url)}" class="gallery-img" loading="lazy">`).join('');
-    sections.push(`<div class="extra-card">
+    sections.push(`<div class="extra-card reveal">
       <div class="extra-title">📸 ${t.galleryTitle}</div>
       <div class="gallery-grid">${imgs}</div>
     </div>`);
   }
 
   if(inv.lodging_info||inv.map_url){
-    sections.push(`<div class="extra-card">
+    sections.push(`<div class="extra-card reveal">
       <div class="extra-title">🏨 ${t.lodgingTitle}</div>
       ${inv.lodging_info?`<p class="extra-story">${esc(inv.lodging_info).replace(/\n/g,'<br>')}</p>`:''}
       ${inv.map_url?`<div class="extra-links-row"><a href="${esc(inv.map_url)}" target="_blank" rel="noopener" class="extra-link-btn">🗺️ ${t.seeOnMap}</a></div>`:''}
@@ -665,7 +1443,7 @@ function renderExtraSections(inv,t){
 
   if(Array.isArray(inv.registry_links)&&inv.registry_links.length){
     const links=inv.registry_links.map(r=>`<a href="${esc(r.url)}" target="_blank" rel="noopener" class="extra-link-btn">🎁 ${esc(r.name)}</a>`).join('');
-    sections.push(`<div class="extra-card">
+    sections.push(`<div class="extra-card reveal">
       <div class="extra-title">🎁 ${t.registryTitle}</div>
       <div class="extra-links-row">${links}</div>
     </div>`);
@@ -677,7 +1455,7 @@ function renderExtraSections(inv,t){
         <div class="faq-q">${esc(f.question)}</div>
         <div class="faq-a">${esc(f.answer)}</div>
       </div>`).join('');
-    sections.push(`<div class="extra-card">
+    sections.push(`<div class="extra-card reveal">
       <div class="extra-title">❓ ${t.faqTitle}</div>
       ${items}
     </div>`);
@@ -702,6 +1480,7 @@ function hexToRgba(hex,alpha){
 }
 
 function renderInvitation(inv){
+  currentView='invitation';
   const days=daysUntil(inv.event_date_raw);
   const t=T[lang];
   const restricted=!!inv.restrict_to_guest_list;
@@ -741,6 +1520,7 @@ function renderInvitation(inv){
 
   document.getElementById('content').innerHTML=`
     <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
+      ${renderMarco(inv)}
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
       <div class="names">${esc(toTitleCase(inv.host_names))}</div>
       <div class="divider"></div>
@@ -753,7 +1533,8 @@ function renderInvitation(inv){
       </div>
       ${inv.message?`<div class="msg">${esc(inv.message)}</div>`:''}
       ${inv.hashtag?`<div class="hashtag">${esc(inv.hashtag)}</div>`:''}
-      ${days!==null?`<div class="countdown"><div><div class="cd-num">${days}</div><div class="cd-lbl">${t.daysLabel}</div></div></div>`:''}
+      <div class="countdown" id="countdown"></div>
+      <div class="rsvp-count" id="rsvp-count"></div>
     </div>
     ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
 
@@ -767,11 +1548,16 @@ function renderInvitation(inv){
       </div>
     </div>
 
+    <!-- Compartir: usa el share sheet nativo del teléfono cuando existe
+         (WhatsApp, Mensajes, etc. aparecen solos, sin que el invitado
+         copie y pegue nada). Sin eso, cae a copiar el link al portapapeles. -->
+    <button type="button" id="share-btn" onclick="compartirInvitacion()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:-.75rem 0 1.5rem;background:var(--cream-2);color:var(--text-2);border:1.5px solid var(--border-gray);border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer">📤 ${t.shareBtn}</button>
+
     ${inv.organizer_phone?`<a href="${buildOrganizerWhatsAppLink(inv,t)}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:linear-gradient(135deg,#25D366,#1da851);color:#fff;border:none;border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;text-decoration:none;margin:-.75rem 0 1.5rem;box-sizing:border-box">💬 ${t.organizerContactBtn}${inv.organizer_name?': '+esc(inv.organizer_name):''}</a>`:''}
 
     ${renderExtraSections(inv,t)}
 
-    <div class="extra-card">
+    <div class="extra-card reveal">
       <div class="extra-title">📸 ${t.eventPhotosTitle}</div>
       <p style="font-size:12.5px;color:var(--text-2);text-align:center;margin-bottom:1rem">${t.eventPhotosHint}</p>
       <div style="text-align:center;margin-bottom:1rem">
@@ -868,6 +1654,10 @@ function renderInvitation(inv){
   if(restricted && selectedGuest) showSelectedGuest(selectedGuest);
   if(attending!==null) setAttending(attending);
   if(lodgingNeeded!==null && document.getElementById('opt-lodging-yes')) setLodging(lodgingNeeded);
+
+  // Todo lo que se mueve se enciende aquí, al final: la tarjeta ya existe
+  // en el DOM y las animaciones no arrancan sobre elementos a medio pintar.
+  activarDinamicos(inv);
 }
 
 function openRsvpModal(){
@@ -1191,7 +1981,7 @@ async function loadEventPhotos(){
     const L=lang==='es';
     if(data.length>0){
       viewAllBtn.style.display='inline-block';
-      viewAllBtn.textContent=L?`🖼️ Ver todas las fotos (${data.length})`:`🖼️ View all photos (${data.length})`;
+      viewAllBtn.textContent=L3(`🖼️ Ver todas las fotos (${data.length})`,`🖼️ View all photos (${data.length})`,`🖼️ Voir toutes les photos (${data.length})`);
     } else {
       viewAllBtn.style.display='none';
     }
@@ -1310,9 +2100,9 @@ function openFullGalleryView(){
   overlay.innerHTML=`
     <div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:900px;width:100%;max-height:88vh;overflow-y:auto;box-sizing:border-box">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:10px;flex-wrap:wrap">
-        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin:0">${L?'Todas las fotos':'All photos'} (${eventPhotosList.length})</h3>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:20px;margin:0">${L3('Todas las fotos','All photos','Toutes les photos')} (${eventPhotosList.length})</h3>
         <div style="display:flex;align-items:center;gap:8px">
-          <button type="button" class="extra-link-btn photos-downloadall-btn" style="border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap" onclick="downloadAllEventPhotos()">⬇️ ${L?'Descargar todas':'Download all'}</button>
+          <button type="button" class="extra-link-btn photos-downloadall-btn" style="border:none;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap" onclick="downloadAllEventPhotos()">⬇️ ${L3('Descargar todas','Download all','Tout télécharger')}</button>
           <button type="button" onclick="closeFullGalleryView()" style="background:var(--cream-2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;flex-shrink:0">✕</button>
         </div>
       </div>
@@ -1455,6 +2245,10 @@ if('serviceWorker' in navigator){
   }).catch(()=>{});
 }
 
+// Aplicar el idioma resuelto antes de pedir la invitación, para que el
+// estado de carga y un posible "no encontrada" ya salgan en el idioma
+// correcto en el primer pintado.
+setLang(lang);
 init();
 </script>
 </body>

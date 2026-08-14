@@ -91,5 +91,49 @@ p{font-size:15px; line-height:1.6; margin-bottom:28px}
 
     <p class="nota">¿Crees que es un error nuestro? <a href="mailto:hola@dragonflaievents.com">Cuéntanos</a>.</p>
   </div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  Registro de rutas rotas
+//
+//  Netlify sirve esta página ante cualquier ruta inexistente, pero en el
+//  plan gratis de Cloudflare solo se ve el CONTEO de 4xx, nunca la ruta.
+//  Esto la guarda para poder verla después en Supabase.
+//
+//  Va por REST directo, sin el SDK de Supabase: un solo POST pesa unos
+//  cientos de bytes, mientras que cargar la librería serían ~40 KB en una
+//  página cuyo único trabajo es fallar rápido.
+//
+//  No se guarda nada personal: ruta, referente y navegador. Nada que
+//  identifique a la persona.
+// ══════════════════════════════════════════════════════════════
+(function(){
+  var SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
+  var ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
+  try{
+    // Evitar duplicados: si la misma ruta ya se registró en esta sesión,
+    // no se manda otra vez (Android reintenta iconos varias veces).
+    var clave = 'df404_' + location.pathname;
+    if(sessionStorage.getItem(clave)) return;
+    sessionStorage.setItem(clave, '1');
+
+    fetch(SUPABASE_URL + '/rest/v1/error_404', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': ANON,
+        'Authorization': 'Bearer ' + ANON,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        ruta:      String(location.pathname || '').slice(0, 300),
+        referente: String(document.referrer || '').slice(0, 300),
+        navegador: String(navigator.userAgent || '').slice(0, 300)
+      }),
+      keepalive: true
+    }).catch(function(){});
+  }catch(e){ /* si falla el registro, la página igual se ve bien */ }
+})();
+</script>
 </body>
 </html>

@@ -932,6 +932,24 @@ footer .teal{color:var(--teal-dark);font-weight:600}
 .profile-label{display:block;font-size:11px;font-weight:600;color:var(--text-3);margin:.6rem 0 .3rem}
 .profile-input{width:100%;padding:11px;border-radius:var(--radius);border:1.5px solid var(--border-gray);font-family:'Inter',sans-serif;font-size:15px;box-sizing:border-box;margin-bottom:.4rem;background:var(--white)}
 .profile-section-divider{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal-dark);margin:1rem 0 .4rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
+
+/* ── Secciones opcionales del editor de invitación, colapsables ──
+   Antes las 7 secciones "(opcional)" estaban abiertas todo el tiempo:
+   itinerario, hospedaje, mesa de regalos, historia, FAQ, galería y
+   contacto. Alguien que solo quería publicar rápido tenía que desplazarse
+   por 13 secciones para llegar al botón. Con <details> nativo, lo esencial
+   queda abierto y lo opcional se agrega solo si se necesita — sin tocar
+   ningún id ni handler: los campos siguen ahí, solo empiezan ocultos.
+   El texto del summary sigue el mismo patrón data-es/data-en que el
+   resto del archivo, así que setLang() lo traduce sin cambios aparte. */
+.opt-section{margin-top:1rem;padding-top:.6rem;border-top:1px solid var(--border-gray)}
+.opt-section summary{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--teal-dark);cursor:pointer;list-style:none;display:flex;align-items:center;
+  justify-content:space-between;gap:8px;padding:2px 0}
+.opt-section summary::-webkit-details-marker{display:none}
+.opt-section summary::after{content:'+';font-size:16px;font-weight:400;color:var(--text-3);flex-shrink:0}
+.opt-section[open] summary::after{content:'–'}
+.opt-section .opt-body{padding-top:.5rem}
 .btn-excel-close:hover{color:var(--text);border-color:var(--teal)}
 </style>
 <!-- Cloudflare Web Analytics -->
@@ -1623,6 +1641,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   <div class="excel-modal" style="max-width:920px;text-align:left;max-height:88vh;overflow-y:auto">
     <h3 style="text-align:center" id="publish-modal-title" data-es="Publicar invitación" data-en="Publish invitation">Publicar invitación</h3>
     <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:1rem" id="publish-modal-sub" data-es="Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta." data-en="Generate a public page with RSVP so your guests can confirm — no account needed.">Genera una página pública con RSVP para que tus invitados confirmen asistencia — no necesitan cuenta.</p>
+    <p style="font-size:11px;color:var(--text-3);text-align:center;margin:-.6rem 0 1rem" data-es="Lo esencial va abierto abajo. Lo demás (itinerario, hospedaje, FAQ, galería…) es opcional — ábrelo solo si lo necesitas, y puedes agregarlo después aunque ya hayas publicado." data-en="What's essential is open below. Everything else (schedule, lodging, FAQ, gallery…) is optional — open it only if you need it, and you can add it later even after publishing.">Lo esencial va abierto abajo. Lo demás (itinerario, hospedaje, FAQ, galería…) es opcional — ábrelo solo si lo necesitas, y puedes agregarlo después aunque ya hayas publicado.</p>
 
     <div class="publish-layout">
     <div id="publish-form" class="publish-form-col">
@@ -1674,16 +1693,33 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       <label class="profile-label" data-es="Dress code (opcional)" data-en="Dress code (optional)">Dress code (opcional)</label>
       <input type="text" id="pub-dresscode" class="profile-input" oninput="debouncedLivePreview()" placeholder="ej. Formal, casual elegante, blanco y negro...">
 
-      <div class="profile-section-divider" data-es="Contacto para dudas (opcional)" data-en="Contact for questions (optional)">Contacto para dudas (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Contacto para dudas (opcional)" data-en="Contact for questions (optional)">Contacto para dudas (opcional)</summary>
+      <div class="opt-body">
       <p style="font-size:11px;color:var(--text-3);margin:-.2rem 0 .5rem" data-es="Tus invitados verán un botón de WhatsApp para escribirte directo." data-en="Your guests will see a WhatsApp button to message you directly.">Tus invitados verán un botón de WhatsApp para escribirte directo.</p>
       <div style="display:flex;gap:10px">
         <input type="text" id="pub-organizer-name" class="profile-input" style="flex:1" placeholder="ej. Ana (organizadora)">
         <input type="text" id="pub-organizer-phone" class="profile-input" style="flex:1" placeholder="ej. 442 123 4567">
       </div>
+      </div>
+      </details>
 
       <div class="profile-section-divider" data-es="Color de la invitación" data-en="Invitation color">Color de la invitación</div>
       <p id="pub-current-theme-label" style="text-align:center;font-size:12px;color:var(--text-2);margin:-.2rem 0 .6rem"></p>
       <div id="pub-combo-picker" style="margin-bottom:1rem"></div>
+
+      <p style="font-size:12px;font-weight:600;color:var(--text-2);margin:0 0 .5rem" data-es="Estilo de sobre" data-en="Envelope style">Estilo de sobre</p>
+      <div style="display:flex;gap:10px;margin-bottom:1rem">
+        <button type="button" id="env-style-clasico" class="envelope-style-btn active" onclick="setEnvelopeStyle('clasico')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:12px;border:2px solid var(--teal);background:var(--teal-light);cursor:pointer">
+          <svg width="40" height="28" viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" rx="3" fill="#FCFAF5" stroke="#B8862F" stroke-width="1"/><circle cx="20" cy="16" r="6" fill="#E8C77E"/></svg>
+          <span style="font-size:11.5px;font-weight:600;color:var(--text)" data-es="Clásico — sello de cera" data-en="Classic — wax seal">Clásico — sello de cera</span>
+        </button>
+        <button type="button" id="env-style-moderno" class="envelope-style-btn" onclick="setEnvelopeStyle('moderno')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:12px;border:2px solid var(--border-gray);background:var(--cream-2);cursor:pointer">
+          <svg width="40" height="28" viewBox="0 0 40 28"><rect x="1" y="1" width="38" height="26" rx="3" fill="#FCFAF5" stroke="#7C8A6B" stroke-width="1"/><rect x="16" y="10" width="8" height="8" rx="1.5" fill="none" stroke="#7C8A6B" stroke-width="1.3" transform="rotate(45 20 14)"/></svg>
+          <span style="font-size:11.5px;font-weight:600;color:var(--text)" data-es="Moderno — trazo lineal" data-en="Modern — line art">Moderno — trazo lineal</span>
+        </button>
+      </div>
+
       <div style="text-align:center;margin-bottom:1rem">
         <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-bg-photo-input').click()" data-es="📷 Subir foto de fondo" data-en="📷 Upload background photo">📷 Subir foto de fondo</button>
         <input type="file" id="pub-bg-photo-input" accept="image/*" style="display:none" onchange="uploadPublishBackground(event)">
@@ -1732,29 +1768,53 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <span data-es="Solo las personas de esta lista pueden confirmar asistencia" data-en="Only people on this list can confirm attendance">Solo las personas de esta lista pueden confirmar asistencia</span>
       </label>
 
-      <div class="profile-section-divider" data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">Itinerario de eventos (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Itinerario de eventos (opcional)" data-en="Event schedule (optional)">Itinerario de eventos (opcional)</summary>
+      <div class="opt-body">
       <div id="pub-events-editor" class="line-editor"></div>
       <textarea id="pub-events" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Cena de bienvenida | Viernes 7:00 PM | Jardín El Encanto | Ven a conocer a la familia&#10;Ceremonia | Sábado 4:00 PM | Iglesia San Miguel&#10;Recepción | Sábado 6:00 PM | Salón Las Rosas"></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Hospedaje y cómo llegar (opcional)" data-en="Lodging & directions (optional)">Hospedaje y cómo llegar (opcional)</summary>
+      <div class="opt-body">
       <textarea id="pub-lodging" class="profile-input" style="min-height:70px;resize:vertical" oninput="mirrorToSTD('pub-lodging','std-lodging');debouncedLivePreview()" placeholder="Hotel recomendado: Hotel Real de Minas — menciona 'Boda Ana y Juan' para tarifa especial."></textarea>
       <input type="text" id="pub-map-url" class="profile-input" style="margin-top:.5rem" oninput="mirrorToSTD('pub-map-url','std-map-url');debouncedLivePreview()" placeholder="Link de Google Maps (opcional)">
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Mesa de regalos (opcional)" data-en="Gift registry (optional)">Mesa de regalos (opcional)</summary>
+      <div class="opt-body">
       <div id="pub-registry-editor" class="line-editor"></div>
       <textarea id="pub-registry" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="Liverpool | https://mesaderegalos.liverpool.com.mx/...&#10;Amazon | https://amazon.com.mx/wedding/..."></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" id="pub-story-title" data-es="📝 Información (opcional)" data-en="📝 Information (optional)">📝 Información (opcional)</div>
+      <details class="opt-section">
+      <summary id="pub-story-title" data-es="📝 Información (opcional)" data-en="📝 Information (optional)">📝 Información (opcional)</summary>
+      <div class="opt-body">
       <textarea id="pub-story" class="profile-input" style="min-height:80px;resize:vertical" oninput="mirrorToSTD('pub-story','std-story');debouncedLivePreview()" placeholder="Nos conocimos hace 10 años..."></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Preguntas frecuentes (opcional)" data-en="FAQ (optional)">Preguntas frecuentes (opcional)</summary>
+      <div class="opt-body">
       <div id="pub-faq-editor" class="line-editor"></div>
       <textarea id="pub-faq" class="profile-input" style="display:none" oninput="debouncedLivePreview()" placeholder="¿Qué me pongo? | Formal, colores neutros&#10;¿Puedo llevar niños? | Sí, hay área de juegos"></textarea>
+      </div>
+      </details>
 
-      <div class="profile-section-divider" data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">Galería de fotos (opcional)</div>
+      <details class="opt-section">
+      <summary data-es="Galería de fotos (opcional)" data-en="Photo gallery (optional)">Galería de fotos (opcional)</summary>
+      <div class="opt-body">
       <button type="button" class="btn-std-upload-photo" onclick="document.getElementById('pub-gallery-input').click()" data-es="📷 Agregar fotos" data-en="📷 Add photos">📷 Agregar fotos</button>
       <input type="file" id="pub-gallery-input" accept="image/*" multiple style="display:none" onchange="onGalleryFilesSelected(event)">
       <div id="pub-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:.6rem"></div>
+      </div>
+      </details>
 
       <div style="display:flex;gap:10px;margin-top:1rem">
         <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:0;flex:2">Publicar →</button>
@@ -1970,7 +2030,50 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 // ══════════════════════════════
 //  STATE
 // ══════════════════════════════
-let lang='es', mode='diy', eventType='Boda/Wedding', guests=50, plan={};
+// ══════════════════════════════════════════════════════════════
+//  RESOLUCIÓN DE IDIOMA — misma lógica que la landing y la invitación.
+//  Prioridad: ?lang= en la URL → localStorage → navegador → es
+//  El perfil de Supabase (preferred_lang) se aplica encima cuando hay
+//  sesión, SALVO que la URL lo haya forzado explícitamente.
+//  Clave global a propósito: sin sesión todavía no hay cuenta a la cual
+//  amarrarla, y el idioma no revela nada de nadie.
+// ══════════════════════════════════════════════════════════════
+const DFLAI_LANG_KEY='dflai_lang';
+let dflaiLangForcedByUrl=false;
+function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
+function dflaiResolveLang(){
+  let q='';
+  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
+  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
+  // Detección por navegador: APAGADA a propósito.
+  // El público real es hispanohablante, pero muchos traen el teléfono
+  // configurado en inglés — y el embudo en inglés (plan generado y
+  // correos del worker) todavía no está validado. Mandarlos a inglés
+  // los deja a medio camino. Se reactiva poniendo esto en true, cuando
+  // la generación y los correos en inglés estén confirmados.
+  const DFLAI_AUTODETECT = false;
+  if(DFLAI_AUTODETECT){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      const b=String(c).toLowerCase();
+      if(b.indexOf('es')===0) return 'es';
+      if(b.indexOf('en')===0) return 'en';
+    }
+  }
+  return 'es';
+}
+const DFLAI_META={
+  es:{title:'DragonflAI Events — Planeemos tu evento juntos'},
+  en:{title:"DragonflAI Events — Let's plan your event together"}
+};
+function dflaiApplyMeta(l){
+  const m=DFLAI_META[l];
+  if(m) document.title=m.title;
+}
+
+let lang=dflaiResolveLang(), mode='diy', eventType='Boda/Wedding', guests=50, plan={};
 let lastGenId=null; // agrupa regeneraciones parciales con la generación original (no cobra doble)
 
 // ══════════════════════════════
@@ -2071,7 +2174,11 @@ async function refreshPaidStatusInner(){
   if(!prefsApplied){
     prefsApplied=true;
     suppressPrefSave=true;
-    if(userProfile.preferred_lang && userProfile.preferred_lang!==lang) setLang(userProfile.preferred_lang);
+    // Si la persona llegó con ?lang= explícito (por ejemplo desde un link
+    // en inglés en la bio de TikTok), esa elección gana sobre el perfil en
+    // ESTA carga. Sin esto, un usuario con perfil en español que abre un
+    // link en inglés ve la app rebotar a español a media carga.
+    if(userProfile.preferred_lang && !dflaiLangForcedByUrl && userProfile.preferred_lang!==lang) setLang(userProfile.preferred_lang);
     if(userProfile.preferred_mode && userProfile.preferred_mode!==mode) setMode(userProfile.preferred_mode);
     suppressPrefSave=false;
   }
@@ -2416,6 +2523,10 @@ async function openPublishModal(){
   if(!plan.typeName){ showToast(lang==='es'?'Genera tu plan primero':'Generate your plan first',true); return; }
   if(!sb){ showToast(lang==='es'?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
   if(!currentUser){ openAuthModal(); showToast(lang==='es'?'Inicia sesión para publicar tu invitación':'Log in to publish your invitation',true); return; }
+  // El modal se reutiliza entre "crear" y "editar" — si una edición previa
+  // dejó abiertas secciones opcionales, un evento nuevo debe arrancar con
+  // todo cerrado otra vez.
+  document.querySelectorAll('#publish-form .opt-section').forEach(det=>det.open=false);
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
   await refreshPaidStatus(); // trae el saldo real de créditos, sin gastar nada todavía
   const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
@@ -2459,6 +2570,7 @@ async function openPublishModal(){
   pubBgColor='#FAF9F7';
   pubFontClass='';
   pubTitleFontClass='';
+  setEnvelopeStyle('clasico');
   pubTextColor=null;
   const stdCard=document.querySelector('#content-savethedate .std-card');
   if(stdCard){
@@ -2484,6 +2596,19 @@ let pubBackgroundImageUrl=null;
 let pubGuestEmails={};
 let pubFontClass='';
 let pubTitleFontClass='';
+// 'clasico' (sello de cera) o 'moderno' (trazo lineal) -- se resetea a
+// 'clasico' en cada evento nuevo, igual que el resto de estos campos.
+let pubEnvelopeStyle='clasico';
+function setEnvelopeStyle(v){
+  pubEnvelopeStyle=v;
+  document.getElementById('env-style-clasico').classList.toggle('active', v==='clasico');
+  document.getElementById('env-style-moderno').classList.toggle('active', v==='moderno');
+  document.getElementById('env-style-clasico').style.borderColor = v==='clasico' ? 'var(--teal)' : 'var(--border-gray)';
+  document.getElementById('env-style-clasico').style.background = v==='clasico' ? 'var(--teal-light)' : 'var(--cream-2)';
+  document.getElementById('env-style-moderno').style.borderColor = v==='moderno' ? 'var(--teal)' : 'var(--border-gray)';
+  document.getElementById('env-style-moderno').style.background = v==='moderno' ? 'var(--teal-light)' : 'var(--cream-2)';
+  debouncedLivePreview();
+}
 let pubTextColor=null;
 
 // Convierte "rgb(250, 249, 247)" (lo que el navegador reporta) de vuelta
@@ -2761,6 +2886,26 @@ function invitationOrigin(){
 }
 function invitationHost(){ return invitationOrigin().replace(/^https?:\/\//,''); }
 
+// Copia el link de la invitación con ?lang= ya puesto, para que el
+// anfitrión pueda mandarle a cada grupo de invitados (México, Inglaterra,
+// Francia...) el link en el idioma correcto sin escribirlo a mano.
+async function dashboardCopyInvLink(slug, langCode){
+  const url=`${invitationOrigin()}/i/${slug}?lang=${langCode}`;
+  try{
+    await navigator.clipboard.writeText(url);
+    showToast(lang==='es'?'Link copiado':'Link copied');
+  }catch(e){
+    // Respaldo para navegadores donde el portapapeles moderno está
+    // bloqueado (típico en http, o webviews viejos).
+    const ta=document.createElement('textarea');
+    ta.value=url; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); showToast(lang==='es'?'Link copiado':'Link copied'); }
+    catch(e2){ showToast(lang==='es'?'No se pudo copiar':'Could not copy',true); }
+    ta.remove();
+  }
+}
+
 async function showQRModal(slug,hostNames,hashtag){
   const L=lang==='es';
   const invUrl=`${invitationOrigin()}/i/${slug}`;
@@ -2867,6 +3012,28 @@ async function continueDraftInvitation(invId){
   }catch(err){ console.error('No se pudo recuperar la lista del borrador:',err); }
 }
 
+// Abre solas las secciones opcionales del editor que ya tengan contenido
+// guardado — para que editar una invitación existente no dé la impresión
+// de que el itinerario, la FAQ o la mesa de regalos desaparecieron.
+function abrirSeccionesConContenido(){
+  const conValor=id=>{ const el=document.getElementById(id); return !!el && String(el.value||'').trim()!==''; };
+  // Un id representativo por sección — basta con que ESE campo (o su
+  // pareja, como lodging+map-url) tenga algo para abrir todo el bloque.
+  const disparador={
+    'pub-organizer-name': conValor('pub-organizer-name')||conValor('pub-organizer-phone'),
+    'pub-events':         conValor('pub-events'),
+    'pub-lodging':        conValor('pub-lodging')||conValor('pub-map-url'),
+    'pub-registry':       conValor('pub-registry'),
+    'pub-story':          conValor('pub-story'),
+    'pub-faq':            conValor('pub-faq'),
+    'pub-gallery-input':  (typeof pubGalleryUrls!=='undefined' && pubGalleryUrls.length>0)
+  };
+  document.querySelectorAll('#publish-form .opt-section').forEach(det=>{
+    const abre=Object.entries(disparador).some(([id,tiene])=>tiene && det.querySelector('#'+id));
+    if(abre) det.open=true;
+  });
+}
+
 async function openEditInvitationModal(invId){
   if(!sb||!currentUser) return;
   loadExtraFontsIfNeeded();
@@ -2956,12 +3123,18 @@ async function openEditInvitationModal(invId){
   renderGalleryPreview();
   pubFontClass=inv.font_family||'';
   pubTitleFontClass=inv.title_font_family||'';
+  setEnvelopeStyle(inv.envelope_style==='moderno' ? 'moderno' : 'clasico');
   pubTextColor=inv.text_color||null;
   pubBackgroundImageUrl=inv.background_image_url||null;
   renderPublishPickers();
   updatePubThemeLabel();
   const bgPreview=document.getElementById('pub-bg-photo-preview');
   if(bgPreview) bgPreview.innerHTML=pubBackgroundImageUrl?`<img src="${pubBackgroundImageUrl}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;border:2px solid var(--violet)">`:'';
+  // Las secciones opcionales empiezan cerradas para no abrumar — pero si
+  // ESTA invitación ya tiene algo guardado ahí (itinerario, hospedaje,
+  // FAQ...), se abren solas. Si no, alguien podría pensar que su
+  // itinerario se borró solo porque el acordeón nació cerrado.
+  abrirSeccionesConContenido();
 
   // La vista previa (showInvitationPreview) lee del objeto "plan" de la
   // sesión actual — si nunca generaste un plan en esta sesión (ej. entraste
@@ -3278,6 +3451,7 @@ async function publishInvitation(){
       custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
       font_family: pubFontClass||null,
       title_font_family: pubTitleFontClass||null,
+      envelope_style: pubEnvelopeStyle||'clasico',
       text_color: pubTextColor
     };
 
@@ -3403,6 +3577,7 @@ async function publishInvitation(){
       custom_color_hex: pubBackgroundImageUrl?null:pubBgColor,
       font_family: pubFontClass||null,
       title_font_family: pubTitleFontClass||null,
+      envelope_style: pubEnvelopeStyle||'clasico',
       text_color: pubTextColor
     };
   }
@@ -4153,7 +4328,7 @@ function showUserDashboard(){
   loadDashboardPlans();
 }
 
-let dashboardActiveTab='checklist';
+let dashboardActiveTab='invitation';
 function dashboardShowFullPlan(){
   const L=lang==='es';
   // OJO: dashboardCurrentPlanData ES el plan_data completo -- {plan, tabsHtml,
@@ -5120,6 +5295,28 @@ async function dashboardSelectPlan(planId){
       <button class="btn-account" onclick="showQRModal('${esc(inv.slug||'').replace(/'/g,"")}','${esc(inv.host_names||'').replace(/'/g,"")}','${esc(inv.hashtag||'').replace(/'/g,"")}')">▦ ${L?'Ver/descargar QR':'View/download QR'}</button>
       <button class="btn-account" onclick="dashboardDownloadGuestList()">📥 ${L?'Descargar lista de invitados':'Download guest list'}</button>
     </div>
+    ${inv.is_published?`
+    <!-- La invitación ya sabe leer ?lang=es|en|fr y quedarse en ese idioma
+         (no vuelve a autodetectar mientras la URL lo diga) -- esto solo le
+         da al anfitrión los tres links ya armados, sin que tenga que
+         escribir el parámetro a mano cada vez que quiera mandarlo a un
+         grupo de invitados distinto. -->
+    <div class="dash-share-langs" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--cream-3)">
+      <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:8px">${L?'Comparte en cada idioma':'Share in each language'}</div>
+      ${[
+        ['es', L?'Español':'Spanish', '🇲🇽'],
+        ['en', 'English', '🇬🇧'],
+        ['fr', 'Français', '🇫🇷']
+      ].map(([code,label,flag])=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+          <span style="font-size:12.5px;color:var(--text-2);width:90px;flex-shrink:0">${flag} ${label}</span>
+          <span style="flex:1;font-size:11px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace">${invitationOrigin()}/i/${esc(inv.slug||'')}?lang=${code}</span>
+          <button class="btn-account" style="padding:4px 10px;font-size:11px;flex-shrink:0" onclick="dashboardCopyInvLink('${esc(inv.slug||'').replace(/'/g,"")}','${code}')">${L?'Copiar':'Copy'}</button>
+        </div>
+      `).join('')}
+      <p style="font-size:10.5px;color:var(--text-3);margin-top:6px">${L?'Cada invitado ve la página en ese idioma, sin importar el de su navegador.':'Each guest sees the page in that language, regardless of their browser.'}</p>
+    </div>
+    `:''}
   `:`<p style="font-size:13px;color:var(--text-3)">${L?'Aquí va a vivir tu invitación digital — créala cuando estés listo/a.':"Your digital invitation will live here — create it whenever you're ready."}</p>
     <button class="btn-gen" style="margin-top:10px" onclick="dashboardEditInvitation('${planId}')">${L?'Crear mi invitación':'Create my invitation'}</button>`;
 
@@ -5196,9 +5393,9 @@ async function dashboardSelectPlan(planId){
     </div>
 
     <div class="dash-tabs">
-      <button class="dash-tab active" data-tab="checklist" onclick="dashboardSwitchTab('checklist')">📋 ${L?'Checklist':'Checklist'}</button>
+      <button class="dash-tab active" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
+      <button class="dash-tab" data-tab="checklist" onclick="dashboardSwitchTab('checklist')">📋 ${L?'Checklist':'Checklist'}</button>
       <button class="dash-tab" data-tab="budget" onclick="dashboardSwitchTab('budget')">💰 ${L?'Presupuesto':'Budget'}</button>
-      <button class="dash-tab" data-tab="invitation" onclick="dashboardSwitchTab('invitation')">💌 ${L?'Invitación':'Invitation'}</button>
       <button class="dash-tab" data-tab="vendors" onclick="dashboardSwitchTab('vendors')">🤝 ${L?'Proveedores':'Vendors'}</button>
       <button class="dash-tab" data-tab="ideas" onclick="dashboardSwitchTab('ideas')">💡 ${L?'Ideas':'Ideas'}</button>
       <button class="dash-tab" data-tab="fullplan" onclick="dashboardSwitchTab('fullplan')">📄 ${L?'Tu plan completo':'Your full plan'}</button>
@@ -5211,9 +5408,9 @@ async function dashboardSelectPlan(planId){
       <button class="btn-account" onclick="dashboardExportExcel()" title="${L?'Descargar todo el evento en Excel':'Download the whole event as Excel'}">📊 ${L?'Descargar Excel':'Download Excel'}</button>
     </div>
 
-    <div class="dash-tab-panel dash-card" data-panel="checklist">${checklistTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="invitation">${invitationTabHtml}</div>
+    <div class="dash-tab-panel dash-card" data-panel="checklist" style="display:none">${checklistTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="budget" style="display:none">${budgetTabHtml}</div>
-    <div class="dash-tab-panel dash-card" data-panel="invitation" style="display:none">${invitationTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="vendors" style="display:none">${vendorsTabHtml}</div>
     <div class="dash-tab-panel dash-card" data-panel="ideas" style="display:none">${ideasTabHtml}</div>
   `;
@@ -5234,7 +5431,7 @@ async function dashboardSelectPlan(planId){
   const savedIdeas=(dashboardCurrentPlanData.plan&&dashboardCurrentPlanData.plan.inspirationIdeas)||'';
   document.getElementById('dash-inspo-ideas').innerHTML=savedIdeas?formatIdeasText(savedIdeas):'';
 
-  if(switchedPlan) dashboardActiveTab='checklist'; // evento distinto: empezar limpio en Checklist
+  if(switchedPlan) dashboardActiveTab='invitation'; // evento distinto: empezar limpio en Invitación
   dashboardSwitchTab(dashboardActiveTab); // si solo se refrescó el mismo evento, se queda en la pestaña donde estabas
 
   detailEl.dataset.loadedOnce='true';
@@ -5817,6 +6014,10 @@ function init(){
   document.getElementById('f-date').value=d.toISOString().split('T')[0];
   document.getElementById('f-date').min=new Date().toISOString().split('T')[0];
   ['f-name','f-name-1','f-name-2','f-location','f-notes'].forEach(id=>document.getElementById(id).addEventListener('input',updateProgress));
+  // Aplicar el idioma resuelto sobre el marcado estático (data-es/data-en).
+  // Va al final de init(): setLang() re-renderiza secciones que las líneas
+  // de arriba acaban de construir.
+  setLang(lang);
 }
 
 // Si el usuario acaba de volver de pagar en Stripe (Payment Link con
@@ -5872,6 +6073,8 @@ async function checkReturnFromPayment(){
 
 function setLang(l){
   lang=l;
+  dflaiRememberLang(l);
+  dflaiApplyMeta(l);
   const btnEs=document.getElementById('btn-es'), btnEn=document.getElementById('btn-en');
   if(btnEs) btnEs.className='lang-btn'+(l==='es'?' active':'');
   if(btnEn) btnEn.className='lang-btn'+(l==='en'?' active':'');
@@ -6258,6 +6461,7 @@ async function generate(){
   pubGalleryUrls=[];
   pubFontClass='';
   pubTitleFontClass='';
+  setEnvelopeStyle('clasico');
   pubTextColor=null;
   pubBackgroundImageUrl=null;
   pubBgColor='#FAF9F7';
@@ -6759,8 +6963,10 @@ ${renderFontColorPickers('std','','','#FAF9F7',(document.querySelector('#content
   // que el fondo SIEMPRE lo controle nuestro CSS del tema, nunca la IA.
   const cleanNoInlineStyle=clean.replace(/(<div class="std-card[^"]*")\s+style="[^"]*"/, '$1');
   const editHint=`<div class="std-edit-hint">✏️ ${p.lang==='es'?'Haz clic en cualquier texto de la tarjeta para editarlo':'Click any text on the card to edit it'}</div>`;
-  const actions=`<p style="font-size:13px;color:var(--text-2);text-align:center;margin-top:1rem">${p.lang==='es'?'Tu Save the Date personalizado — listo para compartir por WhatsApp':'Your personalized Save the Date — ready to share via WhatsApp'}</p>
-<div class="std-actions">
+  // El texto que decía "Tu Save the Date personalizado -- listo para
+  // compartir" se quitó a pedido: los botones de abajo (copiar, WhatsApp,
+  // descargar) ya son autoexplicativos, y la línea era redundante.
+  const actions=`<div class="std-actions">
 <button class="btn-std-copy" onclick="copySTD()">${p.lang==='es'?'📋 Copiar texto':'📋 Copy text'}</button>
 <button class="btn-std-wa" onclick="shareSTDWA()"><svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.108.549 4.09 1.51 5.814L.057 23.997l6.305-1.654A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.894a9.889 9.889 0 01-5.042-1.379l-.361-.214-3.741.981.999-3.648-.235-.374A9.861 9.861 0 012.106 12C2.106 6.58 6.58 2.106 12 2.106c5.42 0 9.894 4.474 9.894 9.894 0 5.42-4.474 9.894-9.894 9.894z"/></svg>${p.lang==='es'?'Enviar por WhatsApp':'Send via WhatsApp'}</button>
 <button class="btn-std-img" onclick="downloadSTDImage()">🖼️ ${p.lang==='es'?'Descargar imagen':'Download image'}</button>

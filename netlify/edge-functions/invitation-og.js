@@ -37,7 +37,21 @@ export default async (request, context) => {
   // Es un robot de vista previa → extraer el slug de la URL (/i/mi-slug)
   const parts = url.pathname.split('/').filter(Boolean);
   const slug = parts[1] || '';
-  const pageUrl = `${url.origin}/i/${slug}`;
+  // Conservar la query string (por ejemplo ?lang=en) al redirigir: antes se
+  // perdía, así que un link compartido en inglés terminaba abriendo la
+  // invitación en el idioma por defecto.
+  const pageUrl = `${url.origin}/i/${slug}${url.search || ''}`;
+
+  // Idioma de la tarjeta de vista previa. Las invitaciones todavía no
+  // guardan idioma propio en la base de datos, así que por ahora solo se
+  // puede forzar con ?lang=en en el link que se comparte. Cuando se agregue
+  // la columna `lang` a `invitations`, esto debería leerla primero.
+  const qLang = (url.searchParams.get('lang') || '').toLowerCase().slice(0, 2);
+  const lang = qLang === 'en' ? 'en' : 'es';
+  const COPY = {
+    es: { invited: 'Estás invitado — confirma tu asistencia aquí' },
+    en: { invited: "You're invited — RSVP here" }
+  };
 
   let inv = null;
   try {
@@ -57,12 +71,12 @@ export default async (request, context) => {
     ? `${inv.host_names}${inv.event_type ? ' — ' + inv.event_type : ''}`
     : 'DragonflAI Events';
   const description = inv
-    ? [inv.event_date, inv.location].filter(Boolean).join(' · ') || 'Estás invitado — confirma tu asistencia aquí'
-    : 'Estás invitado — confirma tu asistencia aquí';
+    ? [inv.event_date, inv.location].filter(Boolean).join(' · ') || COPY[lang].invited
+    : COPY[lang].invited;
   const image = (inv && inv.background_image_url) || `${url.origin}/favicon-180.png`;
 
   const html = `<!DOCTYPE html>
-<html lang="es">
+<html lang="${lang}">
 <head>
 <meta charset="UTF-8">
 <title>${esc(title)}</title>

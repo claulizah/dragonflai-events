@@ -14,10 +14,10 @@
     document.documentElement.style.visibility = "hidden";
   }
 </script>
-<title>DragonflAI Events — Belu, tu asistente personal de eventos</title>
+<title>DragonflAI Events — Invitaciones digitales con RSVP</title>
 <!-- Vista previa al compartir la landing (WhatsApp, redes) -->
-<meta property="og:title" content="DragonflAI Events — Belu, tu asistente personal de eventos">
-<meta property="og:description" content="Cuéntale a Belu tu evento y ella genera el plan completo: cronograma, presupuesto, checklist, proveedores e invitación con RSVP.">
+<meta property="og:title" content="DragonflAI Events — Invitaciones digitales con RSVP">
+<meta property="og:description" content="Crea tu invitación digital con RSVP que se confirma solo — y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento.">
 <meta property="og:image" content="https://dragonflaievents.com/assets/belu/og-image.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dragonflaievents.com/">
@@ -36,7 +36,10 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2EC4B6">
-<meta name="description" content="Genera en menos de 90 segundos un plan completo para tu boda, quinceañera o evento. Cronograma, presupuesto, checklist, proveedores, Save the Date — creado junto contigo, con acceso completo y descarga en Excel editable.">
+<meta name="description" content="Crea tu invitación digital con foto, colores y QR — tus invitados confirman solos. Y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento. Pruébalo gratis.">
+<!-- belu-optimista.png es el elemento LCP medido (3.5 s en P75). El preload
+     hace que el navegador lo pida de inmediato, sin esperar a parsear el body. -->
+<link rel="preload" as="image" href="/assets/belu/belu-optimista.webp" type="image/webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -295,10 +298,10 @@ footer a:hover{color:var(--teal-dark)}
 
 <!-- HERO -->
 <section class="hero">
-  <span class="hero-tag" data-es="✦ Conoce a Belu — tu asistente personal de eventos" data-en="✦ Meet Belu — your personal event assistant">✦ Conoce a Belu — tu asistente personal de eventos</span>
-  <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><img src="/assets/belu/belu-optimista.png" alt="Belu" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></span>
-  <h1 data-es="Tu evento <em>perfecto,</em><br>planeado en segundos" data-en="Your <em>perfect</em> event,<br>planned in seconds">Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
-  <p class="hero-sub" data-es="Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable." data-en="Tell Belu the details of your wedding, quinceañera, or party and she generates your complete plan — timeline, budget, checklist, vendors, and Save the Date. With full access, download it as an editable Excel too.">Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable.</p>
+  <span class="hero-tag" data-es="🪰 Invitaciones con RSVP · Belu planea el resto" data-en="🪰 RSVP invitations · Belu plans the rest">🪰 Invitaciones con RSVP · Belu planea el resto</span>
+  <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><picture><source type="image/webp" srcset="/assets/belu/belu-optimista-1x.webp 1x, /assets/belu/belu-optimista.webp 2x, /assets/belu/belu-optimista-3x.webp 3x"><img src="/assets/belu/belu-optimista-2x.png" alt="Belu" width="182" height="140" fetchpriority="high" decoding="sync" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></picture></span>
+  <h1 data-es="Tu invitación digital,<br><em>con RSVP que se confirma solo</em>" data-en="Your digital invitation,<br><em>with RSVP that confirms itself</em>">Tu invitación digital,<br><em>con RSVP que se confirma solo</em></h1>
+  <p class="hero-sub" data-es="Créala en minutos con tu foto y tus colores, y mándala con un link o un QR. Y ya que estás, Belu te arma también el cronograma, el presupuesto y el checklist del resto del evento." data-en="Build it in minutes with your photo and colors, then share it by link or QR. And since you're at it, Belu also builds the timeline, budget and checklist for the rest of your event.">Créala en minutos con tu foto y tus colores, y mándala con un link o un QR. Y ya que estás, Belu te arma también el cronograma, el presupuesto y el checklist del resto del evento.</p>
   <div class="hero-cta">
     <a href="/app" class="btn-primary">
       <span>✦</span> <span data-es="Generar mi plan gratis" data-en="Generate my free plan">Generar mi plan gratis</span>
@@ -310,9 +313,7 @@ footer a:hover{color:var(--teal-dark)}
     <span class="proof-dot"></span>
     <span class="proof-item" data-es="✓ Sin tarjeta" data-en="✓ No card needed">✓ Sin tarjeta</span>
     <span class="proof-dot"></span>
-    <span class="proof-item" data-es="✓ Español e inglés" data-en="✓ Spanish &amp; English">✓ Español e inglés</span>
-    <span class="proof-dot"></span>
-    <span class="proof-item" data-es="✓ Listo en menos de 90 segundos" data-en="✓ Ready in under 90 seconds">✓ Listo en menos de 90 segundos</span>
+    <span class="proof-item" data-es="✓ Confirman solos, sin perseguir a nadie" data-en="✓ They RSVP themselves — no chasing anyone">✓ Confirman solos, sin perseguir a nadie</span>
   </div>
 </section>
 
@@ -360,7 +361,7 @@ footer a:hover{color:var(--teal-dark)}
 <!-- FEATURES -->
 <section class="features-section">
   <p class="section-eyebrow" data-es="Funcionalidades" data-en="Features">Funcionalidades</p>
-  <h2 class="section-title" data-es="Todo lo que creamos juntos" data-en="Everything we create together">Todo lo que creamos juntos</h2>
+  <h2 class="section-title" data-es="Todo lo que incluye tu plan" data-en="Everything your plan includes">Todo lo que incluye tu plan</h2>
   <p class="section-sub" data-es="8 tipos de evento · Español e inglés · Modo personal y profesional" data-en="8 event types · Spanish &amp; English · Personal &amp; professional mode">8 tipos de evento · Español e inglés · Modo personal y profesional</p>
   <div class="features-grid" style="margin-top:2.5rem">
     <div class="feature-card">
@@ -802,10 +803,71 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 const gensUsed = parseInt(localStorage.getItem('dflai_gens') || '0');
 let currentUser = null;
 let isPaid = false;
-let lang = 'es';
+// ══════════════════════════════════════════════════════════════
+//  RESOLUCIÓN DE IDIOMA — compartida entre landing, app, invitación y legales
+//  Prioridad: ?lang= en la URL → localStorage → idioma del navegador → es
+//  La clave es GLOBAL a propósito (no va scoped por cuenta como plan_id):
+//  el idioma no es un dato de la cuenta ni revela nada de otro usuario, y
+//  necesita sobrevivir cuando todavía no hay sesión — que es justo el caso
+//  de alguien que llega desde un anuncio o desde la bio de TikTok.
+// ══════════════════════════════════════════════════════════════
+const DFLAI_LANG_KEY='dflai_lang';
+let dflaiLangForcedByUrl=false;
+function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
+function dflaiResolveLang(){
+  let q='';
+  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
+  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
+  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
+  // Detección por navegador: APAGADA a propósito.
+  // El público real es hispanohablante, pero muchos traen el teléfono
+  // configurado en inglés — y el embudo en inglés (plan generado y
+  // correos del worker) todavía no está validado. Mandarlos a inglés
+  // los deja a medio camino. Se reactiva poniendo esto en true, cuando
+  // la generación y los correos en inglés estén confirmados.
+  const DFLAI_AUTODETECT = false;
+  if(DFLAI_AUTODETECT){
+    const cands=[navigator.language].concat(navigator.languages||[]);
+    for(const c of cands){
+      if(!c) continue;
+      const b=String(c).toLowerCase();
+      if(b.indexOf('es')===0) return 'es';
+      if(b.indexOf('en')===0) return 'en';
+    }
+  }
+  return 'es';
+}
+// Título y descripción para la pestaña del navegador. Ojo: los robots de
+// vista previa (WhatsApp, TikTok, Facebook) NO ejecutan JavaScript, así que
+// esto NO arregla la tarjeta al compartir — eso se resuelve en el edge.
+const DFLAI_META={
+  es:{
+    title:'DragonflAI Events — Invitaciones digitales con RSVP',
+    desc:'Crea tu invitación digital con foto, colores y QR — tus invitados confirman solos. Y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento. Para bodas, XV años, cumpleaños y eventos de empresa. Pruébalo gratis.'
+  },
+  en:{
+    title:'DragonflAI Events — Digital invitations with RSVP',
+    desc:'Create your digital invitation with photo, colors and QR — guests RSVP themselves. Belu also builds the timeline, budget and checklist for the rest of your event. For weddings, quinceañeras, birthdays and company events. Free to try.'
+  }
+};
+function dflaiApplyMeta(l){
+  const m=DFLAI_META[l];
+  if(!m) return;
+  document.title=m.title;
+  const set=(sel,v)=>{ const el=document.querySelector(sel); if(el) el.setAttribute('content',v); };
+  set('meta[name="description"]',m.desc);
+  set('meta[property="og:title"]',m.title);
+  set('meta[property="og:description"]',m.desc);
+  set('meta[name="twitter:title"]',m.title);
+  set('meta[name="twitter:description"]',m.desc);
+}
+
+let lang = dflaiResolveLang();
 
 function setLang(l){
   lang = l;
+  dflaiRememberLang(l);
+  dflaiApplyMeta(l);
   document.getElementById('btn-es').className = 'lang-btn' + (l === 'es' ? ' active' : '');
   document.getElementById('btn-en').className = 'lang-btn' + (l === 'en' ? ' active' : '');
   document.documentElement.lang = l;
@@ -980,8 +1042,12 @@ function goToPay(productKey) {
   }
   // Mandamos el UUID real del usuario como client_reference_id — así el
   // Worker sabe a qué cuenta aplicarle los créditos cuando Stripe confirme el pago.
+  // locale= le dice a Stripe en qué idioma pintar el checkout. Sin esto,
+  // alguien que vio todo el sitio en inglés aterriza en "Pagar / Correo
+  // electrónico" justo en el paso donde menos conviene dudar.
   const sep = link.includes('?') ? '&' : '?';
-  window.location.href = link + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
+  const params = 'client_reference_id=' + encodeURIComponent(currentUser.id) + '&locale=' + (lang === 'en' ? 'en' : 'es');
+  window.location.href = link + sep + params;
 }
 
 // ══════════════════════════════
@@ -1058,6 +1124,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     location.replace('/app#link-expirado');
   }
 })();
+
+// ── Aplicar el idioma resuelto al cargar ──
+// Va al final a propósito: setLang() toca elementos y funciones que se
+// definen más arriba en este mismo script.
+setLang(lang);
 </script>
 </body>
 </html>
