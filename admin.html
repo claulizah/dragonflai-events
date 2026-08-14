@@ -63,6 +63,25 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
 .timeline-item::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--teal)}
 .timeline-item h4{font-size:14px;font-weight:600;margin:0 0 .3rem;color:var(--text)}
 .timeline-item p{font-size:13px;color:var(--text-2);margin:0}
+
+/* ── Imprimibles ── */
+.pf-row{margin-bottom:.9rem}
+.pf-label{display:block;font-size:12.5px;font-weight:600;color:var(--text-2);margin-bottom:5px}
+.pf-input{width:100%;padding:10px 12px;border:1.5px solid var(--border-gray);border-radius:9px;font-family:'Inter',sans-serif;font-size:13.5px;background:#fff}
+.pf-hint{font-size:11.5px;color:var(--text-3);margin-top:4px}
+.pf-coord-controls{display:flex;gap:10px;margin-bottom:10px}
+.pf-coord-controls div{flex:1}
+.pf-coord-controls label{display:block;font-size:11px;color:var(--text-3);margin-bottom:3px}
+.pf-coord-controls input{width:100%;padding:7px 9px;border:1px solid var(--border-gray);border-radius:6px;font-size:13px}
+#pf-canvas-wrap{border:1px dashed var(--border-gray);border-radius:8px;overflow:auto;max-height:60vh;margin-bottom:14px}
+#pf-canvas{display:block;cursor:crosshair;max-width:100%}
+.pf-field-adder{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;padding:12px;background:var(--cream-2);border-radius:9px}
+.pf-field-adder input[type=text],.pf-field-adder select{padding:7px 9px;border:1px solid var(--border-gray);border-radius:6px;font-size:12.5px;font-family:'Inter',sans-serif}
+.pf-field-adder input[type=number]{width:80px;padding:7px 9px;border:1px solid var(--border-gray);border-radius:6px;font-size:12.5px}
+.pf-field-adder input[type=color]{width:36px;height:32px;padding:0;border:1px solid var(--border-gray);border-radius:6px}
+.pf-checkbox{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text-2)}
+.pf-actions{display:flex;gap:10px;margin-top:1.25rem}
+.save-btn{padding:10px 22px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;border:none;border-radius:100px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
 </style>
 </head>
 <body>
@@ -86,6 +105,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('usage',this)">📊 Uso</button>
       <button class="tab-btn" onclick="showTab('beta',this)">🧪 Beta</button>
+      <button class="tab-btn" onclick="showTab('printables',this)">🖨️ Imprimibles</button>
       <button class="tab-btn" onclick="showTab('arch',this)">🏗️ Arquitectura</button>
       <button class="tab-btn" onclick="showTab('creds',this)">🔑 Credenciales</button>
       <button class="tab-btn" onclick="showTab('workflow',this)">⚙️ Flujo de trabajo</button>
@@ -100,6 +120,91 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
     <div id="tab-beta" class="tab-panel">
       <button class="refresh-btn" onclick="loadUsage()">↻ Actualizar</button>
       <div id="beta-content"><p class="loading">Cargando…</p></div>
+    </div>
+
+    <div id="tab-printables" class="tab-panel">
+      <button class="refresh-btn" onclick="loadPrintables()">↻ Actualizar</button>
+      <button class="refresh-btn" onclick="openPrintableForm()">+ Nuevo diseño</button>
+      <div id="printables-list"><p class="loading">Cargando…</p></div>
+
+      <div id="printable-form-card" class="card" style="display:none">
+        <h2 id="printable-form-title">🖨️ Nuevo diseño</h2>
+        <input type="hidden" id="pf-id">
+
+        <div class="pf-row">
+          <label class="pf-label">Nombre</label>
+          <input type="text" id="pf-name" class="pf-input" placeholder="ej. Boda Elegante Dorado" oninput="autoSlug()">
+        </div>
+        <div class="pf-row">
+          <label class="pf-label">Slug (identificador único)</label>
+          <input type="text" id="pf-slug" class="pf-input" placeholder="boda-elegante-dorado" oninput="this.dataset.manual='1'">
+        </div>
+        <div class="pf-row">
+          <label class="pf-label">Tipo de evento</label>
+          <select id="pf-event-type" class="pf-input">
+            <option value="boda">Boda</option>
+            <option value="cumpleanos">Cumpleaños</option>
+            <option value="baby_shower">Baby Shower</option>
+            <option value="quinceanera">Quinceañera</option>
+            <option value="fiesta_infantil">Fiesta Infantil</option>
+            <option value="corporativo">Corporativo</option>
+            <option value="graduacion">Graduación</option>
+            <option value="aniversario">Aniversario</option>
+          </select>
+        </div>
+        <div class="pf-row">
+          <label class="pf-label">Descripción (opcional, aparece en el catálogo)</label>
+          <input type="text" id="pf-description" class="pf-input" placeholder="Una línea breve">
+        </div>
+        <div class="pf-row">
+          <label class="pf-label">Precio (MXN)</label>
+          <input type="number" id="pf-price" class="pf-input" placeholder="49">
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label">Imagen de vista previa (thumbnail)</label>
+          <input type="file" id="pf-thumb-file" accept="image/*" onchange="onThumbSelected(event)">
+          <div id="pf-thumb-status" class="pf-hint"></div>
+        </div>
+        <div class="pf-row">
+          <label class="pf-label">Plantilla PDF (el archivo real que se personaliza)</label>
+          <input type="file" id="pf-template-file" accept="application/pdf" onchange="onTemplateSelected(event)">
+          <div id="pf-template-status" class="pf-hint"></div>
+        </div>
+
+        <div class="pf-row" id="pf-coords-wrap" style="display:none">
+          <label class="pf-label">Ubica cada campo — haz clic sobre la imagen donde va el texto</label>
+          <div class="pf-coord-controls">
+            <div><label>Ancho del PDF (pt)</label><input type="number" id="pf-pdf-w" value="612" onchange="redrawCanvas()"></div>
+            <div><label>Alto del PDF (pt)</label><input type="number" id="pf-pdf-h" value="792" onchange="redrawCanvas()"></div>
+          </div>
+          <p class="pf-hint" style="margin-bottom:10px">Carta = 612×792 · A4 = 595×842. Debe coincidir con el tamaño real de tu plantilla PDF.</p>
+
+          <div id="pf-canvas-wrap"><canvas id="pf-canvas"></canvas></div>
+
+          <div class="pf-field-adder">
+            <input type="text" id="nf-key" placeholder="key (ej. nombre1)">
+            <input type="text" id="nf-label" placeholder="Etiqueta (ej. Nombre 1)">
+            <select id="nf-type"><option value="text">Texto</option><option value="date">Fecha</option></select>
+            <input type="number" id="nf-maxlen" placeholder="Máx. caracteres" value="30" title="Máximo de caracteres">
+            <input type="number" id="nf-fontsize" placeholder="Tamaño" value="20" title="Tamaño de letra">
+            <input type="color" id="nf-color" value="#1a1a2e" title="Color del texto">
+            <label class="pf-checkbox"><input type="checkbox" id="nf-bold"> Negritas</label>
+          </div>
+          <p class="pf-hint" style="margin-bottom:10px">Llena los datos del campo arriba, luego haz clic en la imagen donde debe aparecer ese texto.</p>
+
+          <table class="cred-table" id="pf-fields-table">
+            <thead><tr><th>key</th><th>x</th><th>y</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="pf-actions">
+          <button class="refresh-btn" onclick="closePrintableForm()">Cancelar</button>
+          <button class="save-btn" onclick="savePrintable()">Guardar diseño</button>
+        </div>
+        <div id="pf-error" class="err-msg" style="display:none;margin-top:1rem"></div>
+      </div>
     </div>
 
     <div id="tab-arch" class="tab-panel">
@@ -211,11 +316,16 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
 </div>
 
 <script>
+let printablesLoaded=false;
 function showTab(id, btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
+  if(id==='printables' && !printablesLoaded){
+    printablesLoaded=true;
+    loadPrintables();
+  }
 }
 </script>
 
@@ -441,6 +551,282 @@ function renderBetaContent(beta){
   html += '</div>';
 
   content.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Imprimibles — CRUD de diseños + buscador de coordenadas integrado
+// ══════════════════════════════════════════════════════════════
+let PF_THUMB_URL = null, PF_TEMPLATE_URL = null, PF_FIELDS = [], PF_THUMB_IMG = null;
+let pfCanvas, pfCtx;
+
+async function loadPrintables(){
+  const listEl = document.getElementById('printables-list');
+  listEl.innerHTML = '<p class="loading">Cargando…</p>';
+  try{
+    const resp = await fetch('/api/admin-printables?action=list', {
+      headers: { 'x-admin-password': savedPassword }, cache: 'no-store'
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error) throw new Error(data.error || `status ${resp.status}`);
+    renderPrintablesList(data);
+  }catch(err){
+    listEl.innerHTML = `<div class="err-msg">${esc(err.message)}</div>`;
+  }
+}
+
+function renderPrintablesList(designs){
+  const listEl = document.getElementById('printables-list');
+  if(!designs.length){
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-3)">Todavía no hay diseños — usa "+ Nuevo diseño" para crear el primero.</p>';
+    return;
+  }
+  window.__PF_CACHE = {};
+  let html = '<table class="cred-table"><tr><th></th><th>Nombre</th><th>Tipo</th><th>Precio</th><th>Activo</th><th></th></tr>';
+  designs.forEach(d=>{
+    window.__PF_CACHE[d.id] = d;
+    html += `<tr>
+      <td><img src="${esc(d.thumbnail_url)}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'"></td>
+      <td>${esc(d.name)}</td>
+      <td>${esc(d.event_type)}</td>
+      <td>$${Number(d.price_mxn).toFixed(0)}</td>
+      <td>${d.is_active ? '✅' : '—'}</td>
+      <td style="white-space:nowrap">
+        <a href="#" onclick="editPrintable('${d.id}');return false" style="color:var(--teal-dark);margin-right:10px">Editar</a>
+        <a href="#" onclick="togglePrintable('${d.id}', ${!d.is_active});return false">${d.is_active ? 'Desactivar' : 'Activar'}</a>
+      </td>
+    </tr>`;
+  });
+  html += '</table>';
+  listEl.innerHTML = html;
+}
+
+async function togglePrintable(id, newActive){
+  try{
+    await fetch('/api/admin-printables?action=toggle', {
+      method: 'POST',
+      headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_active: newActive })
+    });
+    loadPrintables();
+  }catch(err){ alert('Error: ' + err.message); }
+}
+
+function openPrintableForm(){
+  document.getElementById('printable-form-title').textContent = '🖨️ Nuevo diseño';
+  document.getElementById('pf-id').value = '';
+  document.getElementById('pf-name').value = '';
+  const slugField = document.getElementById('pf-slug');
+  slugField.value = ''; delete slugField.dataset.manual;
+  document.getElementById('pf-event-type').value = 'boda';
+  document.getElementById('pf-description').value = '';
+  document.getElementById('pf-price').value = '';
+  document.getElementById('pf-thumb-status').textContent = '';
+  document.getElementById('pf-template-status').textContent = '';
+  document.getElementById('pf-coords-wrap').style.display = 'none';
+  document.getElementById('pf-error').style.display = 'none';
+  PF_THUMB_URL = null; PF_TEMPLATE_URL = null; PF_FIELDS = []; PF_THUMB_IMG = null;
+  renderFieldsTable();
+  document.getElementById('printable-form-card').style.display = 'block';
+  document.getElementById('printable-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closePrintableForm(){
+  document.getElementById('printable-form-card').style.display = 'none';
+}
+
+function editPrintable(id){
+  const d = window.__PF_CACHE && window.__PF_CACHE[id];
+  if(!d){ alert('No se encontró el diseño — recarga la lista.'); return; }
+
+  document.getElementById('printable-form-title').textContent = '🖨️ Editar diseño';
+  document.getElementById('pf-id').value = d.id;
+  document.getElementById('pf-name').value = d.name;
+  const slugField = document.getElementById('pf-slug');
+  slugField.value = d.slug; slugField.dataset.manual = '1';
+  document.getElementById('pf-event-type').value = d.event_type;
+  document.getElementById('pf-description').value = d.description || '';
+  document.getElementById('pf-price').value = d.price_mxn;
+
+  PF_THUMB_URL = d.thumbnail_url;
+  PF_TEMPLATE_URL = d.template_url;
+  PF_FIELDS = Array.isArray(d.editable_fields) ? JSON.parse(JSON.stringify(d.editable_fields)) : [];
+
+  document.getElementById('pf-thumb-status').textContent = 'Imagen actual cargada ✓ (sube una nueva para reemplazarla)';
+  document.getElementById('pf-template-status').textContent = 'Plantilla actual cargada ✓ (sube una nueva para reemplazarla)';
+  document.getElementById('pf-error').style.display = 'none';
+  document.getElementById('pf-coords-wrap').style.display = 'block';
+
+  loadCanvasImage(d.thumbnail_url);
+  renderFieldsTable();
+  document.getElementById('printable-form-card').style.display = 'block';
+  document.getElementById('printable-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function autoSlug(){
+  const slugField = document.getElementById('pf-slug');
+  if(slugField.dataset.manual) return;
+  const name = document.getElementById('pf-name').value;
+  slugField.value = name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+async function onThumbSelected(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('pf-thumb-status');
+  statusEl.textContent = 'Subiendo…';
+  try{
+    const url = await uploadPrintableFile(file, 'thumbnail');
+    PF_THUMB_URL = url;
+    statusEl.textContent = '✓ Subida';
+    document.getElementById('pf-coords-wrap').style.display = 'block';
+    loadCanvasImage(url);
+  }catch(err){ statusEl.textContent = 'Error: ' + err.message; }
+}
+
+async function onTemplateSelected(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('pf-template-status');
+  statusEl.textContent = 'Subiendo…';
+  try{
+    const url = await uploadPrintableFile(file, 'template');
+    PF_TEMPLATE_URL = url;
+    statusEl.textContent = '✓ Subida';
+  }catch(err){ statusEl.textContent = 'Error: ' + err.message; }
+}
+
+async function uploadPrintableFile(file, kind){
+  const slug = document.getElementById('pf-slug').value || 'diseno';
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('kind', kind);
+  fd.append('slug', slug);
+  const resp = await fetch('/api/admin-printables?action=upload', {
+    method: 'POST',
+    headers: { 'x-admin-password': savedPassword },
+    body: fd
+  });
+  const data = await resp.json();
+  if(!resp.ok || data.error) throw new Error(data.error || `status ${resp.status}`);
+  return data.url;
+}
+
+// ── Buscador de coordenadas (integrado) ──
+function loadCanvasImage(url){
+  pfCanvas = document.getElementById('pf-canvas');
+  pfCtx = pfCanvas.getContext('2d');
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    PF_THUMB_IMG = img;
+    pfCanvas.width = img.width;
+    pfCanvas.height = img.height;
+    redrawCanvas();
+  };
+  img.src = url;
+}
+
+function redrawCanvas(){
+  if(!PF_THUMB_IMG || !pfCtx) return;
+  pfCtx.clearRect(0, 0, pfCanvas.width, pfCanvas.height);
+  pfCtx.drawImage(PF_THUMB_IMG, 0, 0);
+  const pdfW = parseFloat(document.getElementById('pf-pdf-w').value) || 612;
+  const pdfH = parseFloat(document.getElementById('pf-pdf-h').value) || 792;
+  PF_FIELDS.forEach(f => {
+    const canvasX = (f.x / pdfW) * pfCanvas.width;
+    const canvasY = pfCanvas.height - (f.y / pdfH) * pfCanvas.height;
+    pfCtx.beginPath();
+    pfCtx.arc(canvasX, canvasY, 5, 0, Math.PI * 2);
+    pfCtx.fillStyle = '#2EC4B6';
+    pfCtx.fill();
+    pfCtx.fillStyle = '#1A1A2E';
+    pfCtx.font = '12px sans-serif';
+    pfCtx.fillText(f.key, canvasX + 8, canvasY - 8);
+  });
+}
+
+document.getElementById('pf-canvas').addEventListener('click', (e) => {
+  if(!PF_THUMB_IMG) return;
+  const key = document.getElementById('nf-key').value.trim();
+  if(!key){ alert('Escribe la key del campo antes de hacer clic sobre la imagen.'); return; }
+
+  const rect = pfCanvas.getBoundingClientRect();
+  const canvasX = (e.clientX - rect.left) * (pfCanvas.width / rect.width);
+  const canvasY = (e.clientY - rect.top) * (pfCanvas.height / rect.height);
+  const pdfW = parseFloat(document.getElementById('pf-pdf-w').value) || 612;
+  const pdfH = parseFloat(document.getElementById('pf-pdf-h').value) || 792;
+  const x = Math.round((canvasX / pfCanvas.width) * pdfW);
+  const y = Math.round(pdfH - (canvasY / pfCanvas.height) * pdfH);
+
+  const field = {
+    key,
+    label: document.getElementById('nf-label').value.trim() || key,
+    type: document.getElementById('nf-type').value,
+    max_length: parseInt(document.getElementById('nf-maxlen').value, 10) || 30,
+    x, y, page: 0,
+    font_size: parseInt(document.getElementById('nf-fontsize').value, 10) || 20,
+    color: document.getElementById('nf-color').value,
+    bold: document.getElementById('nf-bold').checked
+  };
+
+  const existingIdx = PF_FIELDS.findIndex(f => f.key === key);
+  if(existingIdx >= 0) PF_FIELDS[existingIdx] = field; else PF_FIELDS.push(field);
+
+  redrawCanvas();
+  renderFieldsTable();
+  document.getElementById('nf-key').value = '';
+});
+
+function renderFieldsTable(){
+  const tbody = document.querySelector('#pf-fields-table tbody');
+  tbody.innerHTML = PF_FIELDS.map((f, i) => `
+    <tr><td>${esc(f.key)}</td><td>${f.x}</td><td>${f.y}</td>
+    <td><a href="#" onclick="removeField(${i});return false" style="color:var(--red)">quitar</a></td></tr>
+  `).join('');
+}
+
+function removeField(i){
+  PF_FIELDS.splice(i, 1);
+  redrawCanvas();
+  renderFieldsTable();
+}
+
+async function savePrintable(){
+  const errEl = document.getElementById('pf-error');
+  errEl.style.display = 'none';
+
+  const name = document.getElementById('pf-name').value.trim();
+  const slug = document.getElementById('pf-slug').value.trim();
+  const event_type = document.getElementById('pf-event-type').value;
+  const description = document.getElementById('pf-description').value.trim();
+  const price_mxn = parseFloat(document.getElementById('pf-price').value);
+  const id = document.getElementById('pf-id').value || null;
+
+  if(!name || !slug || !price_mxn || !PF_THUMB_URL || !PF_TEMPLATE_URL){
+    errEl.textContent = 'Faltan datos: nombre, slug, precio, imagen y plantilla son obligatorios.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if(!PF_FIELDS.length){
+    errEl.textContent = 'Agrega al menos un campo editable (haz clic sobre la imagen).';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try{
+    const resp = await fetch('/api/admin-printables?action=save', {
+      method: 'POST',
+      headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, slug, name, event_type, description, price_mxn, thumbnail_url: PF_THUMB_URL, template_url: PF_TEMPLATE_URL, editable_fields: PF_FIELDS })
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error) throw new Error(data.error || `status ${resp.status}`);
+    closePrintableForm();
+    loadPrintables();
+  }catch(err){
+    errEl.textContent = 'Error guardando: ' + err.message;
+    errEl.style.display = 'block';
+  }
 }
 
 document.getElementById('pw-input').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
