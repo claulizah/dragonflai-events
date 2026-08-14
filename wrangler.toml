@@ -1,0 +1,19 @@
+name = "dragonflai-worker-v2"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# ⚠️ IMPORTANTE — antes del primer deploy con Wrangler:
+# Si ya tienes un Cron Trigger configurado en el dashboard de Cloudflare
+# (Settings → Triggers → Cron Triggers) para los recordatorios de
+# planeación, AJUSTA la línea de abajo para que coincida EXACTO con esa
+# expresión antes de desplegar. Wrangler sincroniza los triggers según lo
+# que declares aquí — si no coincide, puede cambiar o borrar el que ya
+# tenías configurado manualmente.
+[triggers]
+crons = ["0 14 * * *"]
+
+# Los bindings/secrets (ANTHROPIC_API_KEY, STRIPE_SECRET_KEY,
+# SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, etc.) NO se declaran aquí.
+# Ya viven en tu Worker en Cloudflare (Settings → Variables) y Wrangler
+# los deja intactos al desplegar, mientras el "name" de arriba coincida
+# exactamente con el nombre de tu Worker existente.

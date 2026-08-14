@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu imprimible — DragonflAI Events</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2EC4B6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF9F7;
+  --cream-2:#F3F1EE;
+  --cream-3:#EAE7E2;
+  --white:#FFFFFF;
+
+  --teal:#2EC4B6;
+  --teal-dark:#1A9E92;
+  --teal-light:rgba(46,196,182,.12);
+  --violet:#7B2FBE;
+  --violet-dark:#5A1F9A;
+
+  --text:#1A1A2E;
+  --text-2:#4A4A6A;
+  --text-3:#8A8AAA;
+
+  --border:rgba(46,196,182,.2);
+  --border-gray:rgba(0,0,0,.08);
+
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);
+  --shadow-teal:0 4px 20px rgba(46,196,182,.2);
+
+  --radius:12px;
+  --radius-lg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+a{color:inherit}
+
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);opacity:.12}
+.orb-1{width:600px;height:600px;background:radial-gradient(circle,var(--teal),transparent 70%);top:-150px;right:-150px}
+.orb-2{width:500px;height:500px;background:radial-gradient(circle,var(--violet),transparent 70%);bottom:-150px;left:-150px}
+
+nav{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--border-gray)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)}
+.nav-logo-name em{font-style:normal;color:var(--teal)}
+
+main{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem}
+.card{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-lg);max-width:460px;width:100%;padding:2.75rem 2.25rem;text-align:center;box-shadow:var(--shadow-sm)}
+.card img{height:96px;margin-bottom:1.25rem}
+.card h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;margin-bottom:.75rem;line-height:1.25}
+.card p{font-size:14.5px;color:var(--text-2);line-height:1.65;margin-bottom:1.5rem}
+
+.spinner{width:36px;height:36px;border:3px solid var(--teal-light);border-top-color:var(--teal);border-radius:50%;margin:0 auto 1.25rem;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.btn-primary{padding:14px 32px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:15px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-secondary{display:inline-block;margin-top:.9rem;font-size:13px;color:var(--text-3);text-decoration:none}
+.btn-secondary:hover{color:var(--teal-dark)}
+
+.state{display:none}
+.state.show{display:block}
+
+.error-box{background:rgba(232,99,122,.08);border:1px solid rgba(232,99,122,.3);border-radius:9px;padding:10px 14px;font-size:12.5px;color:#B23A52;margin-bottom:1.25rem;text-align:left}
+</style>
+<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c5f0d811fd8e4eb19d11a9e0cc4bab53"}'></script>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+      <ellipse cx="18" cy="20" rx="2.2" ry="8" fill="#2EC4B6" opacity=".9"/>
+      <ellipse cx="18" cy="13" rx="2.8" ry="2.8" fill="#2EC4B6"/>
+      <ellipse cx="10" cy="14" rx="8" ry="4" fill="#2EC4B6" opacity=".3" transform="rotate(-20 10 14)"/>
+      <ellipse cx="26" cy="14" rx="8" ry="4" fill="#7B2FBE" opacity=".3" transform="rotate(20 26 14)"/>
+      <ellipse cx="9" cy="18" rx="6.5" ry="3" fill="#2EC4B6" opacity=".2" transform="rotate(-10 9 18)"/>
+      <ellipse cx="27" cy="18" rx="6.5" ry="3" fill="#7B2FBE" opacity=".2" transform="rotate(10 27 18)"/>
+    </svg>
+    <span class="nav-logo-name">Dragonfl<em>AI</em> Events</span>
+  </a>
+</nav>
+
+<main>
+  <div class="card">
+
+    <!-- ESTADO: cargando / generando -->
+    <div class="state show" id="stateLoading">
+      <div class="spinner"></div>
+      <h1>Preparando tu imprimible…</h1>
+      <p>Ya confirmamos tu pago. Estamos generando tu archivo con tus datos — normalmente toma solo unos segundos.</p>
+    </div>
+
+    <!-- ESTADO: listo -->
+    <div class="state" id="stateReady">
+      <img src="/assets/belu/belu-celebrando.png" alt="Belu" onerror="this.style.display='none'">
+      <h1>¡Tu imprimible está listo! 🦋</h1>
+      <p id="readyDesignName"></p>
+      <a href="#" id="downloadBtn" class="btn-primary" target="_blank">Descargar mi imprimible →</a>
+      <br>
+      <a href="/imprimibles" class="btn-secondary">Ver más diseños</a>
+    </div>
+
+    <!-- ESTADO: tardando más de lo normal -->
+    <div class="state" id="stateSlow">
+      <div class="spinner"></div>
+      <h1>Casi listo…</h1>
+      <p>Está tomando un poco más de lo normal. No cierres esta página — en cuanto esté listo, aparece aquí solo. También te llegará por correo.</p>
+    </div>
+
+    <!-- ESTADO: error / no encontrado -->
+    <div class="state" id="stateError">
+      <img src="/assets/belu/belu-zen.png" alt="Belu" onerror="this.style.display='none'">
+      <h1>No pudimos mostrar tu imprimible aquí</h1>
+      <div class="error-box" id="errorDetail">No encontramos esta compra.</div>
+      <p>Si ya se te cobró, no te preocupes — escríbenos a <strong>hola@dragonflaievents.com</strong> con tu correo de compra y te lo mandamos directo.</p>
+      <a href="/imprimibles" class="btn-primary">Volver al catálogo</a>
+    </div>
+
+    <!-- ESTADO: la generación falló del lado del servidor -->
+    <div class="state" id="stateFailed">
+      <img src="/assets/belu/belu-zen.png" alt="Belu" onerror="this.style.display='none'">
+      <h1>Tu pago se confirmó, pero algo falló generando el archivo</h1>
+      <p>Ya lo sabemos y lo vamos a resolver. Escríbenos a <strong>hola@dragonflaievents.com</strong> con tu correo de compra y te lo mandamos directo — sin costo adicional, claro.</p>
+      <a href="/imprimibles" class="btn-primary">Volver al catálogo</a>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZ2RrZmRvZWNvaG9vd3dveXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTgxMDYsImV4cCI6MjA5ODc3NDEwNn0.Q382UChw8J5zjXaTgNCvJN4_eh2-HmOQQBDlRjBxm2U';
+
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+// La generación real (descargar plantilla, insertar texto, subir a
+// Storage, mandar correo) toma unos segundos — se reintenta consultando
+// cada 2.5s. Después de 45s sin resolverse, se asume que algo tardó
+// más de lo normal y se avisa sin dejar a la persona viendo un spinner
+// eterno.
+const POLL_INTERVAL_MS = 2500;
+const SLOW_THRESHOLD_MS = 15000;
+const GIVE_UP_MS = 45000;
+
+function showState(id) {
+  document.querySelectorAll('.state').forEach(el => el.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+function getSessionId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('session_id');
+}
+
+async function checkPurchase(sessionId, startedAt) {
+  if (!sb) {
+    showState('stateError');
+    document.getElementById('errorDetail').textContent = 'No se pudo conectar con el servidor.';
+    return;
+  }
+
+  const { data, error } = await sb.rpc('get_printable_purchase_by_session', {
+    p_stripe_session_id: sessionId
+  });
+
+  if (error) {
+    console.error('Error consultando la compra:', error);
+    showState('stateError');
+    document.getElementById('errorDetail').textContent = 'No encontramos esta compra con ese enlace.';
+    return;
+  }
+
+  const purchase = Array.isArray(data) ? data[0] : data;
+  if (!purchase) {
+    showState('stateError');
+    document.getElementById('errorDetail').textContent = 'No encontramos esta compra con ese enlace.';
+    return;
+  }
+
+  if (purchase.status === 'generated' || purchase.status === 'delivered') {
+    document.getElementById('downloadBtn').href = purchase.generated_pdf_url;
+    document.getElementById('readyDesignName').textContent = purchase.design_name
+      ? `"${purchase.design_name}" ya está personalizado con tus datos.`
+      : 'Ya está personalizado con tus datos.';
+    showState('stateReady');
+    return;
+  }
+
+  if (purchase.status === 'failed') {
+    showState('stateFailed');
+    return;
+  }
+
+  // Sigue en 'paid' (todavía generándose) — reintentar.
+  const elapsed = Date.now() - startedAt;
+  if (elapsed > GIVE_UP_MS) {
+    showState('stateFailed');
+    return;
+  }
+  if (elapsed > SLOW_THRESHOLD_MS) {
+    showState('stateSlow');
+  }
+  setTimeout(() => checkPurchase(sessionId, startedAt), POLL_INTERVAL_MS);
+}
+
+const sessionId = getSessionId();
+if (!sessionId) {
+  showState('stateError');
+  document.getElementById('errorDetail').textContent = 'Falta información en el enlace.';
+} else {
+  checkPurchase(sessionId, Date.now());
+}
+</script>
+</body>
+</html>

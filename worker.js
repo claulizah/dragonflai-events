@@ -37,6 +37,10 @@
 //  - RESEND_API_KEY
 // ══════════════════════════════════════════════════════════════
 
+// pdf-lib se instala vía npm (ver package.json) y Wrangler lo empaqueta
+// automáticamente al desplegar — no requiere nada especial en runtime.
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+
 // Dominios que pueden llamar a este Worker desde el navegador.
 // Agrega/quita según tus entornos.
 const ALLOWED_ORIGINS = [
@@ -136,8 +140,11 @@ export default {
       if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
         const userId = session.client_reference_id;
+        // Las compras de imprimibles no requieren cuenta (checkout de
+        // invitado) — se distinguen por metadata.type, no por client_reference_id.
+        const isPrintable = !!(session.metadata && session.metadata.type === 'printable');
 
-        if (userId) {
+        if (userId || isPrintable) {
           // IDEMPOTENCIA: registrar la sesión ANTES de aplicar. Si ya estaba
           // registrada (Stripe reintentó, o llegó duplicada), no se aplica
           // dos veces — sin esto, un reintento del webhook DUPLICA créditos.
@@ -147,7 +154,11 @@ export default {
           }
           if (claim === 'claimed') {
             try {
-              await applyPurchase(env, userId, session.id);
+              if (isPrintable) {
+                await applyPrintablePurchase(env, session);
+              } else {
+                await applyPurchase(env, userId, session.id);
+              }
             } catch (err) {
               console.error('Error aplicando la compra:', err);
               // Liberar el registro para que el reintento de Stripe sí la procese
@@ -161,6 +172,104 @@ export default {
       }
 
       return new Response('ok', { status: 200, headers: CORS });
+    }
+
+    // ── CREAR CHECKOUT DE UN IMPRIMIBLE (compra de invitado, sin login) ──
+    if (url.pathname === '/create-printable-checkout' && request.method === 'POST') {
+      try {
+        let body;
+        try { body = await request.json(); }
+        catch { return json({ success: false, reason: 'invalid_json' }, 400, CORS); }
+
+        const { design_id, field_values, email } = body;
+        if (!design_id || !field_values || typeof field_values !== 'object') {
+          return json({ success: false, reason: 'missing_fields' }, 400, CORS);
+        }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return json({ success: false, reason: 'invalid_email' }, 400, CORS);
+        }
+
+        // El diseño y su precio se leen de Supabase — NUNCA se confía en lo
+        // que mande el navegador (evita que alguien pague menos manipulando
+        // el precio o cuele campos que ese diseño no permite editar).
+        const designRes = await fetch(
+          `${env.SUPABASE_URL}/rest/v1/printable_designs?id=eq.${encodeURIComponent(design_id)}&is_active=eq.true&select=id,name,price_mxn,editable_fields,thumbnail_url`,
+          { headers: serviceHeaders(env) }
+        );
+        if (!designRes.ok) {
+          console.error('Error leyendo diseño:', await designRes.text());
+          return json({ success: false, reason: 'server_error' }, 500, CORS);
+        }
+        const designArr = await designRes.json();
+        const design = designArr[0];
+        if (!design) return json({ success: false, reason: 'design_not_found' }, 404, CORS);
+
+        // Validar que field_values solo traiga keys permitidas por el diseño
+        // y respete max_length — mismo criterio que create_printable_purchase
+        // en SQL, pero aquí se checa ANTES de cobrar.
+        const allowedFields = Array.isArray(design.editable_fields) ? design.editable_fields : [];
+        const allowedKeys = allowedFields.map(f => f.key);
+        for (const key of Object.keys(field_values)) {
+          if (!allowedKeys.includes(key)) {
+            return json({ success: false, reason: 'field_not_allowed', field: key }, 400, CORS);
+          }
+        }
+        for (const f of allowedFields) {
+          const val = field_values[f.key];
+          if (f.max_length && typeof val === 'string' && val.length > f.max_length) {
+            return json({ success: false, reason: 'field_too_long', field: f.key }, 400, CORS);
+          }
+        }
+
+        const originHeader = request.headers.get('Origin') || '';
+        const origin = ALLOWED_ORIGINS.includes(originHeader) ? originHeader : ALLOWED_ORIGINS[0];
+
+        // Metadata de Stripe: cada valor tiene tope de 500 caracteres. Con
+        // nombres + fecha sobra espacio de sobra; si algún día agregas un
+        // campo largo (ej. un mensaje libre), revisa este límite.
+        const metadata = {
+          type: 'printable',
+          design_id: design.id,
+          field_values: JSON.stringify(field_values),
+          email
+        };
+
+        const params = new URLSearchParams();
+        params.append('mode', 'payment');
+        params.append('customer_email', email);
+        params.append('success_url', `${origin}/imprimibles-gracias.html?session_id={CHECKOUT_SESSION_ID}`);
+        params.append('cancel_url', `${origin}/imprimibles.html?design=${encodeURIComponent(design.id)}`);
+        params.append('line_items[0][quantity]', '1');
+        params.append('line_items[0][price_data][currency]', 'mxn');
+        params.append('line_items[0][price_data][unit_amount]', String(Math.round(design.price_mxn * 100)));
+        params.append('line_items[0][price_data][product_data][name]', design.name);
+        if (design.thumbnail_url) {
+          params.append('line_items[0][price_data][product_data][images][0]', design.thumbnail_url);
+        }
+        for (const [k, v] of Object.entries(metadata)) {
+          params.append(`metadata[${k}]`, v);
+        }
+
+        const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: params.toString()
+        });
+
+        if (!stripeRes.ok) {
+          console.error('Error creando sesión de Stripe:', await stripeRes.text());
+          return json({ success: false, reason: 'stripe_error' }, 500, CORS);
+        }
+
+        const session = await stripeRes.json();
+        return json({ success: true, checkout_url: session.url }, 200, CORS);
+      } catch (err) {
+        console.error('Error en /create-printable-checkout:', err);
+        return json({ success: false, reason: 'server_error' }, 500, CORS);
+      }
     }
 
     // ── ENVIAR RECORDATORIOS ──
@@ -495,6 +604,217 @@ async function releaseStripeSession(env, sessionId) {
     method: 'DELETE',
     headers: serviceHeaders(env)
   }).catch(() => {});
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Aplica una compra de IMPRIMIBLE tras confirmar el pago: crea el
+//  registro en printable_purchases, y luego genera y entrega el PDF.
+//
+//  DECISIÓN IMPORTANTE: si la generación/entrega falla DESPUÉS de que
+//  la compra ya quedó registrada, este función NO relanza el error.
+//  ¿Por qué? Porque relanzarlo haría que releaseStripeSession() borre
+//  el registro de idempotencia, Stripe reintente el webhook, y
+//  create_printable_purchase falle por duplicado (stripe_session_id es
+//  UNIQUE) — un bucle de reintentos que nunca se resuelve solo. En vez
+//  de eso, la compra queda marcada 'failed' con el motivo, lista para
+//  revisar o reprocesar manualmente. Solo un fallo ANTES de crear el
+//  registro (ej. diseño no encontrado) debe hacer que Stripe reintente.
+// ══════════════════════════════════════════════════════════════
+async function applyPrintablePurchase(env, session) {
+  const meta = session.metadata || {};
+  const designId = meta.design_id;
+  const email = meta.email || session.customer_email;
+
+  let fieldValues = {};
+  try { fieldValues = JSON.parse(meta.field_values || '{}'); }
+  catch { console.error('field_values de la sesión no es JSON válido:', meta.field_values); }
+
+  if (!designId || !email) {
+    throw new Error('Sesión de imprimible sin design_id o email en metadata');
+  }
+
+  const rpcRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/create_printable_purchase`, {
+    method: 'POST',
+    headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      p_design_id: designId,
+      p_email: email,
+      p_field_values: fieldValues,
+      p_stripe_session_id: session.id,
+      p_user_id: null
+    })
+  });
+
+  if (!rpcRes.ok) {
+    throw new Error('create_printable_purchase falló: ' + await rpcRes.text());
+  }
+
+  const purchaseId = await rpcRes.json();
+  console.log('Compra de imprimible registrada:', purchaseId);
+
+  try {
+    await generateAndDeliverPrintable(env, purchaseId, designId, fieldValues, email);
+  } catch (err) {
+    console.error('Error generando/entregando el imprimible:', err);
+    await markPrintableFailed(env, purchaseId, String((err && err.message) || err)).catch(() => {});
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Genera el PDF final (plantilla + datos del comprador insertados
+//  encima), lo sube a Supabase Storage, y lo entrega por correo.
+// ══════════════════════════════════════════════════════════════
+async function generateAndDeliverPrintable(env, purchaseId, designId, fieldValues, email) {
+  // 1) Traer el diseño: necesitamos la plantilla y dónde va cada campo.
+  const designRes = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/printable_designs?id=eq.${encodeURIComponent(designId)}&select=name,template_url,editable_fields`,
+    { headers: serviceHeaders(env) }
+  );
+  if (!designRes.ok) throw new Error('No se pudo leer el diseño: ' + await designRes.text());
+  const designArr = await designRes.json();
+  const design = designArr[0];
+  if (!design) throw new Error('Diseño no encontrado: ' + designId);
+
+  // 2) Descargar la plantilla PDF base.
+  const templateRes = await fetch(design.template_url);
+  if (!templateRes.ok) throw new Error('No se pudo descargar la plantilla: ' + design.template_url);
+  const templateBytes = await templateRes.arrayBuffer();
+
+  // 3) Insertar cada campo en su posición. Cada entrada de editable_fields
+  //    define no solo qué se puede editar, sino DÓNDE va en el PDF:
+  //    { key, label, type, max_length, x, y, page, font_size, color, bold }
+  //    x/y en puntos PDF (origen abajo-izquierda), page es el índice de
+  //    página (0 = primera). Si faltan, se usan valores por defecto
+  //    razonables para no tronar por un diseño mal configurado.
+  const pdfDoc = await PDFDocument.load(templateBytes);
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const pages = pdfDoc.getPages();
+
+  const allowedFields = Array.isArray(design.editable_fields) ? design.editable_fields : [];
+  for (const f of allowedFields) {
+    const value = fieldValues[f.key];
+    if (value === undefined || value === null || value === '') continue;
+
+    const pageIndex = Number.isInteger(f.page) ? f.page : 0;
+    const targetPage = pages[pageIndex] || pages[0];
+    if (!targetPage) continue;
+
+    const displayValue = f.type === 'date' ? formatDateEs(value) : String(value);
+
+    targetPage.drawText(displayValue, {
+      x: typeof f.x === 'number' ? f.x : 50,
+      y: typeof f.y === 'number' ? f.y : 50,
+      size: typeof f.font_size === 'number' ? f.font_size : 20,
+      font: f.bold ? fontBold : fontRegular,
+      color: hexToRgb(f.color || '#1A1A2E')
+    });
+  }
+
+  const finalBytes = await pdfDoc.save();
+
+  // 4) Subir a Supabase Storage (bucket público 'printables-generated').
+  const storagePath = `${purchaseId}.pdf`;
+  const uploadRes = await fetch(
+    `${env.SUPABASE_URL}/storage/v1/object/printables-generated/${storagePath}`,
+    {
+      method: 'POST',
+      headers: {
+        ...serviceHeaders(env),
+        'Content-Type': 'application/pdf',
+        'x-upsert': 'true'
+      },
+      body: finalBytes
+    }
+  );
+  if (!uploadRes.ok) throw new Error('Error subiendo el PDF a Storage: ' + await uploadRes.text());
+
+  const publicUrl = `${env.SUPABASE_URL}/storage/v1/object/public/printables-generated/${storagePath}`;
+
+  // 5) Marcar como generado.
+  const genRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/mark_printable_generated`, {
+    method: 'POST',
+    headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_purchase_id: purchaseId, p_generated_pdf_url: publicUrl })
+  });
+  if (!genRes.ok) throw new Error('mark_printable_generated falló: ' + await genRes.text());
+
+  // 6) Enviar el correo con el link de descarga.
+  const emailHtml = buildPrintableDeliveryEmailHtml(design.name, publicUrl);
+  const resendRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: 'Belu de DragonflAI Events <hola@dragonflaievents.com>',
+      to: email,
+      subject: `Tu imprimible "${design.name}" está listo 🦋`,
+      html: emailHtml
+    })
+  });
+  if (!resendRes.ok) throw new Error('Resend falló entregando el imprimible: ' + await resendRes.text());
+
+  // 7) Marcar como entregado.
+  const delRes = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/mark_printable_delivered`, {
+    method: 'POST',
+    headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_purchase_id: purchaseId })
+  });
+  if (!delRes.ok) throw new Error('mark_printable_delivered falló: ' + await delRes.text());
+}
+
+async function markPrintableFailed(env, purchaseId, errorMessage) {
+  await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/mark_printable_failed`, {
+    method: 'POST',
+    headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_purchase_id: purchaseId, p_error_message: (errorMessage || '').slice(0, 2000) })
+  });
+}
+
+function hexToRgb(hex) {
+  const clean = (hex || '').replace('#', '');
+  const bigint = parseInt(clean.length === 3
+    ? clean.split('').map(c => c + c).join('')
+    : clean, 16);
+  if (Number.isNaN(bigint)) return rgb(0.1, 0.1, 0.18);
+  const r = ((bigint >> 16) & 255) / 255;
+  const g = ((bigint >> 8) & 255) / 255;
+  const b = (bigint & 255) / 255;
+  return rgb(r, g, b);
+}
+
+// El usuario captura la fecha como YYYY-MM-DD (input type="date") — se
+// muestra en el PDF en un formato legible en español.
+function formatDateEs(isoDate) {
+  const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(isoDate));
+  if (!m) return String(isoDate);
+  const [, y, mo, d] = m;
+  return `${parseInt(d, 10)} de ${months[parseInt(mo, 10) - 1]}, ${y}`;
+}
+
+function buildPrintableDeliveryEmailHtml(designName, downloadUrl) {
+  designName = escapeHtml(designName);
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF9F7;padding:32px 16px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<tr><td align="center">
+<table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background-color:#FFFFFF;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06)">
+<tr><td style="height:6px;background:linear-gradient(90deg,#2EC4B6,#7B2FBE);font-size:0;line-height:0">&nbsp;</td></tr>
+<tr><td style="padding:36px 40px 8px;text-align:center">
+<h1 style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#1A2332;margin:0 0 16px">🦋 ¡Tu imprimible está listo!</h1>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 8px"><strong>${designName}</strong> ya se generó con tus datos.</p>
+<p style="font-size:15px;line-height:1.6;color:#4A5568;margin:0 0 28px">Descárgalo cuando quieras — este link se queda guardado para ti.</p>
+</td></tr>
+<tr><td align="center" style="padding:0 40px 32px">
+<a href="${downloadUrl}" target="_blank" style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:100px;background:linear-gradient(90deg,#2EC4B6,#7B2FBE)">Descargar mi imprimible →</a>
+</td></tr>
+<tr><td style="padding:0 40px 32px;text-align:center">
+<p style="font-size:12px;color:#8A94A6;margin:0">— Belu 🦋 · DragonflAI Events</p>
+</td></tr>
+</table>
+</td></tr>
+</table>`;
 }
 
 // ══════════════════════════════════════════════════════════════

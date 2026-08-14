@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Buscador de coordenadas — Imprimibles DragonflAI</title>
+<style>
+  body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#FAF9F7;color:#1A1A2E;margin:0;padding:24px;display:flex;gap:24px;flex-wrap:wrap}
+  h1{font-size:18px;margin:0 0 6px}
+  p.hint{font-size:13px;color:#4A4A6A;margin:0 0 16px;max-width:480px}
+  .panel{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:16px;flex:1;min-width:280px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:end}
+  .controls label{display:block;font-size:11px;color:#4A4A6A;margin-bottom:4px}
+  .controls input{padding:6px 8px;border-radius:6px;border:1px solid #ccc;width:90px;font-size:13px}
+  .controls input[type=text]{width:160px}
+  #canvasWrap{border:1px dashed #ccc;border-radius:8px;overflow:auto;max-height:70vh}
+  canvas{display:block;cursor:crosshair}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #eee}
+  button{padding:8px 14px;border-radius:100px;border:none;background:linear-gradient(135deg,#2EC4B6,#7B2FBE);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+  button.secondary{background:#F3F1EE;color:#4A4A6A;border:1px solid #ccc}
+  pre{background:#1A1A2E;color:#eee;padding:12px;border-radius:8px;font-size:11.5px;overflow-x:auto;white-space:pre-wrap}
+  .row{display:flex;gap:8px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div class="panel" style="flex:2">
+  <h1>1. Sube la imagen de tu diseño</h1>
+  <p class="hint">Usa la vista previa/thumbnail exportada de tu diseño (Canva, etc). Indica el tamaño real de tu PDF en puntos — carta = 612×792, A4 = 595×842 — para que las coordenadas salgan correctas aunque la imagen esté a otra escala.</p>
+  <div class="controls">
+    <div><label>Ancho PDF (pt)</label><input type="number" id="pdfW" value="612"></div>
+    <div><label>Alto PDF (pt)</label><input type="number" id="pdfH" value="792"></div>
+    <div><label>Imagen</label><input type="file" id="fileInput" accept="image/*"></div>
+  </div>
+  <div id="canvasWrap"><canvas id="canvas"></canvas></div>
+</div>
+
+<div class="panel">
+  <h1>2. Marca cada campo</h1>
+  <p class="hint">Escribe la "key" del campo (debe coincidir con la que uses en editable_fields), haz clic sobre la imagen donde debe aparecer ese texto, y se agrega a la lista.</p>
+  <div class="row">
+    <input type="text" id="nextKey" placeholder="ej. nombre1" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ccc">
+  </div>
+  <table id="pointsTable">
+    <thead><tr><th>key</th><th>x</th><th>y</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="row" style="margin-top:12px">
+    <button onclick="generateJson()">Generar snippet</button>
+    <button class="secondary" onclick="clearAll()">Limpiar</button>
+  </div>
+  <pre id="output" style="display:none"></pre>
+</div>
+
+<script>
+let img = null;
+let points = []; // {key, x, y}
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+document.getElementById('fileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    img = new Image();
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      redraw();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+function redraw() {
+  if (!img) return;
+  ctx.drawImage(img, 0, 0);
+  ctx.fillStyle = '#2EC4B6';
+  points.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.canvasX, p.canvasY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1A1A2E';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(p.key, p.canvasX + 8, p.canvasY - 8);
+    ctx.fillStyle = '#2EC4B6';
+  });
+}
+
+canvas.addEventListener('click', (e) => {
+  if (!img) { alert('Primero sube una imagen'); return; }
+  const key = document.getElementById('nextKey').value.trim();
+  if (!key) { alert('Escribe la key del campo antes de hacer clic'); return; }
+
+  const rect = canvas.getBoundingClientRect();
+  const canvasX = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const canvasY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+  const pdfW = parseFloat(document.getElementById('pdfW').value) || 612;
+  const pdfH = parseFloat(document.getElementById('pdfH').value) || 792;
+
+  // El PDF mide y desde ABAJO hacia arriba; el canvas mide desde ARRIBA.
+  // Por eso se invierte el eje Y al convertir.
+  const x = Math.round((canvasX / canvas.width) * pdfW);
+  const y = Math.round(pdfH - (canvasY / canvas.height) * pdfH);
+
+  points.push({ key, x, y, canvasX, canvasY });
+  renderTable();
+  redraw();
+  document.getElementById('nextKey').value = '';
+});
+
+function renderTable() {
+  const tbody = document.querySelector('#pointsTable tbody');
+  tbody.innerHTML = points.map((p, i) => `
+    <tr>
+      <td>${p.key}</td><td>${p.x}</td><td>${p.y}</td>
+      <td><a href="#" onclick="removePoint(${i});return false" style="color:#B23A52">quitar</a></td>
+    </tr>
+  `).join('');
+}
+
+function removePoint(i) {
+  points.splice(i, 1);
+  renderTable();
+  redraw();
+}
+
+function clearAll() {
+  points = [];
+  renderTable();
+  redraw();
+  document.getElementById('output').style.display = 'none';
+}
+
+function generateJson() {
+  const snippet = points.map(p => ({
+    key: p.key,
+    label: p.key,
+    type: 'text',
+    max_length: 30,
+    x: p.x,
+    y: p.y,
+    page: 0,
+    font_size: 20,
+    color: '#1A1A2E'
+  }));
+  const out = document.getElementById('output');
+  out.textContent = JSON.stringify(snippet, null, 2);
+  out.style.display = 'block';
+}
+</script>
+
+</body>
+</html>

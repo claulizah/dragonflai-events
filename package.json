@@ -1,0 +1,11 @@
+{
+  "name": "dragonflai-worker",
+  "private": true,
+  "version": "1.0.0",
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
