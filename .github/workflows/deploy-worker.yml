@@ -1,1 +1,26 @@
+name: Deploy Worker
 
+# Se dispara solo cuando cambian archivos relacionados con el Worker —
+# subir un cambio al frontend (dragonflai-v2.html, index.html, etc.) NO
+# vuelve a desplegar el Worker innecesariamente.
+on:
+  push:
+    branches:
+      - Milestone
+      - main
+    paths:
+      - 'worker.js'
+      - 'package.json'
+      - 'wrangler.toml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions/checkout@v6
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
