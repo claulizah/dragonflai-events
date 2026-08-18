@@ -342,7 +342,9 @@ function renderCatalog() {
     return;
   }
 
-  catalogEl.innerHTML = list.map(d => `
+  catalogEl.innerHTML = list.map(d => {
+    const isFree = Number(d.price_mxn) === 0;
+    return `
     <div class="design-card" onclick='handleDesignClick(${JSON.stringify(d.id)})'>
       <div class="design-thumb" style="background-image:url('${escapeAttr(d.thumbnail_url)}')">
         <span class="design-tag">${EVENT_TYPE_LABELS[d.event_type] || d.event_type}</span>
@@ -351,25 +353,27 @@ function renderCatalog() {
         <div class="design-name">${escapeHtml(d.name)}</div>
         ${d.description ? `<div class="design-desc">${escapeHtml(d.description)}</div>` : ''}
         <div class="design-footer">
-          <div class="design-price">$${Number(d.price_mxn).toFixed(0)} <span>MXN</span></div>
-          <button class="btn-mini">${(Array.isArray(d.editable_fields) && d.editable_fields.length) ? 'Personalizar' : 'Agregar'}</button>
+          <div class="design-price">${isFree ? 'Gratis' : `$${Number(d.price_mxn).toFixed(0)} <span>MXN</span>`}</div>
+          <button class="btn-mini">${isFree ? 'Próximamente' : 'Agregar'}</button>
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function handleDesignClick(designId) {
   const design = ALL_DESIGNS.find(d => d.id === designId);
   if (!design) return;
-  const fields = Array.isArray(design.editable_fields) ? design.editable_fields : [];
-  if (fields.length) {
-    openModal(designId);
-  } else {
-    // Producto estático (sin campos que llenar) — se agrega directo, sin modal.
-    addToCart({ design_id: design.id, design_name: design.name, thumbnail_url: design.thumbnail_url, price_mxn: design.price_mxn, field_values: {}, fields_summary: '' });
-    showToast(`"${design.name}" agregado al carrito`);
+
+  // Personalización desactivada por el momento — todo se agrega directo
+  // al carrito, sin modal, sin campos. Se reactiva más adelante.
+  if (Number(design.price_mxn) === 0) {
+    showToast('Este diseño gratuito estará disponible muy pronto');
+    return;
   }
+  addToCart({ design_id: design.id, design_name: design.name, thumbnail_url: design.thumbnail_url, price_mxn: design.price_mxn, field_values: {}, fields_summary: '' });
+  showToast(`"${design.name}" agregado al carrito`);
 }
 
 function openModal(designId) {
