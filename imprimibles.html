@@ -94,7 +94,7 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
 .catalog{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 1.5rem 5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem}
 .design-card{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-lg);overflow:hidden;cursor:pointer;transition:all .25s;display:flex;flex-direction:column}
 .design-card:hover{border-color:var(--teal);transform:translateY(-3px);box-shadow:var(--shadow-teal)}
-.design-thumb{width:100%;aspect-ratio:3/4;background:var(--cream-2) center/cover no-repeat;position:relative}
+.design-thumb{width:100%;aspect-ratio:3/4;background:var(--cream-2) center/contain no-repeat;position:relative}
 .design-tag{position:absolute;top:10px;left:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--teal-dark);background:rgba(255,255,255,.92);padding:4px 10px;border-radius:100px}
 .design-body{padding:16px}
 .design-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:.25rem;line-height:1.25}
@@ -144,7 +144,7 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(26,26,46,.55);z-index:100;align-items:center;justify-content:center;padding:1.25rem}
 .modal-backdrop.show{display:flex}
 .modal{background:var(--white);border-radius:var(--radius-lg);max-width:440px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.modal-thumb{width:100%;aspect-ratio:16/9;background:var(--cream-2) center/cover no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.modal-thumb{width:100%;aspect-ratio:16/9;background:var(--cream-2) center/contain no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
 .modal-body{padding:24px}
 .modal-close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:100px;background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:16px;color:var(--text-2);display:flex;align-items:center;justify-content:center}
 .modal-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;margin-bottom:.25rem}
@@ -263,7 +263,11 @@ const EVENT_TYPE_LABELS = {
   fiesta_infantil: 'Fiesta Infantil',
   corporativo: 'Corporativo',
   graduacion: 'Graduación',
-  aniversario: 'Aniversario'
+  aniversario: 'Aniversario',
+  bautizo: 'Bautizo',
+  primera_comunion: 'Primera Comunión',
+  reunion: 'Reunión / Fiesta',
+  cuidado_personal: 'Cuidado Personal'
 };
 
 const sb = window.supabase
