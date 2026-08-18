@@ -592,7 +592,8 @@ function renderPrintablesList(designs){
       <td>${d.is_active ? '✅' : '—'}</td>
       <td style="white-space:nowrap">
         <a href="#" onclick="editPrintable('${d.id}');return false" style="color:var(--teal-dark);margin-right:10px">Editar</a>
-        <a href="#" onclick="togglePrintable('${d.id}', ${!d.is_active});return false">${d.is_active ? 'Desactivar' : 'Activar'}</a>
+        <a href="#" onclick="togglePrintable('${d.id}', ${!d.is_active});return false" style="margin-right:10px">${d.is_active ? 'Desactivar' : 'Activar'}</a>
+        <a href="#" onclick="deletePrintable('${d.id}');return false" style="color:#B23A52">Eliminar</a>
       </td>
     </tr>`;
   });
@@ -607,6 +608,26 @@ async function togglePrintable(id, newActive){
       headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, is_active: newActive })
     });
+    loadPrintables();
+  }catch(err){ alert('Error: ' + err.message); }
+}
+
+async function deletePrintable(id){
+  const d = window.__PF_CACHE && window.__PF_CACHE[id];
+  const name = d ? d.name : 'este diseño';
+  if(!confirm(`¿Eliminar "${name}" definitivamente? Esto no se puede deshacer.`)) return;
+
+  try{
+    const resp = await fetch('/api/admin-printables?action=delete', {
+      method: 'POST',
+      headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error){
+      alert(data.error || 'No se pudo eliminar el diseño.');
+      return;
+    }
     loadPrintables();
   }catch(err){ alert('Error: ' + err.message); }
 }
