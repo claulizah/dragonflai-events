@@ -38,13 +38,16 @@ export default async (request, context) => {
     if (action === 'upload' && request.method === 'POST') {
       const form = await request.formData();
       const file = form.get('file');
-      const kind = form.get('kind'); // 'template' o 'thumbnail'
+      const kind = form.get('kind'); // 'template', 'thumbnail' o 'font'
       const slug = String(form.get('slug') || 'diseno').replace(/[^a-z0-9-]/gi, '-');
 
       if (!file || typeof file === 'string') return json({ error: 'Falta el archivo' }, 400);
-      if (kind !== 'template' && kind !== 'thumbnail') return json({ error: 'kind inválido' }, 400);
+      if (!['template', 'thumbnail', 'font'].includes(kind)) return json({ error: 'kind inválido' }, 400);
 
-      const ext = kind === 'template' ? 'pdf' : (file.type.split('/')[1] || 'png');
+      let ext = 'bin';
+      if (kind === 'template') ext = 'pdf';
+      else if (kind === 'font') ext = (file.name && file.name.split('.').pop()) || 'ttf';
+      else ext = file.type.split('/')[1] || 'png';
       const path = `${kind}/${slug}-${Date.now()}.${ext}`;
       const bytes = new Uint8Array(await file.arrayBuffer());
 
@@ -67,7 +70,7 @@ export default async (request, context) => {
 
     if (action === 'save' && request.method === 'POST') {
       const body = await request.json();
-      const { id, slug, name, event_type, description, price_mxn, thumbnail_url, template_url, editable_fields } = body;
+      const { id, slug, name, event_type, description, price_mxn, thumbnail_url, template_url, font_url, editable_fields } = body;
 
       if (!slug || !name || !event_type || !price_mxn || !thumbnail_url || !template_url) {
         return json({ error: 'Faltan campos requeridos (slug, name, event_type, price_mxn, thumbnail_url, template_url)' }, 400);
@@ -78,6 +81,7 @@ export default async (request, context) => {
         description: description || null,
         price_mxn,
         thumbnail_url, template_url,
+        font_url: font_url || null,
         editable_fields: Array.isArray(editable_fields) ? editable_fields : []
       };
 
