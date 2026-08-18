@@ -105,6 +105,29 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
 .btn-mini{padding:8px 16px;border-radius:100px;background:var(--teal-light);color:var(--teal-dark);font-size:12.5px;font-weight:600;border:1.5px solid var(--border);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap}
 .btn-mini:hover{background:linear-gradient(135deg,var(--teal),var(--violet));border-color:transparent;color:#fff}
 
+/* ── Carrito ── */
+.cart-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:100px;background:var(--white);border:1.5px solid var(--border-gray);cursor:pointer;transition:all .2s}
+.cart-btn:hover{border-color:var(--teal)}
+.cart-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:10.5px;font-weight:700;display:none;align-items:center;justify-content:center}
+.cart-badge.show{display:flex}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--text);color:#fff;font-size:13.5px;font-weight:500;padding:12px 22px;border-radius:100px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:200;opacity:0;pointer-events:none;transition:all .25s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.cart-modal{background:var(--white);border-radius:var(--radius-lg);max-width:420px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative}
+.cart-header{padding:22px 22px 4px;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600}
+.cart-empty{padding:40px 22px;text-align:center;color:var(--text-3);font-size:13.5px}
+.cart-items{padding:10px 22px}
+.cart-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border-gray)}
+.cart-item-thumb{width:52px;height:52px;border-radius:8px;background:var(--cream-2) center/cover no-repeat;flex-shrink:0}
+.cart-item-info{flex:1;min-width:0}
+.cart-item-name{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:2px}
+.cart-item-fields{font-size:11.5px;color:var(--text-3);line-height:1.4}
+.cart-item-price{font-size:13px;color:var(--text-2);font-weight:600;margin-top:4px}
+.cart-item-remove{background:none;border:none;color:var(--text-3);font-size:16px;cursor:pointer;padding:0 4px;align-self:flex-start}
+.cart-item-remove:hover{color:#B23A52}
+.cart-footer{padding:16px 22px 22px;border-top:1px solid var(--border-gray);margin-top:6px}
+.cart-total{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:15px;font-weight:600}
+.cart-total span:last-child{font-family:'Cormorant Garamond',serif;font-size:22px}
+
 .empty-state{grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--text-3)}
 .empty-state img{height:80px;margin-bottom:1rem;opacity:.7}
 .loading-state{grid-column:1/-1;text-align:center;padding:3rem 1rem;color:var(--text-3);font-size:14px}
@@ -168,6 +191,10 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
   <div class="nav-right">
     <a href="/" class="nav-link">Inicio</a>
     <a href="/app" class="btn-nav">Generar mi plan →</a>
+    <button class="cart-btn" onclick="openCart()" aria-label="Carrito">
+      🛒
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
   </div>
 </nav>
 
@@ -200,18 +227,25 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
       <div class="modal-name" id="modalName"></div>
       <div class="modal-price" id="modalPrice"></div>
       <div class="modal-error" id="modalError"></div>
-      <form id="modalForm" onsubmit="return submitPurchase(event)">
+      <form id="modalForm" onsubmit="return addToCartFromModal(event)">
         <div id="modalFields"></div>
-        <div class="field-group">
-          <label class="field-label">Tu correo (para enviarte el archivo)</label>
-          <input class="field-input" type="email" id="fieldEmail" required placeholder="tu@correo.com">
-        </div>
-        <button type="submit" class="btn-submit" id="btnSubmit">Pagar y descargar</button>
-        <p class="modal-note">Tu archivo se descarga al instante después del pago, y también te lo mandamos por correo.</p>
+        <button type="submit" class="btn-submit" id="btnSubmit">Agregar al carrito</button>
+        <p class="modal-note">Puedes seguir viendo más diseños antes de pagar — todo se paga junto al final.</p>
       </form>
     </div>
   </div>
 </div>
+
+<!-- CARRITO -->
+<div class="modal-backdrop" id="cartBackdrop">
+  <div class="cart-modal">
+    <button class="modal-close" onclick="closeCart()">✕</button>
+    <div class="cart-header">🛒 Tu carrito</div>
+    <div id="cartBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const SUPABASE_URL = 'https://wpgdkfdoecohoowwoywx.supabase.co';
@@ -296,7 +330,7 @@ function renderCatalog() {
   }
 
   catalogEl.innerHTML = list.map(d => `
-    <div class="design-card" onclick='openModal(${JSON.stringify(d.id)})'>
+    <div class="design-card" onclick='handleDesignClick(${JSON.stringify(d.id)})'>
       <div class="design-thumb" style="background-image:url('${escapeAttr(d.thumbnail_url)}')">
         <span class="design-tag">${EVENT_TYPE_LABELS[d.event_type] || d.event_type}</span>
       </div>
@@ -305,11 +339,24 @@ function renderCatalog() {
         ${d.description ? `<div class="design-desc">${escapeHtml(d.description)}</div>` : ''}
         <div class="design-footer">
           <div class="design-price">$${Number(d.price_mxn).toFixed(0)} <span>MXN</span></div>
-          <button class="btn-mini">Personalizar</button>
+          <button class="btn-mini">${(Array.isArray(d.editable_fields) && d.editable_fields.length) ? 'Personalizar' : 'Agregar'}</button>
         </div>
       </div>
     </div>
   `).join('');
+}
+
+function handleDesignClick(designId) {
+  const design = ALL_DESIGNS.find(d => d.id === designId);
+  if (!design) return;
+  const fields = Array.isArray(design.editable_fields) ? design.editable_fields : [];
+  if (fields.length) {
+    openModal(designId);
+  } else {
+    // Producto estático (sin campos que llenar) — se agrega directo, sin modal.
+    addToCart({ design_id: design.id, design_name: design.name, thumbnail_url: design.thumbnail_url, price_mxn: design.price_mxn, field_values: {}, fields_summary: '' });
+    showToast(`"${design.name}" agregado al carrito`);
+  }
 }
 
 function openModal(designId) {
@@ -321,7 +368,6 @@ function openModal(designId) {
   document.getElementById('modalName').textContent = design.name;
   document.getElementById('modalPrice').textContent = `$${Number(design.price_mxn).toFixed(0)} MXN`;
   document.getElementById('modalError').classList.remove('show');
-  document.getElementById('fieldEmail').value = '';
 
   const fields = Array.isArray(design.editable_fields) ? design.editable_fields : [];
   document.getElementById('modalFields').innerHTML = fields.map(f => `
@@ -347,7 +393,7 @@ function closeModal() {
   ACTIVE_DESIGN = null;
 }
 
-async function submitPurchase(evt) {
+function addToCartFromModal(evt) {
   evt.preventDefault();
   if (!ACTIVE_DESIGN) return false;
 
@@ -356,41 +402,30 @@ async function submitPurchase(evt) {
 
   const fields = Array.isArray(ACTIVE_DESIGN.editable_fields) ? ACTIVE_DESIGN.editable_fields : [];
   const field_values = {};
+  const summaryParts = [];
   for (const f of fields) {
     const input = document.getElementById(`field_${f.key}`);
-    field_values[f.key] = input ? input.value.trim() : '';
-  }
-  const email = document.getElementById('fieldEmail').value.trim();
-
-  const btn = document.getElementById('btnSubmit');
-  btn.disabled = true;
-  btn.textContent = 'Procesando…';
-
-  try {
-    const res = await fetch(`${WORKER_URL}/create-printable-checkout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ design_id: ACTIVE_DESIGN.id, field_values, email })
-    });
-    const data = await res.json();
-
-    if (!res.ok || !data.success) {
-      errorEl.textContent = errorMessageFor(data.reason);
+    const val = input ? input.value.trim() : '';
+    if (!val) {
+      errorEl.textContent = 'Completa todos los campos antes de agregar al carrito.';
       errorEl.classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'Pagar y descargar';
       return false;
     }
-
-    // Redirige a Stripe Checkout
-    window.location.href = data.checkout_url;
-  } catch (err) {
-    console.error('Error creando checkout:', err);
-    errorEl.textContent = 'No pudimos conectar con el servidor. Intenta de nuevo.';
-    errorEl.classList.add('show');
-    btn.disabled = false;
-    btn.textContent = 'Pagar y descargar';
+    field_values[f.key] = val;
+    summaryParts.push(f.type === 'date' ? val : val);
   }
+
+  addToCart({
+    design_id: ACTIVE_DESIGN.id,
+    design_name: ACTIVE_DESIGN.name,
+    thumbnail_url: ACTIVE_DESIGN.thumbnail_url,
+    price_mxn: ACTIVE_DESIGN.price_mxn,
+    field_values,
+    fields_summary: summaryParts.join(' · ')
+  });
+
+  closeModal();
+  showToast(`"${ACTIVE_DESIGN.name}" agregado al carrito`);
   return false;
 }
 
@@ -398,9 +433,11 @@ function errorMessageFor(reason) {
   const messages = {
     missing_fields: 'Faltan datos por completar.',
     invalid_email: 'Revisa que tu correo esté bien escrito.',
-    design_not_found: 'Este diseño ya no está disponible.',
+    design_not_found: 'Uno de los diseños ya no está disponible.',
     field_not_allowed: 'Hubo un problema con los campos del formulario.',
     field_too_long: 'Uno de los campos excede el largo máximo permitido.',
+    empty_cart: 'Tu carrito está vacío.',
+    cart_too_large: 'Tienes demasiados artículos en el carrito — quita algunos e intenta de nuevo.',
     stripe_error: 'No pudimos iniciar el pago. Intenta de nuevo en unos minutos.',
     server_error: 'Algo salió mal de nuestro lado. Intenta de nuevo.'
   };
@@ -418,6 +455,148 @@ document.getElementById('modalBackdrop').addEventListener('click', (e) => {
   if (e.target.id === 'modalBackdrop') closeModal();
 });
 
+// ══════════════════════════════════════════════════════════════
+//  Carrito — persiste en localStorage para que sobreviva a recargas de
+//  página mientras la persona sigue viendo más diseños antes de pagar.
+// ══════════════════════════════════════════════════════════════
+const CART_KEY = 'dflai_printable_cart';
+let CART = [];
+try { CART = JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { CART = []; }
+
+function saveCart() {
+  try { localStorage.setItem(CART_KEY, JSON.stringify(CART)); } catch {}
+  updateCartBadge();
+}
+
+function addToCart(item) {
+  CART.push({ ...item, _id: Date.now() + Math.random().toString(36).slice(2) });
+  saveCart();
+}
+
+function removeFromCart(cartItemId) {
+  CART = CART.filter(i => i._id !== cartItemId);
+  saveCart();
+  renderCart();
+}
+
+function updateCartBadge() {
+  const badge = document.getElementById('cartBadge');
+  if (CART.length) {
+    badge.textContent = CART.length;
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+function openCart() {
+  renderCart();
+  document.getElementById('cartBackdrop').classList.add('show');
+}
+function closeCart() {
+  document.getElementById('cartBackdrop').classList.remove('show');
+}
+
+function renderCart() {
+  const body = document.getElementById('cartBody');
+  if (!CART.length) {
+    body.innerHTML = '<div class="cart-empty">Tu carrito está vacío.<br>Elige un diseño del catálogo para empezar.</div>';
+    return;
+  }
+
+  const total = CART.reduce((sum, i) => sum + Number(i.price_mxn), 0);
+  const itemsHtml = CART.map(i => `
+    <div class="cart-item">
+      <div class="cart-item-thumb" style="background-image:url('${escapeAttr(i.thumbnail_url)}')"></div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${escapeHtml(i.design_name)}</div>
+        ${i.fields_summary ? `<div class="cart-item-fields">${escapeHtml(i.fields_summary)}</div>` : ''}
+        <div class="cart-item-price">$${Number(i.price_mxn).toFixed(0)} MXN</div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart('${i._id}')" title="Quitar">✕</button>
+    </div>
+  `).join('');
+
+  body.innerHTML = `
+    <div class="cart-items">${itemsHtml}</div>
+    <div class="cart-footer">
+      <div class="cart-total"><span>Total</span><span>$${total.toFixed(0)} MXN</span></div>
+      <div class="field-group">
+        <label class="field-label">Tu correo (para enviarte los archivos)</label>
+        <input class="field-input" type="email" id="cartEmail" placeholder="tu@correo.com" value="${escapeAttr(CART_EMAIL || '')}">
+      </div>
+      <div class="modal-error" id="cartError"></div>
+      <button class="btn-submit" id="cartCheckoutBtn" onclick="checkoutCart()">Pagar $${total.toFixed(0)} MXN →</button>
+      <p class="modal-note">Un solo pago por todo el carrito. Descargas y correo llegan juntos al confirmar.</p>
+    </div>
+  `;
+}
+
+let CART_EMAIL = '';
+
+async function checkoutCart() {
+  const errorEl = document.getElementById('cartError');
+  errorEl.classList.remove('show');
+
+  const email = document.getElementById('cartEmail').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errorEl.textContent = 'Revisa que tu correo esté bien escrito.';
+    errorEl.classList.add('show');
+    return;
+  }
+  CART_EMAIL = email;
+
+  const btn = document.getElementById('cartCheckoutBtn');
+  btn.disabled = true;
+  btn.textContent = 'Procesando…';
+
+  try {
+    const res = await fetch(`${WORKER_URL}/create-cart-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        items: CART.map(i => ({ design_id: i.design_id, field_values: i.field_values })),
+        email
+      })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      errorEl.textContent = errorMessageFor(data.reason);
+      errorEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Reintentar pago →';
+      return;
+    }
+
+    // El carrito ya se guardó del lado del servidor — se limpia local
+    // antes de salir a Stripe, así si regresan con "atrás" no queda pegado.
+    CART = [];
+    saveCart();
+    window.location.href = data.checkout_url;
+  } catch (err) {
+    console.error('Error creando checkout de carrito:', err);
+    errorEl.textContent = 'No pudimos conectar con el servidor. Intenta de nuevo.';
+    errorEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Reintentar pago →';
+  }
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+document.getElementById('cartBackdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'cartBackdrop') closeCart();
+});
+
+updateCartBadge();
 loadDesigns();
 </script>
 </body>

@@ -71,6 +71,9 @@ main{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-
 .state.show{display:block}
 
 .error-box{background:rgba(232,99,122,.08);border:1px solid rgba(232,99,122,.3);border-radius:9px;padding:10px 14px;font-size:12.5px;color:#B23A52;margin-bottom:1.25rem;text-align:left}
+.downloads-list{display:flex;flex-direction:column;gap:10px;margin-bottom:1rem}
+.downloads-list .btn-primary{width:100%;box-sizing:border-box;justify-content:center}
+.partial-note{background:var(--teal-light);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:12px;color:var(--text-2);margin-bottom:1.25rem;text-align:left}
 </style>
 <script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c5f0d811fd8e4eb19d11a9e0cc4bab53"}'></script>
 </head>
@@ -106,10 +109,10 @@ main{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-
     <!-- ESTADO: listo -->
     <div class="state" id="stateReady">
       <img src="/assets/belu/belu-celebrando.png" alt="Belu" onerror="this.style.display='none'">
-      <h1>¡Tu imprimible está listo! 🦋</h1>
+      <h1 id="readyHeading">¡Tu imprimible está listo! 🦋</h1>
       <p id="readyDesignName"></p>
-      <a href="#" id="downloadBtn" class="btn-primary" target="_blank">Descargar mi imprimible →</a>
-      <br>
+      <div class="downloads-list" id="downloadsList"></div>
+      <div class="partial-note" id="partialNote" style="display:none"></div>
       <a href="/imprimibles" class="btn-secondary">Ver más diseños</a>
     </div>
 
@@ -173,7 +176,7 @@ async function checkPurchase(sessionId, startedAt) {
     return;
   }
 
-  const { data, error } = await sb.rpc('get_printable_purchase_by_session', {
+  const { data, error } = await sb.rpc('get_printable_purchases_by_session', {
     p_stripe_session_id: sessionId
   });
 
@@ -184,37 +187,68 @@ async function checkPurchase(sessionId, startedAt) {
     return;
   }
 
-  const purchase = Array.isArray(data) ? data[0] : data;
-  if (!purchase) {
+  const purchases = Array.isArray(data) ? data : [];
+  if (!purchases.length) {
     showState('stateError');
     document.getElementById('errorDetail').textContent = 'No encontramos esta compra con ese enlace.';
     return;
   }
 
-  if (purchase.status === 'generated' || purchase.status === 'delivered') {
-    document.getElementById('downloadBtn').href = purchase.generated_pdf_url;
-    document.getElementById('readyDesignName').textContent = purchase.design_name
-      ? `"${purchase.design_name}" ya está personalizado con tus datos.`
-      : 'Ya está personalizado con tus datos.';
-    showState('stateReady');
+  const pending = purchases.filter(p => p.status === 'paid');
+  const ready = purchases.filter(p => p.status === 'generated' || p.status === 'delivered');
+  const failed = purchases.filter(p => p.status === 'failed');
+
+  if (pending.length) {
+    // Todavía falta generar uno o más artículos — reintentar.
+    const elapsed = Date.now() - startedAt;
+    if (elapsed > GIVE_UP_MS) {
+      // Si al menos algo ya está listo, mostramos eso en vez de dejarlos sin nada.
+      if (ready.length) renderReady(ready, failed); else showState('stateFailed');
+      return;
+    }
+    if (elapsed > SLOW_THRESHOLD_MS) showState('stateSlow');
+    setTimeout(() => checkPurchase(sessionId, startedAt), POLL_INTERVAL_MS);
     return;
   }
 
-  if (purchase.status === 'failed') {
+  // Nada pendiente: todo se resolvió (generado o falló).
+  if (ready.length) {
+    renderReady(ready, failed);
+  } else {
     showState('stateFailed');
-    return;
+  }
+}
+
+function renderReady(ready, failed) {
+  const heading = document.getElementById('readyHeading');
+  const nameP = document.getElementById('readyDesignName');
+  const listEl = document.getElementById('downloadsList');
+  const noteEl = document.getElementById('partialNote');
+
+  if (ready.length > 1) {
+    heading.textContent = `¡Tus ${ready.length} imprimibles están listos! 🦋`;
+    nameP.textContent = 'Cada uno ya está personalizado con tus datos.';
+  } else {
+    heading.textContent = '¡Tu imprimible está listo! 🦋';
+    nameP.textContent = ready[0].design_name ? `"${ready[0].design_name}" ya está personalizado con tus datos.` : 'Ya está personalizado con tus datos.';
   }
 
-  // Sigue en 'paid' (todavía generándose) — reintentar.
-  const elapsed = Date.now() - startedAt;
-  if (elapsed > GIVE_UP_MS) {
-    showState('stateFailed');
-    return;
+  listEl.innerHTML = ready.map(p => `
+    <a href="${p.generated_pdf_url}" class="btn-primary" target="_blank">${ready.length > 1 ? escapeHtml(p.design_name || 'Descargar') : 'Descargar mi imprimible'} →</a>
+  `).join('');
+
+  if (failed.length) {
+    noteEl.style.display = 'block';
+    noteEl.textContent = `${failed.length} artículo(s) de tu compra tuvieron un problema generando el archivo — ya lo sabemos y te lo mandamos por correo aparte, sin costo adicional.`;
+  } else {
+    noteEl.style.display = 'none';
   }
-  if (elapsed > SLOW_THRESHOLD_MS) {
-    showState('stateSlow');
-  }
-  setTimeout(() => checkPurchase(sessionId, startedAt), POLL_INTERVAL_MS);
+
+  showState('stateReady');
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 const sessionId = getSessionId();
