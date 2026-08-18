@@ -1851,6 +1851,12 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <img id="publish-qr-img" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-gray)" onerror="this.style.display='none'">
         <a id="publish-qr-download" href="" download="qr-fotos-evento.png" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none;margin-top:.6rem" data-es="⬇️ Descargar QR" data-en="⬇️ Download QR">⬇️ Descargar QR</a>
       </div>
+
+      <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border-gray)">
+        <p style="font-size:12.5px;color:var(--text-2);margin-bottom:.4rem" data-es="¿Buscas imprimibles a juego?" data-en="Looking for matching printables?">¿Buscas imprimibles a juego?</p>
+        <p style="font-size:12px;color:var(--text-3);margin-bottom:.75rem" id="publish-printables-sub">Invitaciones, recuerdos y más, listos para personalizar y descargar al instante.</p>
+        <a id="publish-printables-link" href="/imprimibles" class="btn-excel-close" style="display:block;text-align:center;text-decoration:none" data-es="🖨️ Ver imprimibles →" data-en="🖨️ See printables →">🖨️ Ver imprimibles →</a>
+      </div>
     </div>
 
     <button class="btn-excel-close" id="publish-modal-bottom-close" onclick="closePublishModal()" data-es="Cerrar" data-en="Close">Cerrar</button>
@@ -2973,7 +2979,7 @@ let lastPublishedUrl='';
 // crear duplicados si reintenta.
 let pendingDraftInvitationId=null;
 // Datos para generar los mensajes de compartir por invitado (hallazgo V7 #3)
-let lastPublishedGuests=[], lastPublishedHost='', lastPublishedType='';
+let lastPublishedGuests=[], lastPublishedHost='', lastPublishedType='', lastPublishedTypeRaw='';
 let editingInvitationId=null;
 // true solo cuando dashboardEditInvitation() (primer publish, sin invitación
 // aún) cambió la vista visible del dashboard a main-planner-view para poder
@@ -3689,6 +3695,7 @@ async function publishInvitation(){
   lastPublishedGuests=guestListEntries.map(g=>g.guest_name);
   lastPublishedHost=hostNames;
   lastPublishedType=p.typeName||'';
+  lastPublishedTypeRaw=p.eventTypeRaw||'';
   renderGuestShareMessages();
   document.getElementById('publish-url').textContent=lastPublishedUrl;
   try{
@@ -3703,6 +3710,7 @@ async function publishInvitation(){
   pendingDraftInvitationId=null;
   document.getElementById('publish-form').style.display='none';
   document.getElementById('publish-success').style.display='block';
+  updatePrintablesCrossSell(lastPublishedType, lastPublishedTypeRaw);
   // Reflejar el valor real (userProfile ya está en memoria) -- si ya dijo
   // que sí desde "Mi perfil", no tiene sentido volver a mostrarlo sin marcar.
   const mktChk=document.getElementById('publish-success-marketing');
@@ -5791,6 +5799,38 @@ const EVENT_TYPE_EN_ES=Object.fromEntries(Object.entries(EVENT_TYPE_ES_EN).map((
 function translateEventTypeName(name){
   if(lang==='en') return EVENT_TYPE_ES_EN[name]||name;
   return EVENT_TYPE_EN_ES[name]||name;
+}
+
+// Mapea el "eventTypeRaw" del generador (ej. 'Boda/Wedding') a la
+// categoría que usa el catálogo de imprimibles (ej. 'boda') — mismos 8
+// valores que ves en el selector "Tipo de evento" del admin de imprimibles.
+// Si algún día agregas un tipo de evento nuevo aquí, agrégalo también ahí.
+const PRINTABLE_SLUG_BY_EVENT_TYPE={
+  'Boda/Wedding':'boda',
+  'Cumpleaños/Birthday':'cumpleanos',
+  'Baby Shower':'baby_shower',
+  'Corporativo/Corporate':'corporativo',
+  'Quinceañera':'quinceanera',
+  'Graduación/Graduation':'graduacion',
+  'Aniversario/Anniversary':'aniversario',
+  'Fiesta Infantil/Kids Party':'fiesta_infantil'
+};
+
+// Actualiza el link y el texto del cross-sell hacia /imprimibles justo
+// después de publicar — usa el tipo de evento real para que el link ya
+// llegue con el filtro correcto preseleccionado (ver ?type= en imprimibles.html).
+function updatePrintablesCrossSell(typeName, eventTypeRaw){
+  const slug=PRINTABLE_SLUG_BY_EVENT_TYPE[eventTypeRaw]||'';
+  const link=document.getElementById('publish-printables-link');
+  if(link) link.href=slug?`/imprimibles?type=${slug}`:'/imprimibles';
+
+  const sub=document.getElementById('publish-printables-sub');
+  if(sub){
+    const displayName=typeName?translateEventTypeName(typeName):(lang==='es'?'tu evento':'your event');
+    sub.textContent=lang==='es'
+      ?`Invitaciones, recuerdos y más para tu ${displayName}, listos para personalizar y descargar al instante.`
+      :`Invitations, favors and more for your ${displayName}, ready to personalize and download instantly.`;
+  }
 }
 
 const tabKeys=['overview','timeline','dayitinerary','budget','checklist','vendors','ideas','savethedate','proposal'];

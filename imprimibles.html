@@ -213,7 +213,7 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
 
 <div class="crosssell">
   <img src="/assets/belu/belu-optimista.png" alt="Belu" onerror="this.style.display='none'">
-  <h3>¿Necesitas más que un imprimible?</h3>
+  <h3>¿Ya tienes tu plan?</h3>
   <p>Genera el plan completo de tu evento con Belu: cronograma, presupuesto, checklist, invitación en línea con RSVP y QR para que tus invitados compartan sus fotos.</p>
   <a href="/app" class="btn-primary">Generar mi plan de evento →</a>
 </div>
@@ -293,6 +293,15 @@ async function loadDesigns() {
   }
 
   ALL_DESIGNS = data || [];
+
+  // Si llegó desde el generador de planes con un tipo de evento específico
+  // (ej. /imprimibles?type=boda), preseleccionar ese filtro — así la
+  // persona ve directo lo relevante para su evento, sin tener que buscarlo.
+  const typeParam = new URLSearchParams(window.location.search).get('type');
+  if (typeParam && ALL_DESIGNS.some(d => d.event_type === typeParam)) {
+    ACTIVE_FILTER = typeParam;
+  }
+
   renderFilters();
   renderCatalog();
 }
