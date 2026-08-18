@@ -858,6 +858,26 @@ async function generateOnePrintable(env, purchaseId, designId, fieldValues) {
   const design = designArr[0];
   if (!design) throw new Error('Diseño no encontrado: ' + designId);
 
+  const allowedFieldsCheck = Array.isArray(design.editable_fields) ? design.editable_fields : [];
+  const isPdfTemplate = /\.pdf($|\?)/i.test(design.template_url || '');
+
+  // Plantillas que NO son PDF (Word, PowerPoint, ZIP, lo que sea) solo
+  // pueden ser estáticas — pdf-lib no puede abrirlas para insertarles
+  // texto. En ese caso no las tocamos: se entregan exactamente como se
+  // subieron, sin pasar por nada de lo de abajo.
+  if (!isPdfTemplate) {
+    if (allowedFieldsCheck.length > 0) {
+      throw new Error(`El diseño "${design.name}" tiene campos personalizables pero su plantilla no es un PDF (pdf-lib no puede insertarle texto) — quita los campos o sube una plantilla en PDF.`);
+    }
+    const genResNonPdf = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/mark_printable_generated`, {
+      method: 'POST',
+      headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_purchase_id: purchaseId, p_generated_pdf_url: design.template_url })
+    });
+    if (!genResNonPdf.ok) throw new Error('mark_printable_generated falló: ' + await genResNonPdf.text());
+    return { publicUrl: design.template_url, designName: design.name };
+  }
+
   // 2) Descargar la plantilla PDF base.
   const templateRes = await fetch(design.template_url);
   if (!templateRes.ok) throw new Error('No se pudo descargar la plantilla: ' + design.template_url);
