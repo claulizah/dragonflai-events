@@ -12,8 +12,20 @@ compatibility_date = "2024-09-23"
 [triggers]
 crons = ["0 14 * * *"]
 
-# Los bindings/secrets (ANTHROPIC_API_KEY, STRIPE_SECRET_KEY,
-# SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, etc.) NO se declaran aquí.
-# Ya viven en tu Worker en Cloudflare (Settings → Variables) y Wrangler
-# los deja intactos al desplegar, mientras el "name" de arriba coincida
-# exactamente con el nombre de tu Worker existente.
+# SUPABASE_URL vive AQUÍ a propósito, no solo en el Dashboard de Cloudflare.
+# No es información sensible (es la URL pública de tu proyecto), y como
+# Wrangler trata este archivo como la fuente de verdad en cada deploy,
+# cualquier variable que NO esté declarada aquí se borra sola la próxima
+# vez que despliegues — eso fue exactamente lo que pasó con el bug del
+# carrito. Ponerla aquí es lo que la hace permanente.
+[vars]
+SUPABASE_URL = "https://wpgdkfdoecohoowwoywx.supabase.co"
+
+# Los secretos (ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
+# SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, etc.) SÍ se quedan solo en
+# Cloudflare (Settings → Variables and Secrets) — esos son sensibles, no
+# deben vivir en el repo. Wrangler los deja intactos al desplegar, mientras
+# el "name" de arriba coincida exactamente con el nombre de tu Worker
+# existente. La diferencia es que esos son "Secrets" (un tipo especial que
+# Wrangler sí respeta), mientras que SUPABASE_URL era una variable de texto
+# simple — ese tipo es el que se pierde si no está declarado aquí.
