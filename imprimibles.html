@@ -160,6 +160,7 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
 .btn-submit:hover{filter:brightness(1.08)}
 .btn-submit:disabled{opacity:.6;cursor:default;filter:none}
 .modal-note{font-size:11px;color:var(--text-3);text-align:center;margin-top:10px;line-height:1.5}
+.free-badge{display:block;text-align:center;color:var(--teal-dark);font-weight:600}
 
 @media(max-width:640px){
   nav{padding:14px 5vw}
@@ -242,6 +243,33 @@ nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-con
     <button class="modal-close" onclick="closeCart()">✕</button>
     <div class="cart-header">🛒 Tu carrito</div>
     <div id="cartBody"></div>
+  </div>
+</div>
+
+<!-- DESCARGA GRATUITA -->
+<div class="modal-backdrop" id="freeModalBackdrop">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeFreeModal()">✕</button>
+    <div class="modal-thumb" id="freeModalThumb"></div>
+    <div class="modal-body">
+      <div class="modal-name" id="freeModalName"></div>
+      <span class="free-badge">Gratis 🎁</span>
+      <div class="modal-error" id="freeModalError"></div>
+
+      <div id="freeModalForm">
+        <div class="field-group">
+          <label class="field-label">Tu correo (te lo mandamos ahí también)</label>
+          <input class="field-input" type="email" id="freeEmailInput" placeholder="tu@correo.com">
+        </div>
+        <button type="button" class="btn-submit" id="freeSubmitBtn" onclick="submitFreeDownload()">Descargar gratis</button>
+        <p class="modal-note">Sin pago, sin tarjeta. Solo tu correo para poder mandarte más recursos como este.</p>
+      </div>
+
+      <div id="freeModalSuccess" style="display:none;text-align:center">
+        <p style="font-size:14px;color:var(--text-2);margin-bottom:1rem">¡Listo! También te lo mandamos a tu correo.</p>
+        <a href="#" id="freeDownloadLink" class="btn-primary" target="_blank" style="width:100%;box-sizing:border-box;justify-content:center">Abrir mi descarga →</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -354,7 +382,7 @@ function renderCatalog() {
         ${d.description ? `<div class="design-desc">${escapeHtml(d.description)}</div>` : ''}
         <div class="design-footer">
           <div class="design-price">${isFree ? 'Gratis' : `$${Number(d.price_mxn).toFixed(0)} <span>MXN</span>`}</div>
-          <button class="btn-mini">${isFree ? 'Próximamente' : 'Agregar'}</button>
+          <button class="btn-mini">${isFree ? 'Descargar gratis' : 'Agregar'}</button>
         </div>
       </div>
     </div>
@@ -366,15 +394,88 @@ function handleDesignClick(designId) {
   const design = ALL_DESIGNS.find(d => d.id === designId);
   if (!design) return;
 
-  // Personalización desactivada por el momento — todo se agrega directo
-  // al carrito, sin modal, sin campos. Se reactiva más adelante.
+  // Personalización sigue desactivada por el momento — los diseños de
+  // paga se agregan directo al carrito, sin modal, sin campos. Los
+  // gratuitos SÍ tienen su propio flujo (correo → descarga, sin Stripe).
   if (Number(design.price_mxn) === 0) {
-    showToast('Este diseño gratuito estará disponible muy pronto');
+    openFreeModal(designId);
     return;
   }
   addToCart({ design_id: design.id, design_name: design.name, thumbnail_url: design.thumbnail_url, price_mxn: design.price_mxn, field_values: {}, fields_summary: '' });
   showToast(`"${design.name}" agregado al carrito`);
 }
+
+let ACTIVE_FREE_DESIGN = null;
+
+function openFreeModal(designId) {
+  const design = ALL_DESIGNS.find(d => d.id === designId);
+  if (!design) return;
+  ACTIVE_FREE_DESIGN = design;
+
+  document.getElementById('freeModalThumb').style.backgroundImage = `url('${escapeAttr(design.thumbnail_url)}')`;
+  document.getElementById('freeModalName').textContent = design.name;
+  document.getElementById('freeModalError').classList.remove('show');
+  document.getElementById('freeEmailInput').value = '';
+  document.getElementById('freeModalForm').style.display = 'block';
+  document.getElementById('freeModalSuccess').style.display = 'none';
+  document.getElementById('freeSubmitBtn').disabled = false;
+  document.getElementById('freeSubmitBtn').textContent = 'Descargar gratis';
+
+  document.getElementById('freeModalBackdrop').classList.add('show');
+}
+
+function closeFreeModal() {
+  document.getElementById('freeModalBackdrop').classList.remove('show');
+}
+
+async function submitFreeDownload() {
+  if (!ACTIVE_FREE_DESIGN) return;
+  const errorEl = document.getElementById('freeModalError');
+  errorEl.classList.remove('show');
+
+  const email = document.getElementById('freeEmailInput').value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errorEl.textContent = 'Revisa que tu correo esté bien escrito.';
+    errorEl.classList.add('show');
+    return;
+  }
+
+  const btn = document.getElementById('freeSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Procesando…';
+
+  try {
+    const res = await fetch(`${WORKER_URL}/printable-free-download`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ design_id: ACTIVE_FREE_DESIGN.id, email })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      errorEl.textContent = errorMessageFor(data.reason);
+      errorEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Descargar gratis';
+      return;
+    }
+
+    document.getElementById('freeDownloadLink').href = data.download_url;
+    document.getElementById('freeModalForm').style.display = 'none';
+    document.getElementById('freeModalSuccess').style.display = 'block';
+    window.open(data.download_url, '_blank');
+  } catch (err) {
+    console.error('Error en descarga gratuita:', err);
+    errorEl.textContent = 'No pudimos conectar con el servidor. Intenta de nuevo.';
+    errorEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Descargar gratis';
+  }
+}
+
+document.getElementById('freeModalBackdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'freeModalBackdrop') closeFreeModal();
+});
 
 function openModal(designId) {
   const design = ALL_DESIGNS.find(d => d.id === designId);
@@ -455,6 +556,7 @@ function errorMessageFor(reason) {
     field_too_long: 'Uno de los campos excede el largo máximo permitido.',
     empty_cart: 'Tu carrito está vacío.',
     cart_too_large: 'Tienes demasiados artículos en el carrito — quita algunos e intenta de nuevo.',
+    not_free: 'Este diseño ya no está disponible gratis.',
     stripe_error: 'No pudimos iniciar el pago. Intenta de nuevo en unos minutos.',
     server_error: 'Algo salió mal de nuestro lado. Intenta de nuevo.'
   };

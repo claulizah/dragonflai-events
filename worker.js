@@ -178,6 +178,81 @@ export default {
       return new Response('ok', { status: 200, headers: CORS });
     }
 
+    // ── DESCARGA GRATUITA (sin Stripe, solo captura de correo) ──
+    // Solo para diseños con price_mxn = 0. No pasa por checkout, no genera
+    // PDF (son estáticos por ahora) — entrega directo la plantilla y
+    // registra el correo como lead.
+    if (url.pathname === '/printable-free-download' && request.method === 'POST') {
+      try {
+        let body;
+        try { body = await request.json(); }
+        catch { return json({ success: false, reason: 'invalid_json' }, 400, CORS); }
+
+        const { design_id, email } = body;
+        if (!design_id) return json({ success: false, reason: 'missing_fields' }, 400, CORS);
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return json({ success: false, reason: 'invalid_email' }, 400, CORS);
+        }
+
+        const designRes = await fetch(
+          `${env.SUPABASE_URL}/rest/v1/printable_designs?id=eq.${encodeURIComponent(design_id)}&is_active=eq.true&select=id,name,price_mxn,template_url`,
+          { headers: serviceHeaders(env) }
+        );
+        if (!designRes.ok) {
+          console.error('Error leyendo diseño gratuito:', await designRes.text());
+          return json({ success: false, reason: 'server_error' }, 500, CORS);
+        }
+        const designArr = await designRes.json();
+        const design = designArr[0];
+        if (!design) return json({ success: false, reason: 'design_not_found' }, 404, CORS);
+
+        // El precio SIEMPRE se valida contra Supabase, nunca contra lo que
+        // mande el navegador — así nadie puede "descargar gratis" algo que
+        // en realidad cuesta, solo porque llamó a este endpoint en vez del
+        // de pago.
+        if (Number(design.price_mxn) !== 0) {
+          return json({ success: false, reason: 'not_free' }, 400, CORS);
+        }
+
+        // Registrar el lead — no bloqueante: si esto falla, igual se
+        // entrega la descarga (mejor dar el archivo y perder el registro
+        // que negarle el archivo a alguien por un error nuestro).
+        await fetch(`${env.SUPABASE_URL}/rest/v1/printable_free_downloads`, {
+          method: 'POST',
+          headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ design_id: design.id, email })
+        }).catch(err => console.error('Error registrando descarga gratuita:', err));
+
+        await fetch(`${env.SUPABASE_URL}/rest/v1/printable_marketing_optin`, {
+          method: 'POST',
+          headers: { ...serviceHeaders(env), 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
+          body: JSON.stringify({ email, source: 'free_download' })
+        }).catch(err => console.error('Error guardando opt-in:', err));
+
+        // También por correo, por si pierde la pestaña — tampoco bloqueante.
+        try {
+          const emailHtml = buildPrintableDeliveryEmailHtml([{ designName: design.name, url: design.template_url }]);
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: 'Belu de DragonflAI Events <hola@dragonflaievents.com>',
+              to: email,
+              subject: `Tu descarga gratis "${design.name}" 🦋`,
+              html: emailHtml
+            })
+          });
+        } catch (err) {
+          console.error('Error enviando correo de descarga gratuita (no bloqueante):', err);
+        }
+
+        return json({ success: true, download_url: design.template_url, design_name: design.name }, 200, CORS);
+      } catch (err) {
+        console.error('Error en /printable-free-download:', err);
+        return json({ success: false, reason: 'server_error' }, 500, CORS);
+      }
+    }
+
     // ── CREAR CHECKOUT DE UN IMPRIMIBLE (compra de invitado, sin login) ──
     if (url.pathname === '/create-printable-checkout' && request.method === 'POST') {
       try {

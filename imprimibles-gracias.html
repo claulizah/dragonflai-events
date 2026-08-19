@@ -227,10 +227,10 @@ function renderReady(ready, failed) {
 
   if (ready.length > 1) {
     heading.textContent = `¡Tus ${ready.length} imprimibles están listos! 🦋`;
-    nameP.textContent = 'Cada uno ya está personalizado con tus datos.';
+    nameP.textContent = 'Todos listos para descargar.';
   } else {
     heading.textContent = '¡Tu imprimible está listo! 🦋';
-    nameP.textContent = ready[0].design_name ? `"${ready[0].design_name}" ya está personalizado con tus datos.` : 'Ya está personalizado con tus datos.';
+    nameP.textContent = ready[0].design_name ? `"${ready[0].design_name}" ya está listo para descargar.` : 'Ya está listo para descargar.';
   }
 
   listEl.innerHTML = ready.map(p => `
