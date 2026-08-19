@@ -229,10 +229,13 @@ export default {
           body: JSON.stringify({ email, source: 'free_download' })
         }).catch(err => console.error('Error guardando opt-in:', err));
 
-        // También por correo, por si pierde la pestaña — tampoco bloqueante.
+        // También por correo, por si pierde la pestaña — tampoco bloqueante,
+        // pero SÍ revisamos y registramos la respuesta de Resend, para que
+        // un rechazo (clave inválida, dominio no verificado, etc.) quede
+        // visible en los logs en vez de desaparecer en silencio.
         try {
           const emailHtml = buildPrintableDeliveryEmailHtml([{ designName: design.name, url: design.template_url }]);
-          await fetch('https://api.resend.com/emails', {
+          const resendRes = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -242,6 +245,11 @@ export default {
               html: emailHtml
             })
           });
+          if (!resendRes.ok) {
+            console.error('Resend rechazó el correo de descarga gratuita:', resendRes.status, await resendRes.text());
+          } else {
+            console.log('Correo de descarga gratuita enviado OK a Resend:', await resendRes.text());
+          }
         } catch (err) {
           console.error('Error enviando correo de descarga gratuita (no bloqueante):', err);
         }
