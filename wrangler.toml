@@ -29,3 +29,8 @@ SUPABASE_URL = "https://wpgdkfdoecohoowwoywx.supabase.co"
 # existente. La diferencia es que esos son "Secrets" (un tipo especial que
 # Wrangler sí respeta), mientras que SUPABASE_URL era una variable de texto
 # simple — ese tipo es el que se pierde si no está declarado aquí.
+#
+# ⚠️ IMPORTANTE: RESEND_API_KEY debe ser tipo "Secret" en Cloudflare, NO
+# "Text" — si se crea como Text, un futuro deploy la puede dejar en un
+# estado inconsistente (nos pasó el 19/ago/2026). Revisa que diga "Secret"
+# en la columna Type si algún día el correo deja de mandarse otra vez.
