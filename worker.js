@@ -1004,11 +1004,17 @@ async function sendPrintableDeliveryEmail(env, email, downloads) {
 }
 
 async function markPrintableFailed(env, purchaseId, errorMessage) {
-  await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/mark_printable_failed`, {
+  const res = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/mark_printable_failed`, {
     method: 'POST',
     headers: { ...serviceHeaders(env), 'Content-Type': 'application/json' },
     body: JSON.stringify({ p_purchase_id: purchaseId, p_error_message: (errorMessage || '').slice(0, 2000) })
   });
+  if (!res.ok) {
+    // No relanzamos el error (esto ya se llama DESDE un catch) — pero al
+    // menos que quede visible en los logs si algún día vuelve a fallar,
+    // en vez de desaparecer en silencio como pasó aquí.
+    console.error('mark_printable_failed en sí mismo falló:', await res.text().catch(() => '(sin detalle)'));
+  }
 }
 
 function hexToRgb(hex) {
