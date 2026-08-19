@@ -256,14 +256,6 @@ export default {
     // ── CREAR CHECKOUT DE UN CARRITO (varios imprimibles, un solo pago) ──
     if (url.pathname === '/create-cart-checkout' && request.method === 'POST') {
       try {
-        // ── DIAGNÓSTICO TEMPORAL — quitar una vez resuelto el bug ──
-        console.error('DIAGNÓSTICO env:', {
-          tiene_SUPABASE_URL: typeof env.SUPABASE_URL !== 'undefined',
-          valor_SUPABASE_URL: env.SUPABASE_URL || '(vacío/undefined)',
-          tiene_SERVICE_ROLE_KEY: typeof env.SUPABASE_SERVICE_ROLE_KEY !== 'undefined',
-          largo_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY ? env.SUPABASE_SERVICE_ROLE_KEY.length : 0
-        });
-
         let body;
         try { body = await request.json(); }
         catch { return json({ success: false, reason: 'invalid_json' }, 400, CORS); }
