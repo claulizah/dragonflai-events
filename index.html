@@ -99,6 +99,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .nav-link:hover{color:var(--teal-dark)}
 .btn-nav{padding:8px 20px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
 .btn-nav:hover{opacity:.9;transform:translateY(-1px)}
+.btn-nav-outline{padding:7px 16px;border-radius:100px;background:var(--white);color:var(--violet);font-size:13px;font-weight:600;border:1.5px solid var(--violet);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none;white-space:nowrap}
+.btn-nav-outline:hover{background:var(--violet);color:#fff}
 
 /* ── HERO ── */
 .hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 1.5rem 5rem}
@@ -151,6 +153,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .feature-icon{font-size:28px;margin-bottom:.875rem;display:block}
 .feature-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:.5rem}
 .feature-desc{font-size:13px;color:var(--text-2);line-height:1.6}
+
+/* ── IMPRIMIBLES (destacado, grande y llamativo) ── */
+.printables-section{position:relative;z-index:1;padding:4.5rem 1.5rem;max-width:1000px;margin:0 auto;text-align:center}
+.printables-band{background:linear-gradient(135deg,var(--teal-light),var(--violet-light,#F1E7FB));border-radius:28px;padding:3rem 1.5rem;border:1.5px solid var(--border-gray)}
+.printables-grid{display:flex;justify-content:center;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:2rem 0}
+.printables-grid img{width:150px;height:150px;object-fit:cover;border-radius:14px;border:4px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,.14);transition:transform .25s}
+.printables-grid img:nth-child(1){transform:rotate(-6deg)}
+.printables-grid img:nth-child(2){transform:rotate(4deg) translateY(-10px)}
+.printables-grid img:nth-child(3){transform:rotate(-3deg) translateY(6px)}
+.printables-grid img:nth-child(4){transform:rotate(7deg)}
+.printables-grid img:hover{transform:scale(1.06) rotate(0deg) !important;box-shadow:0 16px 36px rgba(0,0,0,.2)}
+.printables-price{display:inline-block;font-size:12.5px;font-weight:700;color:var(--violet);background:#fff;padding:5px 14px;border-radius:100px;margin-bottom:1.25rem}
+@media(max-width:600px){
+  .printables-band{padding:2.25rem 1rem;border-radius:22px}
+  .printables-grid img{width:100px;height:100px;border-radius:11px}
+  .printables-grid{gap:10px}
+}
 
 /* ── HOW IT WORKS ── */
 .how-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:760px;margin:0 auto}
@@ -234,13 +253,14 @@ footer a:hover{color:var(--teal-dark)}
 .ub-btn:hover{opacity:.9}
 
 @media(max-width:600px){
-  nav{padding:0 1rem}
-  .nav-right{gap:8px}
+  nav{padding:0 .75rem}
+  .nav-right{gap:6px}
   .nav-link{display:none}
-  .nav-logo-name{font-size:17px;white-space:nowrap}
-  #nav-login{display:inline;font-size:12px;white-space:nowrap}
-  .btn-nav{padding:8px 14px;font-size:12.5px;white-space:nowrap}
-  .lang-btn{padding:4px 8px;font-size:11px}
+  .nav-logo-name{font-size:16px;white-space:nowrap}
+  #nav-login{display:none}
+  .btn-nav-outline{padding:6px 11px;font-size:11.5px}
+  .btn-nav{padding:8px 12px;font-size:12px;white-space:nowrap}
+  .lang-btn{padding:4px 7px;font-size:10.5px}
   .hero{padding:7rem 1rem 4rem}
   .pricing-grid{grid-template-columns:1fr}
   .price-card.featured .featured-badge{display:none}
@@ -249,13 +269,15 @@ footer a:hover{color:var(--teal-dark)}
   .hero-cta{flex-direction:column;align-items:center}
 }
 @media(max-width:480px){
-  /* En teléfonos angostos no caben logo con nombre + "Iniciar sesión" +
-     "Probar gratis" + ES/EN — antes el botón EN se salía de la pantalla y
-     el login se rompía en dos líneas. Queda solo la libélula, igual que
-     en la app. */
+  /* En teléfonos angostos no caben logo con nombre + Imprimibles + Probar
+     gratis + ES/EN — el nombre del logo se esconde (queda solo la
+     libélula) para dejar espacio a los dos botones de acción, que son
+     los que de verdad importa que se vean sin tener que buscarlos. */
   .nav-logo-name{display:none}
-  .nav-right{gap:6px}
-  .btn-nav{padding:7px 12px;font-size:12px}
+  .nav-right{gap:5px}
+  .btn-nav-outline{padding:6px 10px;font-size:11px}
+  .btn-nav{padding:7px 11px;font-size:11.5px}
+  .lang-btn{padding:3px 6px;font-size:10px}
 }.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--night,#0D1B2A);color:#fff;padding:13px 22px;border-radius:100px;font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 .toast.error{background:#E8637A}
@@ -286,8 +308,8 @@ footer a:hover{color:var(--teal-dark)}
   <div class="nav-right">
     <a href="#como-funciona" class="nav-link" data-es="Cómo funciona" data-en="How it works">Cómo funciona</a>
     <a href="#precios" class="nav-link" data-es="Precios" data-en="Pricing">Precios</a>
-    <a href="/imprimibles" class="nav-link" data-es="Imprimibles" data-en="Printables">Imprimibles</a>
     <a href="#" id="nav-login" class="nav-link" onclick="handleNavLogin();return false" data-es="Iniciar sesión" data-en="Log in">Iniciar sesión</a>
+    <a href="/imprimibles" class="btn-nav-outline" data-es="🖨️ Imprimibles" data-en="🖨️ Printables">🖨️ Imprimibles</a>
     <a href="/app" class="btn-nav" data-es="Probar gratis →" data-en="Try for free →">Probar gratis →</a>
     <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
     <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
@@ -355,6 +377,25 @@ footer a:hover{color:var(--teal-dark)}
         <div style="font-size:12px;color:var(--text-3);margin-top:.5rem;font-style:italic" data-es="La invitación formal llegará pronto — guarden la fecha ✨" data-en="Formal invitation coming soon — save the date ✨">La invitación formal llegará pronto — guarden la fecha ✨</div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- IMPRIMIBLES -->
+<section class="printables-section">
+  <div class="printables-band">
+    <p class="section-eyebrow" data-es="🖨️ Imprimibles" data-en="🖨️ Printables">🖨️ Imprimibles</p>
+    <h2 class="section-title" data-es="¿Solo necesitas una plantilla?<br>Empieza por aquí" data-en="Just need a template?<br>Start here">¿Solo necesitas una plantilla?<br>Empieza por aquí</h2>
+    <p class="section-sub" data-es="Planners, checklists y kits de juegos listos para imprimir — sin cuenta, sin esperar, algunos completamente gratis." data-en="Planners, checklists, and game kits ready to print — no account, no waiting, some completely free." style="margin-bottom:1.5rem">Planners, checklists y kits de juegos listos para imprimir — sin cuenta, sin esperar, algunos completamente gratis.</p>
+    <span class="printables-price" data-es="Desde $0 MXN" data-en="From $0 MXN">Desde $0 MXN</span>
+    <div class="printables-grid">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/planner-boda-con-calma-es.png" alt="Planner de Boda" onerror="this.style.display='none'">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/kit-juegos-despedida-soltera.png" alt="Kit Despedida de Soltera" onerror="this.style.display='none'">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/checklist-ultima-semana.png" alt="Checklist Última Semana" onerror="this.style.display='none'">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/diario-gratitud.png" alt="Diario de Gratitud" onerror="this.style.display='none'">
+    </div>
+    <a href="/imprimibles" class="btn-primary">
+      <span>🖨️</span> <span data-es="Ver todos los imprimibles" data-en="See all printables">Ver todos los imprimibles</span>
+    </a>
   </div>
 </section>
 
@@ -590,20 +631,8 @@ footer a:hover{color:var(--teal-dark)}
     <div class="faq-a" data-es="No. Abres el link, llenas el formulario y nosotros hacemos el resto. Solo necesitas tu correo — te mandamos un link mágico para entrar, sin contraseñas que recordar ni nada que instalar. Funciona en cualquier celular o computadora." data-en="No. You open the link, fill out the form, and we take care of the rest. All you need is your email — we send you a magic link to sign in, no passwords to remember and nothing to install. Works on any phone or computer.">No. Abres el link, llenas el formulario y nosotros hacemos el resto. Solo necesitas tu correo — te mandamos un link mágico para entrar, sin contraseñas que recordar ni nada que instalar. Funciona en cualquier celular o computadora.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿Qué tan personalizado es el plan?" data-en="How personalized is the plan?">¿Qué tan personalizado es el plan?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Muy personalizado. Usamos tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico." data-en="Very personalized. We use your name, city, real budget, style, and any details you write (the couple's story, restrictions, special ideas) to generate something unique — not a generic template.">Muy personalizado. Usamos tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico.</div>
-  </div>
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿El Save the Date se puede editar?" data-en="Can the Save the Date be edited?">¿El Save the Date se puede editar?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Sí — puedes hacer clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, hora, vestimenta, hashtag, mensaje) para editarlo, además de elegir entre varias paletas de color, fondos degradados o tu propia foto de fondo." data-en="Yes — you can click directly on any text on the card (names, date, location, time, dress code, hashtag, message) to edit it, plus choose from several color palettes, gradient backgrounds, or your own background photo.">Sí — puedes hacer clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, hora, vestimenta, hashtag, mensaje) para editarlo, además de elegir entre varias paletas de color, fondos degradados o tu propia foto de fondo.</div>
-  </div>
-  <div class="faq-item" onclick="toggleFaq(this)">
     <div class="faq-q"><span data-es="¿Funciona para eventos corporativos o solo bodas?" data-en="Does it work for corporate events, or just weddings?">¿Funciona para eventos corporativos o solo bodas?</span><span class="faq-icon">+</span></div>
     <div class="faq-a" data-es="Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado." data-en="It works for 8 event types: Wedding, Birthday, Baby Shower, Corporate, Quinceañera, Graduation, Anniversary, and Kids Party. The plan adapts to the selected event type.">Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado.</div>
-  </div>
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿Puedo descargar mi plan en Excel?" data-en="Can I download my plan as Excel?">¿Puedo descargar mi plan en Excel?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar." data-en="Yes, with full access you can download your plan as a real, editable Excel file: budget with formulas (recalculates automatically as you log expenses), guest list, timeline, checklist, decor, and food — all in separate sheets, ready to customize.">Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
     <div class="faq-q"><span data-es="¿Qué pasa si ya usé mis 2 planes gratis?" data-en="What happens if I've already used my 2 free plans?">¿Qué pasa si ya usé mis 2 planes gratis?</span><span class="faq-icon">+</span></div>
