@@ -1,0 +1,36 @@
+name = "dragonflai-worker-v2"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# ⚠️ IMPORTANTE — antes del primer deploy con Wrangler:
+# Si ya tienes un Cron Trigger configurado en el dashboard de Cloudflare
+# (Settings → Triggers → Cron Triggers) para los recordatorios de
+# planeación, AJUSTA la línea de abajo para que coincida EXACTO con esa
+# expresión antes de desplegar. Wrangler sincroniza los triggers según lo
+# que declares aquí — si no coincide, puede cambiar o borrar el que ya
+# tenías configurado manualmente.
+[triggers]
+crons = ["0 14 * * *"]
+
+# SUPABASE_URL vive AQUÍ a propósito, no solo en el Dashboard de Cloudflare.
+# No es información sensible (es la URL pública de tu proyecto), y como
+# Wrangler trata este archivo como la fuente de verdad en cada deploy,
+# cualquier variable que NO esté declarada aquí se borra sola la próxima
+# vez que despliegues — eso fue exactamente lo que pasó con el bug del
+# carrito. Ponerla aquí es lo que la hace permanente.
+[vars]
+SUPABASE_URL = "https://wpgdkfdoecohoowwoywx.supabase.co"
+
+# Los secretos (ANTHROPIC_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
+# SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, etc.) SÍ se quedan solo en
+# Cloudflare (Settings → Variables and Secrets) — esos son sensibles, no
+# deben vivir en el repo. Wrangler los deja intactos al desplegar, mientras
+# el "name" de arriba coincida exactamente con el nombre de tu Worker
+# existente. La diferencia es que esos son "Secrets" (un tipo especial que
+# Wrangler sí respeta), mientras que SUPABASE_URL era una variable de texto
+# simple — ese tipo es el que se pierde si no está declarado aquí.
+#
+# ⚠️ IMPORTANTE: RESEND_API_KEY debe ser tipo "Secret" en Cloudflare, NO
+# "Text" — si se crea como Text, un futuro deploy la puede dejar en un
+# estado inconsistente (nos pasó el 19/ago/2026). Revisa que diga "Secret"
+# en la columna Type si algún día el correo deja de mandarse otra vez.

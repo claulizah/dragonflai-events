@@ -63,7 +63,36 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
 .timeline-item::before{content:'';position:absolute;left:-5px;top:4px;width:8px;height:8px;border-radius:50%;background:var(--teal)}
 .timeline-item h4{font-size:14px;font-weight:600;margin:0 0 .3rem;color:var(--text)}
 .timeline-item p{font-size:13px;color:var(--text-2);margin:0}
+
+/* ── Imprimibles ── */
+.pf-row{margin-bottom:.9rem}
+.pf-label{display:block;font-size:12.5px;font-weight:600;color:var(--text-2);margin-bottom:5px}
+.pf-input{width:100%;padding:10px 12px;border:1.5px solid var(--border-gray);border-radius:9px;font-family:'Inter',sans-serif;font-size:13.5px;background:#fff}
+.pf-hint{font-size:11.5px;color:var(--text-3);margin-top:4px}
+.pf-coord-controls{display:flex;gap:10px;margin-bottom:10px}
+.pf-coord-controls div{flex:1}
+.pf-coord-controls label{display:block;font-size:11px;color:var(--text-3);margin-bottom:3px}
+.pf-coord-controls input{width:100%;padding:7px 9px;border:1px solid var(--border-gray);border-radius:6px;font-size:13px}
+#pf-canvas-wrap{border:1px dashed var(--border-gray);border-radius:8px;overflow:auto;max-height:60vh;margin-bottom:14px}
+.pf-page-nav{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;font-size:13px;color:var(--text-2)}
+#pf-canvas{display:block;cursor:crosshair;max-width:100%}
+.pf-field-adder{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;padding:12px;background:var(--cream-2);border-radius:9px}
+.pf-field-adder input[type=text],.pf-field-adder select{padding:7px 9px;border:1px solid var(--border-gray);border-radius:6px;font-size:12.5px;font-family:'Inter',sans-serif}
+.pf-field-adder input[type=number]{width:80px;padding:7px 9px;border:1px solid var(--border-gray);border-radius:6px;font-size:12.5px}
+.pf-field-adder input[type=color]{width:36px;height:32px;padding:0;border:1px solid var(--border-gray);border-radius:6px}
+.pf-checkbox{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--text-2)}
+.pf-actions{display:flex;gap:10px;margin-top:1.25rem}
+.save-btn{padding:10px 22px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;border:none;border-radius:100px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+
+/* ── Tooltips de ayuda ── */
+.tt-wrap{position:relative;display:inline-flex;align-items:center;margin-left:5px}
+.tt-icon{width:15px;height:15px;border-radius:50%;background:var(--cream-2);color:var(--text-3);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-gray);cursor:help;user-select:none}
+.tt-bubble{position:absolute;bottom:calc(100% + 8px);left:0;background:var(--text);color:#fff;font-size:12px;line-height:1.55;padding:9px 12px;border-radius:8px;width:230px;opacity:0;pointer-events:none;transition:opacity .15s;z-index:80;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.tt-bubble::after{content:'';position:absolute;top:100%;left:10px;border:5px solid transparent;border-top-color:var(--text)}
+.tt-wrap:hover .tt-bubble,.tt-wrap.show .tt-bubble{opacity:1}
+.pf-label-row{display:flex;align-items:center}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -86,6 +115,7 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('usage',this)">📊 Uso</button>
       <button class="tab-btn" onclick="showTab('beta',this)">🧪 Beta</button>
+      <button class="tab-btn" onclick="showTab('printables',this)">🖨️ Imprimibles</button>
       <button class="tab-btn" onclick="showTab('arch',this)">🏗️ Arquitectura</button>
       <button class="tab-btn" onclick="showTab('creds',this)">🔑 Credenciales</button>
       <button class="tab-btn" onclick="showTab('workflow',this)">⚙️ Flujo de trabajo</button>
@@ -100,6 +130,106 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
     <div id="tab-beta" class="tab-panel">
       <button class="refresh-btn" onclick="loadUsage()">↻ Actualizar</button>
       <div id="beta-content"><p class="loading">Cargando…</p></div>
+    </div>
+
+    <div id="tab-printables" class="tab-panel">
+      <button class="refresh-btn" onclick="loadPrintables()">↻ Actualizar</button>
+      <button class="refresh-btn" onclick="openPrintableForm()">+ Nuevo diseño</button>
+      <div id="printables-list"><p class="loading">Cargando…</p></div>
+
+      <div id="printable-form-card" class="card" style="display:none">
+        <h2 id="printable-form-title">🖨️ Nuevo diseño</h2>
+        <input type="hidden" id="pf-id">
+
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Nombre<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Es el nombre que ve la persona en el catálogo público — que sea claro y vendedor.</span></span></label>
+          <input type="text" id="pf-name" class="pf-input" placeholder="ej. Boda Elegante Dorado" oninput="autoSlug()">
+        </div>
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Slug (identificador único)<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Se genera solo a partir del nombre. Se usa para nombrar los archivos en Storage — solo edítalo a mano si vas a reemplazar un diseño existente.</span></span></label>
+          <input type="text" id="pf-slug" class="pf-input" placeholder="boda-elegante-dorado" oninput="this.dataset.manual='1'">
+        </div>
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Tipo de evento<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Controla en qué filtro de categoría aparece este diseño dentro de /imprimibles.</span></span></label>
+          <select id="pf-event-type" class="pf-input">
+            <option value="boda">Boda</option>
+            <option value="cumpleanos">Cumpleaños</option>
+            <option value="baby_shower">Baby Shower</option>
+            <option value="quinceanera">Quinceañera</option>
+            <option value="fiesta_infantil">Fiesta Infantil</option>
+            <option value="corporativo">Corporativo</option>
+            <option value="graduacion">Graduación</option>
+            <option value="aniversario">Aniversario</option>
+            <option value="bautizo">Bautizo</option>
+            <option value="primera_comunion">Primera Comunión</option>
+            <option value="reunion">Reunión / Fiesta General</option>
+            <option value="cuidado_personal">Cuidado Personal</option>
+          </select>
+        </div>
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Descripción (opcional, aparece en el catálogo)<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Se muestra debajo del nombre en la tarjeta del catálogo, y en el tooltip de detalle. Una línea breve funciona mejor que un párrafo.</span></span></label>
+          <input type="text" id="pf-description" class="pf-input" placeholder="Una línea breve">
+        </div>
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Precio (MXN)<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Lo que se cobra en Stripe al momento de personalizar y pagar. Pon 0 para que el diseño se muestre como "Gratis" — esos NO pasan por Stripe, se entregan solo con el correo.</span></span></label>
+          <input type="number" id="pf-price" class="pf-input" placeholder="49">
+        </div>
+
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Imagen de vista previa (thumbnail)<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Es la imagen que ve la persona en el catálogo, y también la que usas aquí abajo para ubicar cada campo con clics.</span></span></label>
+          <input type="file" id="pf-thumb-file" accept="image/*" onchange="onThumbSelected(event)">
+          <div id="pf-thumb-status" class="pf-hint"></div>
+        </div>
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Plantilla PDF (el archivo real que se personaliza)<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">El archivo sobre el que se inserta el texto de cada comprador. Debe tener EXACTO el mismo tamaño de página que pongas en Ancho/Alto abajo. Para diseños estáticos (sin campos), este mismo archivo se entrega tal cual.</span></span></label>
+          <input type="file" id="pf-template-file" accept="application/pdf" onchange="onTemplateSelected(event)">
+          <div id="pf-template-status" class="pf-hint"></div>
+        </div>
+        <div class="pf-row">
+          <label class="pf-label pf-label-row">Fuente personalizada (.ttf, opcional)<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Si tu diseño usa una tipografía decorativa o manuscrita, súbela aquí — el nombre y la fecha se insertarán con esa misma letra. Si no subes nada, se usa una fuente genérica (Helvetica).</span></span></label>
+          <input type="file" id="pf-font-file" accept=".ttf,.otf,font/ttf,font/otf" onchange="onFontSelected(event)">
+          <div id="pf-font-status" class="pf-hint"></div>
+        </div>
+
+        <div class="pf-row" id="pf-coords-wrap" style="display:none">
+          <label class="pf-label pf-label-row">Ubica cada campo — solo si este diseño se personaliza<span class="tt-wrap" onclick="toggleTt(this,event)"><span class="tt-icon">?</span><span class="tt-bubble">Si tu producto es igual para cualquier comprador (un planner, un checklist estático), NO agregues ningún campo — se entrega tal cual, sin pasar por aquí. Esta sección es solo para diseños donde insertas nombres, fecha, etc.</span></span></label>
+          <p class="pf-hint" style="margin-bottom:10px">¿Es un producto estático (igual para todos, sin nombres ni fecha)? Sube la plantilla y guarda sin agregar ningún campo aquí abajo.</p>
+
+          <div id="pf-pdf-loading" class="pf-hint" style="display:none">Cargando tu PDF…</div>
+
+          <div class="pf-page-nav" id="pf-page-nav" style="display:none">
+            <button type="button" class="refresh-btn" onclick="pfChangePage(-1)">← Anterior</button>
+            <span id="pf-page-label">Página 1 de 1</span>
+            <button type="button" class="refresh-btn" onclick="pfChangePage(1)">Siguiente →</button>
+            <span class="pf-hint" style="margin-left:auto">Ancho×Alto real: <b id="pf-pdf-dims">—</b> pt</span>
+          </div>
+
+          <div id="pf-canvas-wrap"><canvas id="pf-canvas"></canvas></div>
+
+          <div class="pf-field-adder">
+            <input type="text" id="nf-key" placeholder="key (ej. nombre1)" title="Identificador interno, sin espacios ni acentos. No lo ve el comprador.">
+            <input type="text" id="nf-label" placeholder="Etiqueta (ej. Nombre 1)" title="Lo que sí ve el comprador arriba del campo en el formulario.">
+            <select id="nf-type"><option value="text">Texto</option><option value="date">Fecha</option></select>
+            <input type="number" id="nf-maxlen" placeholder="Máx. caracteres" value="30" title="Evita que un texto muy largo se salga del diseño.">
+            <input type="number" id="nf-fontsize" placeholder="Tamaño" value="20" title="Tamaño de letra en puntos, dentro del PDF final.">
+            <input type="color" id="nf-color" value="#1a1a2e" title="Color del texto en el PDF final.">
+            <label class="pf-checkbox"><input type="checkbox" id="nf-bold"> Negritas</label>
+            <input type="number" id="nf-maxwidth" placeholder="Ancho máx (pt)" title="Opcional. Si lo llenas, el texto se parte en varias líneas para caber en ese ancho — útil para descripciones largas como un platillo de menú. Déjalo vacío para una sola línea.">
+          </div>
+          <p class="pf-hint" style="margin-bottom:10px">Llena los datos del campo arriba, luego haz clic en la página donde debe aparecer ese texto. Los campos se guardan en la página que tengas abierta en ese momento.</p>
+
+          <table class="cred-table" id="pf-fields-table">
+            <thead><tr><th>key</th><th>pág.</th><th>x</th><th>y</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="pf-actions">
+          <button class="refresh-btn" onclick="closePrintableForm()">Cancelar</button>
+          <button class="save-btn" onclick="savePrintable()">Guardar diseño</button>
+        </div>
+        <div id="pf-error" class="err-msg" style="display:none;margin-top:1rem"></div>
+      </div>
     </div>
 
     <div id="tab-arch" class="tab-panel">
@@ -211,11 +341,16 @@ h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-
 </div>
 
 <script>
+let printablesLoaded=false;
 function showTab(id, btn){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('active');
+  if(id==='printables' && !printablesLoaded){
+    printablesLoaded=true;
+    loadPrintables();
+  }
 }
 </script>
 
@@ -441,6 +576,381 @@ function renderBetaContent(beta){
   html += '</div>';
 
   content.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Imprimibles — CRUD de diseños + buscador de coordenadas integrado
+// ══════════════════════════════════════════════════════════════
+let PF_THUMB_URL = null, PF_TEMPLATE_URL = null, PF_FONT_URL = null, PF_FIELDS = [];
+let PF_PDF_LOADED = false, PF_CURRENT_PDF_W = 612, PF_CURRENT_PDF_H = 792;
+let pfCanvas, pfCtx;
+
+async function loadPrintables(){
+  const listEl = document.getElementById('printables-list');
+  listEl.innerHTML = '<p class="loading">Cargando…</p>';
+  try{
+    const resp = await fetch('/api/admin-printables?action=list', {
+      headers: { 'x-admin-password': savedPassword }, cache: 'no-store'
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error) throw new Error(data.error || `status ${resp.status}`);
+    renderPrintablesList(data);
+  }catch(err){
+    listEl.innerHTML = `<div class="err-msg">${esc(err.message)}</div>`;
+  }
+}
+
+function renderPrintablesList(designs){
+  const listEl = document.getElementById('printables-list');
+  if(!designs.length){
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-3)">Todavía no hay diseños — usa "+ Nuevo diseño" para crear el primero.</p>';
+    return;
+  }
+  window.__PF_CACHE = {};
+  let html = '<table class="cred-table"><tr><th></th><th>Nombre</th><th>Tipo</th><th>Precio</th><th>Personalización</th><th>Activo</th><th></th></tr>';
+  designs.forEach(d=>{
+    window.__PF_CACHE[d.id] = d;
+    const hasFields = Array.isArray(d.editable_fields) && d.editable_fields.length > 0;
+    const isFree = Number(d.price_mxn) === 0;
+    html += `<tr>
+      <td><img src="${esc(d.thumbnail_url)}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;display:block" onerror="this.style.display='none'"></td>
+      <td>${esc(d.name)}</td>
+      <td>${esc(d.event_type)}</td>
+      <td>${isFree ? 'Gratis 🎁' : '$' + Number(d.price_mxn).toFixed(0)}</td>
+      <td>${hasFields ? `🖊️ ${d.editable_fields.length} campo(s)` : '📄 Estático'}</td>
+      <td>${d.is_active ? '✅' : '—'}</td>
+      <td style="white-space:nowrap">
+        <a href="#" onclick="editPrintable('${d.id}');return false" style="color:var(--teal-dark);margin-right:10px">Editar</a>
+        <a href="#" onclick="togglePrintable('${d.id}', ${!d.is_active});return false" style="margin-right:10px">${d.is_active ? 'Desactivar' : 'Activar'}</a>
+        <a href="#" onclick="deletePrintable('${d.id}');return false" style="color:#B23A52">Eliminar</a>
+      </td>
+    </tr>`;
+  });
+  html += '</table>';
+  listEl.innerHTML = html;
+}
+
+async function togglePrintable(id, newActive){
+  try{
+    await fetch('/api/admin-printables?action=toggle', {
+      method: 'POST',
+      headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_active: newActive })
+    });
+    loadPrintables();
+  }catch(err){ alert('Error: ' + err.message); }
+}
+
+async function deletePrintable(id){
+  const d = window.__PF_CACHE && window.__PF_CACHE[id];
+  const name = d ? d.name : 'este diseño';
+  if(!confirm(`¿Eliminar "${name}" definitivamente? Esto no se puede deshacer.`)) return;
+
+  try{
+    const resp = await fetch('/api/admin-printables?action=delete', {
+      method: 'POST',
+      headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error){
+      alert(data.error || 'No se pudo eliminar el diseño.');
+      return;
+    }
+    loadPrintables();
+  }catch(err){ alert('Error: ' + err.message); }
+}
+
+function openPrintableForm(){
+  document.getElementById('printable-form-title').textContent = '🖨️ Nuevo diseño';
+  document.getElementById('pf-id').value = '';
+  document.getElementById('pf-name').value = '';
+  const slugField = document.getElementById('pf-slug');
+  slugField.value = ''; delete slugField.dataset.manual;
+  document.getElementById('pf-event-type').value = 'boda';
+  document.getElementById('pf-description').value = '';
+  document.getElementById('pf-price').value = '';
+  document.getElementById('pf-thumb-status').textContent = '';
+  document.getElementById('pf-template-status').textContent = '';
+  document.getElementById('pf-font-status').textContent = '';
+  document.getElementById('pf-coords-wrap').style.display = 'none';
+  document.getElementById('pf-page-nav').style.display = 'none';
+  document.getElementById('pf-error').style.display = 'none';
+  PF_THUMB_URL = null; PF_TEMPLATE_URL = null; PF_FONT_URL = null; PF_FIELDS = [];
+  PF_PDF_DOC = null; PF_PDF_LOADED = false; PF_CURRENT_PAGE = 0;
+  renderFieldsTable();
+  document.getElementById('printable-form-card').style.display = 'block';
+  document.getElementById('printable-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closePrintableForm(){
+  document.getElementById('printable-form-card').style.display = 'none';
+}
+
+function editPrintable(id){
+  const d = window.__PF_CACHE && window.__PF_CACHE[id];
+  if(!d){ alert('No se encontró el diseño — recarga la lista.'); return; }
+
+  document.getElementById('printable-form-title').textContent = '🖨️ Editar diseño';
+  document.getElementById('pf-id').value = d.id;
+  document.getElementById('pf-name').value = d.name;
+  const slugField = document.getElementById('pf-slug');
+  slugField.value = d.slug; slugField.dataset.manual = '1';
+  document.getElementById('pf-event-type').value = d.event_type;
+  document.getElementById('pf-description').value = d.description || '';
+  document.getElementById('pf-price').value = d.price_mxn;
+
+  PF_THUMB_URL = d.thumbnail_url;
+  PF_TEMPLATE_URL = d.template_url;
+  PF_FONT_URL = d.font_url || null;
+  PF_FIELDS = Array.isArray(d.editable_fields) ? JSON.parse(JSON.stringify(d.editable_fields)) : [];
+
+  document.getElementById('pf-thumb-status').textContent = 'Imagen actual cargada ✓ (sube una nueva para reemplazarla)';
+  document.getElementById('pf-template-status').textContent = 'Plantilla actual cargada ✓ (sube una nueva para reemplazarla)';
+  document.getElementById('pf-font-status').textContent = PF_FONT_URL ? 'Fuente personalizada cargada ✓ (sube otra para reemplazarla)' : 'Sin fuente personalizada (usa Helvetica genérica)';
+  document.getElementById('pf-error').style.display = 'none';
+  document.getElementById('pf-coords-wrap').style.display = 'block';
+
+  loadPdfIntoPicker(d.template_url);
+  renderFieldsTable();
+  document.getElementById('printable-form-card').style.display = 'block';
+  document.getElementById('printable-form-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+function autoSlug(){
+  const slugField = document.getElementById('pf-slug');
+  if(slugField.dataset.manual) return;
+  const name = document.getElementById('pf-name').value;
+  slugField.value = name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+async function onThumbSelected(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('pf-thumb-status');
+  statusEl.textContent = 'Subiendo…';
+  try{
+    const url = await uploadPrintableFile(file, 'thumbnail');
+    PF_THUMB_URL = url;
+    statusEl.textContent = '✓ Subida';
+  }catch(err){ statusEl.textContent = 'Error: ' + err.message; }
+}
+
+async function onTemplateSelected(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('pf-template-status');
+  statusEl.textContent = 'Subiendo…';
+  try{
+    const url = await uploadPrintableFile(file, 'template');
+    PF_TEMPLATE_URL = url;
+    statusEl.textContent = '✓ Subida';
+    document.getElementById('pf-coords-wrap').style.display = 'block';
+    await loadPdfIntoPicker(file);
+  }catch(err){ statusEl.textContent = 'Error: ' + err.message; }
+}
+
+async function onFontSelected(evt){
+  const file = evt.target.files[0]; if(!file) return;
+  const statusEl = document.getElementById('pf-font-status');
+  statusEl.textContent = 'Subiendo…';
+  try{
+    const url = await uploadPrintableFile(file, 'font');
+    PF_FONT_URL = url;
+    statusEl.textContent = '✓ Subida — se usará para el nombre y la fecha en este diseño';
+  }catch(err){ statusEl.textContent = 'Error: ' + err.message; }
+}
+
+async function uploadPrintableFile(file, kind){
+  const slug = document.getElementById('pf-slug').value || 'diseno';
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('kind', kind);
+  fd.append('slug', slug);
+  const resp = await fetch('/api/admin-printables?action=upload', {
+    method: 'POST',
+    headers: { 'x-admin-password': savedPassword },
+    body: fd
+  });
+  const data = await resp.json();
+  if(!resp.ok || data.error) throw new Error(data.error || `status ${resp.status}`);
+  return data.url;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Buscador de coordenadas — usa pdf.js para mostrar la PLANTILLA
+//  REAL (no una imagen de marketing aparte), con soporte de varias
+//  páginas. Así las coordenadas siempre coinciden con el PDF real,
+//  y puedes ubicar campos en cualquier página, no solo la primera.
+// ══════════════════════════════════════════════════════════════
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+let PF_PDF_DOC = null;      // documento pdf.js cargado
+let PF_CURRENT_PAGE = 0;    // 0-indexed, como en editable_fields
+
+async function loadPdfIntoPicker(source){
+  document.getElementById('pf-page-nav').style.display = 'none';
+  document.getElementById('pf-pdf-loading').style.display = 'block';
+  try{
+    let loadingTask;
+    if(source instanceof File){
+      const buf = await source.arrayBuffer();
+      loadingTask = pdfjsLib.getDocument({ data: buf });
+    } else {
+      // URL (caso de "editar" un diseño ya guardado) — pdf.js la descarga solo.
+      loadingTask = pdfjsLib.getDocument({ url: source });
+    }
+    PF_PDF_DOC = await loadingTask.promise;
+    PF_CURRENT_PAGE = 0;
+    document.getElementById('pf-page-nav').style.display = PF_PDF_DOC.numPages > 1 ? 'flex' : 'none';
+    await renderPfPage(0);
+  }catch(err){
+    console.error('Error cargando el PDF en el buscador:', err);
+    alert('No se pudo abrir el PDF para ubicar campos: ' + err.message);
+  }finally{
+    document.getElementById('pf-pdf-loading').style.display = 'none';
+  }
+}
+
+async function renderPfPage(pageIndex){
+  if(!PF_PDF_DOC) return;
+  PF_CURRENT_PAGE = pageIndex;
+  const page = await PF_PDF_DOC.getPage(pageIndex + 1); // pdf.js empieza en 1
+
+  // view = [x0, y0, x1, y1] en puntos PDF reales — se autocompleta aquí,
+  // ya no hace falta que lo escribas a mano ni que puedas equivocarte.
+  const [x0, y0, x1, y1] = page.view;
+  const pdfW = x1 - x0, pdfH = y1 - y0;
+  document.getElementById('pf-pdf-dims').textContent = `${Math.round(pdfW)}×${Math.round(pdfH)}`;
+  PF_CURRENT_PDF_W = pdfW;
+  PF_CURRENT_PDF_H = pdfH;
+
+  const targetWidth = 760; // ancho de render cómodo dentro del recuadro
+  const baseViewport = page.getViewport({ scale: 1 });
+  const scale = targetWidth / baseViewport.width;
+  const viewport = page.getViewport({ scale });
+
+  pfCanvas = document.getElementById('pf-canvas');
+  pfCtx = pfCanvas.getContext('2d');
+  pfCanvas.width = viewport.width;
+  pfCanvas.height = viewport.height;
+
+  await page.render({ canvasContext: pfCtx, viewport }).promise;
+  PF_PDF_LOADED = true;
+
+  document.getElementById('pf-page-label').textContent = `Página ${pageIndex + 1} de ${PF_PDF_DOC.numPages}`;
+  redrawCanvas();
+}
+
+function pfChangePage(delta){
+  if(!PF_PDF_DOC) return;
+  const next = PF_CURRENT_PAGE + delta;
+  if(next < 0 || next >= PF_PDF_DOC.numPages) return;
+  renderPfPage(next);
+}
+
+// Vuelve a dibujar los marcadores de campos ENCIMA de la página ya
+// renderizada — solo los que pertenecen a la página actualmente abierta.
+function redrawCanvas(){
+  if(!PF_PDF_LOADED || !pfCtx) return;
+  PF_FIELDS.forEach(f => {
+    if((f.page || 0) !== PF_CURRENT_PAGE) return;
+    const canvasX = (f.x / PF_CURRENT_PDF_W) * pfCanvas.width;
+    const canvasY = pfCanvas.height - (f.y / PF_CURRENT_PDF_H) * pfCanvas.height;
+    pfCtx.beginPath();
+    pfCtx.arc(canvasX, canvasY, 6, 0, Math.PI * 2);
+    pfCtx.fillStyle = '#2EC4B6';
+    pfCtx.fill();
+    pfCtx.strokeStyle = '#fff';
+    pfCtx.lineWidth = 2;
+    pfCtx.stroke();
+    pfCtx.fillStyle = '#1A1A2E';
+    pfCtx.font = 'bold 13px sans-serif';
+    pfCtx.fillText(f.key, canvasX + 9, canvasY - 9);
+  });
+}
+
+document.getElementById('pf-canvas').addEventListener('click', (e) => {
+  if(!PF_PDF_LOADED) return;
+  const key = document.getElementById('nf-key').value.trim();
+  if(!key){ alert('Escribe la key del campo antes de hacer clic sobre la página.'); return; }
+
+  const rect = pfCanvas.getBoundingClientRect();
+  const canvasX = (e.clientX - rect.left) * (pfCanvas.width / rect.width);
+  const canvasY = (e.clientY - rect.top) * (pfCanvas.height / rect.height);
+  const x = Math.round((canvasX / pfCanvas.width) * PF_CURRENT_PDF_W);
+  const y = Math.round(PF_CURRENT_PDF_H - (canvasY / pfCanvas.height) * PF_CURRENT_PDF_H);
+
+  const maxWidthInput = parseFloat(document.getElementById('nf-maxwidth').value);
+  const field = {
+    key,
+    label: document.getElementById('nf-label').value.trim() || key,
+    type: document.getElementById('nf-type').value,
+    max_length: parseInt(document.getElementById('nf-maxlen').value, 10) || 30,
+    x, y, page: PF_CURRENT_PAGE,
+    font_size: parseInt(document.getElementById('nf-fontsize').value, 10) || 20,
+    color: document.getElementById('nf-color').value,
+    bold: document.getElementById('nf-bold').checked
+  };
+  if(maxWidthInput > 0) field.max_width = maxWidthInput;
+
+  // Reemplaza si ya existe un campo con la MISMA key en la MISMA página
+  // (una key puede repetirse en distintas páginas, ej. "titulo" en cada una).
+  const existingIdx = PF_FIELDS.findIndex(f => f.key === key && (f.page || 0) === PF_CURRENT_PAGE);
+  if(existingIdx >= 0) PF_FIELDS[existingIdx] = field; else PF_FIELDS.push(field);
+
+  redrawCanvas();
+  renderFieldsTable();
+  document.getElementById('nf-key').value = '';
+  document.getElementById('nf-maxwidth').value = '';
+});
+
+function renderFieldsTable(){
+  const tbody = document.querySelector('#pf-fields-table tbody');
+  tbody.innerHTML = PF_FIELDS.map((f, i) => `
+    <tr><td>${esc(f.key)}${f.max_width ? ' <span style="color:var(--text-3);font-size:11px">(multi-línea)</span>' : ''}</td>
+    <td>${(f.page || 0) + 1}</td><td>${f.x}</td><td>${f.y}</td>
+    <td><a href="#" onclick="removeField(${i});return false" style="color:var(--red)">quitar</a></td></tr>
+  `).join('');
+}
+
+function removeField(i){
+  PF_FIELDS.splice(i, 1);
+  redrawCanvas();
+  renderFieldsTable();
+}
+
+async function savePrintable(){
+  const errEl = document.getElementById('pf-error');
+  errEl.style.display = 'none';
+
+  const name = document.getElementById('pf-name').value.trim();
+  const slug = document.getElementById('pf-slug').value.trim();
+  const event_type = document.getElementById('pf-event-type').value;
+  const description = document.getElementById('pf-description').value.trim();
+  const price_mxn = parseFloat(document.getElementById('pf-price').value);
+  const id = document.getElementById('pf-id').value || null;
+
+  if(!name || !slug || !price_mxn || !PF_THUMB_URL || !PF_TEMPLATE_URL){
+    errEl.textContent = 'Faltan datos: nombre, slug, precio, imagen y plantilla son obligatorios.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  try{
+    const resp = await fetch('/api/admin-printables?action=save', {
+      method: 'POST',
+      headers: { 'x-admin-password': savedPassword, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, slug, name, event_type, description, price_mxn, thumbnail_url: PF_THUMB_URL, template_url: PF_TEMPLATE_URL, font_url: PF_FONT_URL, editable_fields: PF_FIELDS })
+    });
+    const data = await resp.json();
+    if(!resp.ok || data.error) throw new Error(data.error || `status ${resp.status}`);
+    closePrintableForm();
+    loadPrintables();
+  }catch(err){
+    errEl.textContent = 'Error guardando: ' + err.message;
+    errEl.style.display = 'block';
+  }
 }
 
 document.getElementById('pw-input').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });

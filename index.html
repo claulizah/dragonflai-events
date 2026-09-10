@@ -14,10 +14,10 @@
     document.documentElement.style.visibility = "hidden";
   }
 </script>
-<title>DragonflAI Events — Invitaciones digitales con RSVP</title>
+<title>DragonflAI Events — Belu, tu asistente personal de eventos</title>
 <!-- Vista previa al compartir la landing (WhatsApp, redes) -->
-<meta property="og:title" content="DragonflAI Events — Invitaciones digitales con RSVP">
-<meta property="og:description" content="Crea tu invitación digital con RSVP que se confirma solo — y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento.">
+<meta property="og:title" content="DragonflAI Events — Belu, tu asistente personal de eventos">
+<meta property="og:description" content="Cuéntale a Belu tu evento y ella genera el plan completo: cronograma, presupuesto, checklist, proveedores e invitación con RSVP.">
 <meta property="og:image" content="https://dragonflaievents.com/assets/belu/og-image.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://dragonflaievents.com/">
@@ -36,10 +36,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2EC4B6">
-<meta name="description" content="Crea tu invitación digital con foto, colores y QR — tus invitados confirman solos. Y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento. Pruébalo gratis.">
-<!-- belu-optimista.png es el elemento LCP medido (3.5 s en P75). El preload
-     hace que el navegador lo pida de inmediato, sin esperar a parsear el body. -->
-<link rel="preload" as="image" href="/assets/belu/belu-optimista.webp" type="image/webp" fetchpriority="high">
+<meta name="description" content="Genera en menos de 90 segundos un plan completo para tu boda, quinceañera o evento. Cronograma, presupuesto, checklist, proveedores, Save the Date — creado junto contigo, con acceso completo y descarga en Excel editable.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -102,6 +99,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .nav-link:hover{color:var(--teal-dark)}
 .btn-nav{padding:8px 20px;border-radius:100px;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none}
 .btn-nav:hover{opacity:.9;transform:translateY(-1px)}
+.btn-nav-outline{padding:7px 16px;border-radius:100px;background:var(--white);color:var(--violet);font-size:13px;font-weight:600;border:1.5px solid var(--violet);cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none;white-space:nowrap}
+.btn-nav-outline:hover{background:var(--violet);color:#fff}
 
 /* ── HERO ── */
 .hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8rem 1.5rem 5rem}
@@ -154,6 +153,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .feature-icon{font-size:28px;margin-bottom:.875rem;display:block}
 .feature-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:.5rem}
 .feature-desc{font-size:13px;color:var(--text-2);line-height:1.6}
+
+/* ── IMPRIMIBLES (destacado, grande y llamativo) ── */
+.printables-section{position:relative;z-index:1;padding:4.5rem 1.5rem;max-width:1000px;margin:0 auto;text-align:center}
+.printables-band{background:linear-gradient(135deg,var(--teal-light),var(--violet-light,#F1E7FB));border-radius:28px;padding:3rem 1.5rem;border:1.5px solid var(--border-gray)}
+.printables-grid{display:flex;justify-content:center;align-items:flex-end;gap:14px;flex-wrap:wrap;margin:2rem 0}
+.printables-grid img{width:150px;height:150px;object-fit:cover;border-radius:14px;border:4px solid #fff;box-shadow:0 12px 30px rgba(0,0,0,.14);transition:transform .25s}
+.printables-grid img:nth-child(1){transform:rotate(-6deg)}
+.printables-grid img:nth-child(2){transform:rotate(4deg) translateY(-10px)}
+.printables-grid img:nth-child(3){transform:rotate(-3deg) translateY(6px)}
+.printables-grid img:nth-child(4){transform:rotate(7deg)}
+.printables-grid img:hover{transform:scale(1.06) rotate(0deg) !important;box-shadow:0 16px 36px rgba(0,0,0,.2)}
+.printables-price{display:inline-block;font-size:12.5px;font-weight:700;color:var(--violet);background:#fff;padding:5px 14px;border-radius:100px;margin-bottom:1.25rem}
+@media(max-width:600px){
+  .printables-band{padding:2.25rem 1rem;border-radius:22px}
+  .printables-grid img{width:100px;height:100px;border-radius:11px}
+  .printables-grid{gap:10px}
+}
 
 /* ── HOW IT WORKS ── */
 .how-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:760px;margin:0 auto}
@@ -237,13 +253,14 @@ footer a:hover{color:var(--teal-dark)}
 .ub-btn:hover{opacity:.9}
 
 @media(max-width:600px){
-  nav{padding:0 1rem}
-  .nav-right{gap:8px}
+  nav{padding:0 .75rem}
+  .nav-right{gap:6px}
   .nav-link{display:none}
-  .nav-logo-name{font-size:17px;white-space:nowrap}
-  #nav-login{display:inline;font-size:12px;white-space:nowrap}
-  .btn-nav{padding:8px 14px;font-size:12.5px;white-space:nowrap}
-  .lang-btn{padding:4px 8px;font-size:11px}
+  .nav-logo-name{font-size:16px;white-space:nowrap}
+  #nav-login{display:none}
+  .btn-nav-outline{padding:6px 11px;font-size:11.5px}
+  .btn-nav{padding:8px 12px;font-size:12px;white-space:nowrap}
+  .lang-btn{padding:4px 7px;font-size:10.5px}
   .hero{padding:7rem 1rem 4rem}
   .pricing-grid{grid-template-columns:1fr}
   .price-card.featured .featured-badge{display:none}
@@ -252,13 +269,15 @@ footer a:hover{color:var(--teal-dark)}
   .hero-cta{flex-direction:column;align-items:center}
 }
 @media(max-width:480px){
-  /* En teléfonos angostos no caben logo con nombre + "Iniciar sesión" +
-     "Probar gratis" + ES/EN — antes el botón EN se salía de la pantalla y
-     el login se rompía en dos líneas. Queda solo la libélula, igual que
-     en la app. */
+  /* En teléfonos angostos no caben logo con nombre + Imprimibles + Probar
+     gratis + ES/EN — el nombre del logo se esconde (queda solo la
+     libélula) para dejar espacio a los dos botones de acción, que son
+     los que de verdad importa que se vean sin tener que buscarlos. */
   .nav-logo-name{display:none}
-  .nav-right{gap:6px}
-  .btn-nav{padding:7px 12px;font-size:12px}
+  .nav-right{gap:5px}
+  .btn-nav-outline{padding:6px 10px;font-size:11px}
+  .btn-nav{padding:7px 11px;font-size:11.5px}
+  .lang-btn{padding:3px 6px;font-size:10px}
 }.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--night,#0D1B2A);color:#fff;padding:13px 22px;border-radius:100px;font-size:13.5px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:999;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 .toast.error{background:#E8637A}
@@ -290,6 +309,7 @@ footer a:hover{color:var(--teal-dark)}
     <a href="#como-funciona" class="nav-link" data-es="Cómo funciona" data-en="How it works">Cómo funciona</a>
     <a href="#precios" class="nav-link" data-es="Precios" data-en="Pricing">Precios</a>
     <a href="#" id="nav-login" class="nav-link" onclick="handleNavLogin();return false" data-es="Iniciar sesión" data-en="Log in">Iniciar sesión</a>
+    <a href="/imprimibles" class="btn-nav-outline" data-es="🖨️ Imprimibles" data-en="🖨️ Printables">🖨️ Imprimibles</a>
     <a href="/app" class="btn-nav" data-es="Probar gratis →" data-en="Try for free →">Probar gratis →</a>
     <button class="lang-btn active" onclick="setLang('es')" id="btn-es">ES</button>
     <button class="lang-btn" onclick="setLang('en')" id="btn-en">EN</button>
@@ -298,10 +318,10 @@ footer a:hover{color:var(--teal-dark)}
 
 <!-- HERO -->
 <section class="hero">
-  <span class="hero-tag" data-es="🪰 Invitaciones con RSVP · Belu planea el resto" data-en="🪰 RSVP invitations · Belu plans the rest">🪰 Invitaciones con RSVP · Belu planea el resto</span>
-  <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><picture><source type="image/webp" srcset="/assets/belu/belu-optimista-1x.webp 1x, /assets/belu/belu-optimista.webp 2x, /assets/belu/belu-optimista-3x.webp 3x"><img src="/assets/belu/belu-optimista-2x.png" alt="Belu" width="182" height="140" fetchpriority="high" decoding="sync" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></picture></span>
-  <h1 data-es="Tu invitación digital,<br><em>con RSVP que se confirma solo</em>" data-en="Your digital invitation,<br><em>with RSVP that confirms itself</em>">Tu invitación digital,<br><em>con RSVP que se confirma solo</em></h1>
-  <p class="hero-sub" data-es="Créala en minutos con tu foto y tus colores, y mándala con un link o un QR. Y ya que estás, Belu te arma también el cronograma, el presupuesto y el checklist del resto del evento." data-en="Build it in minutes with your photo and colors, then share it by link or QR. And since you're at it, Belu also builds the timeline, budget and checklist for the rest of your event.">Créala en minutos con tu foto y tus colores, y mándala con un link o un QR. Y ya que estás, Belu te arma también el cronograma, el presupuesto y el checklist del resto del evento.</p>
+  <span class="hero-tag" data-es="✦ Conoce a Belu — tu asistente personal de eventos" data-en="✦ Meet Belu — your personal event assistant">✦ Conoce a Belu — tu asistente personal de eventos</span>
+  <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><img src="/assets/belu/belu-optimista.png" alt="Belu" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></span>
+  <h1 data-es="Tu evento <em>perfecto,</em><br>planeado en segundos" data-en="Your <em>perfect</em> event,<br>planned in seconds">Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
+  <p class="hero-sub" data-es="Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable." data-en="Tell Belu the details of your wedding, quinceañera, or party and she generates your complete plan — timeline, budget, checklist, vendors, and Save the Date. With full access, download it as an editable Excel too.">Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable.</p>
   <div class="hero-cta">
     <a href="/app" class="btn-primary">
       <span>✦</span> <span data-es="Generar mi plan gratis" data-en="Generate my free plan">Generar mi plan gratis</span>
@@ -313,7 +333,9 @@ footer a:hover{color:var(--teal-dark)}
     <span class="proof-dot"></span>
     <span class="proof-item" data-es="✓ Sin tarjeta" data-en="✓ No card needed">✓ Sin tarjeta</span>
     <span class="proof-dot"></span>
-    <span class="proof-item" data-es="✓ Confirman solos, sin perseguir a nadie" data-en="✓ They RSVP themselves — no chasing anyone">✓ Confirman solos, sin perseguir a nadie</span>
+    <span class="proof-item" data-es="✓ Español e inglés" data-en="✓ Spanish &amp; English">✓ Español e inglés</span>
+    <span class="proof-dot"></span>
+    <span class="proof-item" data-es="✓ Listo en menos de 90 segundos" data-en="✓ Ready in under 90 seconds">✓ Listo en menos de 90 segundos</span>
   </div>
 </section>
 
@@ -358,10 +380,29 @@ footer a:hover{color:var(--teal-dark)}
   </div>
 </section>
 
+<!-- IMPRIMIBLES -->
+<section class="printables-section">
+  <div class="printables-band">
+    <p class="section-eyebrow" data-es="🖨️ Imprimibles" data-en="🖨️ Printables">🖨️ Imprimibles</p>
+    <h2 class="section-title" data-es="¿Solo necesitas una plantilla?<br>Empieza por aquí" data-en="Just need a template?<br>Start here">¿Solo necesitas una plantilla?<br>Empieza por aquí</h2>
+    <p class="section-sub" data-es="Planners, checklists y kits de juegos listos para imprimir — sin cuenta, sin esperar, algunos completamente gratis." data-en="Planners, checklists, and game kits ready to print — no account, no waiting, some completely free." style="margin-bottom:1.5rem">Planners, checklists y kits de juegos listos para imprimir — sin cuenta, sin esperar, algunos completamente gratis.</p>
+    <span class="printables-price" data-es="Desde $0 MXN" data-en="From $0 MXN">Desde $0 MXN</span>
+    <div class="printables-grid">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/planner-boda-con-calma-es.png" alt="Planner de Boda" onerror="this.style.display='none'">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/kit-juegos-despedida-soltera.png" alt="Kit Despedida de Soltera" onerror="this.style.display='none'">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/checklist-ultima-semana.png" alt="Checklist Última Semana" onerror="this.style.display='none'">
+      <img src="https://wpgdkfdoecohoowwoywx.supabase.co/storage/v1/object/public/printable-assets/thumbnail/diario-gratitud.png" alt="Diario de Gratitud" onerror="this.style.display='none'">
+    </div>
+    <a href="/imprimibles" class="btn-primary">
+      <span>🖨️</span> <span data-es="Ver todos los imprimibles" data-en="See all printables">Ver todos los imprimibles</span>
+    </a>
+  </div>
+</section>
+
 <!-- FEATURES -->
 <section class="features-section">
   <p class="section-eyebrow" data-es="Funcionalidades" data-en="Features">Funcionalidades</p>
-  <h2 class="section-title" data-es="Todo lo que incluye tu plan" data-en="Everything your plan includes">Todo lo que incluye tu plan</h2>
+  <h2 class="section-title" data-es="Todo lo que creamos juntos" data-en="Everything we create together">Todo lo que creamos juntos</h2>
   <p class="section-sub" data-es="8 tipos de evento · Español e inglés · Modo personal y profesional" data-en="8 event types · Spanish &amp; English · Personal &amp; professional mode">8 tipos de evento · Español e inglés · Modo personal y profesional</p>
   <div class="features-grid" style="margin-top:2.5rem">
     <div class="feature-card">
@@ -590,20 +631,8 @@ footer a:hover{color:var(--teal-dark)}
     <div class="faq-a" data-es="No. Abres el link, llenas el formulario y nosotros hacemos el resto. Solo necesitas tu correo — te mandamos un link mágico para entrar, sin contraseñas que recordar ni nada que instalar. Funciona en cualquier celular o computadora." data-en="No. You open the link, fill out the form, and we take care of the rest. All you need is your email — we send you a magic link to sign in, no passwords to remember and nothing to install. Works on any phone or computer.">No. Abres el link, llenas el formulario y nosotros hacemos el resto. Solo necesitas tu correo — te mandamos un link mágico para entrar, sin contraseñas que recordar ni nada que instalar. Funciona en cualquier celular o computadora.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿Qué tan personalizado es el plan?" data-en="How personalized is the plan?">¿Qué tan personalizado es el plan?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Muy personalizado. Usamos tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico." data-en="Very personalized. We use your name, city, real budget, style, and any details you write (the couple's story, restrictions, special ideas) to generate something unique — not a generic template.">Muy personalizado. Usamos tu nombre, ciudad, presupuesto real, estilo y los detalles que tú escribas (historia de la pareja, restricciones, ideas especiales) para generar algo único — no un template genérico.</div>
-  </div>
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿El Save the Date se puede editar?" data-en="Can the Save the Date be edited?">¿El Save the Date se puede editar?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Sí — puedes hacer clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, hora, vestimenta, hashtag, mensaje) para editarlo, además de elegir entre varias paletas de color, fondos degradados o tu propia foto de fondo." data-en="Yes — you can click directly on any text on the card (names, date, location, time, dress code, hashtag, message) to edit it, plus choose from several color palettes, gradient backgrounds, or your own background photo.">Sí — puedes hacer clic directo en cualquier texto de la tarjeta (nombres, fecha, lugar, hora, vestimenta, hashtag, mensaje) para editarlo, además de elegir entre varias paletas de color, fondos degradados o tu propia foto de fondo.</div>
-  </div>
-  <div class="faq-item" onclick="toggleFaq(this)">
     <div class="faq-q"><span data-es="¿Funciona para eventos corporativos o solo bodas?" data-en="Does it work for corporate events, or just weddings?">¿Funciona para eventos corporativos o solo bodas?</span><span class="faq-icon">+</span></div>
     <div class="faq-a" data-es="Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado." data-en="It works for 8 event types: Wedding, Birthday, Baby Shower, Corporate, Quinceañera, Graduation, Anniversary, and Kids Party. The plan adapts to the selected event type.">Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado.</div>
-  </div>
-  <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿Puedo descargar mi plan en Excel?" data-en="Can I download my plan as Excel?">¿Puedo descargar mi plan en Excel?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar." data-en="Yes, with full access you can download your plan as a real, editable Excel file: budget with formulas (recalculates automatically as you log expenses), guest list, timeline, checklist, decor, and food — all in separate sheets, ready to customize.">Sí, con el acceso completo puedes descargar tu plan como un archivo Excel real y editable: presupuesto con fórmulas (se recalcula solo al registrar gastos), lista de invitados, cronograma, checklist, decoración y comida — todo en hojas separadas, listas para personalizar.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
     <div class="faq-q"><span data-es="¿Qué pasa si ya usé mis 2 planes gratis?" data-en="What happens if I've already used my 2 free plans?">¿Qué pasa si ya usé mis 2 planes gratis?</span><span class="faq-icon">+</span></div>
@@ -803,71 +832,10 @@ const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
 const gensUsed = parseInt(localStorage.getItem('dflai_gens') || '0');
 let currentUser = null;
 let isPaid = false;
-// ══════════════════════════════════════════════════════════════
-//  RESOLUCIÓN DE IDIOMA — compartida entre landing, app, invitación y legales
-//  Prioridad: ?lang= en la URL → localStorage → idioma del navegador → es
-//  La clave es GLOBAL a propósito (no va scoped por cuenta como plan_id):
-//  el idioma no es un dato de la cuenta ni revela nada de otro usuario, y
-//  necesita sobrevivir cuando todavía no hay sesión — que es justo el caso
-//  de alguien que llega desde un anuncio o desde la bio de TikTok.
-// ══════════════════════════════════════════════════════════════
-const DFLAI_LANG_KEY='dflai_lang';
-let dflaiLangForcedByUrl=false;
-function dflaiRememberLang(l){ try{ localStorage.setItem(DFLAI_LANG_KEY,l); }catch(e){} }
-function dflaiResolveLang(){
-  let q='';
-  try{ q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2); }catch(e){}
-  if(q==='es'||q==='en'){ dflaiLangForcedByUrl=true; dflaiRememberLang(q); return q; }
-  try{ const st=localStorage.getItem(DFLAI_LANG_KEY); if(st==='es'||st==='en') return st; }catch(e){}
-  // Detección por navegador: APAGADA a propósito.
-  // El público real es hispanohablante, pero muchos traen el teléfono
-  // configurado en inglés — y el embudo en inglés (plan generado y
-  // correos del worker) todavía no está validado. Mandarlos a inglés
-  // los deja a medio camino. Se reactiva poniendo esto en true, cuando
-  // la generación y los correos en inglés estén confirmados.
-  const DFLAI_AUTODETECT = false;
-  if(DFLAI_AUTODETECT){
-    const cands=[navigator.language].concat(navigator.languages||[]);
-    for(const c of cands){
-      if(!c) continue;
-      const b=String(c).toLowerCase();
-      if(b.indexOf('es')===0) return 'es';
-      if(b.indexOf('en')===0) return 'en';
-    }
-  }
-  return 'es';
-}
-// Título y descripción para la pestaña del navegador. Ojo: los robots de
-// vista previa (WhatsApp, TikTok, Facebook) NO ejecutan JavaScript, así que
-// esto NO arregla la tarjeta al compartir — eso se resuelve en el edge.
-const DFLAI_META={
-  es:{
-    title:'DragonflAI Events — Invitaciones digitales con RSVP',
-    desc:'Crea tu invitación digital con foto, colores y QR — tus invitados confirman solos. Y de paso, Belu te arma el cronograma, presupuesto y checklist del resto del evento. Para bodas, XV años, cumpleaños y eventos de empresa. Pruébalo gratis.'
-  },
-  en:{
-    title:'DragonflAI Events — Digital invitations with RSVP',
-    desc:'Create your digital invitation with photo, colors and QR — guests RSVP themselves. Belu also builds the timeline, budget and checklist for the rest of your event. For weddings, quinceañeras, birthdays and company events. Free to try.'
-  }
-};
-function dflaiApplyMeta(l){
-  const m=DFLAI_META[l];
-  if(!m) return;
-  document.title=m.title;
-  const set=(sel,v)=>{ const el=document.querySelector(sel); if(el) el.setAttribute('content',v); };
-  set('meta[name="description"]',m.desc);
-  set('meta[property="og:title"]',m.title);
-  set('meta[property="og:description"]',m.desc);
-  set('meta[name="twitter:title"]',m.title);
-  set('meta[name="twitter:description"]',m.desc);
-}
-
-let lang = dflaiResolveLang();
+let lang = 'es';
 
 function setLang(l){
   lang = l;
-  dflaiRememberLang(l);
-  dflaiApplyMeta(l);
   document.getElementById('btn-es').className = 'lang-btn' + (l === 'es' ? ' active' : '');
   document.getElementById('btn-en').className = 'lang-btn' + (l === 'en' ? ' active' : '');
   document.documentElement.lang = l;
@@ -1042,12 +1010,8 @@ function goToPay(productKey) {
   }
   // Mandamos el UUID real del usuario como client_reference_id — así el
   // Worker sabe a qué cuenta aplicarle los créditos cuando Stripe confirme el pago.
-  // locale= le dice a Stripe en qué idioma pintar el checkout. Sin esto,
-  // alguien que vio todo el sitio en inglés aterriza en "Pagar / Correo
-  // electrónico" justo en el paso donde menos conviene dudar.
   const sep = link.includes('?') ? '&' : '?';
-  const params = 'client_reference_id=' + encodeURIComponent(currentUser.id) + '&locale=' + (lang === 'en' ? 'en' : 'es');
-  window.location.href = link + sep + params;
+  window.location.href = link + sep + 'client_reference_id=' + encodeURIComponent(currentUser.id);
 }
 
 // ══════════════════════════════
@@ -1124,11 +1088,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     location.replace('/app#link-expirado');
   }
 })();
-
-// ── Aplicar el idioma resuelto al cargar ──
-// Va al final a propósito: setLang() toca elementos y funciones que se
-// definen más arriba en este mismo script.
-setLang(lang);
 </script>
 </body>
 </html>

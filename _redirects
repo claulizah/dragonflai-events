@@ -4,6 +4,9 @@
 # Atajo a la app
 /app  /dragonflai-v2.html  200
 
+# Catálogo de imprimibles
+/imprimibles  /imprimibles.html  200
+
 # Assets faltantes: 404 de verdad, no la landing disfrazada.
 # Tiene que ir ANTES del catch-all — Netlify evalúa de arriba abajo y la
 # primera regla que coincide gana. Sin esto, un asset que falte respondía
@@ -16,7 +19,4 @@
 # Catch-all: cualquier URL desconocida (typos, links rotos) cae a la landing.
 # Antes caía a invitacion.html y mostraba "invitación no encontrada", lo cual
 # confundía a cualquiera que solo escribió mal la dirección.
-# El 404 (antes 200) hace que el navegador siga viendo la landing normal,
-# pero el servidor ahora sí reporta el error real -- así Cloudflare puede
-# contarlo en vez de tratarlo como una visita más.
-/*  /index.html  404
+/*  /index.html  200

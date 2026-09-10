@@ -1,0 +1,22 @@
+# Netlify Edge estaba guardando tus páginas HTML en caché por casi un año
+# (ttl≈365 días) sin importar lo que dijera el Cache-Control del propio
+# HTML — por eso un cambio publicado tardaba en verse, o ni se veía, según
+# qué servidor de Netlify te tocara. Esto lo obliga a revisar siempre.
+#
+# Las imágenes, PDFs y otros archivos NO tienen esta regla — esos sí
+# conviene que se cacheen agresivo, porque casi nunca cambian de nombre.
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/app
+  Cache-Control: public, max-age=0, must-revalidate
+
+/imprimibles
+  Cache-Control: public, max-age=0, must-revalidate
+
+/i/*
+  Cache-Control: public, max-age=0, must-revalidate
