@@ -128,6 +128,37 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 @media(max-width:420px){ .marco svg{width:66px;height:66px} }
 
 /* ══════════════════════════════════════════════════════════════
+   MOTIVO DE CABECERA
+   Un pequeño icono de línea (line-art), arriba del "eyebrow", propio de
+   la familia del evento — por ahora solo boda (anillos entrelazados).
+   Es un PNG monocromático con fondo transparente; se recolorea al color
+   elegido de la invitación con la técnica mask-image + currentColor, el
+   mismo patrón que ya usan las esquinas del marco (ver .marco svg arriba)
+   — así el icono nunca desentona con la paleta de esa invitación en
+   particular.
+   ══════════════════════════════════════════════════════════════ */
+.motivo{width:38px;height:38px;margin:0 auto 8px;opacity:.78;
+  background-color:var(--custom-text-color,var(--teal-dark));
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain}
+.card.velo-oscuro .motivo{background-color:rgba(255,255,255,.9)}
+@media(max-width:420px){ .motivo{width:30px;height:30px} }
+
+/* ══════════════════════════════════════════════════════════════
+   ÍCONO DE LÍNEA INLINE
+   Para reemplazar emojis (📸, 📷) por el mismo set de ilustraciones de
+   línea, dentro de texto normal. currentColor: toma el color del texto
+   que lo rodea (no el color de marca de la invitación), porque aquí es
+   parte de la interfaz (galería, subir fotos), no del papel/tarjeta.
+   ══════════════════════════════════════════════════════════════ */
+.icono-linea{display:inline-block;width:1.5em;height:1.5em;vertical-align:-0.4em;
+  background-color:currentColor;opacity:.85;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain}
+
+/* ══════════════════════════════════════════════════════════════
    EL SOBRE
    Un link de WhatsApp se abre y se juzga en un segundo. El sobre
    convierte ese segundo en un gesto: hay que tocarlo para entrar.
@@ -1000,6 +1031,28 @@ function renderMarco(inv){
 }
 
 // ══════════════════════════════════════════════════════════════
+//  Motivo de cabecera
+//  Un icono por familia de evento (por ahora solo "boda": anillos
+//  entrelazados en trazo fino). Vive arriba del eyebrow, encima de los
+//  nombres. Solo boda tiene ilustración propia todavía — el resto no
+//  muestra nada, para no inventar un ícono que no encaje.
+// ══════════════════════════════════════════════════════════════
+const MOTIVOS={
+  boda:'assets/motivos/anillos-boda.png'
+};
+function renderMotivo(inv){
+  const fam=familiaEvento(inv && inv.event_type);
+  const url=MOTIVOS[fam]; if(!url) return '';
+  return `<div class="motivo" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></div>`;
+}
+
+// Ícono de línea inline (reemplaza un emoji dentro de un título o botón)
+function iconoLinea(archivo){
+  const url=`assets/motivos/${archivo}`;
+  return `<span class="icono-linea" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></span>`;
+}
+
+// ══════════════════════════════════════════════════════════════
 //  Velo de legibilidad
 //  Mide el brillo real de la foto en un canvas pequeño y decide si el
 //  texto va oscuro sobre velo claro, o blanco sobre velo oscuro.
@@ -1086,7 +1139,27 @@ function renderMonograma(inv){
 //  abrir el link para consultar la dirección no tiene que repetir
 //  el gesto. Se puede saltar con ?sobre=0.
 // ══════════════════════════════════════════════════════════════
-const PETALO_COLORES=['#2EC4B6','#7FD8CF','#B98BE0','#F2B544','#E8825F','#C9B8EA'];
+// Antes esto era una paleta arcoíris fija (turquesa, menta, morado, ámbar,
+// coral, lavanda) que caía sobre CUALQUIER invitación al abrir el sobre,
+// sin importar el color que la persona haya elegido para su tarjeta — una
+// boda en tonos sobrios terminaba con confeti de fiesta infantil encima.
+// Ahora se generan variaciones (clara/tono/oscura) del color real de la
+// invitación en petalosParaColor(), y esto queda solo como respaldo si por
+// algún motivo no hay color disponible.
+const PETALO_COLORES_RESPALDO=['#2EC4B6','#7FD8CF','#B98BE0','#F2B544','#E8825F','#C9B8EA'];
+
+function petalosParaColor(color){
+  if(!color) return PETALO_COLORES_RESPALDO;
+  try{
+    return [
+      hexAclarar(color,0.35),
+      color,
+      hexOscurecer(color,0.20),
+      hexAclarar(color,0.60),
+      hexOscurecer(color,0.40)
+    ];
+  }catch(e){ return PETALO_COLORES_RESPALDO; }
+}
 
 function sobreActivo(inv){
   if(!inv) return false;
@@ -1158,7 +1231,6 @@ function montarSobre(inv){
   if(!sobreActivo(inv)) return;
   const t=T[lang];
   const ini=iniciales(inv.host_names)||'✦';
-  const color=inv.text_color||'#0D6E65';
   // El sobre es papel: base clara y tono a tono, con el color que la
   // anfitriona YA eligió para su tarjeta (custom_color_hex) como acento y
   // como color del sello -- no una paleta fija por tipo de evento. Así el
@@ -1213,7 +1285,11 @@ function montarSobre(inv){
   const abrir=()=>{
     if(el.classList.contains('abierto')) return;
     el.classList.add('abierto');
-    lluviaPetalos(color);
+    // Antes se le pasaba una variable ('color') que en realidad nunca tomaba
+    // el custom_color_hex de la invitación (y la función ni siquiera la leía
+    // — ver petalosParaColor arriba). Ahora sí cae el mismo color "elegido"
+    // que ya pinta el sobre y la tarjeta.
+    lluviaPetalos(elegido);
     try{ sessionStorage.setItem('dflai_sobre_'+(inv.slug||inv.id),'1'); }catch(e){}
     setTimeout(()=>{ el.remove(); document.body.style.overflow=''; }, 1100);
   };
@@ -1221,7 +1297,8 @@ function montarSobre(inv){
   el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); }});
 }
 
-function lluviaPetalos(){
+function lluviaPetalos(color){
+  const paleta=petalosParaColor(color);
   const cont=document.createElement('div');
   cont.id='petalos';
   document.body.appendChild(cont);
@@ -1230,7 +1307,7 @@ function lluviaPetalos(){
     const p=document.createElement('span');
     p.className='petalo';
     const w=7+Math.random()*11, h=w*(0.5+Math.random()*0.7);
-    const c=PETALO_COLORES[(Math.random()*PETALO_COLORES.length)|0];
+    const c=paleta[(Math.random()*paleta.length)|0];
     p.style.left=(Math.random()*100)+'vw';
     p.style.width=w+'px'; p.style.height=h+'px';
     p.style.background=c;
@@ -1432,7 +1509,7 @@ function renderExtraSections(inv,t){
   if(Array.isArray(inv.gallery_urls)&&inv.gallery_urls.length){
     const imgs=inv.gallery_urls.map(url=>`<img src="${esc(url)}" class="gallery-img" loading="lazy">`).join('');
     sections.push(`<div class="extra-card reveal">
-      <div class="extra-title">📸 ${t.galleryTitle}</div>
+      <div class="extra-title">${iconoLinea('camara.png')} ${t.galleryTitle}</div>
       <div class="gallery-grid">${imgs}</div>
     </div>`);
   }
@@ -1525,6 +1602,7 @@ function renderInvitation(inv){
   document.getElementById('content').innerHTML=`
     <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
       ${renderMarco(inv)}
+      ${renderMotivo(inv)}
       <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
       <div class="names">${esc(toTitleCase(inv.host_names))}</div>
       <div class="divider"></div>
@@ -1562,10 +1640,10 @@ function renderInvitation(inv){
     ${renderExtraSections(inv,t)}
 
     ${inv.tier==='free'?'':`<div class="extra-card reveal">
-      <div class="extra-title">📸 ${t.eventPhotosTitle}</div>
+      <div class="extra-title">${iconoLinea('camara.png')} ${t.eventPhotosTitle}</div>
       <p style="font-size:12.5px;color:var(--text-2);text-align:center;margin-bottom:1rem">${t.eventPhotosHint}</p>
       <div style="text-align:center;margin-bottom:1rem">
-        <button type="button" class="btn-submit" style="width:auto;padding:10px 24px" onclick="document.getElementById('event-photo-input').click()">📷 ${t.uploadPhotoBtn}</button>
+        <button type="button" class="btn-submit" style="width:auto;padding:10px 24px" onclick="document.getElementById('event-photo-input').click()">${iconoLinea('camara.png')} ${t.uploadPhotoBtn}</button>
         <input type="file" id="event-photo-input" accept="image/*" multiple style="display:none" onchange="uploadEventPhotos(event)">
       </div>
       <div id="event-photos-gallery" class="gallery-grid"></div>
