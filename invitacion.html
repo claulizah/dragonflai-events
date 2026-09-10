@@ -138,13 +138,17 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 #sobre{position:fixed;inset:0;z-index:400;display:flex;flex-direction:column;
        align-items:center;justify-content:center;gap:1.6rem;cursor:pointer;
        background:var(--sobre-bg,linear-gradient(150deg,#FAF9F7 0%,#E9F6F4 45%,#EDE6F7 100%));
-       transition:opacity .75s ease, visibility .75s}
+       transition:opacity .9s ease-in-out, visibility .9s}
 #sobre.abierto{opacity:0;visibility:hidden;pointer-events:none}
-.sobre-wrap{width:min(78vw,330px);perspective:1400px;transition:transform .8s cubic-bezier(.4,0,.2,1)}
+.sobre-wrap{width:min(78vw,330px);perspective:1400px;transition:transform 1s cubic-bezier(.65,0,.35,1)}
 #sobre.abierto .sobre-wrap{transform:scale(1.5) translateY(-14px)}
 .sobre-svg{width:100%;height:auto;display:block;filter:drop-shadow(0 18px 40px rgba(26,35,50,.22))}
-/* La solapa gira sobre su borde superior — el gesto de abrir de verdad */
-.solapa{transform-origin:50% 0%;transition:transform .85s cubic-bezier(.55,-0.3,.35,1.3)}
+/* La solapa gira sobre su borde superior — el gesto de abrir de verdad.
+   cubic-bezier(.65,0,.35,1) es una ease-in-out simétrica sin rebote — antes
+   tenía valores Y fuera de [0,1] (curva "back/overshoot"), que hacía que la
+   solapa pasara de largo y regresara de golpe, sintiéndose como un efecto
+   de plantilla genérico en vez de un gesto elegante. */
+.solapa{transform-origin:50% 0%;transition:transform 1.1s cubic-bezier(.65,0,.35,1)}
 #sobre.abierto .solapa{transform:rotateX(-172deg)}
 .sobre-hint{font-family:'Inter',sans-serif;font-size:13px;letter-spacing:.16em;
             text-transform:uppercase;color:var(--text-3);transition:opacity .3s}
@@ -1211,7 +1215,7 @@ function montarSobre(inv){
     el.classList.add('abierto');
     lluviaPetalos(color);
     try{ sessionStorage.setItem('dflai_sobre_'+(inv.slug||inv.id),'1'); }catch(e){}
-    setTimeout(()=>{ el.remove(); document.body.style.overflow=''; }, 900);
+    setTimeout(()=>{ el.remove(); document.body.style.overflow=''; }, 1100);
   };
   el.addEventListener('click',abrir);
   el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); abrir(); }});

@@ -81,7 +81,14 @@ input,textarea,[contenteditable="true"]{cursor:text}
 .launcher-screen{
   position:fixed;inset:0;z-index:9999;
   background:linear-gradient(160deg,var(--cream),var(--teal-light) 60%,var(--violet-light));
-  display:flex;align-items:center;justify-content:center;padding:2rem;
+  display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;
+  /* align-items:flex-start (no center) + overflow-y:auto — con contenido
+     centrado por flex, si es más alto que el viewport, el "unsafe centering"
+     por default recorta arriba/abajo SIN dejar scroll alcanzable. Con
+     flex-start + este padding simétrico se ve igual de centrado cuando el
+     contenido es corto, pero cuando es alto (ej. el resultado de la
+     invitación gratis con todos los campos opcionales) sí se puede scrollear. */
+  overflow-y:auto;
 }
 .launcher-content{
   max-width:420px;width:100%;text-align:center;
@@ -1025,7 +1032,7 @@ footer .teal{color:var(--teal-dark);font-weight:600}
      Estado propio (variables qi*) — no toca eventType/mode del form del
      plan completo, que sigue viviendo intacto detrás de esta pantalla. -->
 <div id="quick-invite-screen" class="launcher-screen" style="display:none">
-  <div class="launcher-content" style="max-width:480px">
+  <div class="launcher-content" style="max-width:520px">
 
     <div id="qi-form-step">
       <img src="/assets/belu/belu-saludando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
@@ -1047,6 +1054,24 @@ footer .teal{color:var(--teal-dark);font-weight:600}
         <input type="file" id="qi-cover-input" accept="image/*" style="display:none" onchange="qiCoverSelected(event)">
       </label>
 
+      <details class="opt-section" style="text-align:left;margin-bottom:1rem">
+        <summary data-es="Agregar más detalles" data-en="Add more details">Agregar más detalles</summary>
+        <div class="opt-body">
+          <label style="display:block;font-size:12.5px;color:var(--text-3);margin:.5rem 0 .35rem 2px" data-es="Código de vestimenta" data-en="Dress code">Código de vestimenta</label>
+          <div id="qi-dresscode-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.5rem"></div>
+          <input type="text" id="qi-dresscode-input" class="launcher-email-input" data-placeholder-es="ej. Formal, blanco y negro…" data-placeholder-en="e.g. Formal, black and white…" placeholder="ej. Formal, blanco y negro…" oninput="qiDresscodeTyped()">
+
+          <label style="display:block;font-size:12.5px;color:var(--text-3);margin:.5rem 0 .35rem 2px" data-es="Ubicación exacta (lugar + dirección)" data-en="Exact location (venue + address)">Ubicación exacta (lugar + dirección)</label>
+          <input type="text" id="qi-address" class="launcher-email-input" data-placeholder-es="ej. Jardín El Encanto, Av. Reforma 123" data-placeholder-en="e.g. El Encanto Garden, 123 Reforma Ave" placeholder="ej. Jardín El Encanto, Av. Reforma 123">
+
+          <label style="display:block;font-size:12.5px;color:var(--text-3);margin:.5rem 0 .35rem 2px" data-es="Hora del evento" data-en="Event time">Hora del evento</label>
+          <input type="time" id="qi-time" class="launcher-email-input">
+
+          <label style="display:block;font-size:12.5px;color:var(--text-3);margin:.5rem 0 .35rem 2px" data-es="Mensaje para tus invitados" data-en="Message for your guests">Mensaje para tus invitados</label>
+          <textarea id="qi-message" class="launcher-email-input" maxlength="200" rows="3" style="resize:vertical;font-family:'Inter',sans-serif" data-placeholder-es="ej. Con la bendición de Dios y de nuestros padres…" data-placeholder-en="e.g. With the blessing of God and our parents…" placeholder="ej. Con la bendición de Dios y de nuestros padres…"></textarea>
+        </div>
+      </details>
+
       <button class="launcher-btn-primary" id="qi-submit-btn" onclick="qiSubmit()" data-es="Crear mi invitación →" data-en="Create my invitation →">Crear mi invitación →</button>
     </div>
 
@@ -1058,11 +1083,22 @@ footer .teal{color:var(--teal-dark);font-weight:600}
     </div>
 
     <div id="qi-result-step" style="display:none">
+      <p style="font-size:12.5px;color:var(--text-3);text-align:center;margin-bottom:.5rem" data-es="Así la va a ver quien reciba tu link 👇" data-en="This is exactly what whoever gets your link will see 👇">Así la va a ver quien reciba tu link 👇</p>
       <div id="qi-preview-card"></div>
       <button class="launcher-btn-primary" id="qi-whatsapp-btn" onclick="qiShareWhatsapp()" data-link="" data-es="📲 Compartir por WhatsApp" data-en="📲 Share on WhatsApp">📲 Compartir por WhatsApp</button>
       <p id="qi-link-display" style="font-size:11.5px;color:var(--text-3);word-break:break-all;margin:.6rem 0 1.25rem"></p>
 
       <div id="qi-upsells" style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem"></div>
+
+      <details class="opt-section" style="text-align:left;margin-bottom:1rem" ontoggle="if(this.open) qiEnsureQR()">
+        <summary data-es="📲 Imprimir mi invitación (QR)" data-en="📲 Print my invitation (QR)">📲 Imprimir mi invitación (QR)</summary>
+        <div class="opt-body" id="qi-qr-body" style="text-align:center">
+          <p style="font-size:12.5px;color:var(--text-3);margin-bottom:.6rem" data-es="Gratis — es solo el link de tu invitación en código QR, para pegarlo donde quieras." data-en="Free — it's just your invitation's link as a QR code, to put up wherever you like.">Gratis — es solo el link de tu invitación en código QR, para pegarlo donde quieras.</p>
+          <p id="qi-qr-loading" style="font-size:12.5px;color:var(--text-3)" data-es="Generando QR…" data-en="Generating QR…">Generando QR…</p>
+          <img id="qi-qr-img" style="display:none;width:100%;max-width:220px;border-radius:8px;border:1px solid var(--border-gray)" alt="QR">
+          <a id="qi-qr-download" href="#" download="qr-invitacion.png" class="btn-excel-close" style="display:none;text-align:center;text-decoration:none;margin-top:.6rem" data-es="⬇️ Descargar QR" data-en="⬇️ Download QR">⬇️ Descargar QR</a>
+        </div>
+      </details>
 
       <a href="#" onclick="qiOpenClaimEmail();return false" style="display:block;text-align:center;font-size:12.5px;color:var(--text-3)" data-es="Guardar para editar después →" data-en="Save to edit later →">Guardar para editar después →</a>
     </div>
@@ -6176,6 +6212,31 @@ function qiCoverSelected(e){
   reader.readAsDataURL(f);
 }
 
+const QI_DRESSCODE_OPTIONS={
+  es:['Formal','Semi-formal','Casual','Etiqueta rigurosa','Blanco y negro'],
+  en:['Formal','Semi-formal','Casual','Black tie','Black and white']
+};
+let qiDresscode='';
+
+function qiRenderDresscodeChips(){
+  const box=document.getElementById('qi-dresscode-chips');
+  if(!box) return;
+  const opts=QI_DRESSCODE_OPTIONS[lang]||QI_DRESSCODE_OPTIONS.es;
+  box.innerHTML=opts.map(o=>`<span class="ropt${o===qiDresscode?' sel':''}" onclick="qiSelectDresscode('${esc(o).replace(/'/g,"\\'")}')">${esc(o)}</span>`).join('');
+}
+function qiSelectDresscode(value){
+  qiDresscode=(qiDresscode===value)?'':value; // click de nuevo = deseleccionar
+  document.getElementById('qi-dresscode-input').value=qiDresscode;
+  qiRenderDresscodeChips();
+}
+// Si la persona escribe algo distinto a un chip, ningún chip debe quedar
+// marcado como si aplicara — evita mostrar "Formal" seleccionado mientras
+// el texto real dice otra cosa.
+function qiDresscodeTyped(){
+  const val=document.getElementById('qi-dresscode-input').value;
+  if(val!==qiDresscode){ qiDresscode=''; qiRenderDresscodeChips(); }
+}
+
 function startQuickInvite(){
   const launcherEl=document.getElementById('launcher-screen');
   const mainEl=document.getElementById('main-planner-view');
@@ -6188,6 +6249,7 @@ function startQuickInvite(){
   qiRenderEventTypes();
   qiUpdateNamesPlaceholder();
   qiRenderVibeChips();
+  qiRenderDresscodeChips();
   const dateEl=document.getElementById('qi-date');
   if(dateEl){
     const d=new Date(); d.setMonth(d.getMonth()+3);
@@ -6223,6 +6285,16 @@ async function qiSubmit(){
     const theme=EVENT_THEMES[qiEventType]||EVENT_THEMES['Boda/Wedding'];
     const slugBase=defaultSlugFor({name:names,rawDate:dateRaw});
 
+    // Detalles opcionales — sección plegada "Agregar más detalles". Todos
+    // caen a null/vacío si no se llenaron; las columnas ya existen y
+    // invitacion.html ya sabe renderizarlas (mismas que usa el plan completo).
+    const dresscode=document.getElementById('qi-dresscode-input').value.trim();
+    const address=document.getElementById('qi-address').value.trim();
+    const timeRaw=document.getElementById('qi-time').value;
+    const eventTime=timeRaw?formatTimeRange(timeRaw,'',lang):'';
+    const message=document.getElementById('qi-message').value.trim();
+    const mapUrl=address?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`:null;
+
     const payload={
       user_id:currentUser.id,
       plan_id:null,
@@ -6233,11 +6305,16 @@ async function qiSubmit(){
       event_type:typeName,
       event_date:dateDisplay,
       event_date_raw:dateRaw,
+      event_time:eventTime||null,
       location:location,
       vibe:qiVibes.join(' · '),
       theme:'theme-custom-color',
       custom_color_hex:theme.teal,
       background_image_url:qiCoverDataUrl||null,
+      dress_code:dresscode||null,
+      directions_info:address||null,
+      map_url:mapUrl,
+      message:message||null,
       ask_guest_count:false, ask_dietary:false, ask_message:false, ask_song_request:false, ask_lodging_need:false
     };
 
@@ -6262,18 +6339,16 @@ function qiShowResult(inv){
   const L=lang==='es';
   document.getElementById('qi-loading-step').style.display='none';
   document.getElementById('qi-result-step').style.display='block';
+  qiQrGenerated=false; // nueva invitación (o reintento) -> el QR viejo ya no aplica
 
-  const theme=EVENT_THEMES[qiEventType]||EVENT_THEMES['Boda/Wedding'];
-  const bgStyle=inv.background_image_url
-    ? `background-image:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)),url('${inv.background_image_url}');background-size:cover;background-position:center`
-    : `background:linear-gradient(135deg,${theme.teal},${theme.violet})`;
+  // Vista previa REAL: la misma ruta/fetch que vería cualquier invitado
+  // (/i/<slug> → get_public_invitation), no un resumen aparte — así incluye
+  // automáticamente los campos opcionales (vestimenta, dirección, hora,
+  // mensaje) sin duplicar el motor de render. ?sobre=0 salta la animación
+  // del sobre dentro del iframe (aquí es vista previa, no la experiencia real).
   document.getElementById('qi-preview-card').innerHTML=`
-    <div style="${bgStyle};border-radius:18px;padding:2.75rem 1.5rem;color:#fff;text-align:center;margin-bottom:1.25rem">
-      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-bottom:10px">${esc(inv.event_type)}</div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:2.1rem;line-height:1.15;margin-bottom:10px">${esc(inv.host_names)}</div>
-      <div style="font-size:14px;opacity:.92">${esc(inv.event_date)}</div>
-      <div style="font-size:14px;opacity:.92">${esc(inv.location)}</div>
-    </div>`;
+    <iframe src="/i/${encodeURIComponent(inv.slug)}?sobre=0" title="${L?'Vista previa de tu invitación':'Preview of your invitation'}"
+      style="width:100%;height:60vh;min-height:420px;border:1px solid var(--border-gray);border-radius:16px;margin-bottom:1.25rem"></iframe>`;
 
   const link=`${invitationOrigin()}/i/${inv.slug}`;
   const waBtn=document.getElementById('qi-whatsapp-btn');
@@ -6289,6 +6364,32 @@ function qiShowResult(inv){
       <strong style="display:block;font-size:14px;margin-bottom:2px">🚀 ${L?'Plan completo':'Full plan'}</strong>
       <span style="font-size:12.5px;color:var(--text-2)">${L?'Cronograma, presupuesto, checklist y Excel — desde $249 MXN':'Timeline, budget, checklist & Excel — from $249 MXN'}</span>
     </a>`;
+}
+
+// QR gratis del link de la invitación (no confundir con el QR de fotos del
+// evento, que es parte del tier pagado RSVP+QR). Reusa buildBrandedQRDataURL
+// tal cual — mismo generador con marca que ya usa showQRModal() para el
+// dashboard, sin dependencias nuevas. Se genera solo al abrir el <details>
+// (ontoggle="qiEnsureQR()"), no de entrada, para no gastar la llamada al
+// servicio de QR si nadie lo pide.
+let qiQrGenerated=false;
+async function qiEnsureQR(){
+  if(qiQrGenerated || !qiInvitationRow) return;
+  qiQrGenerated=true;
+  const L=lang==='es';
+  const link=`${invitationOrigin()}/i/${qiInvitationRow.slug}`;
+  try{
+    const dataUrl=await buildBrandedQRDataURL(qiInvitationRow.host_names||'','',link);
+    document.getElementById('qi-qr-loading').style.display='none';
+    const img=document.getElementById('qi-qr-img');
+    img.src=dataUrl; img.style.display='block';
+    const dl=document.getElementById('qi-qr-download');
+    dl.href=dataUrl; dl.style.display='block';
+  }catch(err){
+    console.error('Error generando el QR de la invitación gratis:',err);
+    qiQrGenerated=false; // permite reintentar si se vuelve a abrir el details
+    document.getElementById('qi-qr-loading').textContent=L?'No se pudo generar el QR — intenta de nuevo':'Could not generate the QR — try again';
+  }
 }
 
 function qiShareWhatsapp(){
@@ -6435,7 +6536,7 @@ function setLang(l){
     if(txt) el.placeholder=txt;
   });
   renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel(); updateTypedPlaceholders();
-  if(IS_QUICK_INVITE_FLOW){ qiRenderEventTypes(); qiRenderVibeChips(); qiUpdateNamesPlaceholder(); }
+  if(IS_QUICK_INVITE_FLOW){ qiRenderEventTypes(); qiRenderVibeChips(); qiUpdateNamesPlaceholder(); qiRenderDresscodeChips(); }
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
   renderPublishPickers();
