@@ -1188,8 +1188,8 @@ async function applyPurchase(env, userId, sessionId) {
   const liData = await liRes.json();
   const lineItems = liData.data || [];
 
-  let diyCreditsToAdd = 0, plannerCreditsToAdd = 0;
-  let diyUnlimitedDays = 0, plannerUnlimitedDays = 0;
+  let diyCreditsToAdd = 0, plannerCreditsToAdd = 0, rsvpQrCreditsToAdd = 0;
+  let diyUnlimitedDays = 0, plannerUnlimitedDays = 0, rsvpQrUnlimitedDays = 0;
 
   for (const item of lineItems) {
     const product = item.price && item.price.product;
@@ -1206,18 +1206,21 @@ async function applyPurchase(env, userId, sessionId) {
     } else if (accessType === 'planner') {
       plannerCreditsToAdd += credits * qty;
       if (unlimitedDays > plannerUnlimitedDays) plannerUnlimitedDays = unlimitedDays;
+    } else if (accessType === 'rsvp_qr') {
+      rsvpQrCreditsToAdd += credits * qty;
+      if (unlimitedDays > rsvpQrUnlimitedDays) rsvpQrUnlimitedDays = unlimitedDays;
     } else {
       console.error('Producto sin access_type reconocido:', product.id, product.name);
     }
   }
 
-  if (!diyCreditsToAdd && !plannerCreditsToAdd && !diyUnlimitedDays && !plannerUnlimitedDays) {
+  if (!diyCreditsToAdd && !plannerCreditsToAdd && !rsvpQrCreditsToAdd && !diyUnlimitedDays && !plannerUnlimitedDays && !rsvpQrUnlimitedDays) {
     console.error('La compra no trajo ningún crédito/acceso identificable. Revisa la metadata de los productos en Stripe.');
     return;
   }
 
   const profRes = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=diy_event_credits,diy_unlimited_until,planner_event_credits,planner_unlimited_until`,
+    `${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=diy_event_credits,diy_unlimited_until,planner_event_credits,planner_unlimited_until,rsvp_qr_event_credits,rsvp_qr_unlimited_until`,
     { headers: serviceHeaders(env) }
   );
   if (!profRes.ok) {
@@ -1249,6 +1252,15 @@ async function applyPurchase(env, userId, sessionId) {
     const base = (currentExpiry && currentExpiry > new Date()) ? currentExpiry : new Date();
     base.setDate(base.getDate() + plannerUnlimitedDays);
     patch.planner_unlimited_until = base.toISOString();
+  }
+  if (rsvpQrCreditsToAdd > 0) {
+    patch.rsvp_qr_event_credits = (prof.rsvp_qr_event_credits || 0) + rsvpQrCreditsToAdd;
+  }
+  if (rsvpQrUnlimitedDays > 0) {
+    const currentExpiry = prof.rsvp_qr_unlimited_until ? new Date(prof.rsvp_qr_unlimited_until) : null;
+    const base = (currentExpiry && currentExpiry > new Date()) ? currentExpiry : new Date();
+    base.setDate(base.getDate() + rsvpQrUnlimitedDays);
+    patch.rsvp_qr_unlimited_until = base.toISOString();
   }
 
   const patchRes = await fetch(`${env.SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}`, {

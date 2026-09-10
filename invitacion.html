@@ -1538,7 +1538,7 @@ function renderInvitation(inv){
     </div>
     ${inv.published_via_planner?`<div class="planner-watermark">Powered by DragonflAI Events</div>`:''}
 
-    <button type="button" class="rsvp-trigger-btn" onclick="openRsvpModal()">${t.rsvpTitle} →</button>
+    ${inv.tier==='free'?'':`<button type="button" class="rsvp-trigger-btn" onclick="openRsvpModal()">${t.rsvpTitle} →</button>`}
 
     <div id="cal-add-wrap" style="margin:-.75rem 0 1.5rem;position:relative">
       <button type="button" id="cal-add-btn" onclick="toggleCalendarMenu(event)" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:var(--cream-2);color:var(--text-2);border:1.5px solid var(--border-gray);border-radius:100px;padding:11px;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer">📅 ${t.addToCalendar}</button>
@@ -1557,7 +1557,7 @@ function renderInvitation(inv){
 
     ${renderExtraSections(inv,t)}
 
-    <div class="extra-card reveal">
+    ${inv.tier==='free'?'':`<div class="extra-card reveal">
       <div class="extra-title">📸 ${t.eventPhotosTitle}</div>
       <p style="font-size:12.5px;color:var(--text-2);text-align:center;margin-bottom:1rem">${t.eventPhotosHint}</p>
       <div style="text-align:center;margin-bottom:1rem">
@@ -1570,7 +1570,7 @@ function renderInvitation(inv){
         <button type="button" id="event-photos-viewall" class="extra-link-btn" style="display:none;border:none;cursor:pointer;font-family:'Inter',sans-serif" onclick="openFullGalleryView()"></button>
         <button type="button" id="event-photos-downloadall" class="extra-link-btn photos-downloadall-btn" style="display:none;border:none;cursor:pointer;font-family:'Inter',sans-serif" onclick="downloadAllEventPhotos()"></button>
       </div>
-    </div>
+    </div>`}
 
     <div class="modal-overlay" id="rsvp-modal-overlay" onclick="if(event.target===this) closeRsvpModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;z-index:210;padding:20px">
      <div style="max-height:88vh;overflow-y:auto;width:100%;max-width:480px">

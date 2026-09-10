@@ -36,7 +36,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2EC4B6">
-<meta name="description" content="Genera en menos de 90 segundos un plan completo para tu boda, quinceañera o evento. Cronograma, presupuesto, checklist, proveedores, Save the Date — creado junto contigo, con acceso completo y descarga en Excel editable.">
+<meta name="description" content="Crea gratis tu invitación y Save the Date en minutos. Genera también un plan completo para tu boda, quinceañera o evento — cronograma, presupuesto, checklist, proveedores y descarga en Excel editable, creado junto contigo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -192,6 +192,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .price-amount{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;color:var(--text);line-height:1;margin-bottom:.25rem}
 .price-usd-hint{display:block;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--text-3);margin-top:2px}
 .price-amount span{font-size:18px;color:var(--text-2);font-family:'Inter',sans-serif;font-weight:400}
+.promo-badge{display:inline-block;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em}
+.price-before{font-size:15px;color:var(--text-3);text-decoration:line-through;font-weight:400;margin-right:6px}
 .price-desc{font-size:13px;color:var(--text-2);margin-bottom:1.5rem;line-height:1.5}
 .price-features{list-style:none;margin-bottom:1.75rem;display:flex;flex-direction:column;gap:8px}
 .price-features li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text-2)}
@@ -321,7 +323,7 @@ footer a:hover{color:var(--teal-dark)}
   <span class="hero-tag" data-es="✦ Conoce a Belu — tu asistente personal de eventos" data-en="✦ Meet Belu — your personal event assistant">✦ Conoce a Belu — tu asistente personal de eventos</span>
   <span class="hero-dragonfly" style="display:block;text-align:center;margin-bottom:.75rem"><img src="/assets/belu/belu-optimista.png" alt="Belu" style="height:140px;width:auto;display:inline-block;font-size:12px;color:var(--text-3)" onerror="this.style.display='none'"></span>
   <h1 data-es="Tu evento <em>perfecto,</em><br>planeado en segundos" data-en="Your <em>perfect</em> event,<br>planned in seconds">Tu evento <em>perfecto,</em><br>planeado en segundos</h1>
-  <p class="hero-sub" data-es="Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable." data-en="Tell Belu the details of your wedding, quinceañera, or party and she generates your complete plan — timeline, budget, checklist, vendors, and Save the Date. With full access, download it as an editable Excel too.">Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta y ella genera tu plan completo — cronograma, presupuesto, checklist, proveedores y Save the Date. Con acceso completo, descárgalo también como Excel editable.</p>
+  <p class="hero-sub" data-es="Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta — tu invitación y Save the Date son gratis. Si quieres, ella también arma tu plan completo: cronograma, presupuesto, checklist, proveedores y descarga en Excel editable." data-en="Tell Belu the details of your wedding, quinceañera, or party — your invitation and Save the Date are free. If you want, she also builds your full plan: timeline, budget, checklist, vendors, and an editable Excel download.">Cuéntale a Belu los detalles de tu boda, quinceañera o fiesta — tu invitación y Save the Date son gratis. Si quieres, ella también arma tu plan completo: cronograma, presupuesto, checklist, proveedores y descarga en Excel editable.</p>
   <div class="hero-cta">
     <a href="/app" class="btn-primary">
       <span>✦</span> <span data-es="Generar mi plan gratis" data-en="Generate my free plan">Generar mi plan gratis</span>
@@ -442,7 +444,7 @@ footer a:hover{color:var(--teal-dark)}
     </div>
     <div class="feature-card">
       <span class="feature-icon">🌐</span>
-      <div class="feature-title"><span data-es="Invitación con RSVP" data-en="Invitation with RSVP">Invitación con RSVP</span> <span style="display:inline-block;white-space:nowrap;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--violet);background:var(--violet-light);border:1px solid rgba(123,47,190,.25);padding:2px 8px;border-radius:100px;vertical-align:middle;margin:2px 0 0 4px" data-es="Acceso completo" data-en="Full access">Acceso completo</span></div>
+      <div class="feature-title"><span data-es="Invitación con RSVP" data-en="Invitation with RSVP">Invitación con RSVP</span> <span style="display:inline-block;white-space:nowrap;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--violet);background:var(--violet-light);border:1px solid rgba(123,47,190,.25);padding:2px 8px;border-radius:100px;vertical-align:middle;margin:2px 0 0 4px" data-es="RSVP + Fotos QR" data-en="RSVP + Photo QR">RSVP + Fotos QR</span></div>
       <div class="feature-desc" data-es="Publica tu propia página de invitación con link personalizado — tus invitados confirman asistencia sin crear cuenta, con lista de invitados, itinerario, mesa de regalos y más." data-en="Publish your own invitation page with a custom link — guests RSVP without creating an account, with guest list, schedule, gift registry, and more.">Publica tu propia página de invitación con link personalizado — tus invitados confirman asistencia sin crear cuenta, con lista de invitados, itinerario, mesa de regalos y más.</div>
     </div>
     <div class="feature-card">
@@ -499,72 +501,60 @@ footer a:hover{color:var(--teal-dark)}
 <section class="pricing-section" id="precios">
   <p class="section-eyebrow" data-es="Precios" data-en="Pricing">Precios</p>
   <h2 class="section-title" data-es="Empieza gratis,<br>desbloquea cuando quieras" data-en="Start free,<br>unlock whenever you want">Empieza gratis,<br>desbloquea cuando quieras</h2>
-  <p class="section-sub" data-es="Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año." data-en="No surprise subscriptions. Pay once — if you choose Annual, you just pay the same link again when the year is up.">Sin suscripciones sorpresa. Pagas una vez y ya — si eliges Anual, simplemente vuelves a pagar el mismo link cuando se cumpla el año.</p>
-  <p class="section-sub" style="font-size:14px;opacity:.85;margin-top:-1rem" data-es="Sí, hay sitios de invitaciones gratis — pero no arman tu cronograma, presupuesto ni ideas de decoración junto contigo. Eso es lo que pagas aquí, no solo el sitio." data-en="Yes, there are free invitation sites — but they don't build your timeline, budget, or décor ideas together with you. That's what you're paying for here, not just the site.">Sí, hay sitios de invitaciones gratis — pero no arman tu cronograma, presupuesto ni ideas de decoración junto contigo. Eso es lo que pagas aquí, no solo el sitio.</p>
+  <p class="section-sub" data-es="Sin suscripciones sorpresa. Pagas una vez por evento y ya." data-en="No surprise subscriptions. Pay once per event and you're done.">Sin suscripciones sorpresa. Pagas una vez por evento y ya.</p>
+  <p class="section-sub" style="font-size:14px;opacity:.85;margin-top:-1rem" data-es="Tu invitación y Save the Date son gratis. Pagas solo si quieres confirmar invitados en vivo o armar el plan completo del evento." data-en="Your invitation and Save the Date are free. You only pay if you want live guest confirmations or the full event plan.">Tu invitación y Save the Date son gratis. Pagas solo si quieres confirmar invitados en vivo o armar el plan completo del evento.</p>
 
-  <div class="pricing-toggle">
-    <button class="pt-btn active" id="pt-diy" onclick="showPricingGroup('diy')" data-es="Para mi evento" data-en="For my event (DIY)">Para mi evento</button>
-    <button class="pt-btn" id="pt-planner" onclick="showPricingGroup('planner')" data-es="Soy planner profesional" data-en="I'm a professional planner">Soy planner profesional</button>
-  </div>
-
-  <!-- GRUPO DIY -->
+  <!-- GRUPO PRINCIPAL: Gratis / RSVP+QR / Plan completo -->
   <div class="pricing-grid pricing-group" id="pg-diy">
 
     <div class="price-card">
       <div class="price-name" data-es="Gratis" data-en="Free">Gratis</div>
       <div class="price-amount">$0 <span>MXN</span></div>
-      <div class="price-desc" data-es="Prueba con los datos reales de tu evento — sin tarjeta, sin compromiso. Decides si pagar hasta después de ver tu plan completo." data-en="Try it with your event's real details — no card, no commitment. You decide whether to pay only after seeing your full plan.">Prueba con los datos reales de tu evento — sin tarjeta, sin compromiso. Decides si pagar hasta después de ver tu plan completo.</div>
+      <div class="price-desc" data-es="Tu invitación personalizada y Save the Date, lista para compartir por WhatsApp en minutos." data-en="Your personalized invitation and Save the Date, ready to share on WhatsApp in minutes.">Tu invitación personalizada y Save the Date, lista para compartir por WhatsApp en minutos.</div>
       <ul class="price-features">
-        <li data-es="2 planes completos" data-en="2 complete plans">2 planes completos</li>
-        <li data-es="Todos los tipos de evento" data-en="All event types">Todos los tipos de evento</li>
+        <li data-es="Invitación personalizada" data-en="Personalized invitation">Invitación personalizada</li>
         <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
-        <li class="muted" style="text-decoration:line-through;opacity:.5" data-es="Excel, invitación y RSVP" data-en="Excel, invitation and RSVP">Excel, invitación y RSVP</li>
+        <li data-es="Compartible por link de WhatsApp" data-en="Shareable via WhatsApp link">Compartible por link de WhatsApp</li>
+        <li class="muted" style="text-decoration:line-through;opacity:.5" data-es="Confirmación de invitados (RSVP)" data-en="Guest confirmation (RSVP)">Confirmación de invitados (RSVP)</li>
       </ul>
-      <button class="btn-price free" onclick="window.location.href='/app'" data-es="Empezar gratis →" data-en="Start free →">Empezar gratis →</button>
+      <button class="btn-price free" onclick="window.location.href='/app?flow=invitacion-gratis'" data-es="Crear invitación gratis →" data-en="Create free invitation →">Crear invitación gratis →</button>
     </div>
 
     <div class="price-card featured">
       <span class="featured-badge" data-es="Más popular" data-en="Most popular">Más popular</span>
-      <!-- Promo de inauguración: anunciada AQUÍ, antes de comprar -- si solo
-           se avisara después del pago, sería una sorpresa agradable pero no
-           cambiaría la decisión de compra, que es el punto de una promoción.
-           Quitar este bloque cuando termine el mes (o cuando venza el código
-           SEGUNDOGRATIS en la base, lo que pase primero). -->
-      <div style="background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em" data-es="🎉 PROMO DE INAUGURACIÓN — te regalamos el segundo evento" data-en="🎉 LAUNCH OFFER — get your second event free">🎉 PROMO DE INAUGURACIÓN — te regalamos el segundo evento</div>
-      <div class="price-name" data-es="1 evento" data-en="1 event">1 evento</div>
-      <div class="price-amount">$179 <span>MXN</span><span class="price-usd-hint" data-mxn="179"></span></div>
-      <div class="price-desc" data-es="Acceso completo para un solo evento. Perfecto si vas a planear solo el tuyo." data-en="Full access for a single event. Perfect if you're only planning your own.">Acceso completo para un solo evento. Perfecto si vas a planear solo el tuyo.</div>
+      <div class="promo-badge" data-es="🚀 Precio de lanzamiento" data-en="🚀 Launch price">🚀 Precio de lanzamiento</div>
+      <div class="price-name" data-es="RSVP + Fotos QR" data-en="RSVP + Photo QR">RSVP + Fotos QR</div>
+      <div class="price-amount"><span class="price-before">antes $399</span>$149-199 <span>MXN</span></div>
+      <div class="price-desc" data-es="Confirmación de invitados en vivo, sin que tus invitados creen cuenta, más QR de fotos para las mesas." data-en="Live guest confirmation, no account needed for guests, plus a photo QR for the tables.">Confirmación de invitados en vivo, sin que tus invitados creen cuenta, más QR de fotos para las mesas.</div>
       <ul class="price-features">
-        <li><strong data-es="Cronograma, presupuesto e ideas creados junto contigo" data-en="Timeline, budget, and ideas created together with you">Cronograma, presupuesto e ideas creados junto contigo</strong></li>
-        <li data-es="Ese evento, sin límite de regeneraciones" data-en="That event, unlimited regenerations">Ese evento, sin límite de regeneraciones</li>
-        <li data-es="Descarga en Excel editable" data-en="Editable Excel download">Descarga en Excel editable</li>
-        <li data-es="Publicar invitación + RSVP" data-en="Publish invitation + RSVP">Publicar invitación + RSVP</li>
-        <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
+        <li><strong data-es="Lista de invitados confirmados en vivo" data-en="Live confirmed-guest list">Lista de invitados confirmados en vivo</strong></li>
+        <li data-es="QR de fotos para las mesas" data-en="Photo QR for the tables">QR de fotos para las mesas</li>
+        <li data-es="Invitación + Save the Date" data-en="Invitation + Save the Date">Invitación + Save the Date</li>
       </ul>
-      <button class="btn-price paid" onclick="goToPay('diy_event')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+      <button class="btn-price paid" onclick="goToPay('rsvp_qr')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
 
     <div class="price-card">
-      <div style="background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
-      <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
-      <div class="price-amount">$299 <span>MXN</span><span class="price-usd-hint" data-mxn="299"></span></div>
-      <div class="price-desc" data-es="Acceso completo ilimitado por 365 días. Ideal si planeas más de un evento este año." data-en="Unlimited full access for 365 days. Ideal if you'll plan more than one event this year.">Acceso completo ilimitado por 365 días. Ideal si planeas más de un evento este año.</div>
+      <div class="promo-badge" data-es="🚀 Precio de lanzamiento" data-en="🚀 Launch price">🚀 Precio de lanzamiento</div>
+      <div class="price-name" data-es="Plan completo" data-en="Full plan">Plan completo</div>
+      <div class="price-amount"><span class="price-before">antes $599</span>$249-299 <span>MXN</span></div>
+      <div class="price-desc" data-es="Todo lo de RSVP + Fotos QR, más el cronograma, presupuesto y checklist de tu evento, creados junto contigo." data-en="Everything in RSVP + Photo QR, plus your event's timeline, budget, and checklist, created together with you.">Todo lo de RSVP + Fotos QR, más el cronograma, presupuesto y checklist de tu evento, creados junto contigo.</div>
       <ul class="price-features">
-        <li data-es="Eventos ilimitados por 365 días" data-en="Unlimited events for 365 days">Eventos ilimitados por 365 días</li>
-        <li><strong data-es="Descarga en Excel editable" data-en="Editable Excel download">Descarga en Excel editable</strong></li>
-        <li data-es="Publicar invitación + RSVP" data-en="Publish invitation + RSVP">Publicar invitación + RSVP</li>
-        <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
+        <li><strong data-es="Cronograma, presupuesto e ideas creados junto contigo" data-en="Timeline, budget, and ideas created together with you">Cronograma, presupuesto e ideas creados junto contigo</strong></li>
+        <li data-es="Checklist y guía de proveedores" data-en="Checklist and vendor guide">Checklist y guía de proveedores</li>
+        <li data-es="Descarga en Excel editable" data-en="Editable Excel download">Descarga en Excel editable</li>
+        <li data-es="Incluye RSVP + Fotos QR" data-en="Includes RSVP + Photo QR">Incluye RSVP + Fotos QR</li>
       </ul>
-      <button class="btn-price paid" onclick="goToPay('diy_annual')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
+      <button class="btn-price paid" onclick="goToPay('plan_completo')" data-es="Comprar →" data-en="Buy →">Comprar →</button>
     </div>
 
   </div>
 
-  <!-- GRUPO PLANNER -->
+  <!-- GRUPO PLANNER: oculto por ahora, puede reactivarse más adelante -->
   <div class="pricing-grid pricing-group" id="pg-planner" style="display:none">
 
     <div class="price-card">
-      <div style="background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
+      <div class="promo-badge" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
       <div class="price-name" data-es="3 eventos" data-en="3 events">3 eventos</div>
       <div class="price-amount">$249 <span>MXN</span><span class="price-usd-hint" data-mxn="249"></span></div>
       <div class="price-desc" data-es="Ideal para probar el modo Planner con tus primeros clientes." data-en="Perfect for trying Planner mode with your first clients.">Ideal para probar el modo Planner con tus primeros clientes.</div>
@@ -578,7 +568,7 @@ footer a:hover{color:var(--teal-dark)}
 
     <div class="price-card featured">
       <span class="featured-badge" data-es="Mejor valor" data-en="Best value">Mejor valor</span>
-      <div style="background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
+      <div class="promo-badge" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
       <div class="price-name" data-es="10 eventos" data-en="10 events">10 eventos</div>
       <div class="price-amount">$399 <span>MXN</span><span class="price-usd-hint" data-mxn="399"></span></div>
       <div class="price-desc" data-es="El mejor precio por evento si ya tienes varios clientes en fila." data-en="The best price per event if you already have several clients lined up.">El mejor precio por evento si ya tienes varios clientes en fila.</div>
@@ -591,7 +581,7 @@ footer a:hover{color:var(--teal-dark)}
     </div>
 
     <div class="price-card">
-      <div style="background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
+      <div class="promo-badge" data-es="🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20" data-en="🎉 LAUNCH OFFER — 20% off with code BELU20">🎉 PROMO DE INAUGURACIÓN — 20% con código BELU20</div>
       <div class="price-name" data-es="Anual" data-en="Annual">Anual</div>
       <div class="price-amount">$599 <span>MXN</span><span class="price-usd-hint" data-mxn="599"></span></div>
       <div class="price-desc" data-es="Eventos de cliente ilimitados por 365 días, más Excel para tus propuestas." data-en="Unlimited client events for 365 days, plus Excel for your proposals.">Eventos de cliente ilimitados por 365 días, más Excel para tus propuestas.</div>
@@ -635,8 +625,8 @@ footer a:hover{color:var(--teal-dark)}
     <div class="faq-a" data-es="Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado." data-en="It works for 8 event types: Wedding, Birthday, Baby Shower, Corporate, Quinceañera, Graduation, Anniversary, and Kids Party. The plan adapts to the selected event type.">Funciona para 8 tipos de evento: Boda, Cumpleaños, Baby Shower, Corporativo, Quinceañera, Graduación, Aniversario y Fiesta Infantil. El plan se adapta al tipo de evento seleccionado.</div>
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
-    <div class="faq-q"><span data-es="¿Qué pasa si ya usé mis 2 planes gratis?" data-en="What happens if I've already used my 2 free plans?">¿Qué pasa si ya usé mis 2 planes gratis?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Puedes desbloquear acceso completo desde $179 MXN por un solo evento, o $299 MXN por un año de eventos ilimitados. Si eres planner profesional, hay paquetes desde $249 MXN. Todos son pagos únicos — sin suscripciones sorpresa." data-en="You can unlock full access from $179 MXN for a single event, or $299 MXN for a year of unlimited events. If you're a professional planner, packages start at $249 MXN. All are one-time payments — no surprise subscriptions.">Puedes desbloquear acceso completo desde $179 MXN por un solo evento, o $299 MXN por un año de eventos ilimitados. Si eres planner profesional, hay paquetes desde $249 MXN. Todos son pagos únicos — sin suscripciones sorpresa.</div>
+    <div class="faq-q"><span data-es="¿Cuánto cuesta y qué pasa si solo quiero la invitación?" data-en="How much does it cost, and what if I only want the invitation?">¿Cuánto cuesta y qué pasa si solo quiero la invitación?</span><span class="faq-icon">+</span></div>
+    <div class="faq-a" data-es="Tu invitación con Save the Date es gratis, sin límite. Si quieres confirmar invitados en vivo y el QR de fotos, son $149-199 MXN (precio de lanzamiento). Si además quieres el cronograma, presupuesto y checklist completos, es $249-299 MXN. Todos son pagos únicos por evento — sin suscripciones sorpresa." data-en="Your invitation with Save the Date is free, no limit. If you want live guest confirmations and the photo QR, it's $149-199 MXN (launch price). If you also want the full timeline, budget, and checklist, it's $249-299 MXN. All are one-time payments per event — no surprise subscriptions.">Tu invitación con Save the Date es gratis, sin límite. Si quieres confirmar invitados en vivo y el QR de fotos, son $149-199 MXN (precio de lanzamiento). Si además quieres el cronograma, presupuesto y checklist completos, es $249-299 MXN. Todos son pagos únicos por evento — sin suscripciones sorpresa.</div>
   </div>
 </section>
 
@@ -737,6 +727,12 @@ if('serviceWorker' in navigator){
 //  NUEVO con el nuevo precio, sí tienes que reemplazar la URL aquí.
 // ══════════════════════════════
 const STRIPE_LINKS = {
+  // RSVP + Fotos QR — producto Stripe, metadata access_type=rsvp_qr, credits=1. $149-199 MXN.
+  rsvp_qr:        'https://buy.stripe.com/7sY8wQdlA7mO9N61aPdEs0h',
+  // Plan completo — producto Stripe, metadata access_type=diy, credits=1. $249-299 MXN.
+  plan_completo:  'https://buy.stripe.com/dRm3cwbds0Yqgbu06LdEs0i',
+  // Planner y DIY viejos: ocultos del pricing visible, pero el link sigue vivo
+  // por si algún usuario ya lo tenía guardado o hay que reactivar el toggle.
   diy_event:      'https://buy.stripe.com/cNibJ295kbD49N6bPtdEs00', // DIY — 1 evento — $179 MXN (sin cambio)
   diy_annual:     'https://buy.stripe.com/9B68wQa9o7mO2kEaLpdEs01', // DIY — Anual — $299 MXN (sin cambio)
   planner_3:      'https://buy.stripe.com/aFa5kE81g22ugbudXBdEs02', // Planner — 3 eventos — $249 MXN (sin cambio)

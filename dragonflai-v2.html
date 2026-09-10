@@ -1017,6 +1017,69 @@ footer .teal{color:var(--teal-dark);font-weight:600}
   </div>
 </div>
 
+<!-- INVITACIÓN GRATIS — entrypoint alterno (index.html#precios "Crear
+     invitación gratis" -> /app?flow=invitacion-gratis). Formulario corto,
+     sin pasar por el launcher ni por launcher-email-step: el correo solo
+     se pide después de ver el resultado (qi-claim-email-step), y solo si
+     la persona quiere guardarlo/comprarlo/tener el link permanente.
+     Estado propio (variables qi*) — no toca eventType/mode del form del
+     plan completo, que sigue viviendo intacto detrás de esta pantalla. -->
+<div id="quick-invite-screen" class="launcher-screen" style="display:none">
+  <div class="launcher-content" style="max-width:480px">
+
+    <div id="qi-form-step">
+      <img src="/assets/belu/belu-saludando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+      <h2 data-es="Tu invitación, gratis" data-en="Your invitation, free">Tu invitación, gratis</h2>
+      <p data-es="Cuéntale a Belu lo básico — en menos de un minuto tienes tu invitación lista para compartir por WhatsApp." data-en="Tell Belu the basics — in under a minute your invitation is ready to share on WhatsApp.">Cuéntale a Belu lo básico — en menos de un minuto tienes tu invitación lista para compartir por WhatsApp.</p>
+
+      <div id="qi-event-types" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:1.1rem"></div>
+
+      <input type="text" id="qi-names" class="launcher-email-input" placeholder="">
+      <input type="text" id="qi-location" class="launcher-email-input" data-placeholder-es="Lugar o ciudad" data-placeholder-en="Venue or city" placeholder="Lugar o ciudad">
+      <label style="display:block;text-align:left;font-size:12.5px;color:var(--text-3);margin:-.5rem 0 .35rem 2px" data-es="Fecha del evento" data-en="Event date">Fecha del evento</label>
+      <input type="date" id="qi-date" class="launcher-email-input">
+
+      <p style="font-size:12.5px;color:var(--text-3);text-align:left;margin:.25rem 0 .5rem 2px" data-es="Estilo (elige hasta 2)" data-en="Style (pick up to 2)">Estilo (elige hasta 2)</p>
+      <div id="qi-vibe-chips" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:1.1rem"></div>
+
+      <label class="launcher-btn-primary" style="display:block;background:var(--cream-2);color:var(--text-2);cursor:pointer;text-align:center;box-sizing:border-box;margin-bottom:1rem">
+        <span id="qi-cover-label" data-es="📷 Foto de portada (opcional) — omitir, Belu elige algo bonito" data-en="📷 Cover photo (optional) — skip it, Belu will pick something nice">📷 Foto de portada (opcional) — omitir, Belu elige algo bonito</span>
+        <input type="file" id="qi-cover-input" accept="image/*" style="display:none" onchange="qiCoverSelected(event)">
+      </label>
+
+      <button class="launcher-btn-primary" id="qi-submit-btn" onclick="qiSubmit()" data-es="Crear mi invitación →" data-en="Create my invitation →">Crear mi invitación →</button>
+    </div>
+
+    <div id="qi-loading-step" style="display:none">
+      <img src="/assets/belu/belu-trabajando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+      <h2 data-es="Diseñando tu invitación…" data-en="Designing your invitation…">Diseñando tu invitación…</h2>
+      <p data-es="Belu está eligiendo el estilo perfecto para tu evento" data-en="Belu is picking the perfect style for your event">Belu está eligiendo el estilo perfecto para tu evento</p>
+      <div class="ldots"><span class="ldot"></span><span class="ldot"></span><span class="ldot"></span></div>
+    </div>
+
+    <div id="qi-result-step" style="display:none">
+      <div id="qi-preview-card"></div>
+      <button class="launcher-btn-primary" id="qi-whatsapp-btn" onclick="qiShareWhatsapp()" data-link="" data-es="📲 Compartir por WhatsApp" data-en="📲 Share on WhatsApp">📲 Compartir por WhatsApp</button>
+      <p id="qi-link-display" style="font-size:11.5px;color:var(--text-3);word-break:break-all;margin:.6rem 0 1.25rem"></p>
+
+      <div id="qi-upsells" style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem"></div>
+
+      <a href="#" onclick="qiOpenClaimEmail();return false" style="display:block;text-align:center;font-size:12.5px;color:var(--text-3)" data-es="Guardar para editar después →" data-en="Save to edit later →">Guardar para editar después →</a>
+    </div>
+
+    <div id="qi-claim-email-step" style="display:none">
+      <img src="/assets/belu/belu-senalando.png" alt="Belu" class="launcher-belu-img" onerror="this.style.display='none'">
+      <h2 data-es="¿Cuál es tu correo?" data-en="What's your email?">¿Cuál es tu correo?</h2>
+      <p data-es="Así puedes volver a encontrar y editar tu invitación cuando quieras" data-en="This way you can find and edit your invitation again whenever you want">Así puedes volver a encontrar y editar tu invitación cuando quieras</p>
+      <input type="email" id="qi-claim-email-input" class="launcher-email-input" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter') qiClaimEmail()">
+      <button class="launcher-btn-primary" onclick="qiClaimEmail()" data-es="Continuar" data-en="Continue">Continuar</button>
+      <div id="qi-claim-email-status" class="launcher-email-status"></div>
+      <a href="#" onclick="qiBackToResult();return false" style="display:block;text-align:center;font-size:12.5px;color:var(--text-3);margin-top:.75rem" data-es="← Volver" data-en="← Back">← Volver</a>
+    </div>
+
+  </div>
+</div>
+
 
 <!-- BACKGROUND ORBS -->
 <div class="bg-orb bg-orb-1"></div>
@@ -1978,6 +2041,11 @@ if (location.hash.startsWith('##')) {
   history.replaceState(null, '', location.pathname + location.search + location.hash.slice(1));
 }
 
+// Entrypoint alterno para la invitación gratis (index.html#precios -> "Crear
+// invitación gratis"): salta el carrusel de bienvenida y launcher-email-step
+// por completo — ver startQuickInvite() y el guard en routeInitialScreen().
+const IS_QUICK_INVITE_FLOW = new URLSearchParams(location.search).get('flow') === 'invitacion-gratis';
+
 const sb = (window.supabase && SUPABASE_URL.startsWith('http'))
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       // flowType:'pkce' — con el flujo implícito (el default), el link
@@ -2094,7 +2162,7 @@ let isPaid=false;
 let suppressPrefSave=false;
 let prefsApplied=false;
 
-let access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false};
+let access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false,rsvpQrEventCredits:0,rsvpQrUnlimitedActive:false};
 
 async function refreshPaidStatus(){
   if(!sb) return isPaid;
@@ -2119,7 +2187,7 @@ let refreshPaidStatusInFlight=null;
 async function refreshPaidStatusInner(){
   const {data:{session}}=await sb.auth.getSession();
   currentUser=session?session.user:null;
-  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false}; updateAccountUI(); updateGenBadge(); return isPaid; }
+  if(!currentUser){ isPaid=false; currentUserName=''; userProfile={}; access={diyEventCredits:0,diyUnlimitedActive:false,plannerEventCredits:0,plannerUnlimitedActive:false,rsvpQrEventCredits:0,rsvpQrUnlimitedActive:false}; updateAccountUI(); updateGenBadge(); return isPaid; }
 
   // Si veníamos de mandar el link mágico con un nombre escrito, lo guardamos
   // ahora que ya hay sesión — SOLO si el correo coincide con quien inició
@@ -2153,7 +2221,9 @@ async function refreshPaidStatusInner(){
       diyEventCredits:accessData.diy_event_credits||0,
       diyUnlimitedActive:!!accessData.diy_unlimited_active,
       plannerEventCredits:accessData.planner_event_credits||0,
-      plannerUnlimitedActive:!!accessData.planner_unlimited_active
+      plannerUnlimitedActive:!!accessData.planner_unlimited_active,
+      rsvpQrEventCredits:accessData.rsvp_qr_event_credits||0,
+      rsvpQrUnlimitedActive:!!accessData.rsvp_qr_unlimited_active
     };
   }
   // isPaid = "¿tiene cualquier acceso pagado activo?" — se usa para el badge de
@@ -2535,7 +2605,10 @@ async function openPublishModal(){
   document.querySelectorAll('#publish-form .opt-section').forEach(det=>det.open=false);
   showToast(lang==='es'?'Verificando tu acceso…':'Verifying your access…');
   await refreshPaidStatus(); // trae el saldo real de créditos, sin gastar nada todavía
-  const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+  // El publish modal se abre con acceso completo (diy/planner) O con solo
+  // RSVP+QR — publicar-con-RSVP no exige el plan completo, ver
+  // tryUnlockPublishAccess().
+  const hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive||access.rsvpQrEventCredits>0||access.rsvpQrUnlimitedActive;
   if(!hasAnyAccess){ openExcelPaywall('publish'); return; }
   document.getElementById('publish-form').style.display='block';
   document.getElementById('publish-success').style.display='none';
@@ -3620,7 +3693,7 @@ async function publishInvitation(){
   }
 
   // ── Intentar desbloquear acceso; si no hay crédito, guardar borrador ──
-  const result=await tryUnlockAccess('diy');
+  const result=await tryUnlockPublishAccess('diy');
   if(!result.success){
     if(result.reason==='save_failed'){
       // No es un tema de crédito — el plan ni siquiera se pudo guardar
@@ -3905,10 +3978,10 @@ Belu's personality:
 
 You can help with two kinds of questions:
 1) How DragonflAI Events works — use this exact info, don't invent anything beyond it:
-   - Free: 2 free plan generations, no account needed to try
-   - DIY (Haz tu propio evento) — for planning your OWN event: 1 evento $179 MXN, or Anual (365 días ilimitado) $299 MXN. Includes: Excel editable con presupuesto/cronograma/checklist, invitación pública con RSVP, Save the Date personalizado.
-   - Planner — for professional event planners managing client events: 3 eventos $249 MXN, 10 eventos $399 MXN, or Anual $599 MXN. Includes everything in DIY plus: propuestas de cliente profesionales.
-   - To publish an invitation or download the Excel, the event needs an unlocked credit (DIY or Planner).
+   - Free: personalized invitation + Save the Date are free, no limit, no card needed. Also 2 free full-plan generations to try.
+   - RSVP + Fotos QR (launch price $149-199 MXN, per event): unlocks live guest confirmation (RSVP) and a photo QR for the tables, on top of the free invitation.
+   - Plan completo (launch price $249-299 MXN, per event): everything in RSVP + Fotos QR, plus the full event plan — cronograma, presupuesto, checklist, guía de proveedores — and Excel export.
+   - Planner mode — for professional event planners managing client events: separate packages (contact support for current pricing). Includes everything in Plan completo plus client proposals.
    - RSVP: guests confirm via the public invitation link, no account needed on their side.
    - Support/bugs: there's a 🐞 button in the app for reporting issues directly.
 2) General event-planning questions (budgeting tips, vendor advice, timelines, etiquette, etc.) — answer these using your own general knowledge, exactly as a helpful assistant would.
@@ -3921,8 +3994,8 @@ If asked something you're not sure about regarding the product, say so honestly 
 const HELP_CHAT_QUICK_QUESTIONS=[
   {
     es:'¿Cuánto cuesta?', en:'How much does it cost?',
-    answerEs:'Puedes probarlo gratis con 2 planes completos, sin tarjeta ni compromiso 🙂 Si quieres publicar tu invitación con RSVP o bajar el Excel, desde $179 MXN por evento (o $299 MXN al año si vas a planear más de uno). Si eres planner profesional, los paquetes empiezan en $249 MXN. Todos los detalles están en Precios, en la página principal.',
-    answerEn:"You can try it free with 2 complete plans, no card or commitment needed 🙂 To publish your invitation with RSVP or download the Excel, it starts at $179 MXN per event (or $299 MXN/year if you'll plan more than one). For professional planners, packages start at $249 MXN. Full details are in the Pricing section on the homepage."
+    answerEs:'Tu invitación con Save the Date es gratis, sin límite 🙂 Si quieres confirmar invitados en vivo (RSVP) y el QR de fotos, es desde $149 MXN por evento. Si además quieres el plan completo (cronograma, presupuesto, checklist y Excel), es desde $249 MXN. Todos los detalles están en Precios, en la página principal.',
+    answerEn:"Your invitation with Save the Date is free, no limit 🙂 If you want live guest confirmation (RSVP) and the photo QR, it starts at $149 MXN per event. If you also want the full plan (timeline, budget, checklist, and Excel), it starts at $249 MXN. Full details are in the Pricing section on the homepage."
   },
   {
     es:'¿Cómo publico mi invitación?', en:'How do I publish my invitation?',
@@ -4156,7 +4229,7 @@ if(sb){
     // sesión desde ESTA línea, sin esperar nada de red, así que cambiamos
     // al spinner ligero de inmediato; el carrusel completo ahora solo lo ve
     // alguien sin sesión (que sí lo necesita).
-    if(session) launcherShowLoadingStep();
+    if(session && !IS_QUICK_INVITE_FLOW) launcherShowLoadingStep();
     if(newUserId===lastAuthListenerUserId){
       routeInitialScreen(); // sigue corriendo — es barato y solo actúa una vez (initialRoutingDone)
       return;
@@ -4275,6 +4348,9 @@ async function dashboardGenerateInspoIdeas(){
 }
 
 async function routeInitialScreen(){
+  // La invitación gratis maneja su propia pantalla (startQuickInvite) —
+  // nunca debe saltar al launcher completo ni al dashboard del plan pagado.
+  if(IS_QUICK_INVITE_FLOW) return;
   if(initialRoutingDone) return;
   initialRoutingDone=true;
   if(!currentUser){
@@ -6030,6 +6106,231 @@ function updateNameLabel(){
   input.placeholder=cfg[lang][1];
 }
 
+// ══════════════════════════════
+//  INVITACIÓN GRATIS (Milestone: nuevos niveles de precio)
+//  Formulario corto e independiente del plan completo — estado propio
+//  (qi*), no toca eventType/mode/radios del form principal. Genera una
+//  invitación sin pasar por el Worker de IA (no hay costo que proteger:
+//  es una plantilla elegida por tipo de evento + vibe, no un plan
+//  generado), y sin pedir correo hasta que la persona quiera guardarla,
+//  comprarla, o tener el link permanente (qiOpenClaimEmail).
+// ══════════════════════════════
+let qiEventType=T.eventTypes.vals[0];
+let qiVibes=[];
+let qiCoverDataUrl=null;
+let qiInvitationRow=null;
+
+function qiRenderEventTypes(){
+  const types=T.eventTypes[lang];
+  const box=document.getElementById('qi-event-types');
+  if(!box) return;
+  box.innerHTML=types.map((t,i)=>
+    `<button type="button" class="epill${T.eventTypes.vals[i]===qiEventType?' active':''}" onclick="qiSelectType(${i})">${t}</button>`
+  ).join('');
+}
+
+function qiSelectType(idx){
+  qiEventType=T.eventTypes.vals[idx];
+  qiRenderEventTypes();
+  qiRenderVibeChips();
+  qiUpdateNamesPlaceholder();
+}
+
+function qiUpdateNamesPlaceholder(){
+  const input=document.getElementById('qi-names');
+  if(!input) return;
+  const L=lang==='es';
+  input.placeholder=TYPES_COUPLE_NAMES.includes(qiEventType)
+    ? (L?'ej. Ana & Juan':'e.g. Ana & Juan')
+    : (L?'ej. María Fernanda':'e.g. María Fernanda');
+}
+
+function qiRenderVibeChips(){
+  const box=document.getElementById('qi-vibe-chips');
+  if(!box) return;
+  const suggestions=VIBE_SUGGESTIONS[qiEventType];
+  if(!suggestions){ box.innerHTML=''; return; }
+  const opts=suggestions[lang]||suggestions.es;
+  qiVibes=qiVibes.filter(v=>opts.includes(v)); // al cambiar de tipo, solo se conservan chips que sigan existiendo
+  box.innerHTML=opts.map(o=>`<span class="ropt${qiVibes.includes(o)?' sel':''}" onclick="qiToggleVibe(this)">${esc(o)}</span>`).join('');
+}
+
+function qiToggleVibe(el){
+  const value=el.textContent.trim();
+  const idx=qiVibes.indexOf(value);
+  if(idx>=0){ qiVibes.splice(idx,1); el.classList.remove('sel'); return; }
+  if(qiVibes.length>=2){ showToast(lang==='es'?'Máximo 2 estilos':'Max 2 styles',true); return; }
+  qiVibes.push(value); el.classList.add('sel');
+}
+
+function qiCoverSelected(e){
+  const f=e.target.files&&e.target.files[0];
+  if(!f) return;
+  const L=lang==='es';
+  const reader=new FileReader();
+  reader.onload=()=>{
+    qiCoverDataUrl=reader.result;
+    const lbl=document.getElementById('qi-cover-label');
+    if(lbl) lbl.textContent=L?'✅ Foto lista':'✅ Photo ready';
+  };
+  reader.readAsDataURL(f);
+}
+
+function startQuickInvite(){
+  const launcherEl=document.getElementById('launcher-screen');
+  const mainEl=document.getElementById('main-planner-view');
+  const dashEl=document.getElementById('user-dashboard');
+  const qiEl=document.getElementById('quick-invite-screen');
+  if(launcherEl) launcherEl.style.display='none';
+  if(mainEl) mainEl.style.display='none';
+  if(dashEl) dashEl.style.display='none';
+  if(qiEl) qiEl.style.display='flex';
+  qiRenderEventTypes();
+  qiUpdateNamesPlaceholder();
+  qiRenderVibeChips();
+  const dateEl=document.getElementById('qi-date');
+  if(dateEl){
+    const d=new Date(); d.setMonth(d.getMonth()+3);
+    dateEl.value=d.toISOString().split('T')[0];
+    dateEl.min=new Date().toISOString().split('T')[0];
+  }
+}
+
+async function qiSubmit(){
+  const L=lang==='es';
+  const names=document.getElementById('qi-names').value.trim();
+  const location=document.getElementById('qi-location').value.trim();
+  const dateRaw=document.getElementById('qi-date').value;
+  if(!names){ showToast(L?'Escribe el nombre':'Enter the name',true); document.getElementById('qi-names').focus(); return; }
+  if(!location){ showToast(L?'Escribe el lugar':'Enter the location',true); document.getElementById('qi-location').focus(); return; }
+  if(!dateRaw){ showToast(L?'Elige la fecha':'Pick a date',true); return; }
+  if(!sb){ showToast(L?'Supabase no está configurado todavía':'Supabase is not configured yet',true); return; }
+
+  document.getElementById('qi-form-step').style.display='none';
+  document.getElementById('qi-loading-step').style.display='block';
+
+  try{
+    if(!currentUser){
+      const {data:anonData,error:anonErr}=await sb.auth.signInAnonymously();
+      if(anonErr) throw anonErr;
+      currentUser=anonData.user;
+    }
+
+    const typeIdx=T.eventTypes.vals.indexOf(qiEventType);
+    const typeName=typeIdx>=0?T.eventTypes[lang][typeIdx].replace(/^\S+\s/,''):qiEventType.split('/')[0];
+    const d=new Date(dateRaw+'T00:00:00');
+    const dateDisplay=isNaN(d)?dateRaw:d.toLocaleDateString(lang==='es'?'es-MX':'en-US',{day:'numeric',month:'long',year:'numeric'});
+    const theme=EVENT_THEMES[qiEventType]||EVENT_THEMES['Boda/Wedding'];
+    const slugBase=defaultSlugFor({name:names,rawDate:dateRaw});
+
+    const payload={
+      user_id:currentUser.id,
+      plan_id:null,
+      slug:slugBase,
+      is_published:true,
+      tier:'free',
+      host_names:names,
+      event_type:typeName,
+      event_date:dateDisplay,
+      event_date_raw:dateRaw,
+      location:location,
+      vibe:qiVibes.join(' · '),
+      theme:'theme-custom-color',
+      custom_color_hex:theme.teal,
+      background_image_url:qiCoverDataUrl||null,
+      ask_guest_count:false, ask_dietary:false, ask_message:false, ask_song_request:false, ask_lodging_need:false
+    };
+
+    let {data,error}=await sb.from('invitations').insert(payload).select().single();
+    if(error && /duplicate|unique/i.test(error.message||'')){
+      payload.slug=`${slugBase}-${Math.floor(Math.random()*900+100)}`;
+      ({data,error}=await sb.from('invitations').insert(payload).select().single());
+    }
+    if(error) throw error;
+
+    qiInvitationRow=data;
+    qiShowResult(data);
+  }catch(err){
+    console.error('qiSubmit error:',err);
+    showToast(L?'No se pudo crear tu invitación — intenta de nuevo':'Could not create your invitation — try again',true);
+    document.getElementById('qi-loading-step').style.display='none';
+    document.getElementById('qi-form-step').style.display='block';
+  }
+}
+
+function qiShowResult(inv){
+  const L=lang==='es';
+  document.getElementById('qi-loading-step').style.display='none';
+  document.getElementById('qi-result-step').style.display='block';
+
+  const theme=EVENT_THEMES[qiEventType]||EVENT_THEMES['Boda/Wedding'];
+  const bgStyle=inv.background_image_url
+    ? `background-image:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)),url('${inv.background_image_url}');background-size:cover;background-position:center`
+    : `background:linear-gradient(135deg,${theme.teal},${theme.violet})`;
+  document.getElementById('qi-preview-card').innerHTML=`
+    <div style="${bgStyle};border-radius:18px;padding:2.75rem 1.5rem;color:#fff;text-align:center;margin-bottom:1.25rem">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-bottom:10px">${esc(inv.event_type)}</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2.1rem;line-height:1.15;margin-bottom:10px">${esc(inv.host_names)}</div>
+      <div style="font-size:14px;opacity:.92">${esc(inv.event_date)}</div>
+      <div style="font-size:14px;opacity:.92">${esc(inv.location)}</div>
+    </div>`;
+
+  const link=`${invitationOrigin()}/i/${inv.slug}`;
+  const waBtn=document.getElementById('qi-whatsapp-btn');
+  waBtn.setAttribute('data-link',link);
+  document.getElementById('qi-link-display').textContent=link;
+
+  document.getElementById('qi-upsells').innerHTML=`
+    <a href="index.html#precios" style="display:block;padding:14px 16px;border:1.5px solid var(--border-gray);border-radius:14px;text-align:left;text-decoration:none;color:var(--text)">
+      <strong style="display:block;font-size:14px;margin-bottom:2px">🚀 ${L?'RSVP + Fotos QR':'RSVP + Photo QR'}</strong>
+      <span style="font-size:12.5px;color:var(--text-2)">${L?'Confirma invitados en vivo + QR de fotos — desde $149 MXN':'Live guest confirmation + photo QR — from $149 MXN'}</span>
+    </a>
+    <a href="index.html#precios" style="display:block;padding:14px 16px;border:1.5px solid var(--border-gray);border-radius:14px;text-align:left;text-decoration:none;color:var(--text)">
+      <strong style="display:block;font-size:14px;margin-bottom:2px">🚀 ${L?'Plan completo':'Full plan'}</strong>
+      <span style="font-size:12.5px;color:var(--text-2)">${L?'Cronograma, presupuesto, checklist y Excel — desde $249 MXN':'Timeline, budget, checklist & Excel — from $249 MXN'}</span>
+    </a>`;
+}
+
+function qiShareWhatsapp(){
+  const link=document.getElementById('qi-whatsapp-btn').getAttribute('data-link');
+  if(!link) return;
+  const L=lang==='es';
+  const text=L?`¡Aquí está mi invitación! ${link}`:`Here's my invitation! ${link}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+
+function qiOpenClaimEmail(){
+  document.getElementById('qi-result-step').style.display='none';
+  document.getElementById('qi-claim-email-step').style.display='block';
+}
+function qiBackToResult(){
+  document.getElementById('qi-claim-email-step').style.display='none';
+  document.getElementById('qi-result-step').style.display='block';
+}
+
+async function qiClaimEmail(){
+  const L=lang==='es';
+  const email=document.getElementById('qi-claim-email-input').value.trim();
+  const statusEl=document.getElementById('qi-claim-email-status');
+  if(!email){ showToast(L?'Escribe tu correo':'Enter your email',true); return; }
+  if(!sb||!currentUser){ showToast(L?'Algo salió mal — intenta de nuevo':'Something went wrong — try again',true); return; }
+  statusEl.textContent='';
+  try{
+    // Sesión anónima -> permanente: mismo user_id, la invitación ya creada
+    // (y su link) no se pierde. Si por lo que sea ya no es anónima, cae al
+    // link mágico normal (mismo mecanismo que el resto del sitio).
+    const {error}=currentUser.is_anonymous
+      ? await sb.auth.updateUser({email},{emailRedirectTo:canonicalRedirectUrl()})
+      : await sb.auth.signInWithOtp({email,options:{emailRedirectTo:canonicalRedirectUrl()}});
+    if(error) throw error;
+    statusEl.style.color='var(--teal-dark)';
+    statusEl.textContent=L?'✉️ Te mandamos un link de confirmación a tu correo — ábrelo desde este mismo dispositivo.':'✉️ We sent a confirmation link to your email — open it on this same device.';
+  }catch(err){
+    statusEl.style.color='#C14A5E';
+    statusEl.textContent=err.message||(L?'No se pudo enviar el correo':'Could not send the email');
+  }
+}
+
 function init(){
   updateBudget(15000);
   applyEventTheme(eventType);
@@ -6081,12 +6382,12 @@ async function checkReturnFromPayment(){
   // sí llegaba. Como el regalo del segundo evento vive adentro de la rama de
   // "sí hay acceso", esa carrera también se comía el regalo en silencio.
   // Ahora se reintenta por unos segundos antes de darse por vencido.
-  let hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+  let hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive||access.rsvpQrEventCredits>0||access.rsvpQrUnlimitedActive;
   let intentos=0;
   while(!hasAnyAccess && intentos<5){
     await new Promise(r=>setTimeout(r,2000));
     await refreshPaidStatus();
-    hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive;
+    hasAnyAccess=access.diyEventCredits>0||access.diyUnlimitedActive||access.plannerEventCredits>0||access.plannerUnlimitedActive||access.rsvpQrEventCredits>0||access.rsvpQrUnlimitedActive;
     intentos++;
   }
 
@@ -6134,6 +6435,7 @@ function setLang(l){
     if(txt) el.placeholder=txt;
   });
   renderEventTypes(); renderRadios(); renderMustHaves(); renderThemeSuggestions(); renderVibeSuggestions(); renderUpsells(); renderTabs(); updateExtraFieldVisibility(); updateNameLabel(); updateTypedPlaceholders();
+  if(IS_QUICK_INVITE_FLOW){ qiRenderEventTypes(); qiRenderVibeChips(); qiUpdateNamesPlaceholder(); }
   updateFormTitle(); updateModePill(); updateGenBadge();
   if(helpChatOpen) renderHelpChatQuickQuestions();
   renderPublishPickers();
@@ -8628,6 +8930,32 @@ async function tryUnlockAccess(accessType){
   return data||{success:false,reason:'unknown'};
 }
 
+// Publicar con RSVP+QR solo (sin el plan completo) — gasta un crédito
+// rsvp_qr en vez de diy/planner, y marca plans.rsvp_qr_unlocked en vez de
+// full_access_unlocked (así no desbloquea Excel de regalo).
+async function tryUnlockRsvpAccess(){
+  if(!sb||!currentUser) return {success:false,reason:'not_logged_in'};
+  const planId=await ensurePlanSaved();
+  if(!planId) return {success:false,reason:'save_failed'};
+  const {data,error}=await sb.rpc('unlock_plan_rsvp_access',{p_plan_id:planId,p_access_type:'rsvp_qr'});
+  if(error){ console.error('unlock_plan_rsvp_access error:',error); return {success:false,reason:'rpc_error'}; }
+  if(data&&data.success) await refreshPaidStatus();
+  return data||{success:false,reason:'unknown'};
+}
+
+// Para publicar: intenta primero el acceso completo (diy/planner — más
+// valioso, de paso desbloquea Excel); si no hay crédito de eso pero SÍ hay
+// crédito rsvp_qr, publica con ese en vez de mostrar el paywall de una vez.
+// Plan completo sigue siendo superset — confirmado con Claudia: comprar
+// Plan completo cubre RSVP+QR automáticamente, sin cobrar aparte.
+async function tryUnlockPublishAccess(accessType){
+  const full=await tryUnlockAccess(accessType);
+  if(full.success||full.reason!=='no_credits') return full;
+  const rsvp=await tryUnlockRsvpAccess();
+  if(rsvp.success) return rsvp;
+  return full; // preferimos el motivo del intento "completo" para el paywall
+}
+
 function openMyPlans(){
   document.getElementById('account-dropdown').style.display='none';
   document.getElementById('myplans-modal').classList.add('open');
@@ -8755,13 +9083,13 @@ async function deleteSavedPlan(id){
 const PAYWALL_CONTENT={
   excel:{icon:'📊🔒',
     title:{es:'Descarga tu Excel editable',en:'Download your editable Excel'},
-    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del acceso Haz tu propio evento — desde $179 por evento, o ilimitado por un año.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
+    text:{es:'La exportación a Excel (presupuesto con fórmulas, invitados, cronograma, checklist y más) es parte del Plan completo — desde $249 MXN por evento.',en:'Excel export (budget with formulas, guest list, timeline, checklist and more) is part of the Full plan — from $249 MXN per event.'}},
   publish:{icon:'🌐🔒',
     title:{es:'Publica tu invitación',en:'Publish your invitation'},
-    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) es parte del acceso Haz tu propio evento — desde $179 por evento, o ilimitado por un año.',en:'Your own invitation site with a custom URL and RSVP is part of DIY access — from $179 MXN per event, or unlimited for a year.'}},
+    text:{es:'Tu propio sitio de invitación con URL personalizada y confirmación de asistencia (RSVP) — desde $149 MXN por evento con RSVP + Fotos QR, o inclúyelo comprando el Plan completo (cronograma, presupuesto, checklist y Excel) desde $249 MXN.',en:'Your own invitation site with a custom URL and RSVP — from $149 MXN per event with RSVP + Photo QR, or get it included with the Full plan (timeline, budget, checklist and Excel) from $249 MXN.'}},
   planner:{icon:'💼🔒',
     title:{es:'Genera propuestas para tus clientes',en:'Generate client proposals'},
-    text:{es:'El modo Planner (propuestas de cliente, y todo lo de Haz tu propio evento incluido) es parte del acceso Planner — paquetes desde $249, o ilimitado por un año.',en:'Planner mode (client proposals, plus everything in DIY) is part of Planner access — packages from $249 MXN, or unlimited for a year.'}}
+    text:{es:'El modo Planner (propuestas de cliente, y todo lo del Plan completo incluido) es un acceso aparte — escríbenos para paquetes de planner.',en:'Planner mode (client proposals, plus everything in the Full plan) is a separate access tier — contact us for planner packages.'}}
 };
 
 function openExcelPaywall(feature){
@@ -9838,6 +10166,7 @@ document.querySelectorAll('.fbody [id^="f-"]').forEach(el=>{
   el.addEventListener('change',scheduleDraftSave);
 });
 restoreDraftIfAny();
+if(IS_QUICK_INVITE_FLOW) startQuickInvite();
 
 </script>
 </body>
