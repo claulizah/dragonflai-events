@@ -124,6 +124,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .demo-section{position:relative;z-index:1;padding:4rem 1.5rem;max-width:900px;margin:0 auto}
 .section-eyebrow{text-align:center;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-dark);margin-bottom:.75rem}
 .section-title{text-align:center;font-family:'Cormorant Garamond',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:600;margin-bottom:.75rem;line-height:1.2;color:var(--text)}
+.section-title em{font-style:italic;color:var(--teal)}
 .section-sub{text-align:center;font-size:15px;color:var(--text-2);max-width:500px;margin:0 auto 2.5rem}
 .demo-window{background:var(--white);border:1px solid var(--border-gray);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow)}
 .demo-bar{background:var(--cream-2);padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border-gray)}
@@ -193,6 +194,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .price-usd-hint{display:block;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;color:var(--text-3);margin-top:2px}
 .price-amount span{font-size:18px;color:var(--text-2);font-family:'Inter',sans-serif;font-weight:400}
 .promo-badge{display:inline-block;background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff;font-size:11.5px;font-weight:700;text-align:center;padding:5px 10px;border-radius:100px;margin-bottom:10px;letter-spacing:.02em}
+.promo-badge.free-badge{background:var(--teal-light);color:var(--teal-dark)}
 .price-before{font-size:15px;color:var(--text-3);text-decoration:line-through;font-weight:400;margin-right:6px}
 .price-desc{font-size:13px;color:var(--text-2);margin-bottom:1.5rem;line-height:1.5}
 .price-features{list-style:none;margin-bottom:1.75rem;display:flex;flex-direction:column;gap:8px}
@@ -201,8 +203,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:var(--white);bord
 .price-features li.muted{color:var(--text-3)}
 .price-features li.muted::before{color:var(--text-3)}
 .btn-price{width:100%;padding:14px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;border:none}
-.btn-price.free{background:var(--cream-2);color:var(--text-2);border:1.5px solid var(--border-gray)}
-.btn-price.free:hover{border-color:var(--teal);color:var(--teal-dark);background:var(--teal-light)}
+.btn-price.free{background:var(--teal);color:#fff;border:none}
+.btn-price.free:hover{background:var(--teal-dark);color:#fff}
 .btn-price.paid{background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff}
 .btn-price.paid:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(46,196,182,.3)}
 .pricing-note{text-align:center;font-size:12px;color:var(--text-2);margin-top:1rem}
@@ -500,31 +502,32 @@ footer a:hover{color:var(--teal-dark)}
 <!-- PRICING -->
 <section class="pricing-section" id="precios">
   <p class="section-eyebrow" data-es="Precios" data-en="Pricing">Precios</p>
-  <h2 class="section-title" data-es="Empieza gratis,<br>desbloquea cuando quieras" data-en="Start free,<br>unlock whenever you want">Empieza gratis,<br>desbloquea cuando quieras</h2>
-  <p class="section-sub" data-es="Sin suscripciones sorpresa. Pagas una vez por evento y ya." data-en="No surprise subscriptions. Pay once per event and you're done.">Sin suscripciones sorpresa. Pagas una vez por evento y ya.</p>
-  <p class="section-sub" style="font-size:14px;opacity:.85;margin-top:-1rem" data-es="Tu invitación y Save the Date son gratis. Pagas solo si quieres confirmar invitados en vivo o armar el plan completo del evento." data-en="Your invitation and Save the Date are free. You only pay if you want live guest confirmations or the full event plan.">Tu invitación y Save the Date son gratis. Pagas solo si quieres confirmar invitados en vivo o armar el plan completo del evento.</p>
+  <h2 class="section-title" data-es="Tu invitación es <em>100% gratis</em>.<br>Lo demás, solo si lo quieres." data-en="Your invitation is <em>100% free</em>.<br>Everything else, only if you want it.">Tu invitación es <em>100% gratis</em>.<br>Lo demás, solo si lo quieres.</h2>
+  <p class="section-sub" data-es="Genera y comparte tu invitación sin pagar nada. Sin suscripciones — si más adelante quieres RSVP o el plan completo, pagas una vez por eso, nada más." data-en="Generate and share your invitation without paying anything. No subscriptions — if later you want RSVP or the full plan, you pay once for that, nothing more.">Genera y comparte tu invitación sin pagar nada. Sin suscripciones — si más adelante quieres RSVP o el plan completo, pagas una vez por eso, nada más.</p>
+  <p class="section-sub" style="font-size:14px;opacity:.85;margin-top:-1rem" data-es="🎉 Precios de lanzamiento por tiempo limitado en RSVP+QR y Plan completo." data-en="🎉 Launch prices for a limited time on RSVP+QR and the Full plan.">🎉 Precios de lanzamiento por tiempo limitado en RSVP+QR y Plan completo.</p>
 
   <!-- GRUPO PRINCIPAL: Gratis / RSVP+QR / Plan completo -->
   <div class="pricing-grid pricing-group" id="pg-diy">
 
     <div class="price-card">
       <div class="price-name" data-es="Gratis" data-en="Free">Gratis</div>
-      <div class="price-amount">$0 <span>MXN</span></div>
-      <div class="price-desc" data-es="Tu invitación personalizada y Save the Date, lista para compartir por WhatsApp en minutos." data-en="Your personalized invitation and Save the Date, ready to share on WhatsApp in minutes.">Tu invitación personalizada y Save the Date, lista para compartir por WhatsApp en minutos.</div>
+      <div class="promo-badge free-badge" data-es="✨ Totalmente gratis" data-en="✨ Totally free">✨ Totalmente gratis</div>
+      <div class="price-amount">$0 <span data-es="MXN, siempre" data-en="MXN, always">MXN, siempre</span></div>
+      <div class="price-desc" data-es="Genera tu invitación con Belu y compártela por WhatsApp hoy mismo — no es una prueba ni un truco, tu invitación no cuesta nada." data-en="Generate your invitation with Belu and share it on WhatsApp today — it's not a trial or a trick, your invitation really costs nothing.">Genera tu invitación con Belu y compártela por WhatsApp hoy mismo — no es una prueba ni un truco, tu invitación no cuesta nada.</div>
       <ul class="price-features">
         <li data-es="Invitación personalizada" data-en="Personalized invitation">Invitación personalizada</li>
         <li data-es="Save the Date incluido" data-en="Save the Date included">Save the Date incluido</li>
         <li data-es="Compartible por link de WhatsApp" data-en="Shareable via WhatsApp link">Compartible por link de WhatsApp</li>
         <li class="muted" style="text-decoration:line-through;opacity:.5" data-es="Confirmación de invitados (RSVP)" data-en="Guest confirmation (RSVP)">Confirmación de invitados (RSVP)</li>
       </ul>
-      <button class="btn-price free" onclick="window.location.href='/app?flow=invitacion-gratis'" data-es="Crear invitación gratis →" data-en="Create free invitation →">Crear invitación gratis →</button>
+      <button class="btn-price free" onclick="window.location.href='/app?flow=invitacion-gratis'" data-es="Generar mi invitación gratis →" data-en="Generate my free invitation →">Generar mi invitación gratis →</button>
     </div>
 
     <div class="price-card featured">
       <span class="featured-badge" data-es="Más popular" data-en="Most popular">Más popular</span>
       <div class="promo-badge" data-es="🚀 Precio de lanzamiento" data-en="🚀 Launch price">🚀 Precio de lanzamiento</div>
       <div class="price-name" data-es="RSVP + Fotos QR" data-en="RSVP + Photo QR">RSVP + Fotos QR</div>
-      <div class="price-amount"><span class="price-before">antes $399</span>$149-199 <span>MXN</span></div>
+      <div class="price-amount"><span class="price-before">antes $399</span>$149 <span>MXN</span></div>
       <div class="price-desc" data-es="Confirmación de invitados en vivo, sin que tus invitados creen cuenta, más QR de fotos para las mesas." data-en="Live guest confirmation, no account needed for guests, plus a photo QR for the tables.">Confirmación de invitados en vivo, sin que tus invitados creen cuenta, más QR de fotos para las mesas.</div>
       <ul class="price-features">
         <li><strong data-es="Lista de invitados confirmados en vivo" data-en="Live confirmed-guest list">Lista de invitados confirmados en vivo</strong></li>
@@ -537,7 +540,7 @@ footer a:hover{color:var(--teal-dark)}
     <div class="price-card">
       <div class="promo-badge" data-es="🚀 Precio de lanzamiento" data-en="🚀 Launch price">🚀 Precio de lanzamiento</div>
       <div class="price-name" data-es="Plan completo" data-en="Full plan">Plan completo</div>
-      <div class="price-amount"><span class="price-before">antes $599</span>$249-299 <span>MXN</span></div>
+      <div class="price-amount"><span class="price-before">antes $599</span>$249 <span>MXN</span></div>
       <div class="price-desc" data-es="Todo lo de RSVP + Fotos QR, más el cronograma, presupuesto y checklist de tu evento, creados junto contigo." data-en="Everything in RSVP + Photo QR, plus your event's timeline, budget, and checklist, created together with you.">Todo lo de RSVP + Fotos QR, más el cronograma, presupuesto y checklist de tu evento, creados junto contigo.</div>
       <ul class="price-features">
         <li><strong data-es="Cronograma, presupuesto e ideas creados junto contigo" data-en="Timeline, budget, and ideas created together with you">Cronograma, presupuesto e ideas creados junto contigo</strong></li>
@@ -626,7 +629,7 @@ footer a:hover{color:var(--teal-dark)}
   </div>
   <div class="faq-item" onclick="toggleFaq(this)">
     <div class="faq-q"><span data-es="¿Cuánto cuesta y qué pasa si solo quiero la invitación?" data-en="How much does it cost, and what if I only want the invitation?">¿Cuánto cuesta y qué pasa si solo quiero la invitación?</span><span class="faq-icon">+</span></div>
-    <div class="faq-a" data-es="Tu invitación con Save the Date es gratis, sin límite. Si quieres confirmar invitados en vivo y el QR de fotos, son $149-199 MXN (precio de lanzamiento). Si además quieres el cronograma, presupuesto y checklist completos, es $249-299 MXN. Todos son pagos únicos por evento — sin suscripciones sorpresa." data-en="Your invitation with Save the Date is free, no limit. If you want live guest confirmations and the photo QR, it's $149-199 MXN (launch price). If you also want the full timeline, budget, and checklist, it's $249-299 MXN. All are one-time payments per event — no surprise subscriptions.">Tu invitación con Save the Date es gratis, sin límite. Si quieres confirmar invitados en vivo y el QR de fotos, son $149-199 MXN (precio de lanzamiento). Si además quieres el cronograma, presupuesto y checklist completos, es $249-299 MXN. Todos son pagos únicos por evento — sin suscripciones sorpresa.</div>
+    <div class="faq-a" data-es="Tu invitación con Save the Date es 100% gratis, siempre. Si quieres confirmar invitados en vivo y el QR de fotos, son $149 MXN (precio de lanzamiento). Si además quieres el cronograma, presupuesto y checklist completos, es $249 MXN. Todos son pagos únicos por evento — sin suscripciones sorpresa." data-en="Your invitation with Save the Date is 100% free, always. If you want live guest confirmations and the photo QR, it's $149 MXN (launch price). If you also want the full timeline, budget, and checklist, it's $249 MXN. All are one-time payments per event — no surprise subscriptions.">Tu invitación con Save the Date es 100% gratis, siempre. Si quieres confirmar invitados en vivo y el QR de fotos, son $149 MXN (precio de lanzamiento). Si además quieres el cronograma, presupuesto y checklist completos, es $249 MXN. Todos son pagos únicos por evento — sin suscripciones sorpresa.</div>
   </div>
 </section>
 
@@ -727,9 +730,9 @@ if('serviceWorker' in navigator){
 //  NUEVO con el nuevo precio, sí tienes que reemplazar la URL aquí.
 // ══════════════════════════════
 const STRIPE_LINKS = {
-  // RSVP + Fotos QR — producto Stripe, metadata access_type=rsvp_qr, credits=1. $149-199 MXN.
+  // RSVP + Fotos QR — producto Stripe, metadata access_type=rsvp_qr, credits=1. $149 MXN.
   rsvp_qr:        'https://buy.stripe.com/7sY8wQdlA7mO9N61aPdEs0h',
-  // Plan completo — producto Stripe, metadata access_type=diy, credits=1. $249-299 MXN.
+  // Plan completo — producto Stripe, metadata access_type=diy, credits=1. $249 MXN.
   plan_completo:  'https://buy.stripe.com/dRm3cwbds0Yqgbu06LdEs0i',
   // Planner y DIY viejos: ocultos del pricing visible, pero el link sigue vivo
   // por si algún usuario ya lo tenía guardado o hay que reactivar el toggle.
