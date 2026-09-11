@@ -1065,7 +1065,7 @@ const ESQUINAS={
 // tenemos una ramita/dibujo mejor que el trazo SVG a mano. Se revisa
 // primero: si la familia no tiene entrada aquí, cae al SVG de ESQUINAS.
 const ESQUINAS_IMG={
-  boda:'assets/motivos/ramita-boda.png'
+  boda:'/assets/motivos/ramita-boda.png'
 };
 function renderMarco(inv){
   const fam=familiaEvento(inv && inv.event_type);
@@ -1087,7 +1087,7 @@ function renderMarco(inv){
 //  muestra nada, para no inventar un ícono que no encaje.
 // ══════════════════════════════════════════════════════════════
 const MOTIVOS={
-  boda:'assets/motivos/anillos-boda.png'
+  boda:'/assets/motivos/anillos-boda.png'
 };
 function renderMotivo(inv){
   const fam=familiaEvento(inv && inv.event_type);
@@ -1099,7 +1099,7 @@ function renderMotivo(inv){
 // filigrana sutil (opacidad baja) enmarcando la cabecera de la tarjeta.
 // Solo boda/aniversario por ahora.
 const MARCOS_DIAMANTE={
-  boda:'assets/motivos/marco-diamante.png'
+  boda:'/assets/motivos/marco-diamante.png'
 };
 function renderMarcoDiamante(inv){
   const fam=familiaEvento(inv && inv.event_type);
@@ -1110,12 +1110,12 @@ function renderMarcoDiamante(inv){
 // Motivo de la pantalla del sobre (antes de abrir): un sobre con flores
 // dibujado, arriba del nombre de los anfitriones. Solo boda/aniversario.
 const MOTIVOS_SOBRE={
-  boda:'assets/motivos/sobre-flores.png'
+  boda:'/assets/motivos/sobre-flores.png'
 };
 
 // Ícono de línea inline (reemplaza un emoji dentro de un título o botón)
 function iconoLinea(archivo){
-  const url=`assets/motivos/${archivo}`;
+  const url=`/assets/motivos/${archivo}`;
   return `<span class="icono-linea" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></span>`;
 }
 
@@ -1128,7 +1128,7 @@ const MOTIVOS_RSVP={
 function renderMotivoRsvp(inv){
   const fam=familiaEvento(inv && inv.event_type);
   const archivo=MOTIVOS_RSVP[fam]; if(!archivo) return '';
-  const url=`assets/motivos/${archivo}`;
+  const url=`/assets/motivos/${archivo}`;
   return `<div class="motivo" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></div>`;
 }
 
