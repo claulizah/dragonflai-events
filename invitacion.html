@@ -1052,6 +1052,19 @@ function iconoLinea(archivo){
   return `<span class="icono-linea" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></span>`;
 }
 
+// Motivo del modal de RSVP: dos copas brindando, arriba del título
+// "Confirma tu asistencia" — solo para boda/aniversario, como pequeño
+// gesto de celebración antes de pedir la confirmación.
+const MOTIVOS_RSVP={
+  boda:'copas.png'
+};
+function renderMotivoRsvp(inv){
+  const fam=familiaEvento(inv && inv.event_type);
+  const archivo=MOTIVOS_RSVP[fam]; if(!archivo) return '';
+  const url=`assets/motivos/${archivo}`;
+  return `<div class="motivo" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></div>`;
+}
+
 // ══════════════════════════════════════════════════════════════
 //  Velo de legibilidad
 //  Mide el brillo real de la foto en un canvas pequeño y decide si el
@@ -1231,11 +1244,13 @@ function montarSobre(inv){
   if(!sobreActivo(inv)) return;
   const t=T[lang];
   const ini=iniciales(inv.host_names)||'✦';
-  // El sobre es papel: base clara y tono a tono, con el color que la
-  // anfitriona YA eligió para su tarjeta (custom_color_hex) como acento y
-  // como color del sello -- no una paleta fija por tipo de evento. Así el
-  // sobre combina con lo que sea que haya elegido, sin excepciones.
-  const elegido = inv.custom_color_hex || inv.text_color || '#7C8A6B';
+  // El sobre es papel: base clara y tono a tono, con el color de ACENTO de
+  // la invitación (text_color) como color del sello -- no con el color de
+  // fondo de la tarjeta (custom_color_hex), que ahora es una versión muy
+  // aclarada de ese mismo acento (ver qiSubmit en dragonflai-v2.html) y se
+  // vería lavado si se usara aquí. Si la invitación es de antes de separar
+  // acento/fondo, cae a custom_color_hex como antes.
+  const elegido = inv.text_color || inv.custom_color_hex || '#7C8A6B';
   const fam=familiaEvento(inv.event_type);
   const estilo = inv.envelope_style==='moderno' ? 'moderno' : 'clasico';
 
@@ -1658,6 +1673,7 @@ function renderInvitation(inv){
      <div style="max-height:88vh;overflow-y:auto;width:100%;max-width:480px">
       <div class="rsvp-card" style="position:relative">
         <button type="button" onclick="closeRsvpModal()" style="position:absolute;top:14px;right:14px;background:var(--cream-2);border:none;border-radius:50%;width:30px;height:30px;font-size:14px;cursor:pointer">✕</button>
+        ${renderMotivoRsvp(inv)}
         <div class="rsvp-title">${t.rsvpTitle}</div>
         <form id="rsvp-form">
         ${restricted?`

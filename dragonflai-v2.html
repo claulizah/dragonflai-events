@@ -5802,6 +5802,111 @@ const VIBE_SUGGESTIONS={
 //  tipo de evento — SIN tocar el logo de la marca (ese usa hex fijo a
 //  propósito, para que la identidad de DragonflAI no cambie nunca).
 // ══════════════════════════════
+// ══════════════════════════════
+//  COLOR DE INVITACIÓN SEGÚN ESTILO (VIBE)
+//  El flujo rápido y gratis (qiSubmit) generaba SIEMPRE el color de marca
+//  del tipo de evento (theme.teal), sin importar el/los estilo(s) que la
+//  persona haya elegido en los chips de "Estilo (elige hasta 2)" — así que
+//  una boda "Minimalista Moderna" salía con el mismo turquesa saturado que
+//  una boda sin estilo elegido. Este mapeo conecta cada estilo con un color
+//  de tarjeta acorde (más sobrio para los estilos formales/minimalistas),
+//  alineado por posición con las listas de VIBE_SUGGESTIONS.
+//  El orden de cada arreglo DEBE coincidir con VIBE_SUGGESTIONS[tipo].es.
+// ══════════════════════════════
+const VIBE_COLOR_OVERRIDES={
+  'Boda/Wedding':[
+    '#B98B82', // Clásica Romántica — blush apagado
+    '#A9835F', // Vintage — sepia cálido
+    '#B5673A', // Boho Chic — terracota
+    '#5B8F86', // Playa — aqua desaturado
+    '#55534C'  // Minimalista Moderna — grafito cálido
+  ],
+  'Quinceañera':[
+    '#C79AAE', // Princesa clásica — rosa empolvado
+    '#B08D46', // Hollywood Glam — dorado apagado
+    '#A9835F', // Boho chic juvenil — terracota
+    '#6B6FA0'  // Fiesta Temática — se deja algo más vivo, es temática
+  ],
+  'Aniversario/Anniversary':[
+    '#A3495B', // Romántico clásico — vino apagado
+    '#8C7A6B', // Cena íntima gourmet — taupe cálido
+    '#7A6A55', // Retro pareja — sepia
+    '#5B7A8C'  // Viaje temático
+  ]
+};
+
+function vibeOverrideColor(eventType,vibes){
+  const overrides=VIBE_COLOR_OVERRIDES[eventType];
+  const suggestions=VIBE_SUGGESTIONS[eventType];
+  if(!overrides||!suggestions||!vibes||!vibes.length) return null;
+  // Se usa el primer estilo elegido (si marcó dos, el primero manda el
+  // color — igual que hoy el primero manda en el copy que redacta Belu).
+  for(const label of vibes){
+    let idx=suggestions.es.indexOf(label);
+    if(idx<0) idx=(suggestions.en||[]).indexOf(label);
+    if(idx>=0 && overrides[idx]) return overrides[idx];
+  }
+  return null;
+}
+
+// Mezcla un hex hacia blanco (t=0 → el color tal cual, t=1 → blanco puro).
+// Uso: derivar un fondo de tarjeta claro a partir de un acento saturado,
+// sin depender de las funciones de color de invitacion.html (viven en un
+// archivo distinto).
+function hexAclararQI(hex,t){
+  hex=String(hex||'').replace('#','');
+  if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+  const r=parseInt(hex.substring(0,2),16)||0, g=parseInt(hex.substring(2,4),16)||0, b=parseInt(hex.substring(4,6),16)||0;
+  const mix=c=>Math.round(c+(255-c)*t).toString(16).padStart(2,'0');
+  return '#'+mix(r)+mix(g)+mix(b);
+}
+
+// Mezcla un hex hacia negro (t=0 → el color tal cual, t=1 → negro puro).
+function hexOscurecerQI(hex,t){
+  hex=String(hex||'').replace('#','');
+  if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+  const r=parseInt(hex.substring(0,2),16)||0, g=parseInt(hex.substring(2,4),16)||0, b=parseInt(hex.substring(4,6),16)||0;
+  const mix=c=>Math.round(c*(1-t)).toString(16).padStart(2,'0');
+  return '#'+mix(r)+mix(g)+mix(b);
+}
+
+// Contraste WCAG entre dos hex (fórmula de luminancia relativa estándar).
+function contrasteQI(hexA,hexB){
+  const lum=hex=>{
+    hex=String(hex||'').replace('#','');
+    if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+    const chans=[0,2,4].map(i=>{
+      let c=(parseInt(hex.substring(i,i+2),16)||0)/255;
+      return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4);
+    });
+    return 0.2126*chans[0]+0.7152*chans[1]+0.0722*chans[2];
+  };
+  const l1=lum(hexA), l2=lum(hexB);
+  const hi=Math.max(l1,l2), lo=Math.min(l1,l2);
+  return (hi+0.05)/(lo+0.05);
+}
+
+// El acento del estilo/tipo de evento pinta el nombre de los anfitriones
+// -- el texto más grande de toda la tarjeta -- así que no basta con que
+// el FONDO sea claro; el acento también debe leerse bien sobre ese fondo.
+// Colores muy luminosos (turquesas, celestes, naranjas de marca) tienen
+// contraste bajo contra un fondo casi blanco aunque sean "saturados": se
+// ven desteñidos, no elegantes. Esto lo oscurece lo mínimo necesario
+// para llegar a un contraste WCAG AA (4.5:1) contra el fondo ya calculado,
+// conservando el tono. Si el acento ya tiene contraste de sobra, no lo
+// toca.
+function asegurarContrasteQI(acento,fondo,minimo){
+  minimo=minimo||4.5;
+  if(contrasteQI(acento,fondo)>=minimo) return acento;
+  let t=0.02;
+  while(t<=0.6){
+    const candidato=hexOscurecerQI(acento,t);
+    if(contrasteQI(candidato,fondo)>=minimo) return candidato;
+    t+=0.02;
+  }
+  return hexOscurecerQI(acento,0.6); // límite de seguridad, no debería llegar aquí
+}
+
 const EVENT_THEMES={
   'Boda/Wedding':{teal:'#2EC4B6',tealDark:'#1A9E92',violet:'#7B2FBE',violetDark:'#5A1F9A',gold:'#D4972A'},
   'Cumpleaños/Birthday':{teal:'#FF6F3C',tealDark:'#E0562A',violet:'#E91E8C',violetDark:'#B8165F',gold:'#FFC107'},
@@ -6295,6 +6400,19 @@ async function qiSubmit(){
     const message=document.getElementById('qi-message').value.trim();
     const mapUrl=address?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`:null;
 
+    // El color elegido (por estilo, o el de marca del tipo de evento si no
+    // hay estilo) se usa como ACENTO -- texto, marco, sello del sobre --
+    // vía text_color. La tarjeta en sí (custom_color_hex, que invitacion.html
+    // pinta como fondo sólido) usa una versión muy aclarada de ese mismo
+    // color: así el resultado se ve como el papel crema con detalles de
+    // color de las referencias, no como una tarjeta pintada entera de un
+    // tono saturado -- que es justo lo que se veía "muy fuerte".
+    const colorFondo=hexAclararQI(vibeOverrideColor(qiEventType,qiVibes)||theme.teal,0.9);
+    // El acento se oscurece lo mínimo necesario para que el nombre de los
+    // anfitriones (que se pinta con este color) se lea bien sobre el fondo
+    // ya aclarado -- ver asegurarContrasteQI arriba.
+    const colorAcento=asegurarContrasteQI(vibeOverrideColor(qiEventType,qiVibes)||theme.teal,colorFondo);
+
     const payload={
       user_id:currentUser.id,
       plan_id:null,
@@ -6309,7 +6427,8 @@ async function qiSubmit(){
       location:location,
       vibe:qiVibes.join(' · '),
       theme:'theme-custom-color',
-      custom_color_hex:theme.teal,
+      custom_color_hex:colorFondo,
+      text_color:colorAcento,
       background_image_url:qiCoverDataUrl||null,
       dress_code:dresscode||null,
       directions_info:address||null,
