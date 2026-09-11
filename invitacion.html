@@ -128,13 +128,13 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 @media(max-width:420px){ .marco svg{width:66px;height:66px} }
 /* Esquina de boda con ramita ilustrada (PNG + mask), en vez del trazo SVG
    a mano — mismas clases e1-e4 para heredar posición y espejeado. */
-.marco .ramita{position:absolute;width:88px;height:auto;aspect-ratio:155/89;opacity:.5;
+.marco .ramita{position:absolute;width:64px;height:auto;aspect-ratio:155/89;opacity:.4;
   background-color:var(--custom-text-color,var(--teal-dark));
   -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
   -webkit-mask-position:center;mask-position:center;
   -webkit-mask-size:contain;mask-size:contain}
-.card.velo-oscuro .marco .ramita{background-color:rgba(255,255,255,.85)}
-@media(max-width:420px){ .marco .ramita{width:58px} }
+.card.velo-oscuro .marco .ramita{background-color:rgba(255,255,255,.75)}
+@media(max-width:420px){ .marco .ramita{width:44px} }
 
 /* ══════════════════════════════════════════════════════════════
    MOTIVO DE CABECERA
@@ -1687,7 +1687,6 @@ function renderInvitation(inv){
     <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
       ${renderMarco(inv)}
       <div class="header-marco">
-        ${renderMarcoDiamante(inv)}
         ${renderMotivo(inv)}
         <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
         <div class="names">${esc(toTitleCase(inv.host_names))}</div>
