@@ -146,6 +146,25 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 @media(max-width:420px){ .motivo{width:30px;height:30px} }
 
 /* ══════════════════════════════════════════════════════════════
+   MARCO DIAMANTE
+   Un rombo de laurel fino que envuelve el bloque de encabezado
+   (motivo + eyebrow + nombres + divisor), detrás del texto. Solo
+   boda/aniversario -- ver MARCOS_DIAMANTE. Es decorativo y discreto
+   (opacidad baja); si el texto es muy largo y no cabe adentro, no pasa
+   nada -- sigue siendo legible, el rombo solo pierde algo de simetría
+   visual, nunca tapa el texto porque va detrás (z-index).
+   ══════════════════════════════════════════════════════════════ */
+.header-marco{position:relative;padding:8px 10px}
+.header-marco>*{position:relative;z-index:1}
+.marco-diamante{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(78%,240px);height:auto;aspect-ratio:268/420;opacity:.5;
+  background-color:var(--custom-text-color,var(--teal-dark));
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain;z-index:0;pointer-events:none}
+.card.velo-oscuro .marco-diamante{background-color:rgba(255,255,255,.7)}
+
+/* ══════════════════════════════════════════════════════════════
    ÍCONO DE LÍNEA INLINE
    Para reemplazar emojis (📸, 📷) por el mismo set de ilustraciones de
    línea, dentro de texto normal. currentColor: toma el color del texto
@@ -186,6 +205,16 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 #sobre.abierto .sobre-hint{opacity:0}
 .sobre-nombres{font-family:var(--title-font,'Cormorant Garamond',serif);font-size:clamp(22px,5.6vw,30px);
                color:var(--teal-dark);text-align:center;padding:0 1.4rem;line-height:1.25}
+
+/* Sobre con flores: ilustración de bienvenida arriba del nombre, en la
+   pantalla previa a abrir el sobre. Solo boda/aniversario -- ver
+   MOTIVOS_SOBRE. Mismo patrón de recoloreado (mask-image + color inline
+   con el acento) que el resto de los motivos. */
+.sobre-motivo{width:120px;height:auto;aspect-ratio:380/249;margin:0 auto;opacity:.85;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain}
+@media(max-width:420px){ .sobre-motivo{width:92px} }
 @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .sello{animation:latir 2.4s ease-in-out infinite;transform-origin:center}
 #sobre.abierto .sello{animation:none;opacity:0;transition:opacity .35s}
@@ -1046,6 +1075,24 @@ function renderMotivo(inv){
   return `<div class="motivo" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></div>`;
 }
 
+// Marco diamante: silueta fina detrás del eyebrow/nombres, a modo de
+// filigrana sutil (opacidad baja) enmarcando la cabecera de la tarjeta.
+// Solo boda/aniversario por ahora.
+const MARCOS_DIAMANTE={
+  boda:'assets/motivos/marco-diamante.png'
+};
+function renderMarcoDiamante(inv){
+  const fam=familiaEvento(inv && inv.event_type);
+  const url=MARCOS_DIAMANTE[fam]; if(!url) return '';
+  return `<div class="marco-diamante" style="-webkit-mask-image:url('${url}');mask-image:url('${url}')" aria-hidden="true"></div>`;
+}
+
+// Motivo de la pantalla del sobre (antes de abrir): un sobre con flores
+// dibujado, arriba del nombre de los anfitriones. Solo boda/aniversario.
+const MOTIVOS_SOBRE={
+  boda:'assets/motivos/sobre-flores.png'
+};
+
 // Ícono de línea inline (reemplaza un emoji dentro de un título o botón)
 function iconoLinea(archivo){
   const url=`assets/motivos/${archivo}`;
@@ -1274,7 +1321,9 @@ function montarSobre(inv){
   el.setAttribute('tabindex','0');
   el.setAttribute('aria-label', L3('Abrir la invitación','Open the invitation','Ouvrir l\u2019invitation'));
   const svgInner = estilo==='moderno' ? sobreSvgModerno(PAPEL, ini) : sobreSvgClasico(PAPEL, ini);
+  const motivoSobreUrl=MOTIVOS_SOBRE[fam];
   el.innerHTML=`
+    ${motivoSobreUrl?`<div class="sobre-motivo" style="background-color:${esc(acento)};-webkit-mask-image:url('${motivoSobreUrl}');mask-image:url('${motivoSobreUrl}')" aria-hidden="true"></div>`:''}
     <div class="sobre-nombres">${esc(toTitleCase(inv.host_names||''))}</div>
     <div class="sobre-wrap sobre-wrap--${estilo}">
       <svg class="sobre-svg" viewBox="0 0 340 232" xmlns="http://www.w3.org/2000/svg">
@@ -1617,10 +1666,13 @@ function renderInvitation(inv){
   document.getElementById('content').innerHTML=`
     <div class="card${inv.theme==='theme-custom-photo'?' theme-custom-photo':''}${inv.font_family?' '+esc(inv.font_family):''}" style="${cardStyleParts.join(';')}">
       ${renderMarco(inv)}
-      ${renderMotivo(inv)}
-      <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
-      <div class="names">${esc(toTitleCase(inv.host_names))}</div>
-      <div class="divider"></div>
+      <div class="header-marco">
+        ${renderMarcoDiamante(inv)}
+        ${renderMotivo(inv)}
+        <div class="eyebrow">— ${inv.event_type?esc(inv.event_type):t.invitedFallback} —</div>
+        <div class="names">${esc(toTitleCase(inv.host_names))}</div>
+        <div class="divider"></div>
+      </div>
       <div class="details">
         ${inv.event_date?`<div class="detail-item">📅 ${esc(inv.event_date)}</div>`:''}
         ${inv.location?`<div class="detail-item">📍 ${esc(inv.location)}</div>`:''}
