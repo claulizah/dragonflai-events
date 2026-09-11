@@ -126,6 +126,15 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(180deg,var(--page
 .marco .e4{bottom:12px;right:12px;transform:scale(-1,-1)}
 .card.velo-oscuro .marco svg{opacity:.55;color:rgba(255,255,255,.9)}
 @media(max-width:420px){ .marco svg{width:66px;height:66px} }
+/* Esquina de boda con ramita ilustrada (PNG + mask), en vez del trazo SVG
+   a mano — mismas clases e1-e4 para heredar posición y espejeado. */
+.marco .ramita{position:absolute;width:88px;height:auto;aspect-ratio:155/89;opacity:.5;
+  background-color:var(--custom-text-color,var(--teal-dark));
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-position:center;mask-position:center;
+  -webkit-mask-size:contain;mask-size:contain}
+.card.velo-oscuro .marco .ramita{background-color:rgba(255,255,255,.85)}
+@media(max-width:420px){ .marco .ramita{width:58px} }
 
 /* ══════════════════════════════════════════════════════════════
    MOTIVO DE CABECERA
@@ -1052,8 +1061,19 @@ const ESQUINAS={
       <circle cx="12" cy="12" r="2.6" fill="currentColor"/>`
 };
 
+// Esquinas ilustradas con PNG (mask-image), para familias donde ya
+// tenemos una ramita/dibujo mejor que el trazo SVG a mano. Se revisa
+// primero: si la familia no tiene entrada aquí, cae al SVG de ESQUINAS.
+const ESQUINAS_IMG={
+  boda:'assets/motivos/ramita-boda.png'
+};
 function renderMarco(inv){
   const fam=familiaEvento(inv && inv.event_type);
+  const imgUrl=ESQUINAS_IMG[fam];
+  if(imgUrl){
+    const div=c=>`<div class="ramita ${c}" style="-webkit-mask-image:url('${imgUrl}');mask-image:url('${imgUrl}')" aria-hidden="true"></div>`;
+    return `<div class="marco">${div('e1')}${div('e2')}${div('e3')}${div('e4')}</div>`;
+  }
   const d=ESQUINAS[fam]; if(!d) return '';
   const svg=c=>`<svg class="${c}" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">${d}</svg>`;
   return `<div class="marco">${svg('e1')}${svg('e2')}${svg('e3')}${svg('e4')}</div>`;
