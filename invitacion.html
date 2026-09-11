@@ -454,6 +454,7 @@ async function anonUpdateMyRsvp(params){
 
 let invitation=null;
 let isHost=false; // true si quien ve esta invitación tiene sesión iniciada y es su dueño
+let PREVIEW_MODE=false; // true si esta página se abrió como vista previa desde el editor (?preview=1): no hay fila real en la base, así que no se guarda nada (RSVP, fotos, etc.)
 
 // Identifica este dispositivo (no una cuenta) para saber qué fotos subió
 // — así el botón de borrar solo aparece en las tuyas, sin necesitar login.
@@ -1518,7 +1519,7 @@ function arrancarCuenta(){
 // ══════════════════════════════════════════════════════════════
 async function pintarConfirmaciones(inv){
   const cont=document.getElementById('rsvp-count');
-  if(!cont || !inv) return;
+  if(!cont || !inv || PREVIEW_MODE) return;
   try{
     const {data,error}=await sb.rpc('get_rsvp_public_count',{p_invitation_id:inv.id});
     if(error || !data) return;
@@ -2023,6 +2024,7 @@ function renderThanksScreen(didAttend){
 async function submitRSVP(e){
   e.preventDefault();
   const t=T[lang];
+  if(PREVIEW_MODE){ showToast(lang==='es'?'Esto es solo una vista previa — el RSVP no se guarda aquí':'This is just a preview — RSVPs aren\'t saved here'); return; }
   const btn=document.getElementById('btn-submit');
   const isGroup=groupMembers!==null;
 
@@ -2343,6 +2345,7 @@ async function uploadEventPhotos(event){
   event.target.value='';
   if(!files.length||!invitation) return;
   const t=T[lang];
+  if(PREVIEW_MODE){ showToast(lang==='es'?'Esto es solo una vista previa — las fotos no se guardan aquí':'This is just a preview — photos aren\'t saved here'); return; }
 
   let uploaded=0;
   for(const file of files){
@@ -2365,6 +2368,23 @@ async function uploadEventPhotos(event){
 }
 
 async function init(){
+  // ── Vista previa desde el editor (?preview=1): no hay slug real ni fila
+  // en la base — los datos vienen de sessionStorage, puestos ahí por
+  // dragonflai-v2.html justo antes de abrir esta pestaña. Así se puede ver
+  // el sobre y la tarjeta con los datos que se están editando, sin
+  // necesidad de guardar/publicar nada primero. ──
+  if(new URLSearchParams(location.search).get('preview')==='1'){
+    let row=null;
+    try{ row=JSON.parse(sessionStorage.getItem('dflai_preview_inv')||'null'); }catch(e){}
+    if(!row){ renderNotFound(); return; }
+    PREVIEW_MODE=true;
+    row.id=row.id||'preview';
+    row.slug=row.slug||'preview';
+    invitation=row;
+    renderInvitation(row);
+    return;
+  }
+
   if(!sb){ renderNotFound(); return; }
   const slug=getSlug();
   if(!slug){ renderNotFound(); return; }

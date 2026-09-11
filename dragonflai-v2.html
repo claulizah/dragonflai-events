@@ -1915,6 +1915,8 @@ footer .teal{color:var(--teal-dark);font-weight:600}
       </div>
       </details>
 
+      <button type="button" class="btn-excel-close" onclick="openRealPreview()" style="display:block;text-align:center;width:100%;margin-top:.75rem" data-es="👁️ Ver el sobre y la invitación real" data-en="👁️ See the real envelope & invitation">👁️ Ver el sobre y la invitación real</button>
+
       <div style="display:flex;gap:10px;margin-top:1rem">
         <button class="btn-excel-unlock" href="#" onclick="publishInvitation();return false" id="publish-btn" data-es="Publicar →" data-en="Publish →" style="display:block;text-align:center;text-decoration:none;margin-top:0;flex:2">Publicar →</button>
         <button class="btn-excel-close" onclick="closePublishModal()" style="flex:1" data-es="Cancelar" data-en="Cancel">Cancelar</button>
@@ -3519,6 +3521,77 @@ function getEditedDateTimeVibe(){
     hashtag:document.getElementById('pub-hashtag').value.trim(),
     vibe:document.getElementById('pub-vibe').value.trim()
   };
+}
+
+// ── Vista previa real (sobre + tarjeta) mientras se edita ──
+// El "publish-live-preview-container" de arriba es una recreación aparte,
+// aproximada, así que no enseña ni el sobre ni el diseño real (marcos,
+// motivos, fuentes). Esta función arma el mismo objeto que buildInvitationPayload()
+// / el modo edición guardarían, y lo manda por sessionStorage a invitacion.html
+// en modo ?preview=1 (ver ahí) para que abra la página REAL con esos datos,
+// sin necesidad de publicar ni guardar nada primero.
+function buildPreviewInvitationPayload(){
+  const p=plan||{}, e=p.extra||{};
+  const g=id=>document.getElementById(id);
+  const hostNames=(g('pub-host-names')?.value?.trim())||p.name||'';
+  const location=(g('pub-location')?.value?.trim())||p.location||'';
+  const edited=(typeof getEditedDateTimeVibe==='function')?getEditedDateTimeVibe():{};
+  const theme=pubBackgroundImageUrl?'theme-custom-photo':'theme-custom-color';
+  return {
+    id:'preview',
+    slug:(g('pub-slug')?.value?.trim())||'preview',
+    tier:'plan_completo', // para que en la vista previa se vean todas las secciones, sin importar lo que se haya pagado de verdad
+    is_published:true,
+    host_names:hostNames,
+    event_type:g('pub-event-type')?.value||p.typeName||'',
+    event_date:edited.dateDisplay||p.date||'',
+    event_date_raw:edited.rawDate||p.rawDate||null,
+    event_time:edited.timeDisplay||p.time||'',
+    location,
+    dress_code:g('pub-dresscode')?.value?.trim()||e.dresscode||'',
+    organizer_name:g('pub-organizer-name')?.value?.trim()||null,
+    organizer_phone:g('pub-organizer-phone')?.value?.trim()||null,
+    hashtag:edited.hashtag||e.hashtag||'',
+    message:g('pub-message')?.value?.trim()||null,
+    vibe:edited.vibe||p.vibe||'',
+    theme,
+    ask_guest_count:!!g('pub-ask-guests')?.checked,
+    ask_dietary:!!g('pub-ask-dietary')?.checked,
+    ask_message:!!g('pub-ask-message')?.checked,
+    ask_song_request:!!g('pub-ask-song')?.checked,
+    ask_lodging_need:!!g('pub-ask-lodging')?.checked,
+    directions_info:g('pub-directions')?.value?.trim()||null,
+    custom_question:g('pub-custom-question')?.value?.trim()||null,
+    restrict_to_guest_list:false,
+    events_schedule:parseEventsSchedule(g('pub-events')?.value||''),
+    lodging_info:g('pub-lodging')?.value?.trim()||null,
+    map_url:g('pub-map-url')?.value?.trim()||null,
+    registry_links:parseRegistryLinks(g('pub-registry')?.value||''),
+    couple_story:g('pub-story')?.value?.trim()||null,
+    faq:parseFAQ(g('pub-faq')?.value||''),
+    gallery_urls:pubGalleryUrls||[],
+    background_image_url:pubBackgroundImageUrl,
+    custom_color_hex:pubBackgroundImageUrl?null:pubBgColor,
+    font_family:pubFontClass||null,
+    title_font_family:pubTitleFontClass||null,
+    envelope_style:pubEnvelopeStyle||'clasico',
+    text_color:pubTextColor
+  };
+}
+
+function openRealPreview(){
+  const L=lang==='es';
+  let inv;
+  try{
+    inv=buildPreviewInvitationPayload();
+    sessionStorage.setItem('dflai_preview_inv', JSON.stringify(inv));
+  }catch(err){
+    console.error('openRealPreview error:',err);
+    showToast(L?'No se pudo generar la vista previa':'Could not generate the preview',true);
+    return;
+  }
+  const w=window.open('/i/vista-previa?preview=1','_blank');
+  if(!w) location.href='/i/vista-previa?preview=1';
 }
 
 async function publishInvitation(){
